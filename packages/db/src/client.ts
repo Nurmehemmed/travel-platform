@@ -10,14 +10,9 @@ import * as schema from "./schema";
  * connection exhaustion in stateless Lambda-style deployments.
  */
 
-const connectionString = process.env["DATABASE_URL"];
-
-if (!connectionString) {
-  throw new Error(
-    "[packages/db] DATABASE_URL environment variable is not set. " +
-      "Copy .env.example → .env and configure your Postgres connection string."
-  );
-}
+const connectionString =
+  process.env["DATABASE_URL"] ||
+  "postgresql://postgres:postgres@localhost:5432/travel_db";
 
 // `max: 1` is safe for serverless. Increase to ~10 for long-lived server processes.
 const queryClient = postgres(connectionString, { max: 1 });
