@@ -293,9 +293,11 @@ export default function HomePage() {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   // Auto-advance hero background slider every 6 seconds
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
     }, 6000);
@@ -695,28 +697,31 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════════════ HERO SLIDER */}
       <section className="relative h-[88vh] min-h-[560px] overflow-hidden group">
         {/* Background Images with smooth Cross-Fade Transition */}
-        {HERO_SLIDES.map((slide, index) => (
-          <div
-            key={slide.title}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentSlide ? "opacity-100 z-0" : "opacity-0 pointer-events-none -z-10"
-            }`}
-          >
-            <Image
-              src={slide.image}
-              alt={slide.alt}
-              fill
-              sizes="100vw"
-              style={{ objectFit: "cover" }}
-              className={`object-cover object-center transition-transform duration-10000 ease-out ${
-                index === currentSlide ? "scale-105" : "scale-100"
+        {HERO_SLIDES.map((slide, index) => {
+          if (index !== 0 && !mounted) return null;
+          return (
+            <div
+              key={slide.title}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentSlide ? "opacity-100 z-0" : "opacity-0 pointer-events-none -z-10"
               }`}
-              priority={index === 0}
-            />
-            {/* Dark gradient overlays for premium contrast */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
-          </div>
-        ))}
+            >
+              <Image
+                src={slide.image}
+                alt={slide.alt}
+                fill
+                sizes="100vw"
+                style={{ objectFit: "cover" }}
+                className={`object-cover object-center transition-transform duration-10000 ease-out ${
+                  index === currentSlide ? "scale-105" : "scale-100"
+                }`}
+                priority={index === 0}
+              />
+              {/* Dark gradient overlays for premium contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
+            </div>
+          );
+        })}
 
         {/* Content Container with key-based re-animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10 pointer-events-none">
@@ -944,7 +949,7 @@ export default function HomePage() {
                       src={tour.image || "/images/baku-old-city.jpg"}
                       alt={tour.title}
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"
+                      sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 420px"
                       style={{ objectFit: "cover" }}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
