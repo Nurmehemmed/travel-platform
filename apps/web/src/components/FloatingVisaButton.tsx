@@ -24,7 +24,7 @@ export default function FloatingVisaButton() {
         href="/visa"
         className="group relative flex items-center gap-2 rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-2xl transition-all duration-300 hover:scale-105"
         style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
-        aria-label="Apply for Azerbaijan e-Visa — Fast processing in 3 hours"
+        aria-label="Azerbaijan e-Visa — Apply online in 3 hours"
       >
         {/* Continuous pulse ring */}
         <span

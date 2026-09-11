@@ -784,20 +784,24 @@ export default function HomePage() {
         </button>
 
         {/* Interactive Slide dots */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-20 bg-black/30 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15 shadow-lg">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1 z-20 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 shadow-lg">
           {HERO_SLIDES.map((_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setCurrentSlide(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className="rounded-full transition-all duration-500 cursor-pointer"
-              style={{
-                width: i === currentSlide ? "2.25rem" : "0.5rem",
-                height: "0.5rem",
-                backgroundColor: i === currentSlide ? "#c9a227" : "rgba(255,255,255,0.45)",
-              }}
-            />
+              className="flex items-center justify-center p-2.5 cursor-pointer rounded-full"
+            >
+              <span
+                className="block rounded-full transition-all duration-500"
+                style={{
+                  width: i === currentSlide ? "2.25rem" : "0.5rem",
+                  height: "0.5rem",
+                  backgroundColor: i === currentSlide ? "#c9a227" : "rgba(255,255,255,0.45)",
+                }}
+              />
+            </button>
           ))}
         </div>
       </section>
@@ -832,6 +836,7 @@ export default function HomePage() {
               <input
                 type="text"
                 placeholder="Search tours, destinations..."
+                aria-label="Search tours and destinations"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
@@ -841,6 +846,7 @@ export default function HomePage() {
               <select
                 value={activeDuration}
                 onChange={(e) => setActiveDuration(e.target.value)}
+                aria-label="Filter tours by duration"
                 className="flex-1 bg-transparent text-sm text-slate-700 outline-none cursor-pointer"
               >
                 {DURATIONS.map((d) => (
@@ -1002,7 +1008,7 @@ export default function HomePage() {
                       <span className="text-xs font-semibold" style={{ color: "#c9a227" }}>
                         {tour.rating}
                       </span>
-                      <span className="text-xs text-slate-400">({tour.reviews})</span>
+                      <span className="text-xs text-slate-500">({tour.reviews})</span>
                     </div>
 
                     <h3 className="font-display text-lg font-bold text-slate-900 leading-snug mb-2">
@@ -1026,14 +1032,14 @@ export default function HomePage() {
                     <div className="flex items-center justify-between">
                       <div>
                         {tour.originalPrice && (
-                          <span className="text-xs text-slate-400 line-through">
+                          <span className="text-xs text-slate-500 line-through">
                             From ${tour.originalPrice}
                           </span>
                         )}
                         <p className="text-lg font-bold text-slate-900">
                           <span className="text-sm font-normal text-slate-500">From </span>
                           <span style={{ color: "#133e35" }}>${tour.price}</span>
-                          <span className="text-xs font-normal text-slate-400"> / person</span>
+                          <span className="text-xs font-normal text-slate-500"> / person</span>
                         </p>
                       </div>
                       <button
@@ -1206,7 +1212,7 @@ export default function HomePage() {
         <div className="container-section">
           {/* Header */}
           <div className="text-center mb-12">
-            <p className="section-label mb-2" style={{ color: "#c9a227" }}>
+            <p className="section-label mb-2" style={{ color: "#8e6d12" }}>
               What Travelers Say
             </p>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-3">
@@ -1224,7 +1230,7 @@ export default function HomePage() {
                 ))}
               </div>
               <span className="font-semibold text-slate-800">4.9 / 5</span>
-              <span className="text-slate-400">&middot;</span>
+              <span className="text-slate-500">&middot;</span>
               <span>TripAdvisor</span>
             </div>
           </div>
@@ -1265,9 +1271,9 @@ export default function HomePage() {
                       {t.initials}
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900 leading-tight">
+                      <h3 className="text-sm font-bold text-slate-900 leading-tight">
                         {t.name}
-                      </h4>
+                      </h3>
                       <p className="text-xs text-slate-500 mt-0.5 leading-tight">
                         {t.subtitle}
                       </p>
@@ -1295,7 +1301,7 @@ export default function HomePage() {
       <section id="faq" className="py-24" style={{ backgroundColor: "#faf6f0" }}>
         <div className="container-section max-w-4xl">
           <div className="text-center mb-14">
-            <p className="section-label mb-3" style={{ color: "#c9a227" }}>
+            <p className="section-label mb-3" style={{ color: "#8e6d12" }}>
               Common Questions
             </p>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4" style={{ color: "#133e35" }}>
@@ -1360,7 +1366,7 @@ export default function HomePage() {
             style={{ backgroundColor: "#f0e7d8", border: "1px dashed #c9a227" }}
           >
             <div className="text-left">
-              <h4 className="font-bold text-slate-900 text-base">Have a question not answered here?</h4>
+              <h3 className="font-bold text-slate-900 text-base">Have a question not answered here?</h3>
               <p className="text-xs md:text-sm text-slate-600 mt-0.5">
                 Our local Baku concierge team is available 24/7 on WhatsApp.
               </p>
