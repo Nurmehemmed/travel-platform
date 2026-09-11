@@ -14,8 +14,23 @@ const connectionString =
   process.env["DATABASE_URL"] ||
   "postgresql://postgres:postgres@localhost:5432/travel_db";
 
-// `max: 1` is safe for serverless. Increase to ~10 for long-lived server processes.
-const queryClient = postgres(connectionString, { max: 1 });
+// Singleton pattern with globalThis prevents connection exhaustion during Next.js dev HMR
+const globalForDb = globalThis as unknown as {
+  conn?: postgres.Sql;
+};
+
+// `max: 1` is safe for serverless Lambdas.
+const queryClient =
+  globalForDb.conn ??
+  postgres(connectionString, {
+    max: 1,
+    idle_timeout: 20,
+    connect_timeout: 10,
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForDb.conn = queryClient;
+}
 
 export const db = drizzle(queryClient, { schema });
 export type Database = typeof db;

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { db, packages, destinations } from "@travel/db";
 import { eq, desc } from "drizzle-orm";
 
+// Edge CDN caching: revalidate every 60 seconds, serve stale while revalidating up to 5 minutes
+export const revalidate = 60;
+
 export async function GET() {
   try {
     const list = await db
@@ -76,7 +79,14 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ tours: formatted });
+    return NextResponse.json(
+      { tours: formatted },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("[tours public get error]:", error);
     return NextResponse.json(

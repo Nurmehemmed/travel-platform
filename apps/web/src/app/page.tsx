@@ -708,6 +708,7 @@ export default function HomePage() {
               src={slide.image}
               alt={slide.alt}
               fill
+              sizes="100vw"
               className={`object-cover object-center transition-transform duration-10000 ease-out ${
                 index === currentSlide ? "scale-105" : "scale-100"
               }`}
@@ -938,7 +939,7 @@ export default function HomePage() {
                       src={tour.image || "/images/baku-old-city.jpg"}
                       alt={tour.title}
                       fill
-                      unoptimized
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     {/* Badge */}
@@ -1123,6 +1124,7 @@ export default function HomePage() {
                   src="https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=600&q=80"
                   alt="Baku skyline"
                   fill
+                  sizes="(max-width: 768px) 75vw, 450px"
                   className="object-cover"
                 />
               </div>
@@ -1132,6 +1134,7 @@ export default function HomePage() {
                   src="/images/baku-old-city.jpg"
                   alt="Old City Baku"
                   fill
+                  sizes="(max-width: 768px) 55vw, 320px"
                   className="object-cover"
                 />
               </div>
@@ -1141,6 +1144,7 @@ export default function HomePage() {
                   src="https://images.unsplash.com/photo-1548013146-72479768bada?w=300&q=80"
                   alt="Azerbaijan landscape"
                   fill
+                  sizes="(max-width: 768px) 35vw, 200px"
                   className="object-cover"
                 />
               </div>
@@ -1177,6 +1181,7 @@ export default function HomePage() {
                   src={dest.image}
                   alt={dest.name}
                   fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

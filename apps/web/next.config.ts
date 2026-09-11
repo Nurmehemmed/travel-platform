@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
   // Strict mode catches subtle React bugs early
   reactStrictMode: true,
 
+  // Optimize package imports for tree-shaking and faster compilation
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
+
   // Compress responses for faster TTFB
   compress: true,
 

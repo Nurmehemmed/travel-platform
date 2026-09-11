@@ -1,21 +1,6 @@
 import type { Metadata } from "next";
-import { Fraunces, Outfit } from "next/font/google";
 import "@travel/ui/styles";
 import FloatingVisaButton from "@/components/FloatingVisaButton";
-
-// ─── Google Fonts ─────────────────────────────────────────────────────────────
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
-});
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -248,7 +233,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${outfit.variable} font-body`}
+      className="font-body"
       suppressHydrationWarning
     >
       <head>
