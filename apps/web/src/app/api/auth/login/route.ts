@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
-import { db, users } from "@travel/db";
+import { db, users, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { signSessionToken, setSessionCookie } from "@/lib/auth";
-
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
   try {
-    const ip = getClientIp(request);
     const rl = checkRateLimit(`login_${ip}`, { limit: 15, windowMs: 5 * 60 * 1000 });
     if (!rl.success) {
+      logger.warn("Login rate limit exceeded", { ip });
       return NextResponse.json(
         { error: "Too many login attempts. Please wait 5 minutes before trying again." },
         { status: 429 }
@@ -43,6 +44,16 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (!user || !user.passwordHash) {
+      logger.warn("Login attempt for non-existent user", { email: trimmedEmail, ip });
+      await recordAuditLog({
+        action: "auth.login_failed",
+        entityType: "user",
+        entityId: trimmedEmail,
+        actorType: "system",
+        actorEmail: trimmedEmail,
+        ipAddress: ip,
+        metadata: { reason: "User not found" },
+      });
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
@@ -52,6 +63,16 @@ export async function POST(request: Request) {
     // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
+      logger.warn("Login failed: invalid password", { email: trimmedEmail, userId: user.id, ip });
+      await recordAuditLog({
+        action: "auth.login_failed",
+        entityType: "user",
+        entityId: user.id,
+        actorType: user.role === "admin" ? "admin" : "customer",
+        actorEmail: user.email || trimmedEmail,
+        ipAddress: ip,
+        metadata: { reason: "Invalid password" },
+      });
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
@@ -67,6 +88,23 @@ export async function POST(request: Request) {
     });
     await setSessionCookie(token);
 
+    // Audit log successful login
+    await recordAuditLog({
+      action: "auth.login_success",
+      entityType: "user",
+      entityId: user.id,
+      actorType: user.role === "admin" ? "admin" : "customer",
+      actorEmail: user.email || trimmedEmail,
+      ipAddress: ip,
+      metadata: { role: user.role },
+    });
+
+    logger.info("User logged in successfully", {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
     return NextResponse.json({
       success: true,
       user: {
@@ -77,7 +115,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error: any) {
-    console.error("[login API error]:", error);
+    logger.error("Login API error:", error, { ip });
     return NextResponse.json(
       { error: error?.message || "Internal server error during login" },
       { status: 500 }

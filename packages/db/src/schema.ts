@@ -27,6 +27,7 @@ import {
   date,
   index,
   integer,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -552,6 +553,30 @@ export const visaApplicationsRelations = relations(visaApplications, ({ one }) =
 }));
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 12. Audit Logs (Enterprise security, state changes, staff actions)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const auditLogs = pgTable(
+  "audit_logs",
+  {
+    id:          uuid("id").defaultRandom().primaryKey(),
+    entityType:  varchar("entity_type", { length: 50 }).notNull(), // 'visa', 'booking', 'payment', 'auth', 'user'
+    entityId:    varchar("entity_id", { length: 100 }).notNull(),  // e.g. applicationNumber 'AZV-798227'
+    action:      varchar("action", { length: 50 }).notNull(),     // 'created', 'status_changed', 'payment_success', etc.
+    actorEmail:  varchar("actor_email", { length: 255 }),
+    actorRole:   varchar("actor_role", { length: 50 }).notNull().default("system"), // 'admin', 'customer', 'system'
+    metadata:    jsonb("metadata"),
+    createdAt:   timestamp("created_at", { withTimezone: true }).notNull().default(sql`now()`),
+  },
+  (t) => [
+    index("audit_logs_entity_idx").on(t.entityType, t.entityId),
+    index("audit_logs_action_idx").on(t.action),
+    index("audit_logs_created_at_idx").on(t.createdAt),
+    index("audit_logs_actor_idx").on(t.actorEmail),
+  ]
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Type exports — infer insert/select types from schema for use in app code
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -582,3 +607,6 @@ export type NewReview          = typeof reviews.$inferInsert;
 
 export type VisaApplication    = typeof visaApplications.$inferSelect;
 export type NewVisaApplication = typeof visaApplications.$inferInsert;
+
+export type AuditLog           = typeof auditLogs.$inferSelect;
+export type NewAuditLog        = typeof auditLogs.$inferInsert;

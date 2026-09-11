@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { db, visaApplications } from "@travel/db";
+import { db, visaApplications, recordAuditLog } from "@travel/db";
 import { sendTelegramVisaAlert } from "@/lib/telegram";
 import { validatePassportValidity } from "@/lib/visa-countries";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: Request) {
   try {
@@ -160,6 +161,29 @@ export async function POST(req: Request) {
       })
       .returning();
 
+    // Record audit event
+    await recordAuditLog({
+      entityType: "visa",
+      entityId: applicationNumber,
+      action: "submitted",
+      actorEmail: email,
+      actorRole: "customer",
+      metadata: {
+        visaType: isUrgent ? "urgent" : "standard",
+        totalAmount,
+        nationality,
+        arrivalDate,
+        payriffOrderId: payriffOrder.orderId,
+      },
+    });
+
+    logger.info(`Visa application submitted: ${applicationNumber}`, {
+      applicationNumber,
+      visaType: isUrgent ? "urgent" : "standard",
+      totalAmount,
+      nationality,
+    });
+
     return NextResponse.json({
       success: true,
       applicationNumber,
@@ -169,7 +193,7 @@ export async function POST(req: Request) {
       message: "Application initiated. Redirecting to payment...",
     });
   } catch (error: any) {
-    console.error("[visa apply error]:", error);
+    logger.error("Visa apply submission error", error);
     return NextResponse.json(
       { error: error?.message || "Failed to submit visa application. Please try again." },
       { status: 500 }

@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
-import { db, visaApplications } from "@travel/db";
+import { db, visaApplications, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
 import { sendTelegramVisaAlert } from "@/lib/telegram";
 import { verifyPayriffOrder } from "@/lib/payriff";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req);
   try {
     // 1. Rate Limit Check (max 10 requests per minute per IP)
-    const ip = getClientIp(req);
     const rl = checkRateLimit(`payment_confirm_${ip}`, { limit: 10, windowMs: 60 * 1000 });
     if (!rl.success) {
+      logger.warn("Payment confirmation rate limit hit", { ip });
       return NextResponse.json(
         { error: "Too many payment confirmation requests. Please wait a moment." },
         { status: 429 }
@@ -23,8 +25,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing application number" }, { status: 400 });
     }
 
+    logger.info("Processing payment confirmation", {
+      applicationNumber,
+      orderId,
+      simulated: !!simulated,
+      ip,
+    });
+
     // 2. Strict Production Guard: NEVER allow simulated payments in production
     if (process.env.NODE_ENV === "production" && simulated) {
+      logger.warn("Attempted simulated payment in production", { applicationNumber, ip });
       return NextResponse.json(
         { error: "Unauthorized: Sandbox payment simulation is strictly prohibited in production mode." },
         { status: 403 }
@@ -35,6 +45,7 @@ export async function POST(req: Request) {
     if (!simulated && orderId) {
       const check = await verifyPayriffOrder(orderId);
       if (!check.isPaid) {
+        logger.warn("Payriff order settlement verification failed", { orderId, applicationNumber });
         return NextResponse.json(
           { error: "Payment verification failed. Payriff reports order is not settled." },
           { status: 400 }
@@ -48,6 +59,7 @@ export async function POST(req: Request) {
     });
 
     if (!app) {
+      logger.warn("Payment confirmation: Application not found", { applicationNumber });
       return NextResponse.json({ error: "Application not found" }, { status: 404 });
     }
 
@@ -62,6 +74,29 @@ export async function POST(req: Request) {
       })
       .where(eq(visaApplications.applicationNumber, applicationNumber));
 
+    // Record audit trail
+    await recordAuditLog({
+      action: "payment.confirmed",
+      entityType: "payment",
+      entityId: applicationNumber,
+      actorType: "customer",
+      actorEmail: app.email,
+      ipAddress: ip,
+      metadata: {
+        orderId: orderId || null,
+        amount: app.totalAmount,
+        simulated: !!simulated,
+        previousPaymentStatus: app.paymentStatus,
+        newPaymentStatus: "paid",
+      },
+    });
+
+    logger.info("Payment confirmed successfully", {
+      applicationNumber,
+      orderId,
+      totalAmount: app.totalAmount,
+    });
+
     // Send Telegram alert with payment confirmation
     sendTelegramVisaAlert({
       applicationNumber: app.applicationNumber,
@@ -73,7 +108,7 @@ export async function POST(req: Request) {
       totalAmount: app.totalAmount,
       email: app.email,
       phoneNumber: app.phoneNumber,
-    }).catch((err) => console.error("Telegram alert error:", err));
+    }).catch((err) => logger.error("Telegram alert error:", err));
 
     return NextResponse.json({
       success: true,
@@ -81,7 +116,7 @@ export async function POST(req: Request) {
       redirectUrl: `/visa/track?ref=${encodeURIComponent(applicationNumber)}&email=${encodeURIComponent(app.email)}&paid=true`,
     });
   } catch (error: any) {
-    console.error("Payriff Confirmation Error:", error);
+    logger.error("Payriff Confirmation Error:", error, { ip });
     return NextResponse.json({ error: error.message || "Payment confirmation failed" }, { status: 500 });
   }
 }

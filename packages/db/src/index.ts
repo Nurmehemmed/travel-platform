@@ -13,3 +13,7 @@ export type { Database } from "./client";
 
 // Full schema — tables, relations, enums, and inferred types
 export * from "./schema";
+
+// Audit logging
+export { recordAuditLog } from "./audit";
+export type { CreateAuditLogParams } from "./audit";

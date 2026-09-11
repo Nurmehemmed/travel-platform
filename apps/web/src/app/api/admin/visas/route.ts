@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
-import { db, visaApplications } from "@travel/db";
+import { db, visaApplications, recordAuditLog } from "@travel/db";
 import { desc, eq } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth";
+import { logger } from "@/lib/logger";
+
+const log = logger.withContext({ route: "/api/admin/visas" });
 
 export async function GET() {
   try {
     const admin = await requireAdmin();
     if (!admin) {
+      log.warn("Unauthorized attempt to fetch admin visas");
       return NextResponse.json({ error: "Unauthorized: Admin privileges required" }, { status: 401 });
     }
 
@@ -17,7 +21,7 @@ export async function GET() {
 
     return NextResponse.json({ visas: list });
   } catch (error: any) {
-    console.error("[admin visas get error]:", error);
+    log.error("Failed to fetch visa applications", error);
     return NextResponse.json(
       { error: "Failed to fetch visa applications" },
       { status: 500 }
@@ -29,6 +33,7 @@ export async function PATCH(req: Request) {
   try {
     const admin = await requireAdmin();
     if (!admin) {
+      log.warn("Unauthorized attempt to update admin visas");
       return NextResponse.json({ error: "Unauthorized: Admin privileges required" }, { status: 401 });
     }
 
@@ -54,9 +59,31 @@ export async function PATCH(req: Request) {
       .where(eq(visaApplications.id, id))
       .returning();
 
+    if (updated) {
+      await recordAuditLog({
+        entityType: "visa",
+        entityId: updated.applicationNumber,
+        action: status ? `status_${status}` : "details_updated",
+        actorEmail: admin.email,
+        actorRole: "admin",
+        metadata: {
+          newStatus: status,
+          asanApplicationId,
+          hasPdf: !!evisaPdfUrl,
+          adminNotes,
+        },
+      });
+
+      log.info(`Visa application updated by admin: ${updated.applicationNumber}`, {
+        applicationNumber: updated.applicationNumber,
+        adminEmail: admin.email,
+        status: updated.status,
+      });
+    }
+
     return NextResponse.json({ success: true, application: updated });
   } catch (error: any) {
-    console.error("[admin visas patch error]:", error);
+    log.error("Admin visa update error", error);
     return NextResponse.json(
       { error: error?.message || "Failed to update visa application" },
       { status: 500 }
