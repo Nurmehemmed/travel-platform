@@ -256,6 +256,10 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        />
         <link rel="alternate" hrefLang="en" href={APP_URL} />
         <link rel="alternate" hrefLang="x-default" href={APP_URL} />
         <script
