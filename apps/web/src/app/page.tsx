@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  MapPin, Search, Clock, Users, Star, ChevronDown,
+  MapPin, Search, Clock, Users, Star, ChevronDown, ChevronLeft, ChevronRight,
   Zap, Shield, MessageCircle, Award, ArrowRight, Globe,
   Eye, EyeOff, X, Menu, LogOut, User as UserIcon, Loader2, AlertCircle, Bookmark, Heart, FileText
 } from "lucide-react";
@@ -17,6 +17,36 @@ import {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const TOUR_FILTERS = ["All", "City", "Day Trip", "Overnight", "Adventure"] as const;
+
+const HERO_SLIDES = [
+  {
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=85",
+    alt: "Great Caucasus Mountains in Azerbaijan",
+    badge: "TripAdvisor Travelers' Choice · Baku, Azerbaijan",
+    title: "Into the Great Caucasus",
+    subtitle: "Highland villages, Silk Road caravansaries, and mountain air — Azerbaijan beyond the city.",
+    primaryCta: { text: "Explore Our Tours", href: "#tours" },
+    secondaryCta: { text: "About AddmeTour", href: "#about" },
+  },
+  {
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85",
+    alt: "Baku City and Caspian Sea Boulevard",
+    badge: "UNESCO Heritage & Modern Marvels",
+    title: "Enchanting Baku & Caspian Shores",
+    subtitle: "Cobblestone alleys of ancient Icherisheher, dazzling Flame Towers, and seaside boulevard sunsets.",
+    primaryCta: { text: "Discover Baku Tours", href: "#tours" },
+    secondaryCta: { text: "Apply for e-Visa", href: "/visa" },
+  },
+  {
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1600&q=85",
+    alt: "Gobustan and Land of Sacred Fire Azerbaijan",
+    badge: "Mystical Land of Fire · Ancient Wonders",
+    title: "Gobustan & The Land of Sacred Fire",
+    subtitle: "Active bubbling mud volcanoes, 40,000-year-old prehistoric rock art, and eternal burning flames.",
+    primaryCta: { text: "Book Day Trips", href: "#tours" },
+    secondaryCta: { text: "Fast e-Visa 3h", href: "/visa" },
+  },
+];
 
 const TOURS = [
   {
@@ -262,6 +292,15 @@ export default function HomePage() {
   const [socialNotice, setSocialNotice] = useState<string | null>(null);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto-advance hero background slider every 6 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Check existing session on mount & load saved tours
   useEffect(() => {
@@ -401,6 +440,8 @@ export default function HomePage() {
 
     return matchesCategory && matchesSearch && matchesDuration;
   });
+
+  const activeHeroSlide = HERO_SLIDES[currentSlide] ?? HERO_SLIDES[0]!;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5ede0" }}>
@@ -653,72 +694,107 @@ export default function HomePage() {
         )}
       </header>
 
-      {/* ═══════════════════════════════════════════════════════ HERO */}
-      <section className="relative h-[88vh] min-h-[560px] overflow-hidden">
-        <Image
-          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=85"
-          alt="Great Caucasus Mountains in Azerbaijan"
-          fill
-          className="object-cover object-center"
-          priority
-        />
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
+      {/* ═══════════════════════════════════════════════════════ HERO SLIDER */}
+      <section className="relative h-[88vh] min-h-[560px] overflow-hidden group">
+        {/* Background Images with smooth Cross-Fade Transition */}
+        {HERO_SLIDES.map((slide, index) => (
+          <div
+            key={slide.title}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? "opacity-100 z-0" : "opacity-0 pointer-events-none -z-10"
+            }`}
+          >
+            <Image
+              src={slide.image}
+              alt={slide.alt}
+              fill
+              className={`object-cover object-center transition-transform duration-10000 ease-out ${
+                index === currentSlide ? "scale-105" : "scale-100"
+              }`}
+              priority={index === 0}
+            />
+            {/* Dark gradient overlays for premium contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
+          </div>
+        ))}
 
-        {/* Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <div className="animate-fade-in">
+        {/* Content Container with key-based re-animation */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10 pointer-events-none">
+          <div key={`badge-${currentSlide}`} className="animate-fade-in pointer-events-auto">
             <span
-              className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-6 backdrop-blur-sm"
-              style={{ borderColor: "#c9a227", color: "#c9a227", backgroundColor: "rgba(201,162,39,0.18)" }}
+              className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm"
+              style={{ borderColor: "#c9a227", color: "#c9a227", backgroundColor: "rgba(201,162,39,0.22)" }}
             >
-              TripAdvisor Travelers&apos; Choice &middot; Baku, Azerbaijan
+              {activeHeroSlide.badge}
             </span>
           </div>
+
           <h1
-            className="animate-slide-up font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-tight max-w-4xl"
-            style={{ animationDelay: "0.1s" }}
+            key={`title-${currentSlide}`}
+            className="animate-slide-up font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-tight max-w-4xl pointer-events-auto drop-shadow-lg"
           >
-            Into the Great Caucasus
+            {activeHeroSlide.title}
           </h1>
+
           <p
-            className="animate-slide-up mt-6 max-w-xl text-lg text-white/80"
-            style={{ animationDelay: "0.2s" }}
+            key={`desc-${currentSlide}`}
+            className="animate-slide-up mt-6 max-w-xl text-base sm:text-lg text-white/90 pointer-events-auto leading-relaxed drop-shadow"
           >
-            Highland villages, Silk Road caravansaries, and mountain air &mdash;<br />
-            Azerbaijan beyond the city.
+            {activeHeroSlide.subtitle}
           </p>
+
           <div
-            className="animate-slide-up mt-10 flex flex-col sm:flex-row items-center gap-4"
-            style={{ animationDelay: "0.3s" }}
+            key={`cta-${currentSlide}`}
+            className="animate-slide-up mt-10 flex flex-col sm:flex-row items-center gap-4 pointer-events-auto"
           >
             <Link
-              href="#tours"
-              className="rounded-full px-8 py-3.5 font-semibold text-sm transition-all duration-200 hover:opacity-95 hover:scale-105 hover:shadow-xl"
+              href={activeHeroSlide.primaryCta.href}
+              className="rounded-full px-8 py-3.5 font-semibold text-sm transition-all duration-200 hover:opacity-95 hover:scale-105 hover:shadow-2xl shadow-lg"
               style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
             >
-              Explore Our Tours
+              {activeHeroSlide.primaryCta.text}
             </Link>
             <Link
-              href="#about"
-              className="rounded-full border border-white/40 px-8 py-3.5 font-semibold text-sm text-white transition-all duration-200 hover:bg-white/10 backdrop-blur-sm"
-              style={{ backgroundColor: "rgba(19,62,53,0.4)" }}
+              href={activeHeroSlide.secondaryCta.href}
+              className="rounded-full border border-white/40 px-8 py-3.5 font-semibold text-sm text-white transition-all duration-200 hover:bg-white/10 backdrop-blur-md shadow-sm"
+              style={{ backgroundColor: "rgba(19,62,53,0.45)" }}
             >
-              About AddmeTour
+              {activeHeroSlide.secondaryCta.text}
             </Link>
           </div>
         </div>
 
-        {/* Slide dots */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2">
-          {[0, 1, 2].map((i) => (
-            <span
+        {/* Previous / Next Arrow Controls */}
+        <button
+          type="button"
+          onClick={() => setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
+          aria-label="Previous slide"
+          className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60 hover:scale-110 cursor-pointer shadow-xl"
+        >
+          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length)}
+          aria-label="Next slide"
+          className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60 hover:scale-110 cursor-pointer shadow-xl"
+        >
+          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+        </button>
+
+        {/* Interactive Slide dots */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-20 bg-black/30 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15 shadow-lg">
+          {HERO_SLIDES.map((_, i) => (
+            <button
               key={i}
-              className="rounded-full transition-all"
+              type="button"
+              onClick={() => setCurrentSlide(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className="rounded-full transition-all duration-500 cursor-pointer"
               style={{
-                width: i === 2 ? "2rem" : "0.5rem",
+                width: i === currentSlide ? "2.25rem" : "0.5rem",
                 height: "0.5rem",
-                backgroundColor: i === 2 ? "#c9a227" : "rgba(255,255,255,0.5)",
+                backgroundColor: i === currentSlide ? "#c9a227" : "rgba(255,255,255,0.45)",
               }}
             />
           ))}
