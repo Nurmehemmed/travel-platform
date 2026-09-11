@@ -59,10 +59,10 @@ export async function GET() {
             : null,
         badgeColor:
           idx === 0
-            ? "bg-brand-700"
+            ? "bg-[#133e35] text-white"
             : pkg.reviewCount > 150
-            ? "bg-amber-500"
-            : "bg-emerald-600",
+            ? "bg-[#c9a227] text-[#0f2e27] font-bold"
+            : "bg-emerald-800 text-white",
         image:
           pkg.coverImageUrl ||
           "/images/baku-old-city.jpg",

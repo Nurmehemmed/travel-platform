@@ -87,7 +87,7 @@
 
   /* Section label (small uppercase overline) with accessible contrast */
   .section-label {
-    @apply text-xs font-semibold uppercase tracking-widest text-accent-700;
+    @apply text-xs font-bold uppercase tracking-widest text-brand-800;
   }
 }
 

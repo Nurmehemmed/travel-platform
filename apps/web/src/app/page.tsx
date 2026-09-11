@@ -52,7 +52,7 @@ const TOURS = [
   {
     id: "t1",
     badge: "Best Seller",
-    badgeColor: "bg-amber-500",
+    badgeColor: "bg-[#c9a227] text-[#0f2e27] font-bold shadow-sm",
     image: "/images/baku-old-city.jpg",
     tags: ["Walking", "History", "Culture"],
     rating: 4.9,
@@ -68,7 +68,7 @@ const TOURS = [
   {
     id: "t2",
     badge: "Popular",
-    badgeColor: "bg-brand-700",
+    badgeColor: "bg-brand-800 text-white",
     image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80",
     tags: ["History", "Nature", "Private"],
     rating: 4.8,
@@ -84,7 +84,7 @@ const TOURS = [
   {
     id: "t3",
     badge: "Limited Deal",
-    badgeColor: "bg-red-500",
+    badgeColor: "bg-red-600 text-white",
     image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
     tags: ["Overnight", "Culture", "Scenery"],
     rating: 5.0,
@@ -116,7 +116,7 @@ const TOURS = [
   {
     id: "t5",
     badge: "Top Rated",
-    badgeColor: "bg-brand-700",
+    badgeColor: "bg-brand-800 text-white",
     image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=600&q=80",
     tags: ["Nature", "Archaeology", "Unique"],
     rating: 4.9,
@@ -132,7 +132,7 @@ const TOURS = [
   {
     id: "t6",
     badge: "Adventure",
-    badgeColor: "bg-white text-slate-800 shadow-sm font-semibold",
+    badgeColor: "bg-white text-slate-900 shadow-sm font-semibold",
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80",
     tags: ["Adventure", "Mountains", "Villages"],
     rating: 4.8,
@@ -951,7 +951,9 @@ export default function HomePage() {
                     {/* Badge */}
                     {tour.badge && (
                       <span
-                        className={`absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold text-white ${tour.badgeColor}`}
+                        className={`absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold ${
+                          tour.badgeColor?.includes("text-") ? "" : "text-white"
+                        } ${tour.badgeColor}`}
                       >
                         {tour.badge}
                       </span>
@@ -1005,7 +1007,7 @@ export default function HomePage() {
                           strokeWidth={1.5}
                         />
                       ))}
-                      <span className="text-xs font-semibold" style={{ color: "#c9a227" }}>
+                      <span className="text-xs font-bold text-slate-800">
                         {tour.rating}
                       </span>
                       <span className="text-xs text-slate-500">({tour.reviews})</span>
@@ -1159,8 +1161,8 @@ export default function HomePage() {
                 className="absolute bottom-28 right-4 flex flex-col items-center justify-center rounded-2xl px-4 py-3 shadow-xl"
                 style={{ backgroundColor: "#c9a227" }}
               >
-                <span className="text-2xl font-bold text-white">4.9</span>
-                <span className="text-xs font-semibold text-white/90">TripAdvisor</span>
+                <span className="text-2xl font-bold text-[#0f2e27]">4.9</span>
+                <span className="text-xs font-bold text-[#0f2e27]/90">TripAdvisor</span>
               </div>
             </div>
           </div>
@@ -1190,7 +1192,7 @@ export default function HomePage() {
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-5">
                   <h3 className="text-xl font-bold text-white font-display">{dest.name}</h3>
                   <p className="text-sm text-white/70 mt-0.5">{dest.subtitle}</p>
@@ -1212,7 +1214,7 @@ export default function HomePage() {
         <div className="container-section">
           {/* Header */}
           <div className="text-center mb-12">
-            <p className="section-label mb-2" style={{ color: "#8e6d12" }}>
+            <p className="section-label mb-2">
               What Travelers Say
             </p>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-3">
@@ -1274,7 +1276,7 @@ export default function HomePage() {
                       <h3 className="text-sm font-bold text-slate-900 leading-tight">
                         {t.name}
                       </h3>
-                      <p className="text-xs text-slate-500 mt-0.5 leading-tight">
+                      <p className="text-xs text-slate-600 mt-0.5 leading-tight">
                         {t.subtitle}
                       </p>
                     </div>
@@ -1301,7 +1303,7 @@ export default function HomePage() {
       <section id="faq" className="py-24" style={{ backgroundColor: "#faf6f0" }}>
         <div className="container-section max-w-4xl">
           <div className="text-center mb-14">
-            <p className="section-label mb-3" style={{ color: "#8e6d12" }}>
+            <p className="section-label mb-3">
               Common Questions
             </p>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4" style={{ color: "#133e35" }}>
@@ -1430,7 +1432,7 @@ export default function HomePage() {
               </div>
               <span className="font-bold text-lg" style={{ color: "#c9a227" }}>addmetour</span>
             </div>
-            <p className="text-sm text-white/40">
+            <p className="text-sm text-white/70">
               © 2025 AddmeTour. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
@@ -1442,7 +1444,7 @@ export default function HomePage() {
                 { label: "FAQ", href: "#faq" },
                 { label: "Admin Portal", href: "/admin" },
               ].map((item) => (
-                <Link key={item.label} href={item.href} className="text-sm text-white/50 hover:text-white/80 transition-colors">
+                <Link key={item.label} href={item.href} className="text-sm text-white/75 hover:text-white transition-colors">
                   {item.label}
                 </Link>
               ))}
