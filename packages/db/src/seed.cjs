@@ -16,8 +16,7 @@ async function seed() {
       name: "Baku",
       country: "Azerbaijan",
       slug: "baku",
-      heroImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+      heroImageUrl: "/images/baku-maiden-tower-wide.jpg",
     },
     {
       name: "Absheron",
@@ -61,8 +60,7 @@ async function seed() {
       destSlug: "baku",
       overview:
         "Wander through the UNESCO-listed Icherisheher (Old City), discover ancient caravanserais and hidden courtyards.",
-      coverImageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+      coverImageUrl: "/images/baku-old-city.jpg",
       durationDays: 1,
       durationNights: 0,
       basePrice: "35.00",

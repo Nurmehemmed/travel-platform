@@ -846,7 +846,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                     className="h-full w-full object-cover"
                                     onError={(e) => {
                                       (e.target as HTMLImageElement).src =
-                                        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80";
+                                        "/images/baku-old-city.jpg";
                                     }}
                                   />
                                 ) : (

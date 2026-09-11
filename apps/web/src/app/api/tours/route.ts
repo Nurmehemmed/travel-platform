@@ -62,7 +62,7 @@ export async function GET() {
             : "bg-emerald-600",
         image:
           pkg.coverImageUrl ||
-          "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+          "/images/baku-old-city.jpg",
         tags: [pkg.destinationName || "Azerbaijan", category, "Guided"],
         rating: parseFloat(pkg.ratingAvg) || 5.0,
         reviews: pkg.reviewCount || 0,

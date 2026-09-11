@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         overview,
         coverImageUrl:
           coverImageUrl ||
-          "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+          "/images/baku-old-city.jpg",
         durationDays: Number(durationDays) || 1,
         durationNights: Number(durationNights) || 0,
         basePrice: String(basePrice),

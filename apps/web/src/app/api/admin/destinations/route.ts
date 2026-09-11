@@ -64,7 +64,7 @@ export async function POST(request: Request) {
         slug,
         heroImageUrl:
           heroImageUrl ||
-          "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+          "/images/baku-maiden-tower-wide.jpg",
       })
       .returning();
 

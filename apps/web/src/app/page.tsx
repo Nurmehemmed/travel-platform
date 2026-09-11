@@ -29,8 +29,8 @@ const HERO_SLIDES = [
     secondaryCta: { text: "About AddmeTour", href: "#about" },
   },
   {
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85",
-    alt: "Baku City and Caspian Sea Boulevard",
+    image: "/images/baku-maiden-tower-wide.jpg",
+    alt: "Baku Maiden Tower and Old City Icherisheher",
     badge: "UNESCO Heritage & Modern Marvels",
     title: "Enchanting Baku & Caspian Shores",
     subtitle: "Cobblestone alleys of ancient Icherisheher, dazzling Flame Towers, and seaside boulevard sunsets.",
@@ -53,7 +53,7 @@ const TOURS = [
     id: "t1",
     badge: "Best Seller",
     badgeColor: "bg-amber-500",
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+    image: "/images/baku-old-city.jpg",
     tags: ["Walking", "History", "Culture"],
     rating: 4.9,
     reviews: 214,
@@ -935,7 +935,7 @@ export default function HomePage() {
                   {/* Image */}
                   <div className="relative h-52 overflow-hidden bg-slate-100">
                     <Image
-                      src={tour.image || "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80"}
+                      src={tour.image || "/images/baku-old-city.jpg"}
                       alt={tour.title}
                       fill
                       unoptimized
@@ -1129,7 +1129,7 @@ export default function HomePage() {
               {/* Bottom-left photo */}
               <div className="absolute bottom-0 left-0 h-[200px] w-[55%] overflow-hidden rounded-2xl shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80"
+                  src="/images/baku-old-city.jpg"
                   alt="Old City Baku"
                   fill
                   className="object-cover"
