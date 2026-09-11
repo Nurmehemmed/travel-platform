@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { db, users } from "@travel/db";
+import { db, users, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
-import { signSessionToken, setSessionCookie } from "@/lib/auth";
+import { signSessionToken, setSessionCookie, getRequestBaseUrl } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: Request) {
   const googleClientId = process.env.AUTH_GOOGLE_ID;
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.AUTH_URL ||
-    "http://localhost:3000";
+  const baseUrl = getRequestBaseUrl(request);
 
   // 1. If real Google OAuth credentials are provided, redirect to Google OAuth consent
   if (googleClientId && process.env.AUTH_GOOGLE_SECRET) {
@@ -19,10 +17,11 @@ export async function GET(request: Request) {
     googleAuthUrl.searchParams.set("response_type", "code");
     googleAuthUrl.searchParams.set("scope", "openid email profile");
     googleAuthUrl.searchParams.set("prompt", "select_account");
+    logger.info("Redirecting to Google OAuth", { redirectUri });
     return NextResponse.redirect(googleAuthUrl.toString());
   }
 
-  // 2. Fallback Dev Mode: Create / sign-in with verified Google user in Neon DB
+  // 2. Fallback Mode: Create / sign-in with verified Google demo user in Neon DB
   try {
     const devEmail = "google.traveler@gmail.com";
     const devName = "Alex Wanderer (Google)";
@@ -62,9 +61,19 @@ export async function GET(request: Request) {
     });
     await setSessionCookie(token);
 
+    await recordAuditLog({
+      action: "auth.login_google",
+      entityType: "user",
+      entityId: existing.id,
+      actorType: existing.role === "admin" ? "admin" : "customer",
+      actorEmail: existing.email,
+      metadata: { provider: "google", simulated: !(googleClientId && process.env.AUTH_GOOGLE_SECRET) },
+    });
+
+    logger.info("Google OAuth login successful", { email: existing.email, baseUrl });
     return NextResponse.redirect(`${baseUrl}/?auth_provider=google`);
   } catch (error: any) {
-    console.error("[google auth dev error]:", error);
+    logger.error("Google auth error:", error);
     return NextResponse.redirect(`${baseUrl}/?auth_error=google_failed`);
   }
 }

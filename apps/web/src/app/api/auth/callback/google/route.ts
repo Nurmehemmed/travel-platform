@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
-import { db, users } from "@travel/db";
+import { db, users, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
-import { signSessionToken, setSessionCookie } from "@/lib/auth";
+import { signSessionToken, setSessionCookie, getRequestBaseUrl } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.AUTH_URL ||
-    "http://localhost:3000";
+  const baseUrl = getRequestBaseUrl(request);
 
   if (!code) {
+    logger.warn("Google OAuth callback missing code parameter");
     return NextResponse.redirect(`${baseUrl}/?auth_error=no_code`);
   }
 
@@ -30,7 +29,7 @@ export async function GET(request: Request) {
 
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
-      console.error("Token exchange failed:", tokenData);
+      logger.error("Google token exchange failed:", tokenData);
       return NextResponse.redirect(`${baseUrl}/?auth_error=token_failed`);
     }
 
@@ -40,6 +39,7 @@ export async function GET(request: Request) {
     const googleUser = await userRes.json();
 
     if (!googleUser.email) {
+      logger.error("Google userinfo returned no email");
       return NextResponse.redirect(`${baseUrl}/?auth_error=no_email`);
     }
 
@@ -75,9 +75,19 @@ export async function GET(request: Request) {
     });
     await setSessionCookie(token);
 
+    await recordAuditLog({
+      action: "auth.login_google",
+      entityType: "user",
+      entityId: existingUser.id,
+      actorType: existingUser.role === "admin" ? "admin" : "customer",
+      actorEmail: existingUser.email,
+      metadata: { provider: "google", email: existingUser.email },
+    });
+
+    logger.info("Google OAuth login successful", { email: existingUser.email });
     return NextResponse.redirect(`${baseUrl}/?auth_provider=google`);
   } catch (err) {
-    console.error("[google callback error]:", err);
+    logger.error("Google callback error:", err);
     return NextResponse.redirect(`${baseUrl}/?auth_error=google_callback_failed`);
   }
 }

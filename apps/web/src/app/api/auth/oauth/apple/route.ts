@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { db, users } from "@travel/db";
+import { db, users, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
-import { signSessionToken, setSessionCookie } from "@/lib/auth";
+import { signSessionToken, setSessionCookie, getRequestBaseUrl } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: Request) {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.AUTH_URL ||
-    "http://localhost:3000";
+  const baseUrl = getRequestBaseUrl(request);
 
   try {
     const devEmail = "apple.traveler@icloud.com";
@@ -48,9 +46,19 @@ export async function GET(request: Request) {
     });
     await setSessionCookie(token);
 
+    await recordAuditLog({
+      action: "auth.login_apple",
+      entityType: "user",
+      entityId: existing.id,
+      actorType: existing.role === "admin" ? "admin" : "customer",
+      actorEmail: existing.email,
+      metadata: { provider: "apple", simulated: true },
+    });
+
+    logger.info("Apple OAuth login successful", { email: existing.email, baseUrl });
     return NextResponse.redirect(`${baseUrl}/?auth_provider=apple`);
   } catch (error: any) {
-    console.error("[apple auth dev error]:", error);
+    logger.error("Apple auth error:", error);
     return NextResponse.redirect(`${baseUrl}/?auth_error=apple_failed`);
   }
 }

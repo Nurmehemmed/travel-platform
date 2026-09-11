@@ -94,3 +94,38 @@ export async function requireAdmin(): Promise<SessionPayload | null> {
   }
   return user;
 }
+
+/**
+ * Resolves the accurate public base URL from incoming request headers or fallback.
+ * Works seamlessly across custom domains, Vercel deployments, and localhost.
+ */
+export function getRequestBaseUrl(request: Request): string {
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
+  if (forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  const host = request.headers.get("host");
+  if (host) {
+    const proto = host.includes("localhost") ? "http" : "https";
+    return `${proto}://${host}`;
+  }
+
+  try {
+    const parsed = new URL(request.url);
+    if (parsed.origin) {
+      return parsed.origin;
+    }
+  } catch {}
+
+  if (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes("localhost")) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return process.env.NEXT_PUBLIC_APP_URL || process.env.AUTH_URL || "http://localhost:3000";
+}
