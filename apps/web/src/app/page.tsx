@@ -69,7 +69,7 @@ const TOURS = [
     id: "t2",
     badge: "Popular",
     badgeColor: "bg-brand-800 text-white",
-    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&q=80",
     tags: ["History", "Nature", "Private"],
     rating: 4.8,
     reviews: 142,
@@ -85,7 +85,7 @@ const TOURS = [
     id: "t3",
     badge: "Limited Deal",
     badgeColor: "bg-red-600 text-white",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
     tags: ["Overnight", "Culture", "Scenery"],
     rating: 5.0,
     reviews: 87,
@@ -101,7 +101,7 @@ const TOURS = [
     id: "t4",
     badge: null,
     badgeColor: "",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80",
     tags: ["Architecture", "Photography", "Walking"],
     rating: 4.7,
     reviews: 98,
@@ -117,7 +117,7 @@ const TOURS = [
     id: "t5",
     badge: "Top Rated",
     badgeColor: "bg-brand-800 text-white",
-    image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=1200&q=80",
     tags: ["Nature", "Archaeology", "Unique"],
     rating: 4.9,
     reviews: 167,
@@ -133,7 +133,7 @@ const TOURS = [
     id: "t6",
     badge: "Adventure",
     badgeColor: "bg-white text-slate-900 shadow-sm font-semibold",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
     tags: ["Adventure", "Mountains", "Villages"],
     rating: 4.8,
     reviews: 61,
@@ -176,28 +176,28 @@ const DESTINATIONS = [
     name: "Baku",
     subtitle: "City of Winds",
     tours: 12,
-    image: "https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=1000&q=80",
   },
   {
     slug: "absheron",
     name: "Absheron",
     subtitle: "Fire & Legend",
     tours: 5,
-    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1000&q=80",
   },
   {
     slug: "sheki",
     name: "Sheki",
     subtitle: "Silk Road Heritage",
     tours: 4,
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1000&q=80",
   },
   {
     slug: "gobustan",
     name: "Gobustan",
     subtitle: "Ancient Rock Art",
     tours: 3,
-    image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=1000&q=80",
   },
 ];
 
@@ -364,9 +364,7 @@ export default function HomePage() {
       await fetch("/api/auth/logout", { method: "POST" });
       setCurrentUser(null);
       setUserDropdownOpen(false);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -709,6 +707,7 @@ export default function HomePage() {
               alt={slide.alt}
               fill
               sizes="100vw"
+              style={{ objectFit: "cover" }}
               className={`object-cover object-center transition-transform duration-10000 ease-out ${
                 index === currentSlide ? "scale-105" : "scale-100"
               }`}
@@ -945,7 +944,8 @@ export default function HomePage() {
                       src={tour.image || "/images/baku-old-city.jpg"}
                       alt={tour.title}
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"
+                      style={{ objectFit: "cover" }}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     {/* Badge */}
@@ -1129,10 +1129,11 @@ export default function HomePage() {
               {/* Main large photo */}
               <div className="absolute right-0 top-0 h-[300px] w-[75%] overflow-hidden rounded-2xl shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=600&q=80"
+                  src="https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=1200&q=85"
                   alt="Baku skyline"
                   fill
-                  sizes="(max-width: 768px) 75vw, 450px"
+                  sizes="(max-width: 768px) 75vw, 600px"
+                  style={{ objectFit: "cover" }}
                   className="object-cover"
                 />
               </div>
@@ -1142,17 +1143,19 @@ export default function HomePage() {
                   src="/images/baku-old-city.jpg"
                   alt="Old City Baku"
                   fill
-                  sizes="(max-width: 768px) 55vw, 320px"
+                  sizes="(max-width: 768px) 55vw, 450px"
+                  style={{ objectFit: "cover" }}
                   className="object-cover"
                 />
               </div>
               {/* Bottom-right small photo */}
               <div className="absolute bottom-0 right-0 h-[160px] w-[35%] overflow-hidden rounded-2xl shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1548013146-72479768bada?w=300&q=80"
+                  src="https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=85"
                   alt="Azerbaijan landscape"
                   fill
-                  sizes="(max-width: 768px) 35vw, 200px"
+                  sizes="(max-width: 768px) 35vw, 300px"
+                  style={{ objectFit: "cover" }}
                   className="object-cover"
                 />
               </div>
@@ -1189,7 +1192,8 @@ export default function HomePage() {
                   src={dest.image}
                   alt={dest.name}
                   fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 320px"
+                  style={{ objectFit: "cover" }}
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
