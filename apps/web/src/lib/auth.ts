@@ -57,11 +57,18 @@ export async function setSessionCookie(token: string) {
 }
 
 /**
- * Clears the session cookie
+ * Clears the session cookie with exact matching attributes across all browsers
  */
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
+  cookieStore.set(SESSION_COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+    expires: new Date(0),
+  });
 }
 
 /**

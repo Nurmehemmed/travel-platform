@@ -314,12 +314,18 @@ export default function HomePage() {
       }
     } catch {}
 
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data?.user) setCurrentUser(data.user);
+        if (data?.user) {
+          setCurrentUser(data.user);
+        } else {
+          setCurrentUser(null);
+        }
       })
-      .catch(() => {});
+      .catch(() => {
+        setCurrentUser(null);
+      });
 
     // Fetch live active tours from Neon DB
     fetch("/api/tours")
@@ -363,7 +369,11 @@ export default function HomePage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
       setCurrentUser(null);
       setUserDropdownOpen(false);
     } catch {}

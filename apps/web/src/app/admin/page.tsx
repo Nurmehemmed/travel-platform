@@ -31,6 +31,7 @@ import {
   ScrollText,
   Activity,
   Eye,
+  LogOut,
 } from "lucide-react";
 
 interface AuditLogItem {
@@ -544,6 +545,21 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             <ArrowLeft className="h-3.5 w-3.5" />
             Back to Live Site
           </Link>
+
+          <button
+            onClick={async () => {
+              await fetch("/api/auth/logout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                cache: "no-store",
+              });
+              window.location.href = "/";
+            }}
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium text-rose-300 hover:text-rose-100 bg-rose-500/10 hover:bg-rose-500/20 transition-colors cursor-pointer"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sign Out
+          </button>
         </div>
       </aside>
 
