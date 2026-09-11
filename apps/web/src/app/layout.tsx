@@ -252,6 +252,7 @@ export default function RootLayout({
         />
         <link rel="alternate" hrefLang="en" href={APP_URL} />
         <link rel="alternate" hrefLang="x-default" href={APP_URL} />
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
