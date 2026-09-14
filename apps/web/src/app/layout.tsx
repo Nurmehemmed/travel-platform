@@ -90,8 +90,12 @@ export const metadata: Metadata = {
     ICBM: "40.4093, 49.8671",
   },
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: [
+      { url: "/icon.svg?v=5", type: "image/svg+xml" },
+      { url: "/favicon.ico?v=5", sizes: "32x32" },
+    ],
+    shortcut: "/favicon.ico?v=5",
+    apple: "/icon.svg?v=5",
   },
   manifest: "/manifest.json",
   verification: {
@@ -262,6 +266,9 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,400..800&display=swap"
         />
+        <link rel="icon" href="/icon.svg?v=5" type="image/svg+xml" />
+        <link rel="alternate icon" href="/favicon.ico?v=5" />
+        <link rel="apple-touch-icon" href="/icon.svg?v=5" />
         <link rel="alternate" hrefLang="en" href={APP_URL} />
         <link rel="alternate" hrefLang="x-default" href={APP_URL} />
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
