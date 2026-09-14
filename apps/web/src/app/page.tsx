@@ -1090,11 +1090,11 @@ export default function HomePage() {
                 return (
                 <div
                   key={tour.id}
-                  className="group rounded-2xl bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                  className="group rounded-2xl bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1 h-full flex flex-col"
                   style={{ boxShadow: "0 4px 24px -4px rgba(15,23,42,0.10)" }}
                 >
                   {/* Image */}
-                  <div className="relative h-52 overflow-hidden bg-slate-100">
+                  <div className="relative h-52 overflow-hidden bg-slate-100 shrink-0">
                     <Image
                       src={tour.image || "/images/baku-old-city.jpg"}
                       alt={tourTitle}
@@ -1136,7 +1136,7 @@ export default function HomePage() {
                   </div>
 
                   {/* Body */}
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-1">
                     {/* Tags + Rating */}
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex flex-wrap gap-1">
@@ -1159,7 +1159,7 @@ export default function HomePage() {
                     <h3 className="font-display text-lg font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-amber-600 transition-colors">
                       {tourTitle}
                     </h3>
-                    <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
+                    <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2 min-h-[2.75rem]">
                       {tourDesc}
                     </p>
 
@@ -1173,8 +1173,8 @@ export default function HomePage() {
                       </span>
                     </div>
 
-                    {/* Price + Dual CTAs */}
-                    <div className="flex flex-col gap-3 pt-2">
+                    {/* Price + Dual CTAs - Always pinned to bottom */}
+                    <div className="flex flex-col gap-3 pt-4 mt-auto border-t border-slate-100">
                       <div className="flex items-baseline justify-between">
                         <div>
                           {tour.originalPrice && (
