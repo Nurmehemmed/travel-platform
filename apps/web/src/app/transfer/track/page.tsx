@@ -28,6 +28,7 @@ import {
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 import { getVehicleConfig } from "@/lib/transfer-zones";
+import { TransferBookingSkeleton } from "@/components/Skeletons";
 import { TRANSFER_TRACK_TRANSLATIONS, LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
 
 interface BookingData {
@@ -242,8 +243,11 @@ function TransferTrackContent() {
           )}
         </div>
 
+        {/* Loading Skeleton */}
+        {loading && <TransferBookingSkeleton />}
+
         {/* Booking Details Display */}
-        {booking && (
+        {!loading && booking && (
           <div className="rounded-2xl bg-white shadow-md border border-sky-100 overflow-hidden space-y-6 p-6 sm:p-8">
             {/* Top Bar: Ref & Status */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">

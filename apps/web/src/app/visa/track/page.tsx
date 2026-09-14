@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { VisaTrackingSkeleton } from "@/components/Skeletons";
 
 interface TrackedApplication {
   id: string;
@@ -183,8 +184,11 @@ export default function VisaTrackPage() {
           </div>
         )}
 
+        {/* Loading Skeleton */}
+        {loading && <VisaTrackingSkeleton />}
+
         {/* Application Status Card */}
-        {application && (
+        {!loading && application && (
           <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 animate-fade-in space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>

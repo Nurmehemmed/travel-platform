@@ -17,6 +17,7 @@ import { useLanguage, LanguageCode } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS } from "@/lib/tours-i18n";
 import { useSiteSettings } from "@/lib/settings-context";
+import { TourCardsSkeleton } from "@/components/Skeletons";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -234,6 +235,7 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [toursList, setToursList] = useState(TOURS);
+  const [toursLoading, setToursLoading] = useState(true);
   const [savedTourIds, setSavedTourIds] = useState<string[]>([]);
   const [bookingModalTour, setBookingModalTour] = useState<{ id: string; title: string; price: number } | null>(null);
   const [bookingDate, setBookingDate] = useState("");
@@ -318,7 +320,10 @@ export default function HomePage() {
           setToursList(data.tours);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        setToursLoading(false);
+      });
 
     // Clean URL if redirected back from social auth or handle auth modal trigger
     if (typeof window !== "undefined") {
@@ -1080,9 +1085,12 @@ export default function HomePage() {
           </div>
 
           {/* Tour cards grid */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredTours.length > 0 ? (
-              filteredTours.map((tour) => {
+          {toursLoading ? (
+            <TourCardsSkeleton count={6} />
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredTours.length > 0 ? (
+                filteredTours.map((tour) => {
                 const localizedTour = LOCALIZED_TOURS[language]?.[tour.id] || LOCALIZED_TOURS.EN[tour.id] || tour;
                 const tourTitle = localizedTour.title || tour.title;
                 const tourDesc = localizedTour.desc || tour.desc;
@@ -1250,6 +1258,7 @@ export default function HomePage() {
               </div>
             )}
           </div>
+          )}
         </div>
       </section>
 

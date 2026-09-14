@@ -40,6 +40,7 @@ import {
   Megaphone,
   Save,
 } from "lucide-react";
+import { StatsCardsSkeleton, TableSkeleton } from "@/components/Skeletons";
 
 interface AuditLogItem {
   id: string;
@@ -899,10 +900,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             <button
               onClick={fetchAllData}
               disabled={refreshing}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm cursor-pointer disabled:opacity-70"
             >
               <RefreshCw className={`h-3.5 w-3.5 text-[#f59e0b] ${refreshing ? "animate-spin" : ""}`} />
-              Refresh Data
+              <span>{refreshing ? "Refreshing..." : "Refresh Data"}</span>
             </button>
 
             {activeTab === "visas" && (
@@ -941,6 +942,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
         {/* Content Container */}
         <div className="p-6 md:p-8 space-y-8 flex-1">
+          {loading ? (
+            <div className="space-y-6 animate-fade-in">
+              <StatsCardsSkeleton />
+              <TableSkeleton rows={7} cols={5} />
+            </div>
+          ) : (
+            <>
           {/* ═══════════════════════════════════════════════════════ TAB: OVERVIEW */}
           {activeTab === "overview" && (
             <>
@@ -2911,6 +2919,8 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
               )}
             </div>
+          )}
+            </>
           )}
         </div>
       </main>
