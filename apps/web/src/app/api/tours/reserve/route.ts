@@ -120,9 +120,10 @@ export async function POST(req: Request) {
 
     const reservationNumber = generateReservationNumber();
 
-    const tourDateStr = typeof tourDate === "string"
-      ? tourDate.split("T")[0]
-      : new Date(tourDate).toISOString().split("T")[0];
+    const tourDateStr: string =
+      (typeof tourDate === "string"
+        ? tourDate.split("T")[0]
+        : new Date(tourDate).toISOString().split("T")[0]) || new Date().toISOString().slice(0, 10);
 
     const [created] = await db
       .insert(tourReservations)
