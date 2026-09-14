@@ -65,28 +65,60 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // Webhook listener from Payriff
+  // Webhook listener from Payriff — hardened with server-to-server verification
   try {
     const body = await req.json();
     const orderId = body.orderId || body.payload?.orderId;
     const orderStatus = body.orderStatus || body.payload?.orderStatus;
     const applicationNumber = body.applicationNumber || body.description?.match(/AZV-\d+/)?.[0];
 
-    if (applicationNumber && (orderStatus === "APPROVED" || orderStatus === "PAID")) {
+    if (!applicationNumber) {
+      return NextResponse.json({ error: "Missing application reference" }, { status: 400 });
+    }
+
+    if (!orderId) {
+      return NextResponse.json({ error: "Missing orderId for webhook verification" }, { status: 400 });
+    }
+
+    // Direct server-to-server verification to prevent forged webhook calls
+    const check = await verifyPayriffOrder(orderId);
+    if (!check.isPaid) {
+      console.warn("Rejected unverified Payriff webhook for order:", orderId, "Status:", orderStatus);
+      return NextResponse.json({ error: "Payment verification failed with provider" }, { status: 400 });
+    }
+
+    const app = await db.query.visaApplications.findFirst({
+      where: eq(visaApplications.applicationNumber, applicationNumber),
+    });
+
+    if (app && app.paymentStatus !== "paid") {
       await db
         .update(visaApplications)
         .set({
           paymentStatus: "paid",
           status: "received",
-          adminNotes: `Payriff Webhook Verified: Order ${orderId}`,
+          adminNotes: `Payriff Webhook Verified: Order ${orderId} (${check.rawStatus || "APPROVED"})`,
           updatedAt: new Date(),
         })
         .where(eq(visaApplications.applicationNumber, applicationNumber));
+
+      // Alert operations
+      sendTelegramVisaAlert({
+        applicationNumber: app.applicationNumber,
+        visaType: app.visaType,
+        applicantName: `${app.surname} ${app.givenNames}`,
+        nationality: app.nationality,
+        passportNumber: app.passportNumber,
+        arrivalDate: app.arrivalDate,
+        totalAmount: app.totalAmount,
+        email: app.email,
+        phoneNumber: app.phoneNumber,
+      }).catch(console.error);
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, verified: true });
   } catch (err: any) {
     console.error("Payriff Webhook Error:", err);
-    return NextResponse.json({ error: err.message }, { status: 400 });
+    return NextResponse.json({ error: err.message || "Internal error" }, { status: 400 });
   }
 }

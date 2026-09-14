@@ -21,6 +21,15 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: `${APP_URL}/transfer`,
+    languages: {
+      "en-US": `${APP_URL}/transfer?lang=en`,
+      "az-AZ": `${APP_URL}/transfer?lang=az`,
+      "ru-RU": `${APP_URL}/transfer?lang=ru`,
+      "fr-FR": `${APP_URL}/transfer?lang=fr`,
+      "ar-SA": `${APP_URL}/transfer?lang=ar`,
+      "de-DE": `${APP_URL}/transfer?lang=de`,
+      "x-default": `${APP_URL}/transfer`,
+    },
   },
   openGraph: {
     type: "website",
@@ -63,6 +72,45 @@ const transferJsonLd = {
   },
 };
 
+const transferFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How does the airport meet and greet service work in Baku?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Your professional driver monitors your flight in real time and waits inside the arrival terminal holding a personalized name sign. 60 minutes of complimentary wait time is included after flight touchdown.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What happens if my flight to Baku (GYD) is delayed?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Flight monitoring is fully automated and complimentary. Your pickup schedule automatically adjusts to your actual landing time at no additional surcharge.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What vehicles are available for Azerbaijan airport transfers?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "We offer Executive Sedans (Mercedes E-Class/Toyota Camry for up to 3 passengers), Premium SUVs (Toyota Prado/Land Cruiser for up to 4 passengers), and VIP Minivans (Mercedes V-Class/Vito for up to 7 passengers).",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I pay upon arrival to the driver?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, we support both instant secure online payment and Pay on Arrival directly to your chauffeur in cash.",
+      },
+    },
+  ],
+};
+
 export default function TransferLayout({
   children,
 }: Readonly<{
@@ -73,6 +121,10 @@ export default function TransferLayout({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(transferJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(transferFaqJsonLd) }}
       />
       {children}
     </>

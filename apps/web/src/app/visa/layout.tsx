@@ -30,6 +30,15 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: `${APP_URL}/visa`,
+    languages: {
+      "en-US": `${APP_URL}/visa?lang=en`,
+      "az-AZ": `${APP_URL}/visa?lang=az`,
+      "ru-RU": `${APP_URL}/visa?lang=ru`,
+      "fr-FR": `${APP_URL}/visa?lang=fr`,
+      "ar-SA": `${APP_URL}/visa?lang=ar`,
+      "de-DE": `${APP_URL}/visa?lang=de`,
+      "x-default": `${APP_URL}/visa`,
+    },
   },
   openGraph: {
     type: "website",
@@ -101,6 +110,43 @@ const visaJsonLd = {
           },
         ],
       },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "How fast is the urgent Azerbaijan e-Visa processed?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Urgent e-Visa applications are processed within 3 hours, 7 days a week, including weekends and public holidays.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How long is the Azerbaijan e-Visa valid for?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "The official ASAN e-Visa is valid for 90 days from the date of issue and allows a single entry for a stay of up to 30 days in Azerbaijan.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Which countries are eligible for an Azerbaijan electronic visa?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Citizens of over 95 countries including the United States, United Kingdom, European Union member states, Canada, Australia, India, and GCC nations are eligible to apply online.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What documents are required to apply for an Azerbaijan e-Visa?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Only a valid passport copy with at least 3 months validity beyond your intended departure date from Azerbaijan is required.",
+          },
+        },
+      ],
     },
     {
       "@type": "BreadcrumbList",

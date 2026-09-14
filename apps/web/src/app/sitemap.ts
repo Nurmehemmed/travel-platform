@@ -13,6 +13,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
 
+    // ─── Airport Transfer Services (high-value conversion pages) ───────
+    {
+      url: `${baseUrl}/transfer`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/transfer/book`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/transfer/track`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.7,
+    },
+
     // ─── e-Visa Service (high-value conversion pages) ─────────────────
     {
       url: `${baseUrl}/visa`,

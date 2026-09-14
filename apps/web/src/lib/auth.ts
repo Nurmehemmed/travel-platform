@@ -1,6 +1,10 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
+if (process.env.NODE_ENV === "production" && !process.env.AUTH_SECRET) {
+  throw new Error("FATAL: AUTH_SECRET must be set in production environment.");
+}
+
 const SECRET_KEY = new TextEncoder().encode(
   process.env.AUTH_SECRET || "addmetour-dev-fallback-secret-2025"
 );
