@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db, packages, destinations } from "@travel/db";
 import { eq, desc } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth";
@@ -96,6 +97,13 @@ export async function POST(request: Request) {
       })
       .returning();
 
+    try {
+      revalidatePath("/");
+      revalidatePath("/api/tours");
+    } catch (revalErr) {
+      console.warn("Tour revalidatePath warning:", revalErr);
+    }
+
     return NextResponse.json({ success: true, tour: newTour });
   } catch (error: any) {
     console.error("[admin tours post error]:", error);
@@ -134,6 +142,13 @@ export async function PATCH(request: Request) {
       .where(eq(packages.id, id))
       .returning();
 
+    try {
+      revalidatePath("/");
+      revalidatePath("/api/tours");
+    } catch (revalErr) {
+      console.warn("Tour revalidatePath warning:", revalErr);
+    }
+
     return NextResponse.json({ success: true, tour: updated });
   } catch (error: any) {
     console.error("[admin tours patch error]:", error);
@@ -159,6 +174,14 @@ export async function DELETE(request: Request) {
     }
 
     await db.delete(packages).where(eq(packages.id, id));
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/api/tours");
+    } catch (revalErr) {
+      console.warn("Tour revalidatePath warning:", revalErr);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("[admin tours delete error]:", error);

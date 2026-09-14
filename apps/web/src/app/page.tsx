@@ -310,8 +310,8 @@ export default function HomePage() {
         setCurrentUser(null);
       });
 
-    // Fetch live active tours from Neon DB
-    fetch("/api/tours")
+    // Fetch live active tours from Neon DB (always fresh, no client cache)
+    fetch("/api/tours", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (data?.tours && data.tours.length > 0) {

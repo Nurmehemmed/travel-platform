@@ -5,8 +5,8 @@ import { COMPANY_CONTACT } from "@/lib/constants";
 
 const log = logger.withContext({ route: "/api/settings" });
 
-// Next.js dynamic route configuration - revalidate periodically
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   try {
@@ -56,7 +56,9 @@ export async function GET() {
 
     return NextResponse.json(publicConfig, {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     });
   } catch (error: any) {

@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { db, packages, destinations } from "@travel/db";
 import { eq, desc } from "drizzle-orm";
 
-// Edge CDN caching: revalidate every 60 seconds, serve stale while revalidating up to 5 minutes
-export const revalidate = 60;
+// Always serve real-time dynamic tour catalog without stale edge caching
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   try {
@@ -83,7 +84,9 @@ export async function GET() {
       { tours: formatted },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       }
     );
