@@ -123,6 +123,13 @@ export default function TransferLandingPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSelector variant="dark" />
             <Link
+              href="/visa"
+              className="text-xs font-semibold text-amber-200 hover:text-white transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 hover:bg-amber-500/20 shrink-0 whitespace-nowrap"
+            >
+              <FileText className="h-3.5 w-3.5 text-amber-300 shrink-0" />
+              <span>{t.nav.evisa}</span>
+            </Link>
+            <Link
               href="/transfer/track"
               className="text-xs font-semibold text-sky-100 hover:text-white transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-white/10 shrink-0 whitespace-nowrap"
             >

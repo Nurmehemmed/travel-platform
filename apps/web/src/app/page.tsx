@@ -528,9 +528,9 @@ export default function HomePage() {
             {/* ── Airport Transfer CTA ── */}
             <Link
               href="/transfer"
-              className="hidden 2xl:flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 hover:scale-105 hover:bg-sky-500/20 text-sky-200 border border-sky-400/30 whitespace-nowrap shrink-0"
+              className="flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-sky-500/15 px-3 py-1 text-xs font-semibold text-sky-200 backdrop-blur-sm transition-all duration-200 hover:border-sky-300 hover:bg-sky-500/25 hover:text-white whitespace-nowrap shrink-0"
             >
-              <Car className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+              <Car className="h-3.5 w-3.5 text-sky-300 shrink-0" />
               <span>{t.nav.transfer}</span>
             </Link>
           </nav>
