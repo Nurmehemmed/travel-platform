@@ -40,6 +40,8 @@ import {
   LOCALIZED_ZONES,
   LOCALIZED_AIRPORT_DESCRIPTIONS,
   LOCALIZED_TRANSFER_FAQS,
+  LOCALIZED_VEHICLE_FEATURES,
+  LOCALIZED_AIRPORT_CITIES,
 } from "@/lib/pages-i18n";
 
 export default function TransferLandingPage() {
@@ -275,7 +277,7 @@ export default function TransferLandingPage() {
                     <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                       <div>
                         <div className="text-[10px] uppercase font-bold text-slate-400">
-                          {direction === "round_trip" ? t.transferPage.roundTrip.split(" ")[0] : t.transferPage.oneWay}
+                          {direction === "round_trip" ? t.transferPage.roundTripLabel : t.transferPage.oneWay}
                         </div>
                         <div className="text-lg font-extrabold text-sky-700">
                           {isCustom ? (
@@ -443,7 +445,7 @@ export default function TransferLandingPage() {
                   </div>
 
                   <ul className="mt-4 space-y-2">
-                    {vc.features.map((feat, idx) => (
+                    {(LOCALIZED_VEHICLE_FEATURES[language]?.[vc.id] || vc.features).map((feat, idx) => (
                       <li key={idx} className="flex items-center gap-2 text-xs text-slate-600">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
                         <span>{feat}</span>
@@ -501,7 +503,9 @@ export default function TransferLandingPage() {
                     <span className="rounded-full bg-sky-600 text-white font-extrabold text-xs px-2.5 py-1">
                       {airport.code}
                     </span>
-                    <span className="text-xs font-semibold text-slate-500">{airport.city}</span>
+                    <span className="text-xs font-semibold text-slate-500">
+                      {LOCALIZED_AIRPORT_CITIES[language]?.[airport.code] || airport.city}
+                    </span>
                   </div>
                   <h3 className="font-bold text-slate-900 text-base">
                     {LOCALIZED_AIRPORTS[language]?.[airport.code] || airport.name}

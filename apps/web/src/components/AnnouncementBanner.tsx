@@ -3,11 +3,40 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSiteSettings } from "@/lib/settings-context";
+import { useLanguage } from "@/lib/i18n";
 import { Sparkles, ArrowRight, X } from "lucide-react";
 
 export function AnnouncementBanner() {
   const { settings } = useSiteSettings();
+  const { language } = useLanguage();
   const [dismissed, setDismissed] = useState(false);
+
+  const learnMoreText =
+    language === "AR"
+      ? "اعرف المزيد"
+      : language === "RU"
+      ? "Подробнее"
+      : language === "AZ"
+      ? "Ətraflı"
+      : language === "FR"
+      ? "En savoir plus"
+      : language === "DE"
+      ? "Mehr erfahren"
+      : "Learn More";
+
+  const announcementBadge =
+    settings.announcement.badge ||
+    (language === "AR"
+      ? "إعلان"
+      : language === "RU"
+      ? "Объявление"
+      : language === "AZ"
+      ? "Elan"
+      : language === "FR"
+      ? "Annonce"
+      : language === "DE"
+      ? "Ankündigung"
+      : "Announcement");
 
   useEffect(() => {
     // Check if dismissed in this session
@@ -40,7 +69,7 @@ export function AnnouncementBanner() {
       <div className="flex-1 flex items-center justify-center gap-2 sm:gap-3 text-center pr-6 sm:pr-0">
         <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-950 text-amber-300 shadow-sm uppercase tracking-wider">
           <Sparkles className="h-3 w-3" />
-          {settings.announcement.badge || "Announcement"}
+          {announcementBadge}
         </span>
 
         <span className="font-semibold text-slate-950 truncate max-w-xl sm:max-w-2xl">
@@ -52,7 +81,7 @@ export function AnnouncementBanner() {
             href={settings.announcement.link}
             className="inline-flex items-center gap-1 font-bold text-slate-950 hover:underline shrink-0 ml-1 text-xs"
           >
-            <span>Learn More</span>
+            <span>{learnMoreText}</span>
             <ArrowRight className="h-3 w-3" />
           </Link>
         )}

@@ -38,12 +38,13 @@ import {
   getAirportByCode,
   getVehicleConfig,
 } from "@/lib/transfer-zones";
-import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
+import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES, TRANSFER_BOOK_TRANSLATIONS } from "@/lib/pages-i18n";
 
 function TransferBookForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, language } = useLanguage();
+  const tb = (TRANSFER_BOOK_TRANSLATIONS[language] || TRANSFER_BOOK_TRANSLATIONS.EN)!;
 
   // Dynamic vehicle translation helpers
   const getVehicleLabel = (id: VehicleClass) => {
@@ -134,8 +135,8 @@ function TransferBookForm() {
     if (!dropoffAddress.trim()) {
       setErrorMessage(
         direction === "departure"
-          ? "Please provide your pickup hotel or residential address."
-          : "Please provide your destination hotel or address."
+          ? tb.pickupAddressLabel
+          : tb.dropoffAddressLabel
       );
       return;
     }
@@ -146,20 +147,20 @@ function TransferBookForm() {
   const handleNextFromStep2 = () => {
     setErrorMessage(null);
     if (!flightNumber.trim()) {
-      setErrorMessage("Flight number is required for airport transfer coordination.");
+      setErrorMessage(tb.flightNumLabel);
       return;
     }
     if (!flightDate) {
-      setErrorMessage("Please select the flight date.");
+      setErrorMessage(tb.flightDateLabel);
       return;
     }
     if (!flightTime) {
-      setErrorMessage("Please select the estimated flight time.");
+      setErrorMessage(tb.flightTimeLabel);
       return;
     }
     if (direction === "round_trip") {
       if (!returnFlightNumber.trim() || !returnDate || !returnTime) {
-        setErrorMessage("Please provide return flight details for your round-trip transfer.");
+        setErrorMessage(tb.retFlightInfo);
         return;
       }
     }
@@ -170,16 +171,16 @@ function TransferBookForm() {
   const handleNextFromStep3 = () => {
     setErrorMessage(null);
     if (!passengerName.trim()) {
-      setErrorMessage("Please enter the lead passenger full name.");
+      setErrorMessage(tb.errEnterName);
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setErrorMessage("Please enter a valid email address for booking confirmation.");
+      setErrorMessage(tb.errValidEmail);
       return;
     }
     if (!phoneNumber.trim() || phoneNumber.trim().length < 6) {
-      setErrorMessage("Please enter a valid telephone or WhatsApp number with country code.");
+      setErrorMessage(tb.errValidPhone);
       return;
     }
     setStep(4);
@@ -189,7 +190,7 @@ function TransferBookForm() {
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreedTerms) {
-      setErrorMessage("Please accept the terms and conditions to complete your reservation.");
+      setErrorMessage(tb.errAcceptTerms);
       return;
     }
 
@@ -282,10 +283,10 @@ function TransferBookForm() {
           <div className="flex items-center justify-between relative">
             <div className="absolute top-1/2 left-6 right-6 h-0.5 bg-slate-200 -translate-y-1/2 z-0 hidden sm:block" />
             {[
-              { num: 1, title: "Route & Vehicle" },
-              { num: 2, title: "Flight Details" },
-              { num: 3, title: "Passenger Info" },
-              { num: 4, title: "Review & Pay" },
+              { num: 1, title: tb.step1Nav },
+              { num: 2, title: tb.step2Nav },
+              { num: 3, title: tb.step3Nav },
+              { num: 4, title: tb.step4Nav },
             ].map((s) => {
               const isDone = step > s.num;
               const isCurrent = step === s.num;
@@ -329,22 +330,22 @@ function TransferBookForm() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Step 1: Select Route & Vehicle</h2>
+                <h2 className="text-xl font-bold text-slate-900">{tb.step1Title}</h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  Choose your airport, direction, and preferred vehicle class.
+                  {tb.step1Desc}
                 </p>
               </div>
 
               {/* Direction selector */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                  Transfer Direction
+                  {tb.transferDirection}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
                     { id: "arrival", label: t.transferPage.arrival.split(" ")[0], desc: t.transferPage.arrival, icon: "🛬" },
                     { id: "departure", label: t.transferPage.departure.split(" ")[0], desc: t.transferPage.departure, icon: "🛫" },
-                    { id: "round_trip", label: t.transferPage.roundTrip.split(" ")[0], desc: t.transferPage.roundTrip, icon: "🔄" },
+                    { id: "round_trip", label: t.transferPage.roundTripLabel, desc: t.transferPage.roundTrip, icon: "🔄" },
                   ].map((d) => (
                     <button
                       key={d.id}
@@ -404,21 +405,21 @@ function TransferBookForm() {
               {/* Exact hotel / dropoff address */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  {direction === "departure" ? "Pickup Hotel / Address" : "Destination Hotel / Address"} *
+                  {direction === "departure" ? tb.pickupAddressLabel : tb.dropoffAddressLabel} *
                 </label>
                 <div className="relative">
                   <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
                     required
-                    placeholder="e.g., Four Seasons Hotel Baku, Neftchilar Ave 1 / apartment address"
+                    placeholder={tb.addressPlaceholder}
                     value={dropoffAddress}
                     onChange={(e) => setDropoffAddress(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
                   />
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Our driver will deliver you directly to the entrance or hotel lobby.
+                  {tb.addressHelp}
                 </p>
               </div>
 
@@ -455,7 +456,7 @@ function TransferBookForm() {
                                 {isCustomZone ? t.transferPage.quoteOnRequest : price ? `$${price.totalAmount}` : "—"}
                               </span>
                               <div className="text-[9px] uppercase font-bold text-slate-400">
-                                {direction === "round_trip" ? t.transferPage.roundTrip.split(" ")[0] : t.transferPage.oneWay}
+                                {direction === "round_trip" ? t.transferPage.roundTripLabel : t.transferPage.oneWay}
                               </div>
                             </div>
                           </div>
@@ -484,7 +485,7 @@ function TransferBookForm() {
                   onClick={handleNextFromStep1}
                   className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
                 >
-                  <span>Continue to Flight Details</span>
+                  <span>{tb.btnContinueFlight}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -495,9 +496,9 @@ function TransferBookForm() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Step 2: Flight Details</h2>
+                <h2 className="text-xl font-bold text-slate-900">{tb.step2Title}</h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  We track your flight number in real-time so your driver is always on time even if your flight is delayed.
+                  {tb.step2Desc}
                 </p>
               </div>
 
@@ -506,31 +507,31 @@ function TransferBookForm() {
                 <div className="text-xs font-bold text-sky-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                   <Plane className="h-4 w-4" />
                   <span>
-                    {direction === "departure" ? "Departure Flight Information" : "Arrival Flight Information"}
+                    {direction === "departure" ? tb.depFlightInfo : tb.arrFlightInfo}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Flight Number *
+                      {tb.flightNumLabel}
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. J2 076, TK 338, FZ 707, QR 353"
+                      placeholder={tb.flightNumPlaceholder}
                       value={flightNumber}
                       onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
                       className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
                     />
                     <span className="block text-[11px] text-slate-400 mt-1">
-                      🛫 We auto-track your airline and meet you at the correct terminal (Terminal 1 or 2 at GYD).
+                      {tb.flightTrackHint}
                     </span>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Date *
+                      {tb.flightDateLabel}
                     </label>
                     <input
                       type="date"
@@ -543,7 +544,7 @@ function TransferBookForm() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Estimated Time *
+                      {tb.flightTimeLabel}
                     </label>
                     <input
                       type="time"
@@ -561,13 +562,13 @@ function TransferBookForm() {
                 <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-4">
                   <div className="text-xs font-bold text-sky-800 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                     <Plane className="h-4 w-4 rotate-180" />
-                    <span>Return Flight Information</span>
+                    <span>{tb.retFlightInfo}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Return Flight Number *
+                        {tb.retFlightNumLabel}
                       </label>
                       <input
                         type="text"
@@ -581,7 +582,7 @@ function TransferBookForm() {
 
                     <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Return Date *
+                        {tb.retFlightDateLabel}
                       </label>
                       <input
                         type="date"
@@ -594,7 +595,7 @@ function TransferBookForm() {
 
                     <div>
                       <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Return Flight Time *
+                        {tb.retFlightTimeLabel}
                       </label>
                       <input
                         type="time"
@@ -612,7 +613,7 @@ function TransferBookForm() {
               <div className="flex items-start gap-3 rounded-xl bg-blue-50 p-4 border border-blue-100">
                 <Clock className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div className="text-xs text-blue-900 leading-relaxed">
-                  <span className="font-bold">Complimentary Wait Time:</span> 60 minutes free waiting time from the actual touchdown time for international arrivals. For hotel pickups, 15 minutes complimentary waiting time is included.
+                  <span className="font-bold">{tb.waitNoticeTitle}</span> {tb.waitNoticeDesc}
                 </div>
               </div>
 
@@ -624,14 +625,14 @@ function TransferBookForm() {
                   className="rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
+                  <span>{tb.btnBack}</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleNextFromStep2}
                   className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
                 >
-                  <span>Continue to Passenger Info</span>
+                  <span>{tb.btnContinuePax}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -642,33 +643,33 @@ function TransferBookForm() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Step 3: Passenger Information</h2>
+                <h2 className="text-xl font-bold text-slate-900">{tb.step3Title}</h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  Please provide the lead passenger contact details for driver communication and booking voucher.
+                  {tb.step3Desc}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Lead Passenger Full Name *
+                    {tb.leadPassengerLabel}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="As shown on passport / ID"
+                    placeholder={tb.leadPassengerPlaceholder}
                     value={passengerName}
                     onChange={(e) => setPassengerName(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
                   />
                   <p className="text-[10px] text-slate-500 mt-1">
-                    The driver will hold a greeting sign with this name.
+                    {tb.nameSignHint}
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Number of Passengers *
+                    {tb.paxCountLabel}
                   </label>
                   <select
                     value={passengerCount}
@@ -677,7 +678,7 @@ function TransferBookForm() {
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => (
                       <option key={num} value={num}>
-                        {num} {num === 1 ? "Passenger" : "Passengers"}
+                        {num} {num === 1 ? tb.paxUnitSingle : tb.paxUnitPlural}
                       </option>
                     ))}
                   </select>
@@ -685,8 +686,7 @@ function TransferBookForm() {
                     <div className="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-start gap-2">
                       <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
                       <div>
-                        You selected <strong>{passengerCount} passengers</strong>, but <strong>{currentVehicle.label}</strong> comfortably accommodates up to <strong>{currentVehicle.maxPax} passengers</strong>.
-                        {passengerCount <= 4 ? " We recommend selecting an SUV or Minivan." : " We recommend selecting our Minivan (up to 7 passengers)."}
+                        {passengerCount} {tb.paxUnitPlural} — {currentVehicle.maxPax} {tb.paxUnitPlural} max ({getVehicleLabel(currentVehicle.id)})
                       </div>
                     </div>
                   )}
@@ -694,12 +694,12 @@ function TransferBookForm() {
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Email Address *
+                    {tb.emailLabel}
                   </label>
                   <input
                     type="email"
                     required
-                    placeholder="For booking confirmation & receipt"
+                    placeholder={tb.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
@@ -708,29 +708,29 @@ function TransferBookForm() {
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Phone / WhatsApp Number *
+                    {tb.phoneLabel}
                   </label>
                   <input
                     type="tel"
                     required
-                    placeholder="+994 55 100 31 46 (with country code)"
+                    placeholder={tb.phonePlaceholder}
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
                   />
                   <p className="text-[10px] text-slate-500 mt-1">
-                    Driver will message or call upon landing.
+                    {tb.phoneHint}
                   </p>
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Luggage & Special Requests (Optional)
+                  {tb.notesLabel}
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="e.g. 1 baby child seat needed, 3 large golf bags, wheelchair assistance, etc."
+                  placeholder={tb.notesPlaceholder}
                   value={luggageNotes}
                   onChange={(e) => setLuggageNotes(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
@@ -745,14 +745,14 @@ function TransferBookForm() {
                   className="rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
+                  <span>{tb.btnBack}</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleNextFromStep3}
                   className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
                 >
-                  <span>Review & Payment</span>
+                  <span>{tb.btnContinueReview}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -763,9 +763,9 @@ function TransferBookForm() {
           {step === 4 && (
             <form onSubmit={handleSubmitBooking} className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Step 4: Review Booking & Payment</h2>
+                <h2 className="text-xl font-bold text-slate-900">{tb.step4Title}</h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  Verify your transfer details and choose your preferred payment method.
+                  {tb.step4Desc}
                 </p>
               </div>
 
@@ -775,55 +775,55 @@ function TransferBookForm() {
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">{currentVehicle?.icon}</span>
                     <div>
-                      <div className="font-bold text-slate-900 text-sm">{currentVehicle?.label}</div>
+                      <div className="font-bold text-slate-900 text-sm">{getVehicleLabel(vehicleClass)}</div>
                       <div className="text-[11px] text-slate-500">
-                        {airportInfo?.fullName ?? airport}
+                        {LOCALIZED_AIRPORTS[language]?.[airport] || airportInfo?.fullName || airport}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
                     <span className="rounded-full bg-sky-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1">
-                      {direction === "arrival" ? "🛬 Arrival" : direction === "departure" ? "🛫 Departure" : "🔄 Round Trip"}
+                      {direction === "arrival" ? `🛬 ${t.transferPage.arrival}` : direction === "departure" ? `🛫 ${t.transferPage.departure}` : `🔄 ${t.transferPage.roundTripLabel}`}
                     </span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-slate-400 font-medium">Destination Zone:</span>
-                    <p className="font-semibold text-slate-800">{currentZone?.name}</p>
+                    <span className="text-slate-400 font-medium">{tb.destZoneLabel}</span>
+                    <p className="font-semibold text-slate-800">{LOCALIZED_ZONES[language]?.[currentZone?.id || ""] || currentZone?.name}</p>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium">Specific Address:</span>
+                    <span className="text-slate-400 font-medium">{tb.addressLabel}</span>
                     <p className="font-semibold text-slate-800">{dropoffAddress}</p>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium">Flight:</span>
+                    <span className="text-slate-400 font-medium">{tb.flightLabel}</span>
                     <p className="font-semibold text-slate-800">
-                      {flightNumber} on {flightDate} at {flightTime}
+                      {flightNumber} · {flightDate} {flightTime}
                     </p>
                   </div>
                   {direction === "round_trip" && (
                     <div>
-                      <span className="text-slate-400 font-medium">Return Flight:</span>
+                      <span className="text-slate-400 font-medium">{tb.returnFlightLabel}</span>
                       <p className="font-semibold text-slate-800">
-                        {returnFlightNumber} on {returnDate} at {returnTime}
+                        {returnFlightNumber} · {returnDate} {returnTime}
                       </p>
                     </div>
                   )}
                   <div>
-                    <span className="text-slate-400 font-medium">Lead Passenger:</span>
-                    <p className="font-semibold text-slate-800">{passengerName} ({passengerCount} pax)</p>
+                    <span className="text-slate-400 font-medium">{tb.leadPaxLabel}</span>
+                    <p className="font-semibold text-slate-800">{passengerName} ({passengerCount} {passengerCount === 1 ? tb.paxUnitSingle : tb.paxUnitPlural})</p>
                   </div>
                   <div>
-                    <span className="text-slate-400 font-medium">Contact:</span>
+                    <span className="text-slate-400 font-medium">{tb.contactLabel}</span>
                     <p className="font-semibold text-slate-800">{phoneNumber} · {email}</p>
                   </div>
                 </div>
 
                 {luggageNotes && (
                   <div className="pt-2 border-t border-sky-100 text-xs">
-                    <span className="text-slate-400 font-medium">Special Notes:</span>
+                    <span className="text-slate-400 font-medium">{tb.notesLabelReview}</span>
                     <p className="text-slate-700 italic mt-0.5">{luggageNotes}</p>
                   </div>
                 )}
@@ -832,34 +832,34 @@ function TransferBookForm() {
               {/* Price Breakdown */}
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <div className="flex items-center justify-between text-xs text-slate-600 mb-2">
-                  <span>Transfer Rate ({currentVehicle?.label} — {currentZone?.name})</span>
-                  <span>{isCustomZone ? "To be quoted" : `$${totalAmount.toFixed(2)}`}</span>
+                  <span>{tb.rateLabel} ({getVehicleLabel(vehicleClass)} — {LOCALIZED_ZONES[language]?.[currentZone?.id || ""] || currentZone?.name})</span>
+                  <span>{isCustomZone ? tb.toBeQuoted : `$${totalAmount.toFixed(2)}`}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-slate-600 mb-2">
-                  <span>Airport meet & greet + 60 min wait time</span>
-                  <span className="text-emerald-600 font-semibold">Included ($0.00)</span>
+                  <span>{tb.meetGreetFree}</span>
+                  <span className="text-emerald-600 font-semibold">{tb.includedFree}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-slate-600 mb-2">
-                  <span>Highway tolls, fuel & parking</span>
-                  <span className="text-emerald-600 font-semibold">Included ($0.00)</span>
+                  <span>{tb.tollsFuelFree}</span>
+                  <span className="text-emerald-600 font-semibold">{tb.includedFree}</span>
                 </div>
                 <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-sm">Total Due:</span>
+                  <span className="font-bold text-slate-900 text-sm">{tb.totalDue}</span>
                   <div className="text-right">
                     <span className="text-2xl font-extrabold text-sky-700">
-                      {isCustomZone ? "Custom Quote" : `$${totalAmount.toFixed(2)}`}
+                      {isCustomZone ? t.transferPage.customQuoteText : `$${totalAmount.toFixed(2)}`}
                     </span>
                     {!isCustomZone && (
                       <span className="block text-xs font-semibold text-slate-600">
                         (~{(totalAmount * 1.7).toFixed(2)} AZN)
                       </span>
                     )}
-                    <div className="text-[10px] text-slate-400">All highway tolls, parking & taxes included</div>
+                    <div className="text-[10px] text-slate-400">{tb.allTaxesInc}</div>
                   </div>
                 </div>
                 {!isCustomZone && (
                   <p className="text-[10px] text-slate-400 mt-2 border-t border-slate-100 pt-1.5 leading-relaxed">
-                    💳 Card transactions processed securely via Payriff at the official Central Bank of Azerbaijan peg (1 USD = 1.70 AZN). Cash on arrival accepted in AZN, USD, or EUR.
+                    {tb.payriffDesc}
                   </p>
                 )}
               </div>
@@ -868,7 +868,7 @@ function TransferBookForm() {
               {!isCustomZone && (
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                    Select Payment Method
+                    {tb.payMethodLabel}
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div
@@ -881,10 +881,10 @@ function TransferBookForm() {
                     >
                       <div className="flex items-center gap-2 mb-1.5">
                         <CreditCard className="h-5 w-5 text-sky-600" />
-                        <span className="font-bold text-sm text-slate-900">Pay Online via Card</span>
+                        <span className="font-bold text-sm text-slate-900">{tb.payOnlineTitle}</span>
                       </div>
                       <p className="text-[11px] text-slate-500 leading-relaxed">
-                        Instant card checkout with Payriff (Visa / Mastercard). Full refund if cancelled 24h before.
+                        {tb.payOnlineDesc}
                       </p>
                     </div>
 
@@ -898,10 +898,10 @@ function TransferBookForm() {
                     >
                       <div className="flex items-center gap-2 mb-1.5">
                         <Banknote className="h-5 w-5 text-emerald-600" />
-                        <span className="font-bold text-sm text-slate-900">Pay on Arrival (Cash)</span>
+                        <span className="font-bold text-sm text-slate-900">{tb.payCashTitle}</span>
                       </div>
                       <p className="text-[11px] text-slate-500 leading-relaxed">
-                        Pay your driver in cash upon arrival. Accepted: USD, EUR, or Azerbaijani Manat (AZN).
+                        {tb.payCashDesc}
                       </p>
                     </div>
                   </div>
@@ -918,7 +918,7 @@ function TransferBookForm() {
                   className="mt-0.5 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
                 <label htmlFor="transferTerms" className="text-xs text-slate-600 leading-relaxed cursor-pointer">
-                  I agree to the transfer booking policy, including 24-hour free cancellation and flight monitoring terms.
+                  {tb.termsCheckbox}
                 </label>
               </div>
 
@@ -931,7 +931,7 @@ function TransferBookForm() {
                   className="rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5 disabled:opacity-50"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
+                  <span>{tb.btnBack}</span>
                 </button>
 
                 <button
@@ -942,16 +942,21 @@ function TransferBookForm() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Processing Booking...</span>
+                      <span>{tb.btnSubmitting}</span>
                     </>
                   ) : paymentMethod === "online" && !isCustomZone ? (
                     <>
-                      <span>Proceed to Card Payment (${totalAmount})</span>
+                      <span>{tb.btnPayCard} (${totalAmount})</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  ) : isCustomZone ? (
+                    <>
+                      <span>{tb.btnRequestQuote}</span>
                       <ArrowRight className="h-4 w-4" />
                     </>
                   ) : (
                     <>
-                      <span>Confirm Reservation (Pay on Arrival)</span>
+                      <span>{tb.btnConfirmCash} (${totalAmount})</span>
                       <CheckCircle2 className="h-4 w-4" />
                     </>
                   )}

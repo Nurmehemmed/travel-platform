@@ -27,6 +27,7 @@ import {
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 import { getVehicleConfig } from "@/lib/transfer-zones";
+import { TRANSFER_TRACK_TRANSLATIONS, LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
 
 interface BookingData {
   bookingNumber: string;
@@ -53,8 +54,9 @@ interface BookingData {
 }
 
 function TransferTrackContent() {
+  const { t, language } = useLanguage();
   const searchParams = useSearchParams();
-  const { t } = useLanguage();
+  const tt = (TRANSFER_TRACK_TRANSLATIONS[language] || TRANSFER_TRACK_TRANSLATIONS.EN)!;
   const initialRef = searchParams.get("ref") || "";
   const isPaid = searchParams.get("paid") === "true";
   const isConfirmed = searchParams.get("confirmed") === "true";
@@ -106,32 +108,32 @@ function TransferTrackContent() {
     switch (status) {
       case "confirmed":
         return {
-          label: "Confirmed — Driver Assigned",
+          label: tt.statusConfirmed,
           color: "bg-emerald-100 text-emerald-800 border-emerald-300",
           icon: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
         };
       case "in_progress":
         return {
-          label: "In Progress / En Route",
+          label: tt.statusInProgress,
           color: "bg-sky-100 text-sky-800 border-sky-300",
           icon: <Car className="h-4 w-4 text-sky-600" />,
         };
       case "completed":
         return {
-          label: "Completed",
+          label: tt.statusCompleted,
           color: "bg-slate-100 text-slate-800 border-slate-300",
           icon: <CheckCircle2 className="h-4 w-4 text-slate-600" />,
         };
       case "cancelled":
         return {
-          label: "Cancelled",
+          label: tt.statusCancelled,
           color: "bg-red-100 text-red-800 border-red-300",
           icon: <AlertCircle className="h-4 w-4 text-red-600" />,
         };
       case "pending":
       default:
         return {
-          label: "Booking Received — Assigning Driver",
+          label: tt.statusPending,
           color: "bg-amber-100 text-amber-800 border-amber-300",
           icon: <Clock className="h-4 w-4 text-amber-600" />,
         };
@@ -177,12 +179,10 @@ function TransferTrackContent() {
             </div>
             <div>
               <h2 className="font-bold text-base">
-                {isPaid ? "Payment Successful & Transfer Confirmed!" : "Transfer Reservation Received!"}
+                {isPaid ? tt.successPaidTitle : tt.successPendingTitle}
               </h2>
               <p className="text-xs text-white/90 mt-0.5">
-                {isPaid
-                  ? "Your transaction was approved via Payriff. Our dispatch team has received your transfer."
-                  : "We have received your reservation. Driver contact details will be shared prior to your flight."}
+                {isPaid ? tt.successPaidDesc : tt.successPendingDesc}
               </p>
             </div>
           </div>
@@ -190,9 +190,9 @@ function TransferTrackContent() {
 
         {/* Search Bar */}
         <div className="rounded-2xl bg-white p-6 shadow-sm border border-sky-100 mb-6">
-          <h1 className="text-lg font-bold text-slate-900 mb-1">Track Your Airport Transfer</h1>
+          <h1 className="text-lg font-bold text-slate-900 mb-1">{tt.trackTitle}</h1>
           <p className="text-xs text-slate-500 mb-4">
-            Enter your booking reference number (e.g. <b>ATR-8K4P9Z</b>) or customer email address.
+            {tt.trackSubtitle}
           </p>
 
           <form onSubmit={handleSearchSubmit} className="flex gap-2">
@@ -200,7 +200,7 @@ function TransferTrackContent() {
               <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="ATR-XXXXXX or your@email.com"
+                placeholder={tt.searchPlaceholder}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100 uppercase"
@@ -211,7 +211,7 @@ function TransferTrackContent() {
               disabled={loading}
               className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Track"}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : tt.trackBtn}
             </button>
           </form>
 
@@ -230,7 +230,7 @@ function TransferTrackContent() {
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Booking Reference
+                  {tt.refLabel}
                 </span>
                 <div className="text-2xl font-black text-slate-900 tracking-tight font-mono">
                   {booking.bookingNumber}
@@ -255,14 +255,14 @@ function TransferTrackContent() {
               <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
                 <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                  <span>Assigned Chauffeur & Vehicle</span>
+                  <span>{tt.chauffeurTitle}</span>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                   <div>
                     <div className="text-sm font-bold text-slate-900">{booking.driverName}</div>
                     <div className="text-xs text-slate-600 mt-0.5 flex items-center gap-1">
                       <Phone className="h-3 w-3 text-emerald-600" />
-                      <span>{booking.driverPhone || "Phone pending"}</span>
+                      <span>{booking.driverPhone || "—"}</span>
                     </div>
                   </div>
                   {booking.driverPhone && (
@@ -272,7 +272,7 @@ function TransferTrackContent() {
                         className="rounded-lg bg-white border border-emerald-300 text-emerald-700 px-3 py-1.5 text-xs font-bold hover:bg-emerald-100 flex items-center gap-1.5 shadow-sm"
                       >
                         <Phone className="h-3 w-3" />
-                        <span>Call Driver</span>
+                        <span>{tt.callDriver}</span>
                       </a>
                       <a
                         href={`https://wa.me/${booking.driverPhone.replace(/[^0-9]/g, "")}`}
@@ -281,7 +281,7 @@ function TransferTrackContent() {
                         className="rounded-lg bg-emerald-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-emerald-700 flex items-center gap-1.5 shadow-sm"
                       >
                         <MessageSquare className="h-3 w-3" />
-                        <span>WhatsApp</span>
+                        <span>{tt.whatsApp}</span>
                       </a>
                     </div>
                   )}
@@ -291,7 +291,7 @@ function TransferTrackContent() {
               <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-4 flex items-center gap-3">
                 <Clock className="h-5 w-5 text-sky-600 flex-shrink-0" />
                 <div className="text-xs text-slate-600">
-                  <span className="font-bold text-slate-800">Driver Assignment:</span> Your driver and vehicle license plate details will be assigned and texted/messaged to your WhatsApp before pickup.
+                  <span className="font-bold text-slate-800">{tt.driverPendingTitle}</span> {tt.driverPendingDesc}
                 </div>
               </div>
             )}
@@ -300,65 +300,65 @@ function TransferTrackContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-2">
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                  <MapPin className="h-3.5 w-3.5 text-sky-600" /> Route & Vehicle
+                  <MapPin className="h-3.5 w-3.5 text-sky-600" /> {tt.routeTitle}
                 </div>
                 <div>
-                  <span className="text-slate-400">Direction:</span>
-                  <p className="font-semibold text-slate-800 capitalize">
-                    {booking.direction.replace("_", " ")}
+                  <span className="text-slate-400">{tt.directionLabel}</span>
+                  <p className="font-semibold text-slate-800">
+                    {booking.direction === "arrival" ? `🛬 ${t.transferPage.arrival}` : booking.direction === "departure" ? `🛫 ${t.transferPage.departure}` : `🔄 ${t.transferPage.roundTripLabel}`}
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Airport:</span>
-                  <p className="font-semibold text-slate-800">{booking.airport}</p>
+                  <span className="text-slate-400">{tt.airportLabel}</span>
+                  <p className="font-semibold text-slate-800">{LOCALIZED_AIRPORTS[language]?.[booking.airport] || booking.airport}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Zone / Destination:</span>
-                  <p className="font-semibold text-slate-800">{booking.pickupZone}</p>
+                  <span className="text-slate-400">{tt.zoneLabel}</span>
+                  <p className="font-semibold text-slate-800">{LOCALIZED_ZONES[language]?.[booking.pickupZone] || booking.pickupZone}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Address:</span>
+                  <span className="text-slate-400">{tt.addressLabel}</span>
                   <p className="font-semibold text-slate-800">{booking.dropoffAddress}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Vehicle Class:</span>
-                  <p className="font-semibold text-slate-800 capitalize flex items-center gap-1.5">
+                  <span className="text-slate-400">{tt.vehicleLabel}</span>
+                  <p className="font-semibold text-slate-800 flex items-center gap-1.5">
                     <span>{getVehicleConfig(booking.vehicleClass)?.icon || "🚗"}</span>
-                    <span>{getVehicleConfig(booking.vehicleClass)?.label || booking.vehicleClass}</span>
+                    <span>{booking.vehicleClass === "sedan" ? t.transferPage.sedan : booking.vehicleClass === "suv" ? t.transferPage.suv : t.transferPage.minivan}</span>
                   </p>
                 </div>
               </div>
 
               <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-2">
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                  <Plane className="h-3.5 w-3.5 text-sky-600" /> Flight & Passenger
+                  <Plane className="h-3.5 w-3.5 text-sky-600" /> {tt.flightTitle}
                 </div>
                 <div>
-                  <span className="text-slate-400">Flight Number:</span>
+                  <span className="text-slate-400">{tt.flightNumLabel}</span>
                   <p className="font-semibold text-slate-800 font-mono">{booking.flightNumber}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Date & Time:</span>
+                  <span className="text-slate-400">{tt.dateTimeLabel}</span>
                   <p className="font-semibold text-slate-800">
-                    {booking.flightDate} at {booking.flightTime}
+                    {booking.flightDate} · {booking.flightTime}
                   </p>
                 </div>
                 {booking.returnFlightNumber && (
                   <div>
-                    <span className="text-slate-400">Return Flight:</span>
+                    <span className="text-slate-400">{tt.returnFlightLabel}</span>
                     <p className="font-semibold text-slate-800 font-mono">
-                      {booking.returnFlightNumber} on {booking.returnDate} at {booking.returnTime}
+                      {booking.returnFlightNumber} · {booking.returnDate} {booking.returnTime}
                     </p>
                   </div>
                 )}
                 <div>
-                  <span className="text-slate-400">Lead Passenger:</span>
+                  <span className="text-slate-400">{tt.passengerLabel}</span>
                   <p className="font-semibold text-slate-800">{booking.passengerName} ({booking.passengerCount} pax)</p>
                 </div>
                 <div>
-                  <span className="text-slate-400">Payment:</span>
+                  <span className="text-slate-400">{tt.paymentLabel}</span>
                   <p className="font-semibold text-slate-800">
-                    ${booking.totalAmount} · {booking.paymentMethod === "online" ? "Paid Online" : "Pay on Arrival (Cash)"}
+                    ${booking.totalAmount} · {booking.paymentMethod === "online" ? tt.paidOnline : tt.payCash}
                   </p>
                 </div>
               </div>
@@ -372,7 +372,7 @@ function TransferTrackContent() {
                 className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all flex items-center gap-1.5"
               >
                 <Printer className="h-3.5 w-3.5 text-slate-500" />
-                <span>Print Booking Voucher</span>
+                <span>{tt.printVoucher}</span>
               </button>
 
               <div className="flex items-center gap-3">
@@ -383,14 +383,14 @@ function TransferTrackContent() {
                   className="text-xs font-semibold text-emerald-700 hover:underline flex items-center gap-1"
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
-                  <span>Ops WhatsApp Support</span>
+                  <span>{tt.supportWhatsApp}</span>
                 </a>
 
                 <Link
                   href="/transfer/book"
                   className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
                 >
-                  <span>Book Another</span>
+                  <span>{tt.bookAnother}</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -409,7 +409,7 @@ export default function TransferTrackPage() {
         <div className="min-h-screen flex items-center justify-center bg-[#f0f9ff]">
           <div className="flex items-center gap-3 text-sky-700 font-semibold text-sm">
             <Loader2 className="h-6 w-6 animate-spin text-sky-600" />
-            <span>Loading tracking details...</span>
+            <span>Loading transfer details...</span>
           </div>
         </div>
       }
