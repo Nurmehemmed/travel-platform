@@ -185,7 +185,7 @@ export default function VisaLandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Standard Tier */}
-            <div className="rounded-3xl bg-white p-8 border border-[#e2d8cc] shadow-sm hover:shadow-lg transition-all flex flex-col justify-between">
+            <div className="rounded-3xl bg-white p-8 border border-slate-200 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <span className="rounded-full bg-slate-100 text-slate-700 font-semibold px-3 py-1 text-xs uppercase tracking-wider">
@@ -298,7 +298,7 @@ export default function VisaLandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ HOW IT WORKS */}
-      <section className="py-16 bg-white border-y border-[#e2d8cc]">
+      <section className="py-16 bg-white border-y border-slate-200">
         <div className="container-section">
           <div className="text-center max-w-xl mx-auto mb-12">
             <h2 className="font-display text-3xl font-bold text-slate-900">4 Simple Steps to Your Visa</h2>

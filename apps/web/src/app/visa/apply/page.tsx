@@ -197,12 +197,12 @@ export default function VisaApplyPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#f5ede0" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
       {/* ═══════════════════════════════════════════════════════ HEADER */}
-      <header className="border-b border-black/10 py-4" style={{ backgroundColor: "#133e35" }}>
+      <header className="border-b border-black/10 py-4" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section flex items-center justify-between">
           <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90">
-            <ArrowLeft className="h-4 w-4 text-[#c9a227]" />
+            <ArrowLeft className="h-4 w-4 text-[#f59e0b]" />
             <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
             <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
@@ -222,7 +222,7 @@ export default function VisaApplyPage() {
 
       {/* ═══════════════════════════════════════════════════════ WIZARD PROGRESS */}
       {step < 5 && (
-        <div className="bg-white border-b border-[#e2d8cc] py-3 sm:py-4">
+        <div className="bg-white border-b border-slate-200 py-3 sm:py-4">
           <div className="container-section max-w-2xl mx-auto">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -translate-y-1/2 -z-0" />
@@ -237,7 +237,7 @@ export default function VisaApplyPage() {
                     className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-xs font-bold transition-colors"
                     style={
                       step >= s.num
-                        ? { backgroundColor: "#133e35", color: "#ffffff" }
+                        ? { backgroundColor: "#0f3460", color: "#ffffff" }
                         : { backgroundColor: "#e2e8f0", color: "#64748b" }
                     }
                   >
@@ -264,7 +264,7 @@ export default function VisaApplyPage() {
 
         {/* ── STEP 1: Nationality & Tier ─────────────────────────── */}
         {step === 1 && (
-          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-[#e2d8cc]">
+          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
               Select Your Nationality
             </h2>
@@ -283,7 +283,7 @@ export default function VisaApplyPage() {
                     setNationality(e.target.value);
                     setBirthCountry(e.target.value);
                   }}
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#133e35]"
+                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
                 >
                   <option value="">Select your passport country...</option>
                   {COUNTRIES.map((c) => (
@@ -345,7 +345,7 @@ export default function VisaApplyPage() {
                     onClick={() => setVisaType("standard")}
                     className={`p-4 rounded-2xl border-2 transition-all cursor-pointer ${
                       visaType === "standard"
-                        ? "border-[#133e35] bg-slate-50 shadow-sm"
+                        ? "border-[#0f3460] bg-slate-50 shadow-sm"
                         : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
@@ -356,18 +356,18 @@ export default function VisaApplyPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mb-2">Regular tourist processing.</p>
-                    <p className="font-bold text-lg text-[#133e35]">$59 <span className="text-xs font-normal text-slate-500">USD</span></p>
+                    <p className="font-bold text-lg text-[#0f3460]">$59 <span className="text-xs font-normal text-slate-500">USD</span></p>
                   </div>
 
                   <div
                     onClick={() => setVisaType("urgent")}
                     className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden ${
                       visaType === "urgent"
-                        ? "border-[#c9a227] bg-amber-50/40 shadow-md"
+                        ? "border-[#f59e0b] bg-amber-50/40 shadow-md"
                         : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
-                    <span className="absolute top-0 right-0 bg-[#c9a227] text-[#0f2e27] text-[9px] font-extrabold px-2 py-0.5 rounded-bl-lg">
+                    <span className="absolute top-0 right-0 bg-[#f59e0b] text-[#061225] text-[9px] font-extrabold px-2 py-0.5 rounded-bl-lg">
                       ⚡ FASTEST
                     </span>
                     <div className="flex items-center justify-between mb-2">
@@ -377,7 +377,7 @@ export default function VisaApplyPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mb-2">Express emergency turnaround.</p>
-                    <p className="font-bold text-lg text-[#133e35]">$110 <span className="text-xs font-normal text-slate-500">USD</span></p>
+                    <p className="font-bold text-lg text-[#0f3460]">$110 <span className="text-xs font-normal text-slate-500">USD</span></p>
                   </div>
                 </div>
               </div>
@@ -387,7 +387,7 @@ export default function VisaApplyPage() {
                 onClick={handleNext}
                 disabled={isVisaFree || isEmbassyRequired || !nationality}
                 className="w-full rounded-2xl py-4 text-sm font-semibold text-white transition-all hover:opacity-95 shadow-lg disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 mt-6"
-                style={{ backgroundColor: "#133e35" }}
+                style={{ backgroundColor: "#0f3460" }}
               >
                 Continue to Travel Information <ArrowRight className="h-4 w-4" />
               </button>
@@ -397,7 +397,7 @@ export default function VisaApplyPage() {
 
         {/* ── STEP 2: Travel Details ─────────────────────────────── */}
         {step === 2 && (
-          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-[#e2d8cc]">
+          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
               Travel Information
             </h2>
@@ -414,7 +414,7 @@ export default function VisaApplyPage() {
                   type="date"
                   value={arrivalDate}
                   onChange={(e) => setArrivalDate(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#133e35]"
+                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
                   Your e-Visa will be valid for 90 days starting from this arrival date.
@@ -447,7 +447,7 @@ export default function VisaApplyPage() {
                   value={stayAddress}
                   onChange={(e) => setStayAddress(e.target.value)}
                   placeholder="e.g. Four Seasons Hotel Baku, 1 Neftchilar Avenue, Baku or private address"
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#133e35]"
+                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
                   Required by Azerbaijan Immigration. Hotel booking address is acceptable.
@@ -466,7 +466,7 @@ export default function VisaApplyPage() {
                   type="button"
                   onClick={handleNext}
                   className="flex-1 rounded-xl py-3 text-xs font-semibold text-white transition-opacity hover:opacity-95 shadow-md cursor-pointer flex items-center justify-center gap-2"
-                  style={{ backgroundColor: "#133e35" }}
+                  style={{ backgroundColor: "#0f3460" }}
                 >
                   Continue to Personal & Passport Info <ArrowRight className="h-4 w-4" />
                 </button>
@@ -477,7 +477,7 @@ export default function VisaApplyPage() {
 
         {/* ── STEP 3: Personal & Passport Information ────────────── */}
         {step === 3 && (
-          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-[#e2d8cc]">
+          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
               Personal & Passport Details
             </h2>
@@ -608,7 +608,7 @@ export default function VisaApplyPage() {
               {/* Passport Section */}
               <div className="pt-4 border-t border-slate-200">
                 <h3 className="font-bold text-sm text-slate-900 mb-3 flex items-center gap-1.5">
-                  <Shield className="h-4 w-4 text-[#c9a227]" />
+                  <Shield className="h-4 w-4 text-[#f59e0b]" />
                   Passport Details
                 </h3>
 
@@ -696,7 +696,7 @@ export default function VisaApplyPage() {
                   type="button"
                   onClick={handleNext}
                   className="flex-1 rounded-xl py-3 text-xs font-semibold text-white transition-opacity hover:opacity-95 shadow-md cursor-pointer flex items-center justify-center gap-2"
-                  style={{ backgroundColor: "#133e35" }}
+                  style={{ backgroundColor: "#0f3460" }}
                 >
                   Review Order & Complete <ArrowRight className="h-4 w-4" />
                 </button>
@@ -707,7 +707,7 @@ export default function VisaApplyPage() {
 
         {/* ── STEP 4: Review & Payment ───────────────────────────── */}
         {step === 4 && (
-          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-[#e2d8cc]">
+          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
               Review & Submit Application
             </h2>
@@ -736,7 +736,7 @@ export default function VisaApplyPage() {
                 </div>
                 <div className="flex justify-between border-b border-slate-200/60 pb-2">
                   <span className="text-slate-500">Service Speed:</span>
-                  <span className="font-bold text-[#133e35] uppercase">{visaType} ({visaType === "urgent" ? "3 Hours" : "3 Days"})</span>
+                  <span className="font-bold text-[#0f3460] uppercase">{visaType} ({visaType === "urgent" ? "3 Hours" : "3 Days"})</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Delivery Email:</span>
@@ -745,7 +745,7 @@ export default function VisaApplyPage() {
               </div>
 
               {/* Price Breakdown */}
-              <div className="rounded-2xl p-4 border border-[#c9a227]/40 bg-amber-50/40">
+              <div className="rounded-2xl p-4 border border-[#f59e0b]/40 bg-amber-50/40">
                 <div className="flex justify-between text-xs text-slate-600 mb-1.5">
                   <span>Official Government ASAN Fee:</span>
                   <span>${govFee}.00 USD</span>
@@ -756,7 +756,7 @@ export default function VisaApplyPage() {
                 </div>
                 <div className="flex justify-between text-base font-bold text-slate-900 border-t border-amber-200 pt-2">
                   <span>Total Amount Due:</span>
-                  <span style={{ color: "#133e35" }}>${totalAmount}.00 USD</span>
+                  <span style={{ color: "#0f3460" }}>${totalAmount}.00 USD</span>
                 </div>
               </div>
 
@@ -774,7 +774,7 @@ export default function VisaApplyPage() {
                   onClick={handleSubmitApplication}
                   disabled={submitting}
                   className="flex-1 rounded-xl py-3.5 text-xs font-semibold text-white transition-opacity hover:opacity-95 shadow-lg cursor-pointer flex items-center justify-center gap-2"
-                  style={{ backgroundColor: "#133e35" }}
+                  style={{ backgroundColor: "#0f3460" }}
                 >
                   {submitting ? (
                     <>
@@ -815,7 +815,7 @@ export default function VisaApplyPage() {
 
             <div className="rounded-2xl p-5 bg-slate-50 border border-slate-200 max-w-sm mx-auto mb-8 text-left">
               <p className="text-[11px] text-slate-400 uppercase font-semibold">Your Tracking Reference</p>
-              <p className="font-mono text-2xl font-bold text-[#133e35] my-1">{completedRef}</p>
+              <p className="font-mono text-2xl font-bold text-[#0f3460] my-1">{completedRef}</p>
               <p className="text-xs text-slate-500">
                 A confirmation has been sent to <b>{email}</b>. Keep this reference to track your live status.
               </p>
@@ -825,7 +825,7 @@ export default function VisaApplyPage() {
               <Link
                 href={`/visa/track?ref=${encodeURIComponent(completedRef || "")}&email=${encodeURIComponent(email)}`}
                 className="w-full sm:w-auto rounded-xl px-6 py-3 text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-95"
-                style={{ backgroundColor: "#133e35" }}
+                style={{ backgroundColor: "#0f3460" }}
               >
                 Track Live Status
               </Link>

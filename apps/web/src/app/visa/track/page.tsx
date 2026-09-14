@@ -91,12 +91,12 @@ export default function VisaTrackPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#f5ede0" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
       {/* ═══════════════════════════════════════════════════════ HEADER */}
-      <header className="border-b border-black/10 py-4" style={{ backgroundColor: "#133e35" }}>
+      <header className="border-b border-black/10 py-4" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section flex items-center justify-between">
           <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90">
-            <ArrowLeft className="h-4 w-4 text-[#c9a227]" />
+            <ArrowLeft className="h-4 w-4 text-[#f59e0b]" />
             <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
             <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
@@ -105,7 +105,7 @@ export default function VisaTrackPage() {
           </span>
           <div className="flex items-center gap-2 sm:gap-3">
             <LanguageSelector variant="dark" />
-            <Link href="/visa/apply" className="text-xs text-[#c9a227] hover:underline font-semibold">
+            <Link href="/visa/apply" className="text-xs text-[#f59e0b] hover:underline font-semibold">
               <span className="hidden sm:inline">{t.nav.applyVisa}</span>
               <span className="sm:hidden">{t.nav.applyVisa}</span>
             </Link>
@@ -115,7 +115,7 @@ export default function VisaTrackPage() {
 
       <main className="container-section py-12 max-w-2xl mx-auto">
         {/* Lookup Box */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-[#e2d8cc] mb-8">
+        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 mb-8">
           <h1 className="font-display text-2xl font-bold text-slate-900 mb-1">
             Check Your e-Visa Status
           </h1>
@@ -161,7 +161,7 @@ export default function VisaTrackPage() {
               type="submit"
               disabled={loading}
               className="w-full rounded-xl py-3.5 text-xs font-semibold text-white transition-opacity hover:opacity-95 shadow-md cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
-              style={{ backgroundColor: "#133e35" }}
+              style={{ backgroundColor: "#0f3460" }}
             >
               <Search className="h-4 w-4" />
               {loading ? "Searching Records..." : "Check Status"}
@@ -186,12 +186,12 @@ export default function VisaTrackPage() {
 
         {/* Application Status Card */}
         {application && (
-          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-[#e2d8cc] animate-fade-in space-y-6">
+          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 animate-fade-in space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <p className="text-[11px] text-slate-400 font-semibold uppercase">Application Reference</p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="font-mono text-xl font-bold text-[#133e35]">{application.applicationNumber}</p>
+                  <p className="font-mono text-xl font-bold text-[#0f3460]">{application.applicationNumber}</p>
                   {application.paymentStatus === "paid" ? (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                       ✓ Paid (${application.totalAmount} USD)
@@ -246,7 +246,7 @@ export default function VisaTrackPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="rounded-xl px-5 py-2.5 text-xs font-bold text-white transition-all shadow-md shrink-0 flex items-center gap-2 hover:opacity-95"
-                    style={{ backgroundColor: "#133e35" }}
+                    style={{ backgroundColor: "#0f3460" }}
                   >
                     <Download className="h-4 w-4" />
                     Download PDF e-Visa

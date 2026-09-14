@@ -4,8 +4,8 @@
   "description": "Handcrafted Azerbaijan tours, e-Visa processing, and travel experiences. Explore Baku, the Great Caucasus, and more.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f5ede0",
-  "theme_color": "#2d5016",
+  "background_color": "#f0f9ff",
+  "theme_color": "#0f3460",
   "orientation": "any",
   "icons": [
     {
