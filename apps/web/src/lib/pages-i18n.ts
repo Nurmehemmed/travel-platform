@@ -1650,6 +1650,8 @@ export interface TransferTrackTranslations {
   trackTitle: string;
   trackSubtitle: string;
   searchPlaceholder: string;
+  emailPlaceholder: string;
+  enterEmailPrompt: string;
   trackBtn: string;
   successPaidTitle: string;
   successPaidDesc: string;
@@ -1690,8 +1692,10 @@ export interface TransferTrackTranslations {
 export const TRANSFER_TRACK_TRANSLATIONS: Record<string, TransferTrackTranslations> = {
   EN: {
     trackTitle: "Track Your Airport Transfer",
-    trackSubtitle: "Enter your booking reference number (e.g. ATR-8K4P9Z) or customer email address.",
-    searchPlaceholder: "ATR-XXXXXX or your@email.com",
+    trackSubtitle: "Enter your booking reference number and customer email address to view real-time transfer details.",
+    searchPlaceholder: "ATR-XXXXXX",
+    emailPlaceholder: "passenger@email.com",
+    enterEmailPrompt: "Please enter your booking email address to verify your identity.",
     trackBtn: "Track",
     successPaidTitle: "Payment Successful & Transfer Confirmed!",
     successPaidDesc: "Your transaction was approved via Payriff. Our dispatch team has received your transfer.",
@@ -1726,12 +1730,14 @@ export const TRANSFER_TRACK_TRANSLATIONS: Record<string, TransferTrackTranslatio
     supportWhatsApp: "Ops WhatsApp Support",
     bookAnother: "Book Another",
     loading: "Loading tracking details...",
-    notFound: "No booking found with that reference.",
+    notFound: "No booking found matching that reference and email address.",
   },
   AZ: {
     trackTitle: "Hava Limanı Transferinizi İzləyin",
-    trackSubtitle: "Rezervasiya nömrənizi (məs. ATR-8K4P9Z) və ya e-poçt ünvanınızı daxil edin.",
-    searchPlaceholder: "ATR-XXXXXX və ya email@unvaniniz.com",
+    trackSubtitle: "Canlı transfer statusunu görmək üçün rezervasiya nömrənizi və e-poçt ünvanınızı daxil edin.",
+    searchPlaceholder: "ATR-XXXXXX",
+    emailPlaceholder: "email@unvaniniz.com",
+    enterEmailPrompt: "Təhlükəsizlik üçün rezervasiya zamanı istifadə edilən e-poçt ünvanını daxil edin.",
     trackBtn: "Axtar",
     successPaidTitle: "Ödəniş Uğurlu Oldu və Transfer Təsdiqləndi!",
     successPaidDesc: "Əməliyyat Payriff vasitəsilə təsdiqləndi. Dispetçer komandamız sifarişinizi qəbul etdi.",
@@ -1766,12 +1772,14 @@ export const TRANSFER_TRACK_TRANSLATIONS: Record<string, TransferTrackTranslatio
     supportWhatsApp: "Dispetçer Dəstəyi (WhatsApp)",
     bookAnother: "Yeni Transfer Sifariş Et",
     loading: "Məlumatlar yüklənir...",
-    notFound: "Bu nömrə ilə rezervasiya tapılmadı.",
+    notFound: "Bu nömrə və e-poçt ilə rezervasiya tapılmadı.",
   },
   RU: {
     trackTitle: "Отслеживание трансфера",
-    trackSubtitle: "Введите номер бронирования (напр. ATR-8K4P9Z) или вашу электронную почту.",
-    searchPlaceholder: "ATR-XXXXXX или email@domain.com",
+    trackSubtitle: "Введите номер бронирования и вашу электронную почту для просмотра деталей трансфера.",
+    searchPlaceholder: "ATR-XXXXXX",
+    emailPlaceholder: "email@domain.com",
+    enterEmailPrompt: "Пожалуйста, введите ваш email для проверки доступа.",
     trackBtn: "Найти",
     successPaidTitle: "Оплата прошла успешно! Трансфер подтвержден",
     successPaidDesc: "Транзакция одобрена Payriff. Наша диспетчерская служба приняла ваш заказ в работу.",
@@ -1806,12 +1814,14 @@ export const TRANSFER_TRACK_TRANSLATIONS: Record<string, TransferTrackTranslatio
     supportWhatsApp: "Диспетчер в WhatsApp",
     bookAnother: "Забронировать еще",
     loading: "Загрузка информации...",
-    notFound: "Бронирование с таким номером не найдено.",
+    notFound: "Бронирование с таким номером и email не найдено.",
   },
   FR: {
     trackTitle: "Suivre votre transfert aéroport",
-    trackSubtitle: "Entrez votre référence de réservation (ex. ATR-8K4P9Z) ou votre adresse e-mail.",
-    searchPlaceholder: "ATR-XXXXXX ou votre@email.com",
+    trackSubtitle: "Entrez votre référence de réservation et votre adresse e-mail pour accéder aux détails.",
+    searchPlaceholder: "ATR-XXXXXX",
+    emailPlaceholder: "votre@email.com",
+    enterEmailPrompt: "Veuillez saisir votre adresse e-mail pour confirmer votre identité.",
     trackBtn: "Rechercher",
     successPaidTitle: "Paiement réussi & Transfert confirmé !",
     successPaidDesc: "Votre transaction a été validée via Payriff. Notre équipe régulation a pris en charge votre transfert.",
@@ -1846,12 +1856,14 @@ export const TRANSFER_TRACK_TRANSLATIONS: Record<string, TransferTrackTranslatio
     supportWhatsApp: "Support WhatsApp 24/7",
     bookAnother: "Réserver un autre transfert",
     loading: "Chargement des détails...",
-    notFound: "Aucune réservation trouvée avec cette référence.",
+    notFound: "Aucune réservation trouvée avec cette référence et cette adresse e-mail.",
   },
   AR: {
     trackTitle: "تتبع حجز توصيل المطار",
-    trackSubtitle: "أدخل رقم الحجز المرجعي (مثال: ATR-8K4P9Z) أو عنوان بريدك الإلكتروني.",
-    searchPlaceholder: "ATR-XXXXXX أو بريدك الإلكتروني",
+    trackSubtitle: "أدخل رقم الحجز المرجعي وعنوان بريدك الإلكتروني لعرض تفاصيل حجزك بأمان.",
+    searchPlaceholder: "ATR-XXXXXX",
+    emailPlaceholder: "name@domain.com",
+    enterEmailPrompt: "يرجى إدخال عنوان البريد الإلكتروني للتحقق من هويتك.",
     trackBtn: "تتبع",
     successPaidTitle: "تم الدفع بنجاح وتأكيد التوصيل!",
     successPaidDesc: "تم اعتماد المعاملة عبر Payriff بنجاح. استلم فريق التشغيل لدينا بيانات توصيلك.",
@@ -1886,12 +1898,14 @@ export const TRANSFER_TRACK_TRANSLATIONS: Record<string, TransferTrackTranslatio
     supportWhatsApp: "دعم العمليات عبر واتساب",
     bookAnother: "حجز توصيل آخر",
     loading: "جارٍ تحميل بيانات الحجز...",
-    notFound: "لم يتم العثور على أي حجز بهذا الرقم المرجعي.",
+    notFound: "لم يتم العثور على أي حجز بهذا الرقم المرجعي والبريد الإلكتروني.",
   },
   DE: {
     trackTitle: "Flughafentransfer verfolgen",
-    trackSubtitle: "Geben Sie Ihre Buchungsnummer (z.B. ATR-8K4P9Z) oder E-Mail-Adresse ein.",
-    searchPlaceholder: "ATR-XXXXXX oder ihre@email.de",
+    trackSubtitle: "Geben Sie Ihre Buchungsnummer und Ihre E-Mail-Adresse ein, um Transferdetails sicher abzurufen.",
+    searchPlaceholder: "ATR-XXXXXX",
+    emailPlaceholder: "name@domain.de",
+    enterEmailPrompt: "Bitte geben Sie Ihre Buchungs-E-Mail-Adresse ein, um Ihre Identität zu bestätigen.",
     trackBtn: "Suchen",
     successPaidTitle: "Zahlung erfolgreich & Transfer bestätigt!",
     successPaidDesc: "Ihre Zahlung via Payriff wurde bestätigt. Unsere Disposition hat Ihren Auftrag übernommen.",
@@ -1926,7 +1940,7 @@ export const TRANSFER_TRACK_TRANSLATIONS: Record<string, TransferTrackTranslatio
     supportWhatsApp: "WhatsApp-Disposition 24/7",
     bookAnother: "Weiteren Transfer buchen",
     loading: "Trackingdaten werden geladen...",
-    notFound: "Keine Buchung mit dieser Referenz gefunden.",
+    notFound: "Keine Buchung mit dieser Buchungsnummer und E-Mail-Adresse gefunden.",
   },
 };
 

@@ -1,46 +1,59 @@
 import { NextResponse } from "next/server";
 import { db, transferBookings } from "@travel/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const ref = url.searchParams.get("ref");
-  const email = url.searchParams.get("email");
+  // Rate limiting: 15 requests per minute per IP to protect against enumeration attacks
+  const clientIp = getClientIp(req);
+  const rateLimit = checkRateLimit(`track_transfer_${clientIp}`, {
+    limit: 15,
+    windowMs: 60 * 1000,
+  });
 
-  if (!ref && !email) {
+  if (!rateLimit.success) {
     return NextResponse.json(
-      { error: "Please provide a booking reference or email address." },
+      { error: "Too many tracking attempts. Please wait a minute and try again." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": "60",
+        },
+      }
+    );
+  }
+
+  const url = new URL(req.url);
+  const ref = url.searchParams.get("ref")?.trim();
+  const email = url.searchParams.get("email")?.trim();
+
+  // Dual-factor requirement: both booking reference AND customer email must match
+  if (!ref || !email) {
+    return NextResponse.json(
+      { error: "Please provide both your booking reference and email address." },
       { status: 400 }
     );
   }
 
   try {
-    let booking = null;
-
-    if (ref) {
-      booking = await db.query.transferBookings.findFirst({
-        where: eq(transferBookings.bookingNumber, ref.trim().toUpperCase()),
-      });
-    } else if (email) {
-      // Find latest booking by email
-      booking = await db.query.transferBookings.findFirst({
-        where: eq(transferBookings.email, email.trim().toLowerCase()),
-        // Return most recent
-        orderBy: (t, { desc }) => [desc(t.createdAt)],
-      });
-    }
+    const booking = await db.query.transferBookings.findFirst({
+      where: and(
+        eq(transferBookings.bookingNumber, ref.toUpperCase()),
+        eq(transferBookings.email, email.toLowerCase())
+      ),
+    });
 
     if (!booking) {
       return NextResponse.json(
-        { error: "No booking found with that reference or email address." },
+        { error: "No booking found matching that reference and email address." },
         { status: 404 }
       );
     }
 
-    // Return safe subset (no internal IDs)
+    // Return safe public subset (no sensitive DB IDs or admin notes)
     return NextResponse.json({
       bookingNumber:      booking.bookingNumber,
       status:             booking.status,
@@ -73,3 +86,4 @@ export async function GET(req: Request) {
     );
   }
 }
+

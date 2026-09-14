@@ -197,24 +197,26 @@ export async function POST(req: Request) {
         paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
       }).catch(console.error);
 
+      const cleanEmail = String(email).trim().toLowerCase();
       return NextResponse.json({
         success: true,
         bookingNumber,
         paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
         totalAmount: pricing.totalAmount,
         isCustomZone: zone.isCustom,
-        trackUrl: `/transfer/track?ref=${bookingNumber}`,
+        trackUrl: `/transfer/track?ref=${encodeURIComponent(bookingNumber)}&email=${encodeURIComponent(cleanEmail)}`,
       });
     }
 
     // 10. Online payment — create Payriff order
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const cleanEmail = String(email).trim().toLowerCase();
     const payriffResult = await createPayriffOrder({
       applicationNumber: bookingNumber,
       amount: pricing.totalAmount,
       currency: "USD",
       description: `Airport Transfer ${direction} — ${zone.name} (${vehicleClass})`,
-      email: String(email).trim().toLowerCase(),
+      email: cleanEmail,
     });
 
     // Store orderId in DB
@@ -230,7 +232,7 @@ export async function POST(req: Request) {
       totalAmount: pricing.totalAmount,
       paymentUrl: payriffResult.paymentUrl,
       isMock: payriffResult.isMock,
-      trackUrl: `/transfer/track?ref=${bookingNumber}`,
+      trackUrl: `/transfer/track?ref=${encodeURIComponent(bookingNumber)}&email=${encodeURIComponent(cleanEmail)}`,
     });
 
   } catch (error) {

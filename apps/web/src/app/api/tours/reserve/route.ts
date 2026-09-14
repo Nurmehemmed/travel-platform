@@ -1,10 +1,27 @@
 import { NextResponse } from "next/server";
-import { db, tourReservations, recordAuditLog } from "@travel/db";
-import { desc, eq } from "drizzle-orm";
+import { db, tourReservations, packages, recordAuditLog } from "@travel/db";
+import { desc, eq, or } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth";
 import { logger } from "@/lib/logger";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const log = logger.withContext({ route: "/api/tours/reserve" });
+
+// Known static catalog fallback prices (USD) when database packages are offline/syncing
+const STATIC_CATALOG_PRICES: Record<string, number> = {
+  t1: 25,
+  t2: 65,
+  t3: 149,
+  t4: 35,
+  t5: 55,
+  t6: 85,
+  "baku-old-city-walking-tour": 25,
+  "absheron-peninsula-day-trip": 65,
+  "sheki-cultural-journey": 149,
+  "modern-baku-architecture-tour": 35,
+  "gobustan-petroglyphs-mud-volcanoes": 55,
+  "caucasus-mountain-highlands": 85,
+};
 
 function generateReservationNumber(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -17,12 +34,86 @@ function generateReservationNumber(): string {
 
 export async function POST(req: Request) {
   try {
+    // 1. Rate limiting: 10 requests per minute per IP
+    const clientIp = getClientIp(req);
+    const rateCheck = checkRateLimit(`tour_reserve_${clientIp}`, {
+      limit: 10,
+      windowMs: 60 * 1000,
+    });
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: "Too many reservation requests. Please wait a minute and try again." },
+        { status: 429, headers: { "Retry-After": "60" } }
+      );
+    }
+
     const body = await req.json();
     const { tourId, tourTitle, tourDate, guests, travelerName, phoneNumber, price } = body;
 
-    if (!tourId || !tourTitle || !tourDate || !travelerName || !phoneNumber || !price) {
+    if (!tourId || !tourTitle || !tourDate || !travelerName || !phoneNumber) {
       return NextResponse.json(
         { error: "Missing required booking details." },
+        { status: 400 }
+      );
+    }
+
+    const guestCount = Math.max(1, Math.min(50, Number(guests) || 1));
+
+    // 2. Server-Side Price Verification: Never trust client-supplied price
+    let trustedUnitPrice: number | null = null;
+
+    // Check if tourId is a valid UUID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(tourId));
+
+    if (isUuid) {
+      const dbPackage = await db.query.packages.findFirst({
+        where: eq(packages.id, String(tourId)),
+      });
+      if (dbPackage) {
+        trustedUnitPrice = dbPackage.promoPrice && parseFloat(dbPackage.promoPrice) > 0
+          ? parseFloat(dbPackage.promoPrice)
+          : parseFloat(dbPackage.basePrice);
+      }
+    }
+
+    // If not found by UUID, try matching by title or static catalog map
+    if (trustedUnitPrice === null) {
+      const dbPackageByTitle = await db.query.packages.findFirst({
+        where: eq(packages.title, String(tourTitle).trim()),
+      });
+      if (dbPackageByTitle) {
+        trustedUnitPrice = dbPackageByTitle.promoPrice && parseFloat(dbPackageByTitle.promoPrice) > 0
+          ? parseFloat(dbPackageByTitle.promoPrice)
+          : parseFloat(dbPackageByTitle.basePrice);
+      }
+    }
+
+    if (trustedUnitPrice === null) {
+      const key = String(tourId).trim().toLowerCase();
+      if (STATIC_CATALOG_PRICES[key] !== undefined) {
+        trustedUnitPrice = STATIC_CATALOG_PRICES[key];
+      }
+    }
+
+    if (trustedUnitPrice === null) {
+      return NextResponse.json(
+        { error: "Invalid tour selection or catalog entry not found." },
+        { status: 400 }
+      );
+    }
+
+    // Verify client-submitted price against server price to detect tampering
+    const submittedPrice = parseFloat(String(price));
+    if (isNaN(submittedPrice) || Math.abs(submittedPrice - trustedUnitPrice) > 0.01) {
+      log.warn("Tour reservation price tampering detected", {
+        tourId,
+        tourTitle,
+        submittedPrice,
+        trustedUnitPrice,
+        clientIp,
+      });
+      return NextResponse.json(
+        { error: "Tour pricing mismatch. Please refresh the page to view current rates." },
         { status: 400 }
       );
     }
@@ -36,10 +127,10 @@ export async function POST(req: Request) {
         tourId: String(tourId),
         tourTitle: String(tourTitle),
         tourDate: new Date(tourDate) as any,
-        guests: Number(guests) || 1,
+        guests: guestCount,
         travelerName: String(travelerName).trim(),
         phoneNumber: String(phoneNumber).trim(),
-        price: String(price),
+        price: String(trustedUnitPrice.toFixed(2)),
         status: "pending",
       })
       .returning();
@@ -53,10 +144,11 @@ export async function POST(req: Request) {
         metadata: {
           tourTitle,
           tourDate,
-          guests,
+          guests: guestCount,
           travelerName,
           phoneNumber,
-          price,
+          verifiedPrice: trustedUnitPrice,
+          clientIp,
         },
       });
 
@@ -64,6 +156,7 @@ export async function POST(req: Request) {
         reservationNumber: created.reservationNumber,
         tourTitle,
         travelerName,
+        verifiedPrice: trustedUnitPrice,
       });
     }
 

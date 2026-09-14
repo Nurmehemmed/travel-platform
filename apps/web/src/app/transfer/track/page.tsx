@@ -22,7 +22,8 @@ import {
   Printer,
   Sparkles,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  Mail
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
@@ -58,50 +59,58 @@ function TransferTrackContent() {
   const searchParams = useSearchParams();
   const tt = (TRANSFER_TRACK_TRANSLATIONS[language] || TRANSFER_TRACK_TRANSLATIONS.EN)!;
   const initialRef = searchParams.get("ref") || "";
+  const initialEmail = searchParams.get("email") || "";
   const isPaid = searchParams.get("paid") === "true";
   const isConfirmed = searchParams.get("confirmed") === "true";
 
-  const [query, setQuery] = useState(initialRef);
+  const [refQuery, setRefQuery] = useState(initialRef);
+  const [emailQuery, setEmailQuery] = useState(initialEmail);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingData | null>(null);
 
-  const fetchBooking = async (searchTerm: string) => {
-    if (!searchTerm.trim()) return;
+  const fetchBooking = async (ref: string, email: string) => {
+    const cleanRef = ref.trim().toUpperCase();
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanRef || !cleanEmail) {
+      setError(tt.enterEmailPrompt || "Please provide both your booking reference and email address.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const isEmail = searchTerm.includes("@");
-      const param = isEmail
-        ? `email=${encodeURIComponent(searchTerm.trim().toLowerCase())}`
-        : `ref=${encodeURIComponent(searchTerm.trim().toUpperCase())}`;
-
-      const res = await fetch(`/api/transfer/track?${param}`);
+      const res = await fetch(
+        `/api/transfer/track?ref=${encodeURIComponent(cleanRef)}&email=${encodeURIComponent(cleanEmail)}`
+      );
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "No booking found with that reference.");
+        throw new Error(data.error || tt.notFound || "No booking found.");
       }
 
       setBooking(data);
     } catch (err: any) {
       setBooking(null);
-      setError(err?.message || "Failed to find booking.");
+      setError(err?.message || tt.notFound || "Failed to find booking.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (initialRef) {
-      fetchBooking(initialRef);
+    if (initialRef && initialEmail) {
+      fetchBooking(initialRef, initialEmail);
+    } else if (initialRef && !initialEmail) {
+      setError(tt.enterEmailPrompt || "Please enter your booking email address to verify your identity.");
     }
-  }, [initialRef]);
+  }, [initialRef, initialEmail]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchBooking(query);
+    fetchBooking(refQuery, emailQuery);
   };
 
   const getStatusBadge = (status: string) => {
@@ -195,21 +204,31 @@ function TransferTrackContent() {
             {tt.trackSubtitle}
           </p>
 
-          <form onSubmit={handleSearchSubmit} className="flex gap-2">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                placeholder={tt.searchPlaceholder}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100 uppercase"
+                placeholder={tt.searchPlaceholder || "ATR-XXXXXX"}
+                value={refQuery}
+                onChange={(e) => setRefQuery(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100 uppercase font-mono"
+              />
+            </div>
+            <div className="relative flex-1">
+              <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+              <input
+                type="email"
+                placeholder={tt.emailPlaceholder || "passenger@email.com"}
+                value={emailQuery}
+                onChange={(e) => setEmailQuery(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+              className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 shrink-0"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : tt.trackBtn}
             </button>

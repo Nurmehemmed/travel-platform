@@ -79,9 +79,10 @@ export async function GET(req: Request) {
     }).catch(console.error);
   }
 
+  const emailParam = booking?.email ? `&email=${encodeURIComponent(booking.email)}` : "";
   return NextResponse.redirect(
     new URL(
-      `/transfer/track?ref=${encodeURIComponent(bookingNumber)}&paid=true`,
+      `/transfer/track?ref=${encodeURIComponent(bookingNumber)}${emailParam}&paid=true`,
       req.url
     )
   );

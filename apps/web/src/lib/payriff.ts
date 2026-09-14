@@ -50,8 +50,9 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
   if (isMock) {
     // Return local Payriff Sandbox checkout simulation
     const mockOrderId = `PR-SIM-${Math.floor(100000 + Math.random() * 900000)}`;
+    const emailQuery = isTransfer ? `&email=${encodeURIComponent(email)}` : "";
     const paymentUrl = isTransfer
-      ? `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&status=success`
+      ? `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}${emailQuery}&orderId=${mockOrderId}&status=success`
       : `${APP_URL}/visa/pay?ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&amount=${amount}&currency=${currency}`;
     return {
       orderId: mockOrderId,
@@ -61,6 +62,7 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
   }
 
   // Live Payriff v3 Order Request
+  const emailParam = isTransfer ? `&email=${encodeURIComponent(email)}` : "";
   const payload = {
     merchant: PAYRIFF_MERCHANT_ID,
     amount: Number(amount.toFixed(2)),
@@ -68,9 +70,9 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     description: description || `AddmeTour Service ${applicationNumber}`,
     language,
     email,
-    approveURL: `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&status=success`,
-    cancelURL:  `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&status=cancelled`,
-    declineURL: `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&status=declined`,
+    approveURL: `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}${emailParam}&status=success`,
+    cancelURL:  `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}${emailParam}&status=cancelled`,
+    declineURL: `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}${emailParam}&status=declined`,
   };
 
   try {
