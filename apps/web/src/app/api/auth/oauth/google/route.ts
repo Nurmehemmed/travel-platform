@@ -21,7 +21,13 @@ export async function GET(request: Request) {
     return NextResponse.redirect(googleAuthUrl.toString());
   }
 
-  // 2. Fallback Mode: Create / sign-in with verified Google demo user in Neon DB
+  // In production, never allow simulated fallback login if credentials are missing
+  if (process.env.NODE_ENV === "production") {
+    logger.error("Google OAuth credentials (AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET) missing in production");
+    return NextResponse.redirect(`${baseUrl}/?auth_error=google_unconfigured`);
+  }
+
+  // 2. Development Simulation Mode: Sign-in with demo customer user in Neon DB
   try {
     const devEmail = "google.traveler@gmail.com";
     const devName = "Alex Wanderer (Google)";
@@ -44,6 +50,7 @@ export async function GET(request: Request) {
           email: devEmail,
           image: devImage,
           emailVerified: new Date(),
+          role: "customer",
         })
         .returning();
       existing = created;
@@ -57,7 +64,7 @@ export async function GET(request: Request) {
       id: existing.id,
       name: existing.name,
       email: existing.email!,
-      role: existing.role || "admin",
+      role: existing.role || "customer",
     });
     await setSessionCookie(token);
 

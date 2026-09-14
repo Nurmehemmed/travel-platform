@@ -22,7 +22,13 @@ export async function GET(request: Request) {
     return NextResponse.redirect(appleAuthUrl.toString());
   }
 
-  // 2. Fallback Mode: Create / sign-in with verified Apple demo user in Neon DB
+  // In production, never allow simulated fallback login if credentials are missing
+  if (process.env.NODE_ENV === "production") {
+    logger.error("Apple OAuth credentials (AUTH_APPLE_ID) missing in production");
+    return NextResponse.redirect(`${baseUrl}/?auth_error=apple_unconfigured`);
+  }
+
+  // 2. Development Simulation Mode: Sign-in with demo customer user in Neon DB
   try {
     const devEmail = "apple.traveler@icloud.com";
     const devName = "Jordan Rivers (Apple)";
@@ -45,6 +51,7 @@ export async function GET(request: Request) {
           email: devEmail,
           image: devImage,
           emailVerified: new Date(),
+          role: "customer",
         })
         .returning();
       existing = created;
@@ -58,7 +65,7 @@ export async function GET(request: Request) {
       id: existing.id,
       name: existing.name,
       email: existing.email!,
-      role: existing.role || "admin",
+      role: existing.role || "customer",
     });
     await setSessionCookie(token);
 
