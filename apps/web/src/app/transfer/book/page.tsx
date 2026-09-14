@@ -492,11 +492,14 @@ function TransferBookForm() {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. J2 076 or TK 338"
+                      placeholder="e.g. J2 076, TK 338, FZ 707, QR 353"
                       value={flightNumber}
                       onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
                       className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
                     />
+                    <span className="block text-[11px] text-slate-400 mt-1">
+                      🛫 We auto-track your airline and meet you at the correct terminal (Terminal 1 or 2 at GYD).
+                    </span>
                   </div>
 
                   <div>
@@ -820,9 +823,19 @@ function TransferBookForm() {
                     <span className="text-2xl font-extrabold text-sky-700">
                       {isCustomZone ? "Custom Quote" : `$${totalAmount.toFixed(2)}`}
                     </span>
-                    <div className="text-[10px] text-slate-400">All taxes & fees included</div>
+                    {!isCustomZone && (
+                      <span className="block text-xs font-semibold text-slate-600">
+                        (~{(totalAmount * 1.7).toFixed(2)} AZN)
+                      </span>
+                    )}
+                    <div className="text-[10px] text-slate-400">All highway tolls, parking & taxes included</div>
                   </div>
                 </div>
+                {!isCustomZone && (
+                  <p className="text-[10px] text-slate-400 mt-2 border-t border-slate-100 pt-1.5 leading-relaxed">
+                    💳 Card transactions processed securely via Payriff at the official Central Bank of Azerbaijan peg (1 USD = 1.70 AZN). Cash on arrival accepted in AZN, USD, or EUR.
+                  </p>
+                )}
               </div>
 
               {/* Payment Method Selector */}

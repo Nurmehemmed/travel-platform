@@ -233,7 +233,12 @@ export default function HomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [toursList, setToursList] = useState(TOURS);
   const [savedTourIds, setSavedTourIds] = useState<string[]>([]);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [bookingModalTour, setBookingModalTour] = useState<{ id: string; title: string; price: number } | null>(null);
+  const [bookingDate, setBookingDate] = useState("");
+  const [bookingGuests, setBookingGuests] = useState(2);
+  const [bookingName, setBookingName] = useState("");
+  const [bookingPhone, setBookingPhone] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Auth state
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
@@ -248,7 +253,7 @@ export default function HomePage() {
   const [socialNotice, setSocialNotice] = useState<string | null>(null);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { language, setLanguage, t, currentLangInfo, isRtl, languages } = useLanguage();
+  const { language, setLanguage, t, currentLangInfo, isRtl, languages, showToast } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mounted, setMounted] = useState(false);
 
@@ -329,35 +334,19 @@ export default function HomePage() {
       e.preventDefault();
       e.stopPropagation();
     }
-    setSavedTourIds((prev) => {
-      const exists = prev.includes(id);
-      const next = exists ? prev.filter((item) => item !== id) : [...prev, id];
-      try {
-        localStorage.setItem("travel_saved_tour_ids", JSON.stringify(next));
-      } catch {}
-      setToastMessage(exists ? "Removed from saved tours" : "Saved to your favorite tours!");
-      setTimeout(() => setToastMessage(null), 2500);
-      return next;
-    });
+    const exists = savedTourIds.includes(id);
+    const next = exists
+      ? savedTourIds.filter((item) => item !== id)
+      : [...savedTourIds, id];
+    setSavedTourIds(next);
+    try {
+      localStorage.setItem("travel_saved_tour_ids", JSON.stringify(next));
+    } catch {}
+    showToast(exists ? t.tours.savedToastRemove : t.tours.savedToastAdd);
   };
 
   const handleSelectLanguage = (code: LanguageCode) => {
     setLanguage(code);
-    const langObj = languages.find((l) => l.code === code);
-    setToastMessage(
-      code === "AZ"
-        ? `Dil dəyişdirildi: ${langObj?.nativeLabel}`
-        : code === "RU"
-        ? `Язык изменен: ${langObj?.nativeLabel}`
-        : code === "FR"
-        ? `Langue sélectionnée : ${langObj?.nativeLabel}`
-        : code === "AR"
-        ? `تم تغيير اللغة إلى: ${langObj?.nativeLabel}`
-        : code === "DE"
-        ? `Sprache geändert: ${langObj?.nativeLabel}`
-        : `Language set to ${langObj?.nativeLabel}`
-    );
-    setTimeout(() => setToastMessage(null), 2500);
   };
 
   const handleLogout = async () => {
@@ -369,6 +358,19 @@ export default function HomePage() {
       });
       setCurrentUser(null);
       setUserDropdownOpen(false);
+      const logoutMsg =
+        language === "AZ"
+          ? "Uğurla çıxış edildi"
+          : language === "RU"
+          ? "Вы успешно вышли"
+          : language === "FR"
+          ? "Déconnexion réussie"
+          : language === "AR"
+          ? "تم تسجيل الخروج بنجاح"
+          : language === "DE"
+          ? "Erfolgreich abgemeldet"
+          : "Logged out successfully";
+      showToast(logoutMsg);
     } catch {}
   };
 
@@ -406,6 +408,32 @@ export default function HomePage() {
         setPassword("");
         setFullName("");
         setAuthError(null);
+        const name = data.user.name || data.user.email?.split("@")[0] || "";
+        const loginMsg =
+          authMode === "login"
+            ? (language === "AZ"
+                ? `Xoş gəldiniz, ${name}!`
+                : language === "RU"
+                ? `Добро пожаловать, ${name}!`
+                : language === "FR"
+                ? `Bienvenue, ${name} !`
+                : language === "AR"
+                ? `مرحباً بك، ${name}!`
+                : language === "DE"
+                ? `Willkommen, ${name}!`
+                : `Welcome back, ${name}!`)
+            : (language === "AZ"
+                ? "Qeydiyyat uğurla tamamlandı!"
+                : language === "RU"
+                ? "Регистрация прошла успешно!"
+                : language === "FR"
+                ? "Inscription réussie !"
+                : language === "AR"
+                ? "تم إنشاء الحساب بنجاح!"
+                : language === "DE"
+                ? "Registrierung erfolgreich!"
+                : "Account created successfully!");
+        showToast(loginMsg);
       }
     } catch (err: any) {
       setAuthError(err?.message || "Network error. Please try again.");
@@ -480,19 +508,15 @@ export default function HomePage() {
               </Link>
             ))}
 
-            {/* ── e-Visa highlighted CTA ── */}
+            {/* ── e-Visa subdued outlined CTA ── */}
             <Link
               href="/visa"
-              className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all duration-200 hover:scale-105 shadow-sm whitespace-nowrap shrink-0"
-              style={{ backgroundColor: "#f59e0b", color: "#061225" }}
+              className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-white/10 hover:text-white whitespace-nowrap shrink-0"
             >
-              <FileText className="h-3.5 w-3.5 shrink-0" />
+              <FileText className="h-3.5 w-3.5 shrink-0 text-slate-300" />
               <span>{t.nav.evisa}</span>
-              {/* "Fast" badge */}
-              <span
-                className="ml-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider shrink-0"
-                style={{ backgroundColor: "#061225", color: "#f59e0b" }}
-              >
+              {/* Subtle badge */}
+              <span className="ml-0.5 rounded bg-white/15 px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-slate-300 shrink-0">
                 {t.nav.fastBadge}
               </span>
             </Link>
@@ -761,33 +785,60 @@ export default function HomePage() {
       </header>
 
       {/* ═══════════════════════════════════════════════════════ HERO SLIDER */}
-      <section className="relative h-[88vh] min-h-[560px] overflow-hidden group">
+      <section className="relative h-[88vh] min-h-[560px] overflow-hidden group bg-slate-950">
         {/* Background Images with smooth Cross-Fade Transition */}
-        {HERO_SLIDES.map((slide, index) => {
-          if (index !== 0 && !mounted) return null;
-          return (
-            <div
-              key={slide.title}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                index === currentSlide ? "opacity-100 z-0" : "opacity-0 pointer-events-none -z-10"
-              }`}
-            >
-              <Image
-                src={slide.image}
-                alt={slide.alt}
-                fill
-                sizes="100vw"
-                style={{ objectFit: "cover" }}
-                className={`object-cover object-center transition-transform duration-10000 ease-out ${
-                  index === currentSlide ? "scale-105" : "scale-100"
+        <div className="absolute inset-0 z-0 bg-slate-950 overflow-hidden">
+          {HERO_SLIDES.map((slide, index) => {
+            if (index !== 0 && !mounted) return null;
+            return (
+              <div
+                key={slide.title}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
+                  index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
                 }`}
-                priority={index === 0}
-              />
-              {/* Dark gradient overlays for premium contrast */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
-            </div>
-          );
-        })}
+              >
+                <Image
+                  src={slide.image}
+                  alt={slide.alt}
+                  fill
+                  sizes="100vw"
+                  style={{ objectFit: "cover" }}
+                  className={`object-cover object-center transition-transform duration-10000 ease-out ${
+                    index === currentSlide ? "scale-105" : "scale-100"
+                  }`}
+                  priority={index === 0}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Stable Permanent Overlays (Outside fading slides to eliminate crossfade flash) ── */}
+        {/* 1. Deep Top Vignette directly below navbar: Eliminates bright/lighty flash */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-slate-950 via-slate-950/75 to-transparent z-10"
+          aria-hidden="true"
+        />
+
+        {/* 2. Global Ambient Scrim */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-slate-950/45 z-10"
+          aria-hidden="true"
+        />
+
+        {/* 3. Bottom Grounding Gradient */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-10"
+          aria-hidden="true"
+        />
+
+        {/* 4. Targeted Central Radial Scrim for Text Contrast */}
+        <div
+          className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center"
+          aria-hidden="true"
+        >
+          <div className="h-[460px] w-full max-w-4xl rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.75)_0%,rgba(0,0,0,0.35)_55%,transparent_80%)] blur-md" />
+        </div>
 
         {/* Content Container with key-based re-animation */}
         {(() => {
@@ -837,8 +888,7 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href="/transfer"
-                  className="rounded-full border border-white/40 px-8 py-3.5 font-semibold text-sm text-white transition-all duration-200 hover:bg-white/10 backdrop-blur-md shadow-sm whitespace-nowrap"
-                  style={{ backgroundColor: "rgba(19,62,53,0.45)" }}
+                  className="rounded-full border border-white/25 bg-slate-900/80 px-8 py-3.5 font-semibold text-sm text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:border-white/40 hover:bg-white/15 active:scale-98 whitespace-nowrap"
                 >
                   {t.nav.transfer}
                 </Link>
@@ -1123,31 +1173,48 @@ export default function HomePage() {
                       </span>
                     </div>
 
-                    {/* Price + CTA */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        {tour.originalPrice && (
-                          <span className="text-xs text-slate-500 line-through">
-                            {t.tours.fromPrice} ${tour.originalPrice}
+                    {/* Price + Dual CTAs */}
+                    <div className="flex flex-col gap-3 pt-2">
+                      <div className="flex items-baseline justify-between">
+                        <div>
+                          {tour.originalPrice && (
+                            <span className="text-xs text-slate-400 line-through mr-1.5">
+                              ${tour.originalPrice}
+                            </span>
+                          )}
+                          <span className="text-lg font-black text-slate-900">
+                            ${tour.price}
                           </span>
-                        )}
-                        <p className="text-lg font-bold text-slate-900">
-                          <span className="text-sm font-normal text-slate-500">{t.tours.fromPrice} </span>
-                          <span style={{ color: "#0f3460" }}>${tour.price}</span>
-                          <span className="text-xs font-normal text-slate-500"> / {t.tours.groupSize}</span>
-                        </p>
+                          <span className="text-[11px] text-slate-500"> / {t.tours.groupSize}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          ~{(tour.price * 1.7).toFixed(0)} AZN
+                        </span>
                       </div>
-                      <a
-                        href={`https://wa.me/994000000000?text=${encodeURIComponent(
-                          `Hello AddmeTour! I would like to book the "${tourTitle}" tour.`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer"
-                        style={{ backgroundColor: "#0f3460" }}
-                      >
-                        {t.tours.bookNow}
-                      </a>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBookingModalTour({ id: tour.id, title: tourTitle, price: tour.price });
+                            setBookingSuccess(false);
+                          }}
+                          className="w-full rounded-xl py-2.5 px-2 text-xs font-bold transition-all duration-200 border border-slate-300 text-slate-800 hover:bg-slate-100 active:scale-98 text-center cursor-pointer shadow-sm"
+                        >
+                          📅 Reserve Date
+                        </button>
+                        <a
+                          href={`https://wa.me/994000000000?text=${encodeURIComponent(
+                            `Hello AddmeTour! I would like to book the "${tourTitle}" tour ($${tour.price} USD).`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full rounded-xl py-2.5 px-2 text-xs font-bold text-white transition-all duration-200 hover:opacity-95 active:scale-98 text-center cursor-pointer shadow-sm flex items-center justify-center gap-1"
+                          style={{ backgroundColor: "#0f3460" }}
+                        >
+                          <span>{t.tours.bookNow}</span>
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1445,6 +1512,54 @@ export default function HomePage() {
               { question: t.faq.q3, answer: t.faq.a3 },
               { question: t.faq.q4, answer: t.faq.a4 },
               { question: t.faq.q5, answer: t.faq.a5 },
+              {
+                question: language === "AZ"
+                  ? "Azərbaycanda 15 gündən çox qaldıqda qeydiyyat tələb olunurmu?"
+                  : language === "RU"
+                  ? "Нужна ли регистрация при пребывании в Азербайджане более 15 дней?"
+                  : language === "FR"
+                  ? "L'enregistrement de séjour de 15 jours (DMX) est-il obligatoire ?"
+                  : language === "AR"
+                  ? "هل التسجيل لدى دائرة الهجرة إلزامي إذا زادت الإقامة عن 15 يوماً؟"
+                  : language === "DE"
+                  ? "Ist eine Registrierung bei mehr als 15 Tagen Aufenthalt erforderlich?"
+                  : "Is the 15-day migration registration (DMX) mandatory?",
+                answer: language === "AZ"
+                  ? "Bəli. Azərbaycan qanunvericiliyinə görə, 15 təqvim günündən çox qalan xaricilər Dövlət Miqrasiya Xidmətində (DMX) qeydiyyatdan keçməlidir. Otellər bunu avtomatik edir. Əgər Airbnb və ya kirayə mənzildə qalırsınızsa, 15 gün ərzində qeydiyyat aparılmalıdır, əks halda hava limanında 300-400 AZN cərimə tətbiq olunur. Komandamız Airbnb qonaqlarına kömək edir."
+                  : language === "RU"
+                  ? "Да. Иностранцы, находящиеся в Азербайджане более 15 дней, обязаны зарегистрироваться по месту пребывания в Государственной миграционной службе (ГМС). Отели делают это автоматически. Если вы живете в Airbnb или квартире, регистрация обязательна, иначе при выезде взимается штраф 300–400 AZN. Наш консьерж помогает с регистрацией."
+                  : language === "FR"
+                  ? "Oui. Tout étranger séjournant plus de 15 jours doit s'enregistrer auprès du Service d'État des Migrations (DMX). Les hôtels le font automatiquement. Pour les séjours en Airbnb ou appartement, l'enregistrement doit être fait sous 15 jours sous peine d'une amende de 300 à 400 AZN à l'aéroport. Notre équipe conciergerie vous accompagne."
+                  : language === "AR"
+                  ? "نعم. يلزم القانون الأذربيجاني أي زائر يقيم أكثر من 15 يوماً بالتسجيل لدى دائرة الهجرة الحكومية (DMX). الفنادق تتولى ذلك تلقائياً، أما في شقق Airbnb فيجب التسجيل خلال 15 يوماً لتجنب غرامة 300-400 مانات عند المغادرة. يقدم فريقنا الدعم الكامل لضيوف الشقق."
+                  : language === "DE"
+                  ? "Ja. Bei einem Aufenthalt von mehr als 15 Tagen ist eine Registrierung bei der Migrationsbehörde (DMX) vorgeschrieben. Hotels erledigen dies automatisch. Bei Unterkünften wie Airbnb muss die Registrierung innerhalb von 15 Tagen erfolgen, um eine Geldstrafe von 300–400 AZN am Flughafen zu vermeiden. Unser Team unterstützt Sie gern."
+                  : "Yes. Under Azerbaijani immigration law, foreigners staying over 15 calendar days must register with the State Migration Service (DMX). 4/5-star hotels handle this automatically at check-in. If you are staying in an Airbnb or private rental, registration must be filed within 15 days to avoid a 300–400 AZN fine at airport exit control. Our concierge team assists Airbnb guests with registration."
+              },
+              {
+                question: language === "AZ"
+                  ? "Quru sərhədləri açıqdırmı? Qonşu ölkələrdən qatar və ya maşınla gəlmək olar?"
+                  : language === "RU"
+                  ? "Открыты ли сухопутные границы? Можно ли приехать на поезде или авто?"
+                  : language === "FR"
+                  ? "Les frontières terrestres sont-elles ouvertes aux voyageurs ?"
+                  : language === "AR"
+                  ? "هل الحدود البرية مفتوحة للمسافرين القادمين بالسيارة أو القطار؟"
+                  : language === "DE"
+                  ? "Sind die Landgrenzen für Touristen geöffnet?"
+                  : "Are Azerbaijan's land borders open for tourist crossings?",
+                answer: language === "AZ"
+                  ? "Xeyr. Azərbaycanın Gürcüstan, Rusiya, İran və Türkiyə ilə quru sərhədləri sərnişin daşımaları üçün bağlı qalır. Bütün xarici turistlər ölkəyə beynəlxalq aviareyslərlə (GYD Bakı, GJA Gəncə, NAJ Naxçıvan) daxil olmalıdır."
+                  : language === "RU"
+                  ? "Нет. Сухопутные границы Азербайджана с Грузией, Россией, Ираном и Турцией закрыты для пассажирского въезда. Въезд туристов возможен исключительно международными авиарейсами в аэропорты Баку (GYD), Гянджи (GJA) и Нахчывана (NAJ)."
+                  : language === "FR"
+                  ? "Non. Les frontières terrestres avec la Géorgie, la Russie, l'Iran et la Turquie restent fermées pour les passagers. L'entrée en Azerbaïdjan s'effectue exclusivement par voie aérienne via les aéroports de Bakou (GYD), Gandja (GJA) ou Nakhitchevan (NAJ)."
+                  : language === "AR"
+                  ? "لا. لا تزال الحدود البرية لأذربيجان مع جورجيا وروسيا وإيران وتركيا مغلقة أمام حركة المسافرين. الدخول متاح حصراً عبر الرحلات الجوية الدولية في مطار باكو (GYD) وغنجة (GJA) ونخجوان (NAJ)."
+                  : language === "DE"
+                  ? "Nein. Die Landgrenzen zu Georgien, Russland, Iran und der Türkei sind für den Personenverkehr weiterhin geschlossen. Die Einreise für Touristen ist derzeit ausschließlich auf dem Luftweg über die Flughäfen Baku (GYD), Ganja (GJA) und Nachitschewan (NAJ) möglich."
+                  : "No. Azerbaijan's land borders with Georgia, Russia, Iran, and Turkey remain closed for international passenger transit. All tourists must arrive via international flights landing at Heydar Aliyev International Airport (GYD Baku), Ganja (GJA), or Nakhchivan (NAJ)."
+              }
             ].map((faq, idx) => {
               const isOpen = openFaq === idx;
               return (
@@ -1882,11 +1997,162 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Floating Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 rounded-2xl bg-slate-900/95 text-white px-4 py-3 shadow-2xl backdrop-blur-md border border-white/10 animate-fade-in pointer-events-none">
-          <Heart className="h-4 w-4 text-[#f59e0b] fill-[#f59e0b]" />
-          <span className="text-sm font-medium">{toastMessage}</span>
+      {/* ═══════════════════════════════════════════════════════ TOUR RESERVATION MODAL */}
+      {bookingModalTour && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setBookingModalTour(null);
+          }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="relative w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl bg-white border border-slate-200 animate-scale-up">
+            <button
+              onClick={() => setBookingModalTour(null)}
+              className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            {bookingSuccess ? (
+              <div className="text-center py-6">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4">
+                  <Check className="h-8 w-8" />
+                </div>
+                <h3 className="font-display text-xl font-bold text-slate-900 mb-2">Reservation Request Received!</h3>
+                <p className="text-xs text-slate-600 mb-6 leading-relaxed">
+                  Thank you, <strong>{bookingName}</strong>. Our local Baku tour concierge has received your booking for <strong>{bookingModalTour.title}</strong> on <strong>{bookingDate}</strong>. We will confirm your pickup schedule and guide details via WhatsApp shortly.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setBookingModalTour(null)}
+                  className="rounded-xl px-6 py-2.5 text-xs font-bold text-white shadow-md cursor-pointer"
+                  style={{ backgroundColor: "#0f3460" }}
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
+                    Direct Booking
+                  </span>
+                </div>
+                <h3 className="font-display text-xl font-bold text-slate-900 mb-1">
+                  {bookingModalTour.title}
+                </h3>
+                <p className="text-xs text-slate-500 mb-5">
+                  Reserve your private guide and departure date. Pay securely online or upon arrival in Baku.
+                </p>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!bookingDate || !bookingName.trim() || !bookingPhone.trim()) {
+                      showToast(
+                        language === "AZ"
+                          ? "Zəhmət olmasa bütün xanaları doldurun"
+                          : language === "RU"
+                          ? "Пожалуйста, заполните все поля"
+                          : "Please fill in all fields"
+                      );
+                      return;
+                    }
+                    setBookingSuccess(true);
+                    showToast(
+                      language === "AZ"
+                        ? "Tur rezervasiyası uğurla qeydə alındı!"
+                        : language === "RU"
+                        ? "Бронирование тура успешно отправлено!"
+                        : "Tour reservation submitted successfully!"
+                    );
+                  }}
+                  className="space-y-3.5"
+                >
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Select Tour Date *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      min={new Date().toISOString().split("T")[0]}
+                      value={bookingDate}
+                      onChange={(e) => setBookingDate(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Number of Guests (Pax)
+                    </label>
+                    <select
+                      value={bookingGuests}
+                      onChange={(e) => setBookingGuests(Number(e.target.value))}
+                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8, "9+ (Custom Group)"].map((n) => (
+                        <option key={n} value={typeof n === "number" ? n : 9}>
+                          {n} {typeof n === "number" ? (n === 1 ? "Guest" : "Guests") : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Lead Traveler Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Sarah Jenkins"
+                      value={bookingName}
+                      onChange={(e) => setBookingName(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      WhatsApp or Phone *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. +44 7123 456789"
+                      value={bookingPhone}
+                      onChange={(e) => setBookingPhone(e.target.value)}
+                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                    <div className="flex justify-between font-medium">
+                      <span>Rate per group:</span>
+                      <span className="font-bold text-slate-900">${bookingModalTour.price} USD</span>
+                    </div>
+                    <div className="flex justify-between text-[11px] text-slate-400">
+                      <span>Approx. local rate:</span>
+                      <span>~{(bookingModalTour.price * 1.7).toFixed(0)} AZN</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full rounded-xl py-3 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:opacity-95 cursor-pointer mt-2"
+                    style={{ backgroundColor: "#0f3460" }}
+                  >
+                    Confirm Tour Reservation &rarr;
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

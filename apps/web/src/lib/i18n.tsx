@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import {
   TRANSFER_PAGE_TRANSLATIONS,
   VISA_PAGE_TRANSLATIONS,
@@ -906,11 +906,13 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
 
 interface LanguageContextType {
   language: LanguageCode;
-  setLanguage: (lang: LanguageCode) => void;
+  setLanguage: (lang: LanguageCode, suppressToast?: boolean) => void;
   t: Translations;
   currentLangInfo: LanguageInfo;
   isRtl: boolean;
   languages: LanguageInfo[];
+  toastMessage: string | null;
+  showToast: (msg: string) => void;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -918,6 +920,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>("EN");
   const [mounted, setMounted] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = useCallback((msg: string) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    // Defer to next tick so it never interrupts or collides with render phase
+    setTimeout(() => {
+      setToastMessage(msg);
+      toastTimeoutRef.current = setTimeout(() => {
+        setToastMessage(null);
+      }, 2800);
+    }, 0);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -929,7 +944,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, []);
 
-  const setLanguage = (lang: LanguageCode) => {
+  const setLanguage = useCallback((lang: LanguageCode, suppressToast = false) => {
     if (!TRANSLATIONS[lang]) return;
     setLanguageState(lang);
     try {
@@ -940,7 +955,25 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (typeof document !== "undefined") {
       document.documentElement.lang = lang.toLowerCase();
     }
-  };
+
+    if (!suppressToast) {
+      const langObj = LANGUAGES.find((l) => l.code === lang);
+      const label = langObj?.nativeLabel || lang;
+      const msg =
+        lang === "AZ"
+          ? `Dil dəyişdirildi: ${label}`
+          : lang === "RU"
+          ? `Язык изменен: ${label}`
+          : lang === "FR"
+          ? `Langue sélectionnée : ${label}`
+          : lang === "AR"
+          ? `تم تغيير اللغة إلى: ${label}`
+          : lang === "DE"
+          ? `Sprache geändert: ${label}`
+          : `Language set to ${label}`;
+      showToast(msg);
+    }
+  }, [showToast]);
 
   useEffect(() => {
     if (mounted && typeof document !== "undefined") {
@@ -976,9 +1009,34 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         currentLangInfo,
         isRtl,
         languages: LANGUAGES,
+        toastMessage,
+        showToast,
       }}
     >
       {children}
+      {/* Global Floating Toast Notification */}
+      {toastMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 animate-bounce-in pointer-events-none print:hidden"
+        >
+          <div className="flex items-center gap-2.5 rounded-full bg-[#0f3460] px-5 py-2.5 text-white shadow-2xl backdrop-blur-md border border-white/20">
+            <svg
+              className="h-4 w-4 text-[#f59e0b] shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span className="text-sm font-semibold">{toastMessage}</span>
+          </div>
+        </div>
+      )}
     </LanguageContext.Provider>
   );
 }
@@ -1001,6 +1059,8 @@ export function useLanguage() {
       currentLangInfo: LANGUAGES[0]!,
       isRtl: false,
       languages: LANGUAGES,
+      toastMessage: null,
+      showToast: () => {},
     };
   }
   return context;

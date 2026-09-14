@@ -756,8 +756,16 @@ export default function VisaApplyPage() {
                 </div>
                 <div className="flex justify-between text-base font-bold text-slate-900 border-t border-amber-200 pt-2">
                   <span>Total Amount Due:</span>
-                  <span style={{ color: "#0f3460" }}>${totalAmount}.00 USD</span>
+                  <div className="text-right">
+                    <span style={{ color: "#0f3460" }}>${totalAmount}.00 USD</span>
+                    <span className="block text-[11px] font-normal text-slate-500">
+                      (~{(totalAmount * 1.7).toFixed(2)} AZN)
+                    </span>
+                  </div>
                 </div>
+                <p className="text-[10px] text-slate-500 mt-2 border-t border-amber-100 pt-1.5 leading-relaxed">
+                  💳 Payment processed via Payriff at the official Central Bank of Azerbaijan peg (1 USD = 1.70 AZN). No hidden merchant conversion markups.
+                </p>
               </div>
 
               <div className="flex gap-3">

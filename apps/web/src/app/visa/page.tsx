@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   ShieldCheck, Clock, CheckCircle2, AlertCircle, ArrowRight,
-  Search, FileText, Sparkles, HelpCircle, MapPin, ChevronRight, Globe
+  Search, FileText, Sparkles, HelpCircle, MapPin, ChevronRight, ChevronDown, Globe, AlertTriangle
 } from "lucide-react";
 import { COUNTRIES, getCountryEligibility } from "@/lib/visa-countries";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -316,6 +316,60 @@ export default function VisaLandingPage() {
                 <span className="font-display text-3xl font-bold text-[#f59e0b]/40 block mb-2">{step.num}</span>
                 <h4 className="font-bold text-slate-900 text-sm mb-1">{step.title}</h4>
                 <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════ ESSENTIAL VISA & BORDER FAQS */}
+      <section className="py-16 bg-slate-50 border-b border-slate-200">
+        <div className="container-section max-w-4xl">
+          <div className="text-center mb-10">
+            <span className="inline-block rounded-full bg-amber-100 text-amber-900 font-bold px-3.5 py-1 text-xs uppercase tracking-wider mb-2">
+              Essential Immigration Guidance
+            </span>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-slate-900">
+              Crucial Azerbaijan Border & Visa Regulations
+            </h2>
+            <p className="mt-1 text-xs md:text-sm text-slate-500">
+              Key immigration rules every international traveler must know before flying to Baku.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              {
+                q: "⚠️ Mandatory 15-Day Migration Registration (DMX Rule)",
+                a: "Under Republic of Azerbaijan immigration law, any foreigner staying longer than 15 calendar days MUST register at their place of residence with the State Migration Service (DMX). While 4-star and 5-star hotels handle this automatically at check-in, travelers staying in Airbnbs, rental apartments, or private homes must file registration within 15 days of arrival. Failure to do so results in a 300–400 AZN (~$175–$235 USD) fine at airport passport control upon departure. If you are staying in an Airbnb, contact our concierge team and we will guide or submit your registration for you.",
+              },
+              {
+                q: "✈️ Land Borders Closed (Arrivals by Air Only)",
+                a: "Azerbaijan's land borders with Georgia, Russia, Iran, and Turkey remain closed for international passenger transit. All foreign tourists must enter Azerbaijan by international flights arriving at Heydar Aliyev International Airport (GYD Baku), Ganja (GJA), or Nakhchivan (NAJ). Crossing by land (e.g. train or taxi from Tbilisi) is not currently permitted.",
+              },
+              {
+                q: "🛂 Armenian Stamps in Passport: Can I Still Enter?",
+                a: "Yes! Having visited Armenia or having Armenian stamps/visas in your passport does NOT legally prevent you from entering Azerbaijan. However, foreign nationals who entered the Nagorno-Karabakh region without official permission from the Azerbaijani government during the previous conflict are considered to have violated state border laws and are denied entry.",
+              },
+              {
+                q: "🔄 Is the ASAN e-Visa Single-Entry or Multi-Entry?",
+                a: "The official ASAN electronic visa is strictly a SINGLE-ENTRY visa. It is valid for travel within a 90-day window and permits a stay of up to 30 days. If you exit Azerbaijan (e.g. taking a side trip to Georgia or Dubai) and wish to return, you must obtain a new e-Visa before your re-entry.",
+              },
+              {
+                q: "⏳ Passport Validity Requirement",
+                a: "Your passport must have at least 3 months (90 days) of remaining validity beyond the expiration date of your e-Visa (which is approximately 6 months from your initial arrival date in Azerbaijan). Passports expiring sooner will be rejected by immigration authorities.",
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-amber-400"
+              >
+                <h3 className="font-bold text-sm md:text-base text-slate-900 mb-2 flex items-start gap-2">
+                  {item.q}
+                </h3>
+                <p className="text-xs md:text-sm text-slate-600 leading-relaxed pl-1">
+                  {item.a}
+                </p>
               </div>
             ))}
           </div>
