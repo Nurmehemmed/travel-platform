@@ -38,10 +38,21 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
   // Check if live/sandbox Payriff keys are present
   const isMock = !PAYRIFF_SECRET_KEY || PAYRIFF_SECRET_KEY === "mock" || PAYRIFF_SECRET_KEY.startsWith("test_mock");
 
+  // Detect service type by reference prefix: ATR- = transfer, AZV- = visa
+  const isTransfer = applicationNumber.startsWith("ATR-");
+  const callbackBase = isTransfer
+    ? `${APP_URL}/api/payment/transfer-callback`
+    : `${APP_URL}/api/payment/payriff-callback`;
+  const mockPayPage = isTransfer
+    ? `${APP_URL}/transfer/track`
+    : `${APP_URL}/visa/pay`;
+
   if (isMock) {
     // Return local Payriff Sandbox checkout simulation
     const mockOrderId = `PR-SIM-${Math.floor(100000 + Math.random() * 900000)}`;
-    const paymentUrl = `${APP_URL}/visa/pay?ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&amount=${amount}&currency=${currency}`;
+    const paymentUrl = isTransfer
+      ? `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&status=success`
+      : `${APP_URL}/visa/pay?ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&amount=${amount}&currency=${currency}`;
     return {
       orderId: mockOrderId,
       paymentUrl,
@@ -54,12 +65,12 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     merchant: PAYRIFF_MERCHANT_ID,
     amount: Number(amount.toFixed(2)),
     currencyType: currency,
-    description: description || `Azerbaijan e-Visa Application ${applicationNumber}`,
+    description: description || `AddmeTour Service ${applicationNumber}`,
     language,
     email,
-    approveURL: `${APP_URL}/api/payment/payriff-callback?ref=${encodeURIComponent(applicationNumber)}&status=success`,
-    cancelURL: `${APP_URL}/visa/pay/callback?ref=${encodeURIComponent(applicationNumber)}&status=cancelled`,
-    declineURL: `${APP_URL}/visa/pay/callback?ref=${encodeURIComponent(applicationNumber)}&status=declined`,
+    approveURL: `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&status=success`,
+    cancelURL:  `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&status=cancelled`,
+    declineURL: `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&status=declined`,
   };
 
   try {
@@ -91,13 +102,15 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
       paymentUrl,
       isMock: false,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Payriff API Connection Failure:", err);
-    // Fall back to sandbox simulation if Payriff API is temporarily unreachable in dev
+    // Fall back to sandbox simulation if Payriff API is temporarily unreachable
     const fallbackOrderId = `PR-FALLBACK-${Math.floor(100000 + Math.random() * 900000)}`;
     return {
       orderId: fallbackOrderId,
-      paymentUrl: `${APP_URL}/visa/pay?ref=${encodeURIComponent(applicationNumber)}&orderId=${fallbackOrderId}&amount=${amount}&currency=${currency}&notice=fallback`,
+      paymentUrl: isTransfer
+        ? `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&orderId=${fallbackOrderId}&status=success`
+        : `${APP_URL}/visa/pay?ref=${encodeURIComponent(applicationNumber)}&orderId=${fallbackOrderId}&amount=${amount}&currency=${currency}&notice=fallback`,
       isMock: true,
     };
   }

@@ -8,8 +8,11 @@ import {
   Clock, Shield, ShieldCheck, Upload, FileText, Sparkles, Loader2, Info
 } from "lucide-react";
 import { COUNTRIES, getCountryEligibility, validatePassportValidity } from "@/lib/visa-countries";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/lib/i18n";
 
 export default function VisaApplyPage() {
+  const { t } = useLanguage();
   const router = useRouter();
 
   // Wizard Step: 1 = Nationality & Tier, 2 = Travel, 3 = Personal & Passport, 4 = Review & Pay, 5 = Success
@@ -200,17 +203,20 @@ export default function VisaApplyPage() {
         <div className="container-section flex items-center justify-between">
           <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90">
             <ArrowLeft className="h-4 w-4 text-[#c9a227]" />
-            <span className="hidden sm:inline">Back to Visa Overview</span>
-            <span className="sm:hidden">Back</span>
+            <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
+            <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
           <div className="flex items-center gap-2">
             <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white truncate max-w-[140px] sm:max-w-none">
               Azerbaijan e-Visa
             </span>
           </div>
-          <Link href="/visa/track" className="text-xs text-white/80 hover:text-white">
-            Track Status
-          </Link>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSelector variant="dark" />
+            <Link href="/visa/track" className="text-xs text-white/80 hover:text-white">
+              {t.nav.trackVisa}
+            </Link>
+          </div>
         </div>
       </header>
 

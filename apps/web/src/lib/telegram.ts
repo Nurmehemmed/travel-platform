@@ -110,3 +110,109 @@ function escapeHtml(text: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
+
+// ─── Transfer Alert ──────────────────────────────────────────────────────────
+
+export interface TransferTelegramAlertPayload {
+  bookingNumber: string;
+  direction: "arrival" | "departure" | "round_trip";
+  airport: string;
+  pickupZone: string;
+  dropoffAddress: string;
+  vehicleClass: string;
+  flightNumber: string;
+  flightDate: string;
+  flightTime: string;
+  returnFlightNumber?: string | null | undefined;
+  returnDate?: string | null | undefined;
+  passengerName: string;
+  passengerCount: number;
+  phoneNumber: string;
+  email: string;
+  totalAmount: number | string;
+  paymentMethod: "online" | "on_arrival";
+}
+
+/**
+ * Sends a transfer booking alert to the dedicated transfer ops Telegram channel.
+ * Uses TELEGRAM_TRANSFER_CHAT_ID; falls back to TELEGRAM_CHAT_ID if not set.
+ */
+export async function sendTelegramTransferAlert(
+  payload: TransferTelegramAlertPayload
+): Promise<boolean> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_TRANSFER_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
+
+  if (!botToken || !chatId) {
+    console.log(
+      `[Telegram Transfer Alert] (not configured): New transfer ${payload.bookingNumber} for ${payload.passengerName}`
+    );
+    return false;
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  const directionLabel =
+    payload.direction === "arrival" ? "🛬 Arrival (Airport \u2192 Hotel)" :
+    payload.direction === "departure" ? "🛫 Departure (Hotel \u2192 Airport)" :
+    "🔄 Round Trip (Both ways)";
+
+  const vehicleLabel =
+    payload.vehicleClass === "sedan" ? "🚗 Sedan" :
+    payload.vehicleClass === "suv" ? "🚙 SUV" :
+    payload.vehicleClass === "minivan" ? "🚐 Minivan" :
+    payload.vehicleClass === "business" ? "🚙 Business Sedan" :
+    payload.vehicleClass === "executive" ? "🚌 Executive Minibus" :
+    "🚗 Sedan";
+
+  const paymentLabel = payload.paymentMethod === "online" ? "✅ Paid Online" : "💵 Pay on Arrival";
+
+  const returnSection =
+    payload.direction === "round_trip" && payload.returnFlightNumber
+      ? `\n↩️ <b>Return Flight:</b> ${payload.returnFlightNumber} on ${payload.returnDate}`
+      : "";
+
+  const text = `
+🚖 <b>NEW AIRPORT TRANSFER BOOKING</b>
+
+🆔 <b>Booking Ref:</b> <code>${payload.bookingNumber}</code>
+${directionLabel}
+🛩️ <b>Airport:</b> ${payload.airport}
+✈️ <b>Flight:</b> ${payload.flightNumber} — ${payload.flightDate} at ${payload.flightTime}${returnSection}
+📍 <b>Zone:</b> ${payload.pickupZone}
+🏨 <b>Address:</b> ${payload.dropoffAddress}
+
+${vehicleLabel}
+👥 <b>Passengers:</b> ${payload.passengerCount}
+👤 <b>Name:</b> ${payload.passengerName}
+📱 <b>Phone:</b> ${payload.phoneNumber}
+📧 <b>Email:</b> ${payload.email}
+
+💰 <b>Total:</b> $${Number(payload.totalAmount).toFixed(2)} — ${paymentLabel}
+
+👉 <a href="${appUrl}/admin">Open Admin Portal → Transfers</a>
+`;
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      console.error("[Telegram Transfer Alert error]:", errData);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("[Telegram Transfer Alert dispatch failed]:", error);
+    return false;
+  }
+}

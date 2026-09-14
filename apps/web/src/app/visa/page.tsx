@@ -7,8 +7,11 @@ import {
   Search, FileText, Sparkles, HelpCircle, MapPin, ChevronRight, Globe
 } from "lucide-react";
 import { COUNTRIES, getCountryEligibility } from "@/lib/visa-countries";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/lib/i18n";
 
 export default function VisaLandingPage() {
+  const { t } = useLanguage();
   const [selectedCountry, setSelectedCountry] = useState("");
   const [eligibilityResult, setEligibilityResult] = useState<ReturnType<typeof getCountryEligibility> | null>(null);
   const [hasChecked, setHasChecked] = useState(false);
@@ -38,25 +41,26 @@ export default function VisaLandingPage() {
               addmetour
             </span>
             <span className="hidden sm:inline-block ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-white/10 text-white/90">
-              e-Visa Service
+              {t.visaPage.headerBadge}
             </span>
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSelector variant="dark" />
             <Link
               href="/visa/track"
               className="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10"
             >
               <FileText className="h-3.5 w-3.5 text-[#f59e0b]" />
-              <span className="hidden sm:inline">Track Application</span>
-              <span className="sm:hidden">Track</span>
+              <span className="hidden sm:inline">{t.nav.trackVisa}</span>
+              <span className="sm:hidden">{t.nav.trackVisa}</span>
             </Link>
             <Link
               href="/visa/apply"
               className="rounded-full px-4 py-2 text-xs font-semibold transition-all hover:opacity-95 shadow-md"
               style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
-              Apply Online
+              {t.nav.applyVisa}
             </Link>
           </div>
         </div>
@@ -69,22 +73,21 @@ export default function VisaLandingPage() {
             className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-4"
             style={{ borderColor: "#f59e0b", color: "#f59e0b", backgroundColor: "rgba(245,158,11,0.15)" }}
           >
-            Official ASAN Visa Compatible &middot; Guaranteed Fast Processing
+            {t.visaPage.heroBadge}
           </span>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
-            Azerbaijan Electronic Visa <br />
-            <span style={{ color: "#f59e0b" }}>Simplified & Error-Free</span>
+            {t.visaPage.heroTitle} <br />
+            <span style={{ color: "#f59e0b" }}>{t.visaPage.heroSubtitle}</span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-            Skip bureaucratic errors and confusing portals. Our certified travel specialists pre-screen your passport,
-            handle government submission to <b>evisa.gov.az</b>, and deliver your approved visa directly to your email.
+            {t.visaPage.heroDesc}
           </p>
 
           {/* Quick Eligibility Checker */}
           <div className="mt-10 rounded-2xl bg-white p-4 sm:p-6 shadow-2xl text-left max-w-2xl mx-auto border border-white/20">
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
               <Globe className="h-4 w-4 text-[#0f3460]" />
-              Check Your Nationality Eligibility
+              {t.visaPage.checkEligibility}
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
@@ -93,7 +96,7 @@ export default function VisaLandingPage() {
                   onChange={(e) => handleCheckEligibility(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460] cursor-pointer"
                 >
-                  <option value="">Select your passport country / citizenship...</option>
+                  <option value="">{t.visaPage.selectCountry}</option>
                   {COUNTRIES.map((c) => (
                     <option key={c.code} value={c.name}>
                       {c.name} {c.category === "visa_free" ? "(Visa-Free)" : ""}
@@ -116,7 +119,7 @@ export default function VisaLandingPage() {
                 }`}
                 style={eligibilityResult?.category !== "visa_free" ? { backgroundColor: "#0f3460" } : {}}
               >
-                Apply Now <ArrowRight className="h-4 w-4" />
+                {t.visaPage.applyNow} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
@@ -170,9 +173,9 @@ export default function VisaLandingPage() {
       <section className="py-20">
         <div className="container-section">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <p className="section-label mb-2" style={{ color: "#f59e0b" }}>Transparent Pricing</p>
+            <p className="section-label mb-2" style={{ color: "#f59e0b" }}>{t.visaPage.pricingTitle}</p>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900">
-              Choose Your Processing Speed
+              {t.visaPage.pricingSubtitle}
             </h2>
             <p className="mt-3 text-sm text-slate-600 leading-relaxed">
               Every package includes official government fees, human pre-check of passport photo/scan,
@@ -186,13 +189,13 @@ export default function VisaLandingPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <span className="rounded-full bg-slate-100 text-slate-700 font-semibold px-3 py-1 text-xs uppercase tracking-wider">
-                    Standard Processing
+                    {t.visaPage.standardTitle}
                   </span>
                   <div className="flex items-center gap-1 text-xs font-semibold text-slate-500">
-                    <Clock className="h-3.5 w-3.5 text-slate-400" /> 3 Business Days
+                    <Clock className="h-3.5 w-3.5 text-slate-400" /> {t.visaPage.standardDays}
                   </div>
                 </div>
-                <h3 className="font-display text-2xl font-bold text-slate-900 mb-2">Standard e-Visa</h3>
+                <h3 className="font-display text-2xl font-bold text-slate-900 mb-2">{t.visaPage.standardTitle}</h3>
                 <p className="text-xs text-slate-500 mb-6">
                   Perfect for travelers planning their journey ahead. Valid for 90 days with a 30-day stay.
                 </p>
@@ -228,7 +231,7 @@ export default function VisaLandingPage() {
                 href="/visa/apply?type=standard"
                 className="w-full rounded-2xl py-3.5 text-center text-xs font-semibold text-slate-800 border border-slate-300 hover:bg-slate-50 transition-colors cursor-pointer"
               >
-                Apply Standard &rarr;
+                {t.visaPage.applyStandard} &rarr;
               </Link>
             </div>
 
@@ -244,13 +247,13 @@ export default function VisaLandingPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <span className="rounded-full bg-white/10 text-[#f59e0b] font-semibold px-3 py-1 text-xs uppercase tracking-wider">
-                    Express Service
+                    {t.visaPage.expressTitle}
                   </span>
                   <div className="flex items-center gap-1 text-xs font-semibold text-[#f59e0b]">
-                    <Clock className="h-3.5 w-3.5" /> Within 3 Hours
+                    <Clock className="h-3.5 w-3.5" /> {t.visaPage.expressHours}
                   </div>
                 </div>
-                <h3 className="font-display text-2xl font-bold text-white mb-2">Urgent 3-Hour e-Visa</h3>
+                <h3 className="font-display text-2xl font-bold text-white mb-2">{t.visaPage.expressTitle}</h3>
                 <p className="text-xs text-white/70 mb-6">
                   For last-minute departures and tight travel schedules. Processed with highest government priority.
                 </p>
@@ -287,7 +290,7 @@ export default function VisaLandingPage() {
                 className="w-full rounded-2xl py-3.5 text-center text-xs font-semibold text-[#061225] transition-all hover:opacity-95 shadow-lg cursor-pointer"
                 style={{ backgroundColor: "#f59e0b" }}
               >
-                Apply Urgent (3 Hours) &rarr;
+                {t.visaPage.applyExpress} &rarr;
               </Link>
             </div>
           </div>

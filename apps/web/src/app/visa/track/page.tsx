@@ -6,6 +6,8 @@ import {
   Search, FileText, CheckCircle2, Clock, AlertCircle,
   Download, ArrowLeft, Shield, ExternalLink, HelpCircle
 } from "lucide-react";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/lib/i18n";
 
 interface TrackedApplication {
   id: string;
@@ -27,6 +29,7 @@ interface TrackedApplication {
 }
 
 export default function VisaTrackPage() {
+  const { t } = useLanguage();
   const [refInput, setRefInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -94,16 +97,19 @@ export default function VisaTrackPage() {
         <div className="container-section flex items-center justify-between">
           <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90">
             <ArrowLeft className="h-4 w-4 text-[#c9a227]" />
-            <span className="hidden sm:inline">Back to Visa Service</span>
-            <span className="sm:hidden">Back</span>
+            <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
+            <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
           <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white">
-            Track Visa Application
+            {t.nav.trackVisa}
           </span>
-          <Link href="/visa/apply" className="text-xs text-[#c9a227] hover:underline font-semibold">
-            <span className="hidden sm:inline">New Application</span>
-            <span className="sm:hidden">New</span>
-          </Link>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <LanguageSelector variant="dark" />
+            <Link href="/visa/apply" className="text-xs text-[#c9a227] hover:underline font-semibold">
+              <span className="hidden sm:inline">{t.nav.applyVisa}</span>
+              <span className="sm:hidden">{t.nav.applyVisa}</span>
+            </Link>
+          </div>
         </div>
       </header>
 

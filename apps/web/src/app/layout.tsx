@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@travel/ui/styles";
-import FloatingVisaButton from "@/components/FloatingVisaButton";
+import FloatingTravelServices from "@/components/FloatingTravelServices";
+import { LanguageProvider } from "@/lib/i18n";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -259,8 +260,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen antialiased">
-        {children}
-        <FloatingVisaButton />
+        <LanguageProvider>
+          {children}
+          <FloatingTravelServices />
+        </LanguageProvider>
       </body>
     </html>
   );

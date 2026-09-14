@@ -16,6 +16,8 @@
  *     - bookings
  *     - saved_packages  (user wishlist, M:N pivot)
  *     - reviews
+ *     - visa_applications
+ *     - transfer_bookings
  *
  * Drizzle `relations()` are defined after every group to enable
  * type-safe relational queries via db.query.*
@@ -84,6 +86,40 @@ export const visaStatusEnum = pgEnum("visa_status", [
   "submitted_to_govt",
   "approved",
   "rejected",
+]);
+
+export const transferDirectionEnum = pgEnum("transfer_direction", [
+  "arrival",
+  "departure",
+  "round_trip",
+]);
+
+export const transferAirportEnum = pgEnum("transfer_airport", [
+  "GYD",  // Heydar Aliyev International Airport (Baku)
+  "GJA",  // Ganja Airport
+  "NAJ",  // Nakhchivan Airport
+]);
+
+export const transferVehicleEnum = pgEnum("transfer_vehicle", [
+  "sedan",      // Sedan up to 3 pax
+  "suv",        // SUV up to 4 pax
+  "minivan",    // Minivan up to 7 pax
+  "economy",    // Backward compatibility
+  "business",
+  "executive",
+]);
+
+export const transferPaymentMethodEnum = pgEnum("transfer_payment_method", [
+  "online",
+  "on_arrival",
+]);
+
+export const transferStatusEnum = pgEnum("transfer_status", [
+  "pending",
+  "confirmed",
+  "in_progress",
+  "completed",
+  "cancelled",
 ]);
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -553,7 +589,75 @@ export const visaApplicationsRelations = relations(visaApplications, ({ one }) =
 }));
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 12. Audit Logs (Enterprise security, state changes, staff actions)
+// 12. Transfer Bookings (Airport Transfer Service)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const transferBookings = pgTable(
+  "transfer_bookings",
+  {
+    id:             uuid("id").primaryKey().defaultRandom(),
+    bookingNumber:  varchar("booking_number", { length: 32 }).notNull().unique(),
+    userId:         text("user_id").references(() => users.id, { onDelete: "set null" }),
+
+    // Route details
+    direction:      transferDirectionEnum("direction").notNull(),
+    airport:        transferAirportEnum("airport").notNull(),
+    pickupZone:     varchar("pickup_zone", { length: 150 }).notNull(),
+    dropoffAddress: text("dropoff_address").notNull(),
+    distanceKm:     numeric("distance_km", { precision: 6, scale: 1 }).notNull(),
+
+    // Vehicle & pricing
+    vehicleClass:   transferVehicleEnum("vehicle_class").notNull(),
+    basePrice:      numeric("base_price",  { precision: 10, scale: 2 }).notNull(),
+    totalAmount:    numeric("total_amount", { precision: 10, scale: 2 }).notNull(),
+
+    // Arrival/departure flight
+    flightNumber:   varchar("flight_number", { length: 20 }).notNull(),
+    flightDate:     date("flight_date").notNull(),
+    flightTime:     varchar("flight_time", { length: 10 }).notNull(),  // HH:MM
+
+    // Return flight (for round_trip)
+    returnFlightNumber: varchar("return_flight_number", { length: 20 }),
+    returnDate:         date("return_date"),
+    returnTime:         varchar("return_time", { length: 10 }),
+
+    // Passenger details
+    passengerName:   varchar("passenger_name", { length: 200 }).notNull(),
+    passengerCount:  integer("passenger_count").notNull().default(1),
+    phoneNumber:     varchar("phone_number",  { length: 50 }).notNull(),
+    email:           varchar("email",         { length: 255 }).notNull(),
+    luggageNotes:    text("luggage_notes"),
+
+    // Payment
+    paymentMethod:  transferPaymentMethodEnum("payment_method").notNull().default("online"),
+    paymentStatus:  varchar("payment_status", { length: 30 }).notNull().default("pending"),
+    payriffOrderId: varchar("payriff_order_id", { length: 100 }),
+
+    // Operations
+    status:      transferStatusEnum("status").notNull().default("pending"),
+    driverName:  varchar("driver_name",  { length: 150 }),
+    driverPhone: varchar("driver_phone", { length: 50 }),
+    adminNotes:  text("admin_notes"),
+    ...timestamps,
+  },
+  (t) => [
+    index("transfer_status_idx").on(t.status),
+    index("transfer_user_idx").on(t.userId),
+    index("transfer_email_idx").on(t.email),
+    index("transfer_flight_date_idx").on(t.flightDate),
+    uniqueIndex("transfer_booking_num_idx").on(t.bookingNumber),
+  ]
+);
+
+export const transferBookingsRelations = relations(transferBookings, ({ one }) => ({
+  user: one(users, {
+    fields: [transferBookings.userId],
+    references: [users.id],
+  }),
+}));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 13. Audit Logs (Enterprise security, state changes, staff actions)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const auditLogs = pgTable(
@@ -607,6 +711,9 @@ export type NewReview          = typeof reviews.$inferInsert;
 
 export type VisaApplication    = typeof visaApplications.$inferSelect;
 export type NewVisaApplication = typeof visaApplications.$inferInsert;
+
+export type TransferBooking    = typeof transferBookings.$inferSelect;
+export type NewTransferBooking = typeof transferBookings.$inferInsert;
 
 export type AuditLog           = typeof auditLogs.$inferSelect;
 export type NewAuditLog        = typeof auditLogs.$inferInsert;

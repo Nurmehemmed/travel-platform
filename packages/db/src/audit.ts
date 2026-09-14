@@ -2,7 +2,7 @@ import { db } from "./client";
 import { auditLogs } from "./schema";
 
 export interface CreateAuditLogParams {
-  entityType: "visa" | "booking" | "payment" | "auth" | "user" | "tour" | "system";
+  entityType: "visa" | "booking" | "transfer" | "payment" | "auth" | "user" | "tour" | "system";
   entityId: string;
   action: string;
   actorEmail?: string | null;

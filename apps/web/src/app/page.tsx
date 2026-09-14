@@ -11,8 +11,11 @@ import Link from "next/link";
 import {
   MapPin, Search, Clock, Users, Star, ChevronDown, ChevronLeft, ChevronRight,
   Zap, Shield, MessageCircle, Award, ArrowRight, Globe,
-  Eye, EyeOff, X, Menu, LogOut, User as UserIcon, Loader2, AlertCircle, Bookmark, Heart, FileText
+  Eye, EyeOff, X, Menu, LogOut, User as UserIcon, Loader2, AlertCircle, Bookmark, Heart, FileText, Car, Check
 } from "lucide-react";
+import { useLanguage, LanguageCode } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS } from "@/lib/tours-i18n";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -26,7 +29,7 @@ const HERO_SLIDES = [
     title: "Into the Great Caucasus",
     subtitle: "Highland villages, Silk Road caravansaries, and mountain air — Azerbaijan beyond the city.",
     primaryCta: { text: "Explore Our Tours", href: "#tours" },
-    secondaryCta: { text: "About AddmeTour", href: "#about" },
+    secondaryCta: { text: "Airport Transfer", href: "/transfer" },
   },
   {
     image: "/images/baku-maiden-tower-wide.jpg",
@@ -147,28 +150,7 @@ const TOURS = [
   },
 ];
 
-const FEATURES = [
-  {
-    icon: Globe,
-    title: "Expert Local Guides",
-    desc: "Born and raised in Azerbaijan, our guides speak your language and know every story behind every stone.",
-  },
-  {
-    icon: Users,
-    title: "Small Groups Only",
-    desc: "Maximum 12 people per tour. You get personal attention, flexible pacing, and genuine connection.",
-  },
-  {
-    icon: MessageCircle,
-    title: "Instant WhatsApp Booking",
-    desc: "No lengthy forms. Message us and we confirm your tour within the hour, any day of the week.",
-  },
-  {
-    icon: Shield,
-    title: "Money-Back Guarantee",
-    desc: "Not satisfied? We'll refund you fully or rebook you on a different tour at no extra charge.",
-  },
-];
+
 
 const DESTINATIONS = [
   {
@@ -233,33 +215,7 @@ const TESTIMONIALS = [
 
 const DURATIONS = ["Any duration", "Half day (1–4h)", "Full day (5–8h)", "Multi-day"];
 
-const FAQS = [
-  {
-    question: "Do I need a visa to travel to Azerbaijan?",
-    answer:
-      "Most international travelers can easily obtain an electronic visa (ASAN Visa) online within 3 hours to 3 days before travel. Citizens of over 95 countries (including USA, UK, EU, UAE, Canada, and Australia) are eligible for the eVisa, while several CIS and regional passport holders enter visa-free.",
-  },
-  {
-    question: "What is the best time of year to visit Baku and the Great Caucasus?",
-    answer:
-      "Spring (April to June) and Autumn (September to November) provide ideal pleasant temperatures (18°C–25°C) for walking tours in Baku and day trips to Gobustan. Summer (July–August) is perfect for cooler mountain highland escapes like Lahij and Sheki.",
-  },
-  {
-    question: "Are your tours private or small-group?",
-    answer:
-      "We offer both! Our signature tours are small-group experiences capped at a maximum of 12 travelers to ensure genuine connection, relaxed pacing, and personal interaction. We also craft fully customized private itineraries.",
-  },
-  {
-    question: "How does booking via WhatsApp work?",
-    answer:
-      "Simply tap any Book Now button or the WhatsApp icon to chat directly with our local Baku team. We confirm tour availability, pickup time, and language preference within the hour.",
-  },
-  {
-    question: "What is your cancellation and refund policy?",
-    answer:
-      "We offer a 100% money-back guarantee. If your travel plans change, notify us at least 24 hours prior to the tour start time for a full refund or an immediate free reschedule to any available date.",
-  },
-];
+
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -292,8 +248,25 @@ export default function HomePage() {
   const [socialNotice, setSocialNotice] = useState<string | null>(null);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { language, setLanguage, t, currentLangInfo, isRtl, languages } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mounted, setMounted] = useState(false);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("#user-dropdown-container")) {
+        setUserDropdownOpen(false);
+      }
+    };
+    if (userDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [userDropdownOpen]);
 
   // Auto-advance hero background slider every 6 seconds
   useEffect(() => {
@@ -306,6 +279,7 @@ export default function HomePage() {
 
   // Check existing session on mount & load saved tours
   useEffect(() => {
+
     // Load saved tours from localStorage
     try {
       const saved = localStorage.getItem("travel_saved_tour_ids");
@@ -365,6 +339,25 @@ export default function HomePage() {
       setTimeout(() => setToastMessage(null), 2500);
       return next;
     });
+  };
+
+  const handleSelectLanguage = (code: LanguageCode) => {
+    setLanguage(code);
+    const langObj = languages.find((l) => l.code === code);
+    setToastMessage(
+      code === "AZ"
+        ? `Dil dəyişdirildi: ${langObj?.nativeLabel}`
+        : code === "RU"
+        ? `Язык изменен: ${langObj?.nativeLabel}`
+        : code === "FR"
+        ? `Langue sélectionnée : ${langObj?.nativeLabel}`
+        : code === "AR"
+        ? `تم تغيير اللغة إلى: ${langObj?.nativeLabel}`
+        : code === "DE"
+        ? `Sprache geändert: ${langObj?.nativeLabel}`
+        : `Language set to ${langObj?.nativeLabel}`
+    );
+    setTimeout(() => setToastMessage(null), 2500);
   };
 
   const handleLogout = async () => {
@@ -470,18 +463,18 @@ export default function HomePage() {
           </Link>
 
           {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden xl:flex items-center gap-5 shrink-0">
             {[
-              { label: "Tours", href: "#tours" },
-              { label: "Destinations", href: "#destinations" },
-              { label: "About Us", href: "#about" },
-              { label: "Reviews", href: "#reviews" },
-              { label: "FAQ", href: "#faq" },
+              { label: t.nav.tours, href: "#tours" },
+              { label: t.nav.destinations, href: "#destinations" },
+              { label: t.nav.about, href: "#about" },
+              { label: t.nav.reviews, href: "#reviews" },
+              { label: t.nav.faq, href: "#faq" },
             ].map((item) => (
               <Link
-                key={item.label}
+                key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-white/80 hover:text-white transition-colors"
+                className="text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
               >
                 {item.label}
               </Link>
@@ -490,31 +483,34 @@ export default function HomePage() {
             {/* ── e-Visa highlighted CTA ── */}
             <Link
               href="/visa"
-              className="relative flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-amber-400/30 group"
+              className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all duration-200 hover:scale-105 shadow-sm whitespace-nowrap shrink-0"
               style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
-              {/* Pulse ring */}
-              <span
-                className="absolute inset-0 rounded-full animate-ping opacity-30"
-                style={{ backgroundColor: "#f59e0b" }}
-              />
-              <FileText className="h-3.5 w-3.5 relative z-10" />
-              <span className="relative z-10">e-Visa</span>
+              <FileText className="h-3.5 w-3.5 shrink-0" />
+              <span>{t.nav.evisa}</span>
               {/* "Fast" badge */}
               <span
-                className="relative z-10 ml-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider"
+                className="ml-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider shrink-0"
                 style={{ backgroundColor: "#061225", color: "#f59e0b" }}
               >
-                Fast
+                {t.nav.fastBadge}
               </span>
+            </Link>
+
+            {/* ── Airport Transfer CTA ── */}
+            <Link
+              href="/transfer"
+              className="hidden 2xl:flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 hover:scale-105 hover:bg-sky-500/20 text-sky-200 border border-sky-400/30 whitespace-nowrap shrink-0"
+            >
+              <Car className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+              <span>{t.nav.transfer}</span>
             </Link>
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-3 relative">
-            <button className="hidden sm:flex items-center gap-1 text-sm text-white/80 hover:text-white transition-colors">
-              🇬🇧 EN <ChevronDown className="h-3 w-3" />
-            </button>
+          <div className="flex items-center gap-2 sm:gap-3 relative shrink-0">
+            {/* Interactive Language Selector */}
+            <LanguageSelector variant="dark" />
 
             {/* Saved Tours quick button in Navbar */}
             <button
@@ -523,18 +519,18 @@ export default function HomePage() {
                 const el = document.getElementById("tours");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-              title="Saved Tours"
+              className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+              title={t.nav.saved}
             >
               <Heart
-                className={`h-4 w-4 transition-colors ${
+                className={`h-4 w-4 shrink-0 transition-colors ${
                   savedTourIds.length > 0 ? "fill-[#f59e0b] text-[#f59e0b]" : "text-white/80"
                 }`}
               />
-              <span className="hidden sm:inline">Saved</span>
+              <span className="hidden 2xl:inline">{t.nav.saved}</span>
               {savedTourIds.length > 0 && (
                 <span
-                  className="flex h-4 min-w-4 items-center justify-center rounded-full text-[10px] font-bold px-1"
+                  className="flex h-4 min-w-4 items-center justify-center rounded-full text-[10px] font-bold px-1 shrink-0"
                   style={{ backgroundColor: "#f59e0b", color: "#061225" }}
                 >
                   {savedTourIds.length}
@@ -543,14 +539,16 @@ export default function HomePage() {
             </button>
 
             {currentUser ? (
-              <div className="relative">
+              <div id="user-dropdown-container" className="relative shrink-0">
                 <button
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 rounded-full py-1.5 px-3 transition-colors hover:bg-white/10 cursor-pointer"
+                  onClick={() => {
+                    setUserDropdownOpen((prev) => !prev);
+                  }}
+                  className="flex items-center gap-2 rounded-full py-1.5 px-3 transition-colors hover:bg-white/10 cursor-pointer shrink-0 whitespace-nowrap"
                   style={{ border: "1px solid rgba(245, 158, 11, 0.4)" }}
                 >
                   <div
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm shrink-0"
                     style={{ backgroundColor: "#f59e0b" }}
                   >
                     {currentUser.name
@@ -560,7 +558,7 @@ export default function HomePage() {
                   <span className="text-sm font-medium text-white max-w-[120px] truncate hidden md:inline">
                     {currentUser.name || currentUser.email.split("@")[0]}
                   </span>
-                  <ChevronDown className="h-3.5 w-3.5 text-white/70" />
+                  <ChevronDown className="h-3.5 w-3.5 text-white/70 shrink-0" />
                 </button>
 
                 {userDropdownOpen && (
@@ -588,7 +586,7 @@ export default function HomePage() {
                         style={{ backgroundColor: "#0f3460" }}
                       >
                         <Shield className="h-3.5 w-3.5 text-[#f59e0b]" />
-                        Admin Portal
+                        {t.nav.adminPortal}
                       </Link>
                     )}
 
@@ -604,7 +602,7 @@ export default function HomePage() {
                     >
                       <span className="flex items-center gap-2">
                         <Bookmark className="h-3.5 w-3.5 text-[#f59e0b]" />
-                        Saved Tours
+                        {t.nav.saved}
                       </span>
                       {savedTourIds.length > 0 && (
                         <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800">
@@ -618,7 +616,7 @@ export default function HomePage() {
                       className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-red-600 hover:bg-red-50 transition-colors mt-1 cursor-pointer"
                     >
                       <LogOut className="h-3.5 w-3.5" />
-                      Sign Out
+                      {t.nav.logout}
                     </button>
                   </div>
                 )}
@@ -632,9 +630,9 @@ export default function HomePage() {
                     setSocialNotice(null);
                     setIsAuthOpen(true);
                   }}
-                  className="text-xs sm:text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer"
+                  className="text-xs sm:text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  Log In
+                  {t.nav.signIn}
                 </button>
                 <button
                   onClick={() => {
@@ -643,10 +641,20 @@ export default function HomePage() {
                     setSocialNotice(null);
                     setIsAuthOpen(true);
                   }}
-                  className="rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer"
+                  className="rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer whitespace-nowrap shrink-0"
                   style={{ backgroundColor: "#f59e0b", color: "#061225" }}
                 >
-                  Sign Up
+                  {language === "AZ"
+                    ? "Qeydiyyat"
+                    : language === "RU"
+                    ? "Регистрация"
+                    : language === "FR"
+                    ? "S'inscrire"
+                    : language === "AR"
+                    ? "إنشاء حساب"
+                    : language === "DE"
+                    ? "Registrieren"
+                    : "Sign Up"}
                 </button>
               </>
             )}
@@ -655,7 +663,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex md:hidden items-center justify-center h-8 w-8 rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer ml-1"
+              className="flex xl:hidden items-center justify-center h-8 w-8 rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer ml-1 shrink-0"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -665,17 +673,17 @@ export default function HomePage() {
 
         {/* Mobile slide-down navigation drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
+          <div className="xl:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
             <div className="flex flex-col space-y-1">
               {[
-                { label: "Tours", href: "#tours" },
-                { label: "Destinations", href: "#destinations" },
-                { label: "About Us", href: "#about" },
-                { label: "Reviews", href: "#reviews" },
-                { label: "FAQ", href: "#faq" },
+                { label: t.nav.tours, href: "#tours" },
+                { label: t.nav.destinations, href: "#destinations" },
+                { label: t.nav.about, href: "#about" },
+                { label: t.nav.reviews, href: "#reviews" },
+                { label: t.nav.faq, href: "#faq" },
               ].map((item) => (
                 <Link
-                  key={item.label}
+                  key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className="px-3 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
@@ -693,12 +701,60 @@ export default function HomePage() {
               >
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
-                  <span>Azerbaijan e-Visa</span>
+                  <span>{t.nav.evisa}</span>
                 </div>
                 <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#061225] text-[#f59e0b]">
-                  Fast 3h
+                  {t.nav.fastBadge}
                 </span>
               </Link>
+
+              {/* Transfer link in mobile menu */}
+              <Link
+                href="/transfer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm shadow-md mt-1 transition-transform active:scale-98 bg-sky-600 text-white"
+              >
+                <div className="flex items-center gap-2">
+                  <Car className="h-4 w-4" />
+                  <span>{t.nav.transfer}</span>
+                </div>
+                <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white">
+                  GYD · GJA · NAJ
+                </span>
+              </Link>
+
+              {/* Language selection in mobile menu */}
+              <div className="pt-3 border-t border-white/10 mt-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white/50 block mb-2 px-1">
+                  {t.nav.selectLanguage}
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {languages.map((lang) => {
+                    const isSelected = language === lang.code;
+                    return (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => {
+                          handleSelectLanguage(lang.code);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-sky-500 text-white shadow-sm ring-1 ring-white/30"
+                            : "bg-white/5 text-white/80 hover:bg-white/10"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>{lang.flag}</span>
+                          <span>{lang.nativeLabel}</span>
+                        </span>
+                        {isSelected && <Check className="h-3.5 w-3.5 text-white" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -734,50 +790,62 @@ export default function HomePage() {
         })}
 
         {/* Content Container with key-based re-animation */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10 pointer-events-none">
-          <div key={`badge-${currentSlide}`} className="animate-fade-in pointer-events-auto">
-            <span
-              className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm"
-              style={{ borderColor: "#f59e0b", color: "#f59e0b", backgroundColor: "rgba(245,158,11,0.22)" }}
-            >
-              {activeHeroSlide.badge}
-            </span>
-          </div>
+        {(() => {
+          const localizedSlides = LOCALIZED_SLIDES[language] || LOCALIZED_SLIDES.EN;
+          const currentSlideData = localizedSlides[currentSlide] || localizedSlides[0]!;
+          return (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 z-10 pointer-events-none">
+              <div key={`badge-${currentSlide}-${language}`} className="animate-fade-in pointer-events-auto">
+                <span
+                  className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-4 sm:mb-6 backdrop-blur-md shadow-sm"
+                  style={{ borderColor: "#f59e0b", color: "#f59e0b", backgroundColor: "rgba(245,158,11,0.22)" }}
+                >
+                  {currentSlide === 0 ? t.hero.badge : currentSlideData.badge}
+                </span>
+              </div>
 
-          <h1
-            key={`title-${currentSlide}`}
-            className="animate-slide-up font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-tight max-w-4xl pointer-events-auto drop-shadow-lg"
-          >
-            {activeHeroSlide.title}
-          </h1>
+              <h1
+                key={`title-${currentSlide}-${language}`}
+                className="animate-slide-up font-display text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight max-w-4xl pointer-events-auto drop-shadow-lg break-words hyphens-auto"
+              >
+                {currentSlide === 0 ? (
+                  <>
+                    {t.hero.titlePart1} <span style={{ color: "#f59e0b" }}>{t.hero.titlePart2}</span>
+                  </>
+                ) : (
+                  currentSlideData.title
+                )}
+              </h1>
 
-          <p
-            key={`desc-${currentSlide}`}
-            className="animate-slide-up mt-6 max-w-xl text-base sm:text-lg text-white/90 pointer-events-auto leading-relaxed drop-shadow"
-          >
-            {activeHeroSlide.subtitle}
-          </p>
+              <p
+                key={`desc-${currentSlide}-${language}`}
+                className="animate-slide-up mt-4 sm:mt-6 max-w-xl text-sm sm:text-base md:text-lg text-white/90 pointer-events-auto leading-relaxed drop-shadow"
+              >
+                {currentSlide === 0 ? t.hero.subtitle : currentSlideData.subtitle}
+              </p>
 
-          <div
-            key={`cta-${currentSlide}`}
-            className="animate-slide-up mt-10 flex flex-col sm:flex-row items-center gap-4 pointer-events-auto"
-          >
-            <Link
-              href={activeHeroSlide.primaryCta.href}
-              className="rounded-full px-8 py-3.5 font-semibold text-sm transition-all duration-200 hover:opacity-95 hover:scale-105 hover:shadow-2xl shadow-lg"
-              style={{ backgroundColor: "#f59e0b", color: "#061225" }}
-            >
-              {activeHeroSlide.primaryCta.text}
-            </Link>
-            <Link
-              href={activeHeroSlide.secondaryCta.href}
-              className="rounded-full border border-white/40 px-8 py-3.5 font-semibold text-sm text-white transition-all duration-200 hover:bg-white/10 backdrop-blur-md shadow-sm"
-              style={{ backgroundColor: "rgba(19,62,53,0.45)" }}
-            >
-              {activeHeroSlide.secondaryCta.text}
-            </Link>
-          </div>
-        </div>
+              <div
+                key={`cta-${currentSlide}-${language}`}
+                className="animate-slide-up mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-4 pointer-events-auto"
+              >
+                <Link
+                  href="#tours"
+                  className="rounded-full px-8 py-3.5 font-semibold text-sm transition-all duration-200 hover:opacity-95 hover:scale-105 hover:shadow-2xl shadow-lg whitespace-nowrap"
+                  style={{ backgroundColor: "#f59e0b", color: "#061225" }}
+                >
+                  {t.hero.ctaBook}
+                </Link>
+                <Link
+                  href="/transfer"
+                  className="rounded-full border border-white/40 px-8 py-3.5 font-semibold text-sm text-white transition-all duration-200 hover:bg-white/10 backdrop-blur-md shadow-sm whitespace-nowrap"
+                  style={{ backgroundColor: "rgba(19,62,53,0.45)" }}
+                >
+                  {t.nav.transfer}
+                </Link>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Previous / Next Arrow Controls */}
         <button
@@ -825,10 +893,10 @@ export default function HomePage() {
         <div className="container-section">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
             {[
-              { value: "5+", label: "Years of Experience" },
-              { value: "50+", label: "Tours Offered" },
-              { value: "2,400+", label: "Happy Travelers" },
-              { value: "4.9★", label: "TripAdvisor Rating" },
+              { value: "2,400+", label: t.hero.statHappy },
+              { value: "50+", label: t.hero.statTours },
+              { value: "15+", label: t.hero.statGuides },
+              { value: "4.9★", label: t.hero.statRating },
             ].map((stat) => (
               <div key={stat.label} className="flex flex-col items-center py-6 px-4 text-center">
                 <span className="font-display text-2xl font-bold" style={{ color: "#f59e0b" }}>
@@ -849,22 +917,29 @@ export default function HomePage() {
               <Search className="h-4 w-4 text-slate-400 shrink-0" />
               <input
                 type="text"
-                placeholder="Search tours, destinations..."
-                aria-label="Search tours and destinations"
+                placeholder={t.search.placeholder}
+                aria-label={t.search.placeholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
               />
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 sm:w-44">
+            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 sm:w-auto sm:min-w-[180px]">
               <select
                 value={activeDuration}
                 onChange={(e) => setActiveDuration(e.target.value)}
-                aria-label="Filter tours by duration"
+                aria-label={t.search.durationLabel}
                 className="flex-1 bg-transparent text-sm text-slate-700 outline-none cursor-pointer"
               >
-                {DURATIONS.map((d) => (
-                  <option key={d}>{d}</option>
+                {[
+                  { val: "Any duration", label: t.search.durationAll },
+                  { val: "Half day (1–4h)", label: t.search.durationHalf },
+                  { val: "Full day (5–8h)", label: t.search.durationFull },
+                  { val: "Multi-day", label: t.search.durationMulti },
+                ].map((d) => (
+                  <option key={d.val} value={d.val}>
+                    {d.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -877,7 +952,7 @@ export default function HomePage() {
               style={{ backgroundColor: "#0f3460" }}
             >
               <Search className="h-4 w-4" />
-              Search
+              <span>{t.nav.tours}</span>
             </button>
           </div>
         </div>
@@ -889,24 +964,30 @@ export default function HomePage() {
           {/* Header + Filter tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
-              <p className="section-label mb-2">What We Offer</p>
+              <p className="section-label mb-2">{t.tours.badge}</p>
               <h2 className="font-display text-4xl font-bold text-slate-900">
-                Our Most Popular Tours
+                {t.tours.title}
               </h2>
             </div>
             <div className="flex flex-wrap gap-2">
-              {TOUR_FILTERS.map((f) => (
+              {[
+                { id: "All", label: t.search.filterAll },
+                { id: "City", label: t.search.filterCity },
+                { id: "Day Trip", label: t.search.filterDayTrip },
+                { id: "Overnight", label: t.search.filterOvernight },
+                { id: "Adventure", label: t.search.filterAdventure },
+              ].map((f) => (
                 <button
-                  key={f}
-                  onClick={() => setActiveFilter(f)}
+                  key={f.id}
+                  onClick={() => setActiveFilter(f.id)}
                   className="rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
                   style={
-                    activeFilter === f
+                    activeFilter === f.id
                       ? { backgroundColor: "#0f3460", color: "#ffffff" }
                       : { backgroundColor: "#ffffff", color: "#4a5568", border: "1px solid #e2d8cc" }
                   }
                 >
-                  {f}
+                  {f.label}
                 </button>
               ))}
 
@@ -928,7 +1009,7 @@ export default function HomePage() {
                       : "text-slate-400"
                   }`}
                 />
-                Saved
+                <span>{t.nav.saved}</span>
                 {savedTourIds.length > 0 && (
                   <span
                     className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
@@ -947,7 +1028,16 @@ export default function HomePage() {
           {/* Tour cards grid */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredTours.length > 0 ? (
-              filteredTours.map((tour) => (
+              filteredTours.map((tour) => {
+                const localizedTour = LOCALIZED_TOURS[language]?.[tour.id] || LOCALIZED_TOURS.EN[tour.id] || tour;
+                const tourTitle = localizedTour.title || tour.title;
+                const tourDesc = localizedTour.desc || tour.desc;
+                const tourDuration = localizedTour.duration || tour.duration;
+                const tourGroupSize = localizedTour.groupSize || tour.groupSize;
+                const tourBadge = localizedTour.badge || tour.badge;
+                const tourTags = localizedTour.tags || tour.tags;
+
+                return (
                 <div
                   key={tour.id}
                   className="group rounded-2xl bg-white overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -957,20 +1047,20 @@ export default function HomePage() {
                   <div className="relative h-52 overflow-hidden bg-slate-100">
                     <Image
                       src={tour.image || "/images/baku-old-city.jpg"}
-                      alt={tour.title}
+                      alt={tourTitle}
                       fill
                       sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 420px"
                       style={{ objectFit: "cover" }}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     {/* Badge */}
-                    {tour.badge && (
+                    {tourBadge && (
                       <span
                         className={`absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold ${
                           tour.badgeColor?.includes("text-") ? "" : "text-white"
                         } ${tour.badgeColor}`}
                       >
-                        {tour.badge}
+                        {tourBadge}
                       </span>
                     )}
 
@@ -983,65 +1073,53 @@ export default function HomePage() {
                       className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-95 shadow-md cursor-pointer"
                       style={
                         savedTourIds.includes(tour.id)
-                          ? { backgroundColor: "#ffffff", color: "#e11d48" }
-                          : { backgroundColor: "rgba(0, 0, 0, 0.4)", color: "#ffffff" }
+                          ? { backgroundColor: "#ffffff", color: "#f59e0b" }
+                          : { backgroundColor: "rgba(15, 52, 96, 0.75)", color: "#ffffff" }
                       }
                     >
                       <Heart
-                        className={`h-4 w-4 transition-colors ${
-                          savedTourIds.includes(tour.id)
-                            ? "fill-red-500 text-red-500"
-                            : "text-white hover:text-red-200"
+                        className={`h-4 w-4 transition-transform duration-200 ${
+                          savedTourIds.includes(tour.id) ? "fill-[#f59e0b] scale-110" : ""
                         }`}
                       />
                     </button>
-
-                    {/* Tags */}
-                    <div className="absolute bottom-3 left-3 flex flex-wrap gap-1">
-                      {tour.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full bg-black/50 px-2 py-0.5 text-xs text-white backdrop-blur-sm"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-5">
-                    {/* Rating */}
-                    <div className="flex items-center gap-1.5 mb-2">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <Star
-                          key={s}
-                          className="h-3.5 w-3.5"
-                          fill={s <= Math.floor(tour.rating) ? "#f59e0b" : "none"}
-                          stroke="#f59e0b"
-                          strokeWidth={1.5}
-                        />
-                      ))}
-                      <span className="text-xs font-bold text-slate-800">
-                        {tour.rating}
-                      </span>
-                      <span className="text-xs text-slate-500">({tour.reviews})</span>
+                  {/* Body */}
+                  <div className="p-6">
+                    {/* Tags + Rating */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="flex flex-wrap gap-1">
+                        {tourTags?.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-semibold text-slate-700 shrink-0">
+                        <Star className="h-3.5 w-3.5 fill-[#f59e0b] text-[#f59e0b]" />
+                        <span>{tour.rating}</span>
+                        <span className="text-slate-400">({tour.reviews})</span>
+                      </div>
                     </div>
 
-                    <h3 className="font-display text-lg font-bold text-slate-900 leading-snug mb-2">
-                      {tour.title}
+                    <h3 className="font-display text-lg font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-amber-600 transition-colors">
+                      {tourTitle}
                     </h3>
                     <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2">
-                      {tour.desc}
+                      {tourDesc}
                     </p>
 
                     {/* Meta */}
                     <div className="flex items-center gap-4 text-xs text-slate-500 mb-4">
                       <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" /> {tour.duration}
+                        <Clock className="h-3.5 w-3.5" /> {tourDuration}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5" /> {tour.groupSize}
+                        <Users className="h-3.5 w-3.5" /> {tourGroupSize}
                       </span>
                     </div>
 
@@ -1050,37 +1128,43 @@ export default function HomePage() {
                       <div>
                         {tour.originalPrice && (
                           <span className="text-xs text-slate-500 line-through">
-                            From ${tour.originalPrice}
+                            {t.tours.fromPrice} ${tour.originalPrice}
                           </span>
                         )}
                         <p className="text-lg font-bold text-slate-900">
-                          <span className="text-sm font-normal text-slate-500">From </span>
+                          <span className="text-sm font-normal text-slate-500">{t.tours.fromPrice} </span>
                           <span style={{ color: "#0f3460" }}>${tour.price}</span>
-                          <span className="text-xs font-normal text-slate-500"> / person</span>
+                          <span className="text-xs font-normal text-slate-500"> / {t.tours.groupSize}</span>
                         </p>
                       </div>
-                      <button
+                      <a
+                        href={`https://wa.me/994000000000?text=${encodeURIComponent(
+                          `Hello AddmeTour! I would like to book the "${tourTitle}" tour.`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer"
                         style={{ backgroundColor: "#0f3460" }}
                       >
-                        Book Now
-                      </button>
+                        {t.tours.bookNow}
+                      </a>
                     </div>
                   </div>
                 </div>
-              ))
+                );
+              })
             ) : (
               <div className="col-span-full py-16 px-6 text-center bg-white rounded-2xl border border-[#e2d8cc] max-w-md mx-auto shadow-sm">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 mb-4">
                   <Bookmark className="h-7 w-7 text-[#f59e0b]" />
                 </div>
                 <h3 className="font-display text-xl font-bold text-slate-900 mb-2">
-                  {activeFilter === "Saved" ? "No Saved Tours Yet" : "No Tours Found"}
+                  {activeFilter === "Saved" ? t.nav.saved : t.search.noToursFound}
                 </h3>
                 <p className="text-sm text-slate-500 mb-6">
                   {activeFilter === "Saved"
-                    ? "Click the heart icon on any tour card to save your favorite experiences for easy access and planning."
-                    : "No tours match your current search or filter criteria."}
+                    ? "You haven't bookmarked any tours yet. Click the bookmark icon on any tour to save it."
+                    : t.search.noToursFound}
                 </p>
                 <button
                   onClick={() => {
@@ -1090,7 +1174,7 @@ export default function HomePage() {
                   className="rounded-full px-6 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-95 cursor-pointer"
                   style={{ backgroundColor: "#0f3460" }}
                 >
-                  Explore All Tours
+                  {t.search.resetFilters}
                 </button>
               </div>
             )}
@@ -1105,20 +1189,21 @@ export default function HomePage() {
             {/* Left: Text + Features */}
             <div>
               <p className="section-label mb-4" style={{ color: "#f59e0b" }}>
-                Why Travel With Us
+                {t.whyUs.badge}
               </p>
               <h2 className="font-display text-4xl font-bold text-white leading-tight mb-6">
-                We Don&apos;t Just Show You Azerbaijan.{" "}
-                <span style={{ color: "#f59e0b" }}>We Make You Feel It.</span>
+                {t.whyUs.title}
               </h2>
               <p className="text-white/70 leading-relaxed mb-10">
-                AddmeTour is a Baku-based boutique travel agency founded by passionate local
-                guides who know every hidden alley, every legend, and every family that bakes
-                the best pakhlava. We offer private and small-group tours crafted around
-                authentic experience — not tourist checkboxes.
+                {t.whyUs.subtitle}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {FEATURES.map((f) => (
+                {[
+                  { icon: Globe, title: t.whyUs.feature1Title, desc: t.whyUs.feature1Desc },
+                  { icon: Shield, title: t.whyUs.feature2Title, desc: t.whyUs.feature2Desc },
+                  { icon: Award, title: t.whyUs.feature3Title, desc: t.whyUs.feature3Desc },
+                  { icon: MessageCircle, title: t.whyUs.feature4Title, desc: t.whyUs.feature4Desc },
+                ].map((f) => (
                   <div
                     key={f.title}
                     className="rounded-xl p-5 transition-all duration-200 hover:bg-white/10"
@@ -1191,16 +1276,30 @@ export default function HomePage() {
       <section id="destinations" className="py-20" style={{ backgroundColor: "#f0f9ff" }}>
         <div className="container-section">
           <div className="text-center mb-12">
-            <p className="section-label mb-3">Explore Azerbaijan</p>
+            <p className="section-label mb-3">{t.destinations.badge}</p>
             <h2 className="font-display text-4xl font-bold text-slate-900">
-              Where Will You Go?
+              {t.destinations.title}
             </h2>
+            <p className="mt-2 text-sm text-slate-600 max-w-xl mx-auto">
+              {t.destinations.subtitle}
+            </p>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {DESTINATIONS.map((dest) => (
+            {[
+              { slug: "baku", name: t.destinations.bakuName, subtitle: t.destinations.bakuDesc, tours: 12, image: "https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=1000&q=80" },
+              { slug: "absheron", name: t.destinations.absheronName, subtitle: t.destinations.absheronDesc, tours: 5, image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1000&q=80" },
+              { slug: "sheki", name: t.destinations.shekiName, subtitle: t.destinations.shekiDesc, tours: 4, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1000&q=80" },
+              { slug: "gobustan", name: t.destinations.gobustanName, subtitle: t.destinations.gobustanDesc, tours: 3, image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=1000&q=80" },
+            ].map((dest) => (
               <Link
                 key={dest.slug}
-                href={`#${dest.slug}`}
+                href="#tours"
+                onClick={() => {
+                  setActiveFilter("All");
+                  setSearchQuery(dest.slug);
+                  const el = document.getElementById("tours");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }}
                 className="group relative h-80 overflow-hidden rounded-2xl block"
               >
                 <Image
@@ -1213,13 +1312,13 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-5">
-                  <h3 className="text-xl font-bold text-white font-display">{dest.name}</h3>
-                  <p className="text-sm text-white/70 mt-0.5">{dest.subtitle}</p>
+                  <h3 className="text-lg font-bold text-white font-display leading-tight">{dest.name}</h3>
+                  <p className="text-xs text-white/70 mt-1 line-clamp-2">{dest.subtitle}</p>
                   <span
                     className="mt-2 inline-flex items-center gap-1 text-xs font-semibold transition-all group-hover:gap-2"
                     style={{ color: "#f59e0b" }}
                   >
-                    {dest.tours} tours <ArrowRight className="h-3 w-3" />
+                    {dest.tours} {t.nav.tours} <ArrowRight className="h-3 w-3" />
                   </span>
                 </div>
               </Link>
@@ -1234,10 +1333,10 @@ export default function HomePage() {
           {/* Header */}
           <div className="text-center mb-12">
             <p className="section-label mb-2">
-              What Travelers Say
+              {t.reviews.badge}
             </p>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-3">
-              Stories From Our Guests
+              {t.reviews.title}
             </h2>
             <div className="flex items-center justify-center gap-2 text-sm font-medium text-slate-600">
               <div className="flex items-center gap-0.5">
@@ -1250,7 +1349,7 @@ export default function HomePage() {
                   />
                 ))}
               </div>
-              <span className="font-semibold text-slate-800">4.9 / 5</span>
+              <span className="font-semibold text-slate-800">{t.reviews.ratingText}</span>
               <span className="text-slate-500">&middot;</span>
               <span>TripAdvisor</span>
             </div>
@@ -1258,48 +1357,53 @@ export default function HomePage() {
 
           {/* Testimonial Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t) => (
-              <div
-                key={t.id}
-                className="flex flex-col justify-between rounded-2xl bg-[#faf6ef]/90 backdrop-blur-sm p-8 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
-                style={{
-                  border: "1px solid #e7dfd4",
-                  boxShadow: "0 4px 20px -4px rgba(15, 23, 42, 0.05)",
-                }}
-              >
-                <div>
-                  {/* Big decorative quotation mark */}
-                  <div className="mb-4">
-                    <svg
-                      className="h-8 w-8 text-[#d8c8b4]"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-slate-700 leading-relaxed">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                </div>
+            {TESTIMONIALS.map((item, idx) => {
+              const localizedReview = LOCALIZED_TESTIMONIALS[language]?.[idx] || item;
+              const quote = localizedReview.quote || item.quote;
+              const subtitle = localizedReview.subtitle || item.subtitle;
 
-                <div className="mt-8 flex items-center justify-between border-t border-[#ede4d8] pt-5">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
-                      style={{ backgroundColor: "#0f3460" }}
-                    >
-                      {t.initials}
+              return (
+                <div
+                  key={item.id}
+                  className="flex flex-col justify-between rounded-2xl bg-[#faf6ef]/90 backdrop-blur-sm p-8 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-lg"
+                  style={{
+                    border: "1px solid #e7dfd4",
+                    boxShadow: "0 4px 20px -4px rgba(15, 23, 42, 0.05)",
+                  }}
+                >
+                  <div>
+                    {/* Decorative quotation mark */}
+                    <div className="mb-4">
+                      <svg
+                        className="h-8 w-8 text-[#d8c8b4]"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900 leading-tight">
-                        {t.name}
-                      </h3>
-                      <p className="text-xs text-slate-600 mt-0.5 leading-tight">
-                        {t.subtitle}
-                      </p>
-                    </div>
+                    <p className="text-sm text-slate-700 leading-relaxed">
+                      &ldquo;{quote}&rdquo;
+                    </p>
                   </div>
+
+                  <div className="mt-8 flex items-center justify-between border-t border-[#ede4d8] pt-5">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
+                        style={{ backgroundColor: "#0f3460" }}
+                      >
+                        {item.initials}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                          {item.name}
+                        </h3>
+                        <p className="text-xs text-slate-600 mt-0.5 leading-tight">
+                          {subtitle}
+                        </p>
+                      </div>
+                    </div>
 
                   <div className="flex items-center gap-0.5 shrink-0 ml-2">
                     {[1, 2, 3, 4, 5].map((s) => (
@@ -1313,7 +1417,8 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1323,18 +1428,24 @@ export default function HomePage() {
         <div className="container-section max-w-4xl">
           <div className="text-center mb-14">
             <p className="section-label mb-3">
-              Common Questions
+              {t.faq.badge}
             </p>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4" style={{ color: "#0f3460" }}>
-              Frequently Asked Questions
+              {t.faq.title}
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto text-base md:text-lg">
-              Everything you need to know about booking tours, visas, group sizes, and visiting Baku & Azerbaijan.
+              {t.faq.subtitle}
             </p>
           </div>
 
           <div className="space-y-4">
-            {FAQS.map((faq, idx) => {
+            {[
+              { question: t.faq.q1, answer: t.faq.a1 },
+              { question: t.faq.q2, answer: t.faq.a2 },
+              { question: t.faq.q3, answer: t.faq.a3 },
+              { question: t.faq.q4, answer: t.faq.a4 },
+              { question: t.faq.q5, answer: t.faq.a5 },
+            ].map((faq, idx) => {
               const isOpen = openFaq === idx;
               return (
                 <div
@@ -1387,9 +1498,9 @@ export default function HomePage() {
             style={{ backgroundColor: "#f0e7d8", border: "1px dashed #f59e0b" }}
           >
             <div className="text-left">
-              <h3 className="font-bold text-slate-900 text-base">Have a question not answered here?</h3>
+              <h3 className="font-bold text-slate-900 text-base">{t.footer.contact}</h3>
               <p className="text-xs md:text-sm text-slate-600 mt-0.5">
-                Our local Baku concierge team is available 24/7 on WhatsApp.
+                {t.footer.supportAvailable}
               </p>
             </div>
             <a
@@ -1400,7 +1511,7 @@ export default function HomePage() {
               style={{ backgroundColor: "#0f3460" }}
             >
               <MessageCircle className="h-4 w-4 text-[#f59e0b]" />
-              Chat on WhatsApp
+              WhatsApp
             </a>
           </div>
         </div>
@@ -1413,12 +1524,12 @@ export default function HomePage() {
           <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full" style={{ backgroundColor: "#f59e0b", filter: "blur(80px)" }} />
         </div>
         <div className="container-section relative z-10 text-center">
-          <p className="section-label mb-4" style={{ color: "#f59e0b" }}>Ready to Explore?</p>
+          <p className="section-label mb-4" style={{ color: "#f59e0b" }}>{t.hero.badge}</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
-            Book Your Dream Tour Today
+            {t.hero.titlePart1} {t.hero.titlePart2}
           </h2>
           <p className="text-white/60 max-w-xl mx-auto mb-10">
-            Join 2,400+ happy travelers who discovered Azerbaijan with our expert local guides.
+            {t.hero.subtitle}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -1426,7 +1537,7 @@ export default function HomePage() {
               className="rounded-full px-8 py-4 font-semibold text-sm transition-all duration-200 hover:opacity-90 hover:scale-105 hover:shadow-xl"
               style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
-              Browse All Tours
+              {t.hero.ctaBrowse}
             </Link>
             <a
               href="https://wa.me/994000000000"
@@ -1435,7 +1546,7 @@ export default function HomePage() {
               className="rounded-full border-2 border-white px-8 py-4 font-semibold text-sm text-white transition-all duration-200 hover:bg-white hover:text-brand-900 flex items-center gap-2"
             >
               <MessageCircle className="h-4 w-4" />
-              WhatsApp Us
+              WhatsApp
             </a>
           </div>
         </div>
@@ -1452,18 +1563,20 @@ export default function HomePage() {
               <span className="font-bold text-lg" style={{ color: "#f59e0b" }}>addmetour</span>
             </div>
             <p className="text-sm text-white/70">
-              © 2025 AddmeTour. All rights reserved.
+              {t.footer.rights}
             </p>
             <div className="flex items-center gap-6">
               {[
-                { label: "Tours", href: "#tours" },
-                { label: "Destinations", href: "#destinations" },
-                { label: "About", href: "#about" },
-                { label: "Reviews", href: "#reviews" },
-                { label: "FAQ", href: "#faq" },
-                { label: "Admin Portal", href: "/admin" },
+                { label: t.nav.tours, href: "#tours" },
+                { label: t.nav.destinations, href: "#destinations" },
+                { label: t.nav.evisa, href: "/visa" },
+                { label: t.nav.transfer, href: "/transfer" },
+                { label: t.nav.about, href: "#about" },
+                { label: t.nav.reviews, href: "#reviews" },
+                { label: t.nav.faq, href: "#faq" },
+                { label: t.nav.adminPortal, href: "/admin" },
               ].map((item) => (
-                <Link key={item.label} href={item.href} className="text-sm text-white/75 hover:text-white transition-colors">
+                <Link key={item.href} href={item.href} className="text-sm text-white/75 hover:text-white transition-colors">
                   {item.label}
                 </Link>
               ))}

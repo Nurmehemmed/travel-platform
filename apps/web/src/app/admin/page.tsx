@@ -32,6 +32,7 @@ import {
   Activity,
   Eye,
   LogOut,
+  Car,
 } from "lucide-react";
 
 interface AuditLogItem {
@@ -141,7 +142,38 @@ interface VisaItem {
   updatedAt: string;
 }
 
-type TabType = "overview" | "tours" | "bookings" | "users" | "destinations" | "visas" | "audit";
+interface TransferItem {
+  id: string;
+  bookingNumber: string;
+  direction: "arrival" | "departure" | "round_trip";
+  airport: string;
+  pickupZone: string;
+  dropoffAddress: string;
+  vehicleClass: string;
+  flightNumber: string;
+  flightDate: string;
+  flightTime: string;
+  returnFlightNumber?: string | null;
+  returnDate?: string | null;
+  returnTime?: string | null;
+  passengerName: string;
+  passengerCount: number;
+  phoneNumber: string;
+  email: string;
+  luggageNotes?: string | null;
+  distanceKm?: string | null;
+  basePrice?: string | null;
+  totalAmount: string;
+  paymentMethod: "online" | "on_arrival";
+  paymentStatus: string;
+  status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
+  driverName?: string | null;
+  driverPhone?: string | null;
+  adminNotes?: string | null;
+  createdAt: string;
+}
+
+type TabType = "overview" | "tours" | "bookings" | "users" | "destinations" | "visas" | "transfers" | "audit";
 
 export default function AdminPortalPage() {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -162,14 +194,26 @@ export default function AdminPortalPage() {
   const [usersList, setUsersList] = useState<UserItem[]>([]);
   const [destinationsList, setDestinationsList] = useState<DestinationItem[]>([]);
   const [visasList, setVisasList] = useState<VisaItem[]>([]);
+  const [transfersList, setTransfersList] = useState<TransferItem[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState("");
   const [bookingStatusFilter, setBookingStatusFilter] = useState<string>("all");
   const [visaStatusFilter, setVisaStatusFilter] = useState<string>("all");
+  const [transferStatusFilter, setTransferStatusFilter] = useState<string>("all");
   const [auditEntityFilter, setAuditEntityFilter] = useState<string>("all");
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
+
+  // Transfer Modal & Dispatch States
+  const [selectedTransfer, setSelectedTransfer] = useState<TransferItem | null>(null);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [editTransferStatus, setEditTransferStatus] = useState<TransferItem["status"]>("pending");
+  const [editTransferPaymentStatus, setEditTransferPaymentStatus] = useState("pending");
+  const [editDriverName, setEditDriverName] = useState("");
+  const [editDriverPhone, setEditDriverPhone] = useState("");
+  const [editTransferNotes, setEditTransferNotes] = useState("");
+  const [transferUpdateLoading, setTransferUpdateLoading] = useState(false);
 
   // Visa Modal & Processing States
   const [selectedVisa, setSelectedVisa] = useState<VisaItem | null>(null);
@@ -196,7 +240,7 @@ export default function AdminPortalPage() {
   const fetchAllData = async () => {
     try {
       setRefreshing(true);
-      const [statsRes, toursRes, bookingsRes, usersRes, destsRes, visasRes, auditRes] =
+      const [statsRes, toursRes, bookingsRes, usersRes, destsRes, visasRes, transfersRes, auditRes] =
         await Promise.all([
           fetch("/api/admin/stats").then((r) => r.json()),
           fetch("/api/admin/tours").then((r) => r.json()),
@@ -204,6 +248,7 @@ export default function AdminPortalPage() {
           fetch("/api/admin/users").then((r) => r.json()),
           fetch("/api/admin/destinations").then((r) => r.json()),
           fetch("/api/admin/visas").then((r) => r.json()).catch(() => ({ visas: [] })),
+          fetch("/api/admin/transfers").then((r) => r.json()).catch(() => ({ transfers: [] })),
           fetch("/api/admin/audit-logs?limit=100").then((r) => r.json()).catch(() => ({ logs: [] })),
         ]);
 
@@ -215,6 +260,7 @@ export default function AdminPortalPage() {
       if (bookingsRes?.bookings) setBookingsList(bookingsRes.bookings);
       if (usersRes?.users) setUsersList(usersRes.users);
       if (visasRes?.visas) setVisasList(visasRes.visas);
+      if (transfersRes?.transfers) setTransfersList(transfersRes.transfers);
       if (auditRes?.logs) setAuditLogs(auditRes.logs);
       if (destsRes?.destinations) {
         setDestinationsList(destsRes.destinations);
@@ -430,6 +476,53 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
     showNotification("Copied applicant details for evisa.gov.az!");
   };
 
+  // Open Transfer Modal
+  const handleOpenTransferModal = (transfer: TransferItem) => {
+    setSelectedTransfer(transfer);
+    setEditTransferStatus(transfer.status);
+    setEditTransferPaymentStatus(transfer.paymentStatus || "pending");
+    setEditDriverName(transfer.driverName || "");
+    setEditDriverPhone(transfer.driverPhone || "");
+    setEditTransferNotes(transfer.adminNotes || "");
+    setIsTransferModalOpen(true);
+  };
+
+  // Update Transfer
+  const handleUpdateTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTransfer) return;
+    try {
+      setTransferUpdateLoading(true);
+      const res = await fetch("/api/admin/transfers", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedTransfer.id,
+          status: editTransferStatus,
+          paymentStatus: editTransferPaymentStatus,
+          driverName: editDriverName.trim() || null,
+          driverPhone: editDriverPhone.trim() || null,
+          adminNotes: editTransferNotes.trim() || null,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data?.transfer) {
+        setTransfersList((prev) =>
+          prev.map((t) => (t.id === selectedTransfer.id ? { ...t, ...data.transfer } : t))
+        );
+        setIsTransferModalOpen(false);
+        showNotification(`Transfer ${selectedTransfer.bookingNumber} updated successfully!`);
+      } else {
+        alert(data?.error || "Failed to update transfer");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTransferUpdateLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ backgroundColor: "#f8f5f0" }}>
       {/* ═══════════════════════════════════════════════════════ SIDEBAR */}
@@ -478,6 +571,16 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     ? `${visasList.filter((v) => v.status === "received").length} New`
                     : undefined,
                 count: visasList.length,
+              },
+              {
+                id: "transfers",
+                label: "Airport Transfers",
+                icon: Car,
+                badge:
+                  transfersList.filter((t) => t.status === "pending").length > 0
+                    ? `${transfersList.filter((t) => t.status === "pending").length} New`
+                    : undefined,
+                count: transfersList.length,
               },
               { id: "users", label: "Users & Staff", icon: Users, count: usersList.length },
               { id: "destinations", label: "Destinations", icon: MapPin, count: destinationsList.length },
@@ -576,6 +679,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {activeTab === "tours" && "Tours & Experiences Management"}
               {activeTab === "bookings" && "Customer Bookings & Reservations"}
               {activeTab === "visas" && "e-Visa Operations & Fulfillment Queue"}
+              {activeTab === "transfers" && "Airport Transfer Dispatch & Chauffeur Management"}
               {activeTab === "users" && "User & Staff Directory"}
               {activeTab === "destinations" && "Destinations & Regions"}
               {activeTab === "audit" && "System Audit Trail & Security Logs"}
@@ -1391,6 +1495,227 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             </div>
           )}
 
+          {/* ═══════════════════════════════════════════════════════ AIRPORT TRANSFERS TAB */}
+          {activeTab === "transfers" && (
+            <div className="space-y-6">
+              {/* Stat cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase">Total Transfers</span>
+                  <p className="text-2xl font-bold font-display text-slate-900 mt-1">{transfersList.length}</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
+                  <span className="text-[11px] font-semibold text-amber-600 uppercase">Awaiting Driver / New</span>
+                  <p className="text-2xl font-bold font-display text-amber-600 mt-1">
+                    {transfersList.filter((t) => t.status === "pending").length}
+                  </p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
+                  <span className="text-[11px] font-semibold text-sky-600 uppercase">Confirmed / En Route</span>
+                  <p className="text-2xl font-bold font-display text-sky-600 mt-1">
+                    {transfersList.filter((t) => t.status === "confirmed" || t.status === "in_progress").length}
+                  </p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
+                  <span className="text-[11px] font-semibold text-emerald-600 uppercase">Completed</span>
+                  <p className="text-2xl font-bold font-display text-emerald-600 mt-1">
+                    {transfersList.filter((t) => t.status === "completed").length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Filter & Search Bar */}
+              <div className="p-4 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-2 w-full sm:w-80 rounded-xl bg-slate-50 border border-slate-200 px-3 py-2">
+                  <Search className="h-4 w-4 text-slate-400 shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search passenger, ref, flight, phone..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent text-xs text-slate-800 outline-none"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+                  {["all", "pending", "confirmed", "in_progress", "completed", "cancelled"].map((st) => (
+                    <button
+                      key={st}
+                      onClick={() => setTransferStatusFilter(st)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
+                        transferStatusFilter === st
+                          ? "bg-[#0f3460] text-white shadow-sm"
+                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      }`}
+                    >
+                      {st === "all" ? "All Transfers" : st.replace("_", " ")}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Transfers Table */}
+              <div className="rounded-2xl bg-white border border-[#e0f2fe] shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="py-3 px-4">Ref & Route</th>
+                        <th className="py-3 px-4">Flight & Schedule</th>
+                        <th className="py-3 px-4">Passenger</th>
+                        <th className="py-3 px-4">Vehicle & Amount</th>
+                        <th className="py-3 px-4">Chauffeur</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {transfersList
+                        .filter((t) => {
+                          const matchesFilter = transferStatusFilter === "all" || t.status === transferStatusFilter;
+                          const q = searchQuery.toLowerCase().trim();
+                          const matchesQuery =
+                            !q ||
+                            t.bookingNumber.toLowerCase().includes(q) ||
+                            t.passengerName.toLowerCase().includes(q) ||
+                            t.flightNumber.toLowerCase().includes(q) ||
+                            t.phoneNumber.toLowerCase().includes(q) ||
+                            t.dropoffAddress.toLowerCase().includes(q);
+                          return matchesFilter && matchesQuery;
+                        })
+                        .map((item) => (
+                          <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="py-3.5 px-4">
+                              <span className="font-mono font-bold text-slate-900 block text-xs">
+                                {item.bookingNumber}
+                              </span>
+                              <span className="text-[11px] text-slate-500 block mt-0.5">
+                                {item.airport} &middot;{" "}
+                                {item.direction === "arrival"
+                                  ? "🛬 Arrival"
+                                  : item.direction === "departure"
+                                  ? "🛫 Departure"
+                                  : "🔄 Round Trip"}
+                              </span>
+                              <span className="text-[10px] text-slate-400 block line-clamp-1">
+                                {item.pickupZone}: {item.dropoffAddress}
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <span className="font-mono font-semibold text-slate-800 block">
+                                ✈️ {item.flightNumber}
+                              </span>
+                              <span className="text-[11px] text-slate-600 block">
+                                {item.flightDate} at {item.flightTime}
+                              </span>
+                              {item.returnFlightNumber && (
+                                <span className="text-[10px] text-slate-400 block font-mono">
+                                  ↩️ {item.returnFlightNumber} on {item.returnDate}
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <span className="font-semibold text-slate-900 block">
+                                {item.passengerName}
+                              </span>
+                              <span className="text-[11px] text-slate-500 block">
+                                {item.passengerCount} pax &middot; {item.phoneNumber}
+                              </span>
+                              <span className="text-[10px] text-slate-400 block">
+                                {item.email}
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              <span className="font-bold text-slate-900 block">
+                                ${item.totalAmount}
+                              </span>
+                              <span className="text-[11px] text-slate-600 font-medium block">
+                                {item.vehicleClass === "sedan" ? "🚗 Sedan" : item.vehicleClass === "suv" ? "🚙 SUV" : item.vehicleClass === "minivan" ? "🚐 Minivan" : item.vehicleClass}
+                              </span>
+                              {item.paymentStatus === "paid" ? (
+                                <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-0.5">
+                                  ✓ Paid Online
+                                </span>
+                              ) : (
+                                <span className="inline-block text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-0.5">
+                                  💵 Pay on Arrival
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              {item.driverName ? (
+                                <div>
+                                  <span className="font-semibold text-slate-800 block text-xs">
+                                    {item.driverName}
+                                  </span>
+                                  {item.driverPhone && (
+                                    <span className="text-[11px] text-slate-500 block font-mono">
+                                      {item.driverPhone}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                                  Unassigned
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3.5 px-4">
+                              {item.status === "pending" && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-[11px] font-bold text-amber-800">
+                                  <Clock className="h-3 w-3" /> Pending
+                                </span>
+                              )}
+                              {item.status === "confirmed" && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
+                                  <CheckCircle2 className="h-3 w-3" /> Confirmed
+                                </span>
+                              )}
+                              {item.status === "in_progress" && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 border border-sky-200 px-2.5 py-1 text-[11px] font-bold text-sky-800">
+                                  <Car className="h-3 w-3" /> En Route
+                                </span>
+                              )}
+                              {item.status === "completed" && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-2.5 py-1 text-[11px] font-bold text-slate-800">
+                                  <CheckCircle2 className="h-3 w-3" /> Completed
+                                </span>
+                              )}
+                              {item.status === "cancelled" && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2.5 py-1 text-[11px] font-bold text-red-800">
+                                  <AlertCircle className="h-3 w-3" /> Cancelled
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3.5 px-4 text-right">
+                              <button
+                                onClick={() => handleOpenTransferModal(item)}
+                                className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
+                                style={{ backgroundColor: "#0f3460" }}
+                              >
+                                {item.driverName ? "Manage" : "Assign Driver"}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                  {transfersList.length === 0 && (
+                    <div className="py-12 text-center text-xs text-slate-500">
+                      No airport transfer bookings received yet.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ═══════════════════════════════════════════════════════ AUDIT TRAIL TAB */}
           {activeTab === "audit" && (
             <div className="space-y-6">
@@ -1957,6 +2282,181 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     style={{ backgroundColor: "#0f3460" }}
                   >
                     {visaUpdateLoading ? "Updating Application..." : "Save & Update Status"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ═══════════════════════════════════════════════════════ TRANSFER DISPATCH MODAL */}
+      {isTransferModalOpen && selectedTransfer && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto border border-sky-100">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Transfer Dispatch & Management
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 font-mono">
+                  {selectedTransfer.bookingNumber}
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsTransferModalOpen(false)}
+                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left Column: Booking Details */}
+              <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
+                <div className="font-bold text-slate-700 text-xs uppercase tracking-wider mb-1">
+                  Trip Information
+                </div>
+
+                <div>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Route</span>
+                  <span className="font-semibold text-slate-800">
+                    {selectedTransfer.airport} &middot;{" "}
+                    {selectedTransfer.direction === "arrival"
+                      ? "🛬 Arrival (Airport → Hotel)"
+                      : selectedTransfer.direction === "departure"
+                      ? "🛫 Departure (Hotel → Airport)"
+                      : "🔄 Round Trip"}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Zone & Specific Address</span>
+                  <span className="font-semibold text-slate-800 block">{selectedTransfer.pickupZone}</span>
+                  <span className="text-slate-600 block text-[11px]">{selectedTransfer.dropoffAddress}</span>
+                </div>
+
+                <div>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Flight Details</span>
+                  <span className="font-mono font-semibold text-slate-800 block">
+                    ✈️ {selectedTransfer.flightNumber} &middot; {selectedTransfer.flightDate} at {selectedTransfer.flightTime}
+                  </span>
+                  {selectedTransfer.returnFlightNumber && (
+                    <span className="font-mono text-slate-600 block text-[11px]">
+                      ↩️ Return: {selectedTransfer.returnFlightNumber} on {selectedTransfer.returnDate} at {selectedTransfer.returnTime}
+                    </span>
+                  )}
+                </div>
+
+                <div className="border-t border-slate-200/60 pt-2">
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Passenger</span>
+                  <span className="font-semibold text-slate-800 block">
+                    {selectedTransfer.passengerName} ({selectedTransfer.passengerCount} pax)
+                  </span>
+                  <span className="text-slate-600 block">{selectedTransfer.phoneNumber}</span>
+                  <span className="text-slate-600 block">{selectedTransfer.email}</span>
+                </div>
+
+                {selectedTransfer.luggageNotes && (
+                  <div className="border-t border-slate-200/60 pt-2">
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Luggage & Special Notes</span>
+                    <span className="text-slate-700 italic block">{selectedTransfer.luggageNotes}</span>
+                  </div>
+                )}
+
+                <div className="border-t border-slate-200/60 pt-2 flex items-center justify-between">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Vehicle Class</span>
+                    <span className="font-semibold text-slate-800">
+                      {selectedTransfer.vehicleClass === "sedan" ? "🚗 Sedan" : selectedTransfer.vehicleClass === "suv" ? "🚙 SUV" : selectedTransfer.vehicleClass === "minivan" ? "🚐 Minivan" : selectedTransfer.vehicleClass}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Total Rate</span>
+                    <span className="text-base font-extrabold text-sky-700">${selectedTransfer.totalAmount}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Dispatch Form */}
+              <form onSubmit={handleUpdateTransfer} className="space-y-4 text-xs">
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">Transfer Status</label>
+                  <select
+                    value={editTransferStatus}
+                    onChange={(e) => setEditTransferStatus(e.target.value as any)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
+                  >
+                    <option value="pending">Pending (Awaiting Driver)</option>
+                    <option value="confirmed">Confirmed (Driver Assigned)</option>
+                    <option value="in_progress">In Progress (Driver En Route)</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">Payment Status</label>
+                  <select
+                    value={editTransferPaymentStatus}
+                    onChange={(e) => setEditTransferPaymentStatus(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid Online</option>
+                    <option value="on_arrival">Pay on Arrival (Cash)</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    Assigned Driver Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Eldar Mammadov"
+                    value={editDriverName}
+                    onChange={(e) => setEditDriverName(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-medium"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-0.5">Visible to passenger on tracking page</p>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    Driver Phone / WhatsApp Number
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. +994 50 123 4567"
+                    value={editDriverPhone}
+                    onChange={(e) => setEditDriverPhone(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-mono"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-0.5">Used for passenger WhatsApp contact button</p>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">Dispatch & Ops Notes</label>
+                  <textarea
+                    rows={3}
+                    placeholder="e.g. Flight monitored, Terminal 1 greeting sign ready."
+                    value={editTransferNotes}
+                    onChange={(e) => setEditTransferNotes(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={transferUpdateLoading}
+                    className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity cursor-pointer disabled:opacity-50"
+                    style={{ backgroundColor: "#0f3460" }}
+                  >
+                    {transferUpdateLoading ? "Updating Dispatch..." : "Save & Update Dispatch"}
                   </button>
                 </div>
               </form>
