@@ -6,7 +6,23 @@ import { logger } from "@/lib/logger";
 
 export async function GET(request: Request) {
   const baseUrl = getRequestBaseUrl(request);
+  const appleClientId = process.env.AUTH_APPLE_ID;
 
+  // 1. If real Apple OAuth Services ID is provided, redirect to Apple Sign-In
+  if (appleClientId) {
+    const redirectUri = `${baseUrl}/api/auth/callback/apple`;
+    const appleAuthUrl = new URL("https://appleid.apple.com/auth/authorize");
+    appleAuthUrl.searchParams.set("client_id", appleClientId);
+    appleAuthUrl.searchParams.set("redirect_uri", redirectUri);
+    appleAuthUrl.searchParams.set("response_type", "code id_token");
+    appleAuthUrl.searchParams.set("response_mode", "form_post");
+    appleAuthUrl.searchParams.set("scope", "name email");
+
+    logger.info("Redirecting to Apple OAuth", { redirectUri });
+    return NextResponse.redirect(appleAuthUrl.toString());
+  }
+
+  // 2. Fallback Mode: Create / sign-in with verified Apple demo user in Neon DB
   try {
     const devEmail = "apple.traveler@icloud.com";
     const devName = "Jordan Rivers (Apple)";
