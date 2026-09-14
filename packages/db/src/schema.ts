@@ -746,3 +746,22 @@ export type NewAuditLog        = typeof auditLogs.$inferInsert;
 export type TourReservation    = typeof tourReservations.$inferSelect;
 export type NewTourReservation = typeof tourReservations.$inferInsert;
 
+export const siteSettings = pgTable(
+  "site_settings",
+  {
+    key:         varchar("key", { length: 100 }).primaryKey(),
+    value:       jsonb("value").notNull(),
+    category:    varchar("category", { length: 50 }).notNull().default("general"),
+    label:       varchar("label", { length: 255 }).notNull(),
+    description: text("description"),
+    updatedAt:   timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    updatedBy:   varchar("updated_by", { length: 255 }),
+  },
+  (t) => [
+    index("site_settings_category_idx").on(t.category),
+  ]
+);
+
+export type SiteSetting        = typeof siteSettings.$inferSelect;
+export type NewSiteSetting     = typeof siteSettings.$inferInsert;
+

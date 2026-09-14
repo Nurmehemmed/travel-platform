@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSiteSettings } from "@/lib/settings-context";
 import {
   Car,
   ChevronLeft,
@@ -88,6 +89,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ slides = DEFAULT_SLIDES }: HeroSectionProps) {
+  const { settings } = useSiteSettings();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -481,7 +483,7 @@ export function HeroSection({ slides = DEFAULT_SLIDES }: HeroSectionProps) {
 
           {/* Segment 3: WhatsApp Support (External Link) */}
           <a
-            href="https://wa.me/994551003146"
+            href={settings.contact.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-emerald-500/20"

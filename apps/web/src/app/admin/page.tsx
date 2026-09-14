@@ -34,6 +34,11 @@ import {
   LogOut,
   Car,
   MessageCircle,
+  Sliders,
+  Phone,
+  Mail,
+  Megaphone,
+  Save,
 } from "lucide-react";
 
 interface AuditLogItem {
@@ -191,7 +196,17 @@ interface TourReservationItem {
   createdAt: string;
 }
 
-type TabType = "overview" | "tours" | "bookings" | "users" | "destinations" | "visas" | "transfers" | "audit";
+interface SiteSettingItem {
+  key: string;
+  value: any;
+  category: string;
+  label: string;
+  description?: string | null;
+  updatedAt?: string | null;
+  updatedBy?: string | null;
+}
+
+type TabType = "overview" | "tours" | "bookings" | "users" | "destinations" | "visas" | "transfers" | "audit" | "settings";
 
 export default function AdminPortalPage() {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
@@ -215,6 +230,12 @@ export default function AdminPortalPage() {
   const [transfersList, setTransfersList] = useState<TransferItem[]>([]);
   const [tourReservationsList, setTourReservationsList] = useState<TourReservationItem[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
+
+  // Site Settings States
+  const [settingsList, setSettingsList] = useState<SiteSettingItem[]>([]);
+  const [settingsDraft, setSettingsDraft] = useState<Record<string, any>>({});
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsCategoryFilter, setSettingsCategoryFilter] = useState<string>("all");
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState("");
@@ -323,7 +344,7 @@ export default function AdminPortalPage() {
   const fetchAllData = async () => {
     try {
       setRefreshing(true);
-      const [statsRes, toursRes, bookingsRes, usersRes, destsRes, visasRes, transfersRes, auditRes, tourRes] =
+      const [statsRes, toursRes, bookingsRes, usersRes, destsRes, visasRes, transfersRes, auditRes, tourRes, settingsRes] =
         await Promise.all([
           fetch("/api/admin/stats").then((r) => r.json()),
           fetch("/api/admin/tours").then((r) => r.json()),
@@ -334,6 +355,7 @@ export default function AdminPortalPage() {
           fetch("/api/admin/transfers").then((r) => r.json()).catch(() => ({ transfers: [] })),
           fetch("/api/admin/audit-logs?limit=100").then((r) => r.json()).catch(() => ({ logs: [] })),
           fetch("/api/tours/reserve").then((r) => r.json()).catch(() => ({ reservations: [] })),
+          fetch("/api/admin/settings").then((r) => r.json()).catch(() => ({ settings: [] })),
         ]);
 
       if (statsRes?.stats) {
@@ -346,6 +368,14 @@ export default function AdminPortalPage() {
       if (visasRes?.visas) setVisasList(visasRes.visas);
       if (transfersRes?.transfers) setTransfersList(transfersRes.transfers);
       if (tourRes?.reservations) setTourReservationsList(tourRes.reservations);
+      if (settingsRes?.settings) {
+        setSettingsList(settingsRes.settings);
+        const draftMap: Record<string, any> = {};
+        for (const s of settingsRes.settings) {
+          draftMap[s.key] = s.value;
+        }
+        setSettingsDraft(draftMap);
+      }
       if (destsRes?.destinations) {
         setDestinationsList(destsRes.destinations);
         if (destsRes.destinations.length > 0 && !newTourDestId) {
@@ -402,6 +432,44 @@ export default function AdminPortalPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  // Save Site Settings
+  const handleSaveSettings = async () => {
+    try {
+      setSettingsSaving(true);
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates: settingsDraft }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.settings) {
+        setSettingsList(data.settings);
+        const draftMap: Record<string, any> = {};
+        for (const s of data.settings) {
+          draftMap[s.key] = s.value;
+        }
+        setSettingsDraft(draftMap);
+        showNotification("Site settings saved and applied to live platform!");
+      } else {
+        alert(data?.error || "Failed to save settings");
+      }
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+      alert("Error saving settings to server");
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const handleResetSettings = () => {
+    const draftMap: Record<string, any> = {};
+    for (const s of settingsList) {
+      draftMap[s.key] = s.value;
+    }
+    setSettingsDraft(draftMap);
+    showNotification("Settings draft reset to saved values");
   };
 
   // Update Booking Status
@@ -712,6 +780,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               { id: "users", label: "Users & Staff", icon: Users, count: usersList.length },
               { id: "destinations", label: "Destinations", icon: MapPin, count: destinationsList.length },
               { id: "audit", label: "Audit Trail", icon: ScrollText, count: auditLogs.length > 0 ? auditLogs.length : undefined },
+              { id: "settings", label: "Site Settings", icon: Sliders },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -810,10 +879,23 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {activeTab === "users" && "User & Staff Directory"}
               {activeTab === "destinations" && "Destinations & Regions"}
               {activeTab === "audit" && "System Audit Trail & Security Logs"}
+              {activeTab === "settings" && "Platform Settings & Operations Control"}
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
+            {activeTab === "settings" && (
+              <button
+                onClick={handleSaveSettings}
+                disabled={settingsSaving}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                style={{ backgroundColor: "#0f3460" }}
+              >
+                <Save className={`h-3.5 w-3.5 text-[#f59e0b] ${settingsSaving ? "animate-spin" : ""}`} />
+                {settingsSaving ? "Saving Settings..." : "Save All Settings"}
+              </button>
+            )}
+
             <button
               onClick={fetchAllData}
               disabled={refreshing}
@@ -2306,6 +2388,528 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ═══════════════════════════════════════════════════════ TAB: SITE SETTINGS */}
+          {activeTab === "settings" && (
+            <div className="space-y-6 animate-fade-in pb-12">
+              {/* Top Banner & Control Bar */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Sliders className="h-5 w-5 text-[#f59e0b]" />
+                    <span>Dynamic Platform Configuration</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Modify business contact channels, pricing margins, announcement banners, and service availability without redeploying code.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleResetSettings}
+                    disabled={settingsSaving}
+                    className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                  >
+                    Reset Draft
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveSettings}
+                    disabled={settingsSaving}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-bold text-white shadow-md hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                    style={{ backgroundColor: "#0f3460" }}
+                  >
+                    <Save className={`h-4 w-4 text-[#f59e0b] ${settingsSaving ? "animate-spin" : ""}`} />
+                    <span>{settingsSaving ? "Saving..." : "Save All Settings"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Category Filter Tabs */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                {[
+                  { id: "all", label: "All Settings", icon: Sliders },
+                  { id: "contact", label: "Contact & Concierge", icon: Phone },
+                  { id: "announcement", label: "Announcement Bar", icon: Megaphone },
+                  { id: "pricing", label: "Pricing & Margins", icon: DollarSign },
+                  { id: "operations", label: "Service Toggles", icon: Shield },
+                  { id: "marketing", label: "Social Proof", icon: Sparkles },
+                ].map((cat) => {
+                  const Icon = cat.icon;
+                  const isSelected = settingsCategoryFilter === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSettingsCategoryFilter(cat.id)}
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                        isSelected
+                          ? "bg-slate-900 text-white shadow-sm"
+                          : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                      }`}
+                    >
+                      <Icon className={`h-3.5 w-3.5 ${isSelected ? "text-[#f59e0b]" : "text-slate-400"}`} />
+                      <span>{cat.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 1. Contact & Concierge Settings */}
+              {(settingsCategoryFilter === "all" || settingsCategoryFilter === "contact") && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+                  <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-emerald-600" />
+                        <span>Contact & Concierge Channels</span>
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Controls numbers and handles used for WhatsApp booking, emergency assistance, and guest inquiries.
+                      </p>
+                    </div>
+                    {settingsDraft["contact_whatsapp"] && (
+                      <a
+                        href={`https://wa.me/${String(settingsDraft["contact_whatsapp"]).replace(/\D/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" />
+                        <span>Test WhatsApp Link</span>
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Primary WhatsApp Number *
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["contact_whatsapp"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, contact_whatsapp: e.target.value }))
+                        }
+                        placeholder="+994 55 100 31 46"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-mono focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        Linked dynamically to all "Book via WhatsApp", tour card buttons, and concierge triggers.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Operations & Emergency Hotline
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["contact_phone"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, contact_phone: e.target.value }))
+                        }
+                        placeholder="+994 55 100 31 46"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-mono focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                      <p className="text-[11px] text-slate-500 mt-1">
+                        Displayed in footer and support documents for voice inquiries.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Support Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={settingsDraft["contact_email"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, contact_email: e.target.value }))
+                        }
+                        placeholder="info@addmetour.com"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Telegram Username / Support Channel
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["contact_telegram"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, contact_telegram: e.target.value }))
+                        }
+                        placeholder="addmetour"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-mono focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Baku Office / Operational Base Address
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["contact_address"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, contact_address: e.target.value }))
+                        }
+                        placeholder="Nizami Street 48, Baku, Azerbaijan"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. Site-wide Announcement Banner */}
+              {(settingsCategoryFilter === "all" || settingsCategoryFilter === "announcement") && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+                  <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                        <Megaphone className="h-4 w-4 text-[#f59e0b]" />
+                        <span>Live Site Announcement Banner</span>
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Renders an interactive ribbon at the top of every page for promotions, border updates, or seasonal specials.
+                      </p>
+                    </div>
+
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(settingsDraft["announcement_active"])}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            announcement_active: e.target.checked,
+                          }))
+                        }
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                      <span className="ml-2 text-xs font-bold text-slate-700">
+                        {settingsDraft["announcement_active"] ? "Active (Visible)" : "Disabled"}
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Banner Preview */}
+                  {settingsDraft["announcement_active"] && (
+                    <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 flex items-center justify-between text-xs font-semibold shadow-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-full bg-slate-950 text-amber-300 text-[10px] uppercase font-bold">
+                          {settingsDraft["announcement_badge"] || "Offer"}
+                        </span>
+                        <span>{settingsDraft["announcement_text"] || "Preview announcement text goes here..."}</span>
+                      </div>
+                      <span className="text-[11px] underline font-bold cursor-pointer">
+                        {settingsDraft["announcement_link"] || "Learn More"} ↗
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Badge Pill Text
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["announcement_badge"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, announcement_badge: e.target.value }))
+                        }
+                        placeholder="Limited Offer"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Announcement Message Text
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["announcement_text"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, announcement_text: e.target.value }))
+                        }
+                        placeholder="🌸 Autumn in Azerbaijan: Book custom tours early and get complimentary airport pickup!"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Call-to-Action Link URL
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["announcement_link"] ?? ""}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({ ...prev, announcement_link: e.target.value }))
+                        }
+                        placeholder="/#tours"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-mono focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Pricing & Rates Configuration */}
+              {(settingsCategoryFilter === "all" || settingsCategoryFilter === "pricing") && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+                  <div className="border-b border-slate-100 pb-3">
+                    <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-emerald-600" />
+                      <span>e-Visa & Airport Transfer Pricing (USD)</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Adjust service fees charged to travelers. Changes reflect immediately on checkout and booking cards.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Standard eVisa (3d)
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-slate-400 font-bold">$</span>
+                        <input
+                          type="number"
+                          value={settingsDraft["pricing_visa_standard"] ?? 45}
+                          onChange={(e) =>
+                            setSettingsDraft((prev) => ({
+                              ...prev,
+                              pricing_visa_standard: Number(e.target.value),
+                            }))
+                          }
+                          className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-400 mt-1 block">Includes govt fee ($26)</span>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/40">
+                      <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider block mb-1">
+                        Urgent eVisa (3h)
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-amber-700 font-bold">$</span>
+                        <input
+                          type="number"
+                          value={settingsDraft["pricing_visa_urgent"] ?? 85}
+                          onChange={(e) =>
+                            setSettingsDraft((prev) => ({
+                              ...prev,
+                              pricing_visa_urgent: Number(e.target.value),
+                            }))
+                          }
+                          className="w-full rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
+                        />
+                      </div>
+                      <span className="text-[10px] text-amber-700 mt-1 block">Includes urgent fee ($61)</span>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Transfer Sedan Base
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-slate-400 font-bold">$</span>
+                        <input
+                          type="number"
+                          value={settingsDraft["pricing_transfer_sedan"] ?? 25}
+                          onChange={(e) =>
+                            setSettingsDraft((prev) => ({
+                              ...prev,
+                              pricing_transfer_sedan: Number(e.target.value),
+                            }))
+                          }
+                          className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-400 mt-1 block">Baku City Center</span>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Transfer Minivan (Vito)
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-slate-400 font-bold">$</span>
+                        <input
+                          type="number"
+                          value={settingsDraft["pricing_transfer_minivan"] ?? 40}
+                          onChange={(e) =>
+                            setSettingsDraft((prev) => ({
+                              ...prev,
+                              pricing_transfer_minivan: Number(e.target.value),
+                            }))
+                          }
+                          className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-400 mt-1 block">Up to 6 Passengers</span>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        Transfer Sprinter VIP
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-slate-400 font-bold">$</span>
+                        <input
+                          type="number"
+                          value={settingsDraft["pricing_transfer_sprinter"] ?? 65}
+                          onChange={(e) =>
+                            setSettingsDraft((prev) => ({
+                              ...prev,
+                              pricing_transfer_sprinter: Number(e.target.value),
+                            }))
+                          }
+                          className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-400 mt-1 block">Up to 16 Passengers</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Operational Kill-Switches & Toggles */}
+              {(settingsCategoryFilter === "all" || settingsCategoryFilter === "operations") && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+                  <div className="border-b border-slate-100 pb-3">
+                    <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-indigo-600" />
+                      <span>Operational Kill-Switches & Feature Toggles</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Enable or suspend customer-facing modules during peak season capacity or scheduled maintenance.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-slate-800 block">Floating WhatsApp Widget</span>
+                        <span className="text-[11px] text-slate-500">Show bottom-right WhatsApp chat bubble</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settingsDraft["operations_floating_whatsapp"] !== false}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            operations_floating_whatsapp: e.target.checked,
+                          }))
+                        }
+                        className="h-4 w-4 rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-slate-800 block">e-Visa Application Service</span>
+                        <span className="text-[11px] text-slate-500">Accept new online visa submissions</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settingsDraft["operations_visa_service"] !== false}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            operations_visa_service: e.target.checked,
+                          }))
+                        }
+                        className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-slate-800 block">Airport Transfer Bookings</span>
+                        <span className="text-[11px] text-slate-500">Accept direct ride reservations</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={settingsDraft["operations_transfer_service"] !== false}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            operations_transfer_service: e.target.checked,
+                          }))
+                        }
+                        className="h-4 w-4 rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 5. Marketing & Social Proof */}
+              {(settingsCategoryFilter === "all" || settingsCategoryFilter === "marketing") && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
+                  <div className="border-b border-slate-100 pb-3">
+                    <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-amber-500" />
+                      <span>Social Proof & Trust Badges</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Ratings and review counters displayed in badges across the homepage.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        TripAdvisor Rating Display
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["marketing_tripadvisor_rating"] ?? "4.9"}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            marketing_tripadvisor_rating: e.target.value,
+                          }))
+                        }
+                        placeholder="4.9"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Verified Reviews Count
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["marketing_tripadvisor_reviews"] ?? "2,400+"}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            marketing_tripadvisor_reviews: e.target.value,
+                          }))
+                        }
+                        placeholder="2,400+"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

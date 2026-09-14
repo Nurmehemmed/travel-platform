@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "@travel/ui/styles";
 import FloatingTravelServices from "@/components/FloatingTravelServices";
 import { LanguageProvider } from "@/lib/i18n";
+import { SettingsProvider } from "@/lib/settings-context";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
@@ -260,10 +262,13 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen antialiased">
-        <LanguageProvider>
-          {children}
-          <FloatingTravelServices />
-        </LanguageProvider>
+        <SettingsProvider>
+          <AnnouncementBanner />
+          <LanguageProvider>
+            {children}
+            <FloatingTravelServices />
+          </LanguageProvider>
+        </SettingsProvider>
       </body>
     </html>
   );
