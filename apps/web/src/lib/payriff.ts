@@ -48,6 +48,9 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     : `${APP_URL}/visa/pay`;
 
   if (isMock) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Payment gateway credentials (PAYRIFF_SECRET_KEY / PAYRIFF_MERCHANT_ID) are missing or invalid in production.");
+    }
     // Return local Payriff Sandbox checkout simulation
     const mockOrderId = `PR-SIM-${Math.floor(100000 + Math.random() * 900000)}`;
     const emailQuery = isTransfer ? `&email=${encodeURIComponent(email)}` : "";
@@ -106,7 +109,10 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     };
   } catch (err: unknown) {
     console.error("Payriff API Connection Failure:", err);
-    // Fall back to sandbox simulation if Payriff API is temporarily unreachable
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Payment gateway connection error. Please try again shortly.");
+    }
+    // Fall back to sandbox simulation in development only
     const fallbackOrderId = `PR-FALLBACK-${Math.floor(100000 + Math.random() * 900000)}`;
     return {
       orderId: fallbackOrderId,
@@ -122,8 +128,17 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
  * Verify Payriff Order Status
  */
 export async function verifyPayriffOrder(orderId: string): Promise<{ isPaid: boolean; rawStatus?: string }> {
-  if (!PAYRIFF_SECRET_KEY || orderId.startsWith("PR-SIM-") || orderId.startsWith("PR-FALLBACK-")) {
-    return { isPaid: true, rawStatus: "SIMULATED_APPROVED" };
+  // In production, NEVER trust mock, simulated, or fallback order IDs. Live settlement is strictly required.
+  if (process.env.NODE_ENV === "production") {
+    if (!PAYRIFF_SECRET_KEY || orderId.startsWith("PR-SIM-") || orderId.startsWith("PR-FALLBACK-")) {
+      console.error("[CRITICAL SECURITY] Blocked simulated/uncredentialed payment verification in production", { orderId });
+      return { isPaid: false, rawStatus: "SIMULATION_BLOCKED_IN_PRODUCTION" };
+    }
+  } else {
+    // Development simulation only
+    if (!PAYRIFF_SECRET_KEY || orderId.startsWith("PR-SIM-") || orderId.startsWith("PR-FALLBACK-")) {
+      return { isPaid: true, rawStatus: "SIMULATED_APPROVED" };
+    }
   }
 
   try {

@@ -11,14 +11,25 @@ export async function GET(request: Request) {
   // 1. If real Google OAuth credentials are provided, redirect to Google OAuth consent
   if (googleClientId && process.env.AUTH_GOOGLE_SECRET) {
     const redirectUri = `${baseUrl}/api/auth/callback/google`;
+    const state = crypto.randomUUID();
     const googleAuthUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     googleAuthUrl.searchParams.set("client_id", googleClientId);
     googleAuthUrl.searchParams.set("redirect_uri", redirectUri);
     googleAuthUrl.searchParams.set("response_type", "code");
     googleAuthUrl.searchParams.set("scope", "openid email profile");
     googleAuthUrl.searchParams.set("prompt", "select_account");
+    googleAuthUrl.searchParams.set("state", state);
+
     logger.info("Redirecting to Google OAuth", { redirectUri });
-    return NextResponse.redirect(googleAuthUrl.toString());
+    const response = NextResponse.redirect(googleAuthUrl.toString());
+    response.cookies.set("oauth_google_state", state, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 600, // 10 minutes
+      path: "/",
+    });
+    return response;
   }
 
   // In production, never allow simulated fallback login if credentials are missing

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { db, users, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
 import { signSessionToken, setSessionCookie, getRequestBaseUrl } from "@/lib/auth";
@@ -7,7 +8,17 @@ import { logger } from "@/lib/logger";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
+  const state = searchParams.get("state");
   const baseUrl = getRequestBaseUrl(request);
+
+  const cookieStore = await cookies();
+  const savedState = cookieStore.get("oauth_google_state")?.value;
+  cookieStore.delete("oauth_google_state");
+
+  if (!state || !savedState || state !== savedState) {
+    logger.warn("Google OAuth callback state CSRF validation failed");
+    return NextResponse.redirect(`${baseUrl}/?auth_error=csrf_state_mismatch`);
+  }
 
   if (!code) {
     logger.warn("Google OAuth callback missing code parameter");

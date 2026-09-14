@@ -11,15 +11,25 @@ export async function GET(request: Request) {
   // 1. If real Apple OAuth Services ID is provided, redirect to Apple Sign-In
   if (appleClientId) {
     const redirectUri = `${baseUrl}/api/auth/callback/apple`;
+    const state = crypto.randomUUID();
     const appleAuthUrl = new URL("https://appleid.apple.com/auth/authorize");
     appleAuthUrl.searchParams.set("client_id", appleClientId);
     appleAuthUrl.searchParams.set("redirect_uri", redirectUri);
     appleAuthUrl.searchParams.set("response_type", "code id_token");
     appleAuthUrl.searchParams.set("response_mode", "form_post");
     appleAuthUrl.searchParams.set("scope", "name email");
+    appleAuthUrl.searchParams.set("state", state);
 
     logger.info("Redirecting to Apple OAuth", { redirectUri });
-    return NextResponse.redirect(appleAuthUrl.toString());
+    const response = NextResponse.redirect(appleAuthUrl.toString());
+    response.cookies.set("oauth_apple_state", state, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none", // Apple form_post is cross-site POST, requires SameSite=None + Secure
+      maxAge: 600, // 10 minutes
+      path: "/",
+    });
+    return response;
   }
 
   // In production, never allow simulated fallback login if credentials are missing

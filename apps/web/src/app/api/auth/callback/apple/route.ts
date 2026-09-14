@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { db, users, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
@@ -21,7 +22,18 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const idToken = formData.get("id_token") as string | null;
     const userJson = formData.get("user") as string | null;
+    const state = formData.get("state") as string | null;
     const appleClientId = process.env.AUTH_APPLE_ID;
+
+    // Verify CSRF state
+    const cookieStore = await cookies();
+    const savedState = cookieStore.get("oauth_apple_state")?.value;
+    cookieStore.delete("oauth_apple_state");
+
+    if (savedState && (!state || state !== savedState)) {
+      logger.warn("Apple OAuth callback state CSRF validation failed");
+      return NextResponse.redirect(`${baseUrl}/?auth_error=csrf_state_mismatch`, { status: 303 });
+    }
 
     if (!idToken) {
       logger.warn("Apple OAuth callback missing id_token");
