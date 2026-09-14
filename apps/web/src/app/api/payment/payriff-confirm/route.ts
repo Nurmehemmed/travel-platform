@@ -41,8 +41,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. For live orders or in production, verify order with Payriff
-    if (!simulated && orderId) {
+    // 3. For live orders or in production, orderId is mandatory and must be verified with Payriff
+    if (!simulated) {
+      if (!orderId) {
+        return NextResponse.json(
+          { error: "Missing Payriff orderId for payment settlement verification" },
+          { status: 400 }
+        );
+      }
       const check = await verifyPayriffOrder(orderId);
       if (!check.isPaid) {
         logger.warn("Payriff order settlement verification failed", { orderId, applicationNumber });

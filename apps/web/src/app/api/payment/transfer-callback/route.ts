@@ -28,14 +28,18 @@ export async function GET(req: Request) {
     );
   }
 
-  // Verify the order with Payriff
-  if (orderId) {
-    const check = await verifyPayriffOrder(orderId);
-    if (!check.isPaid) {
-      return NextResponse.redirect(
-        new URL(`/transfer/book?error=payment_unverified&ref=${bookingNumber}`, req.url)
-      );
-    }
+  // Strictly require orderId and verify order settlement with Payriff
+  if (!orderId) {
+    return NextResponse.redirect(
+      new URL(`/transfer/book?error=missing_order_id&ref=${bookingNumber}`, req.url)
+    );
+  }
+
+  const check = await verifyPayriffOrder(orderId);
+  if (!check.isPaid) {
+    return NextResponse.redirect(
+      new URL(`/transfer/book?error=payment_unverified&ref=${bookingNumber}`, req.url)
+    );
   }
 
   // Look up and update the booking

@@ -19,12 +19,14 @@ export async function GET(req: Request) {
     return NextResponse.redirect(new URL(`/visa/apply?error=payment_${status}&ref=${applicationNumber}`, req.url));
   }
 
-  // Verify order with Payriff if orderId exists
-  if (orderId) {
-    const check = await verifyPayriffOrder(orderId);
-    if (!check.isPaid) {
-      return NextResponse.redirect(new URL(`/visa/apply?error=payment_unverified&ref=${applicationNumber}`, req.url));
-    }
+  // Strictly require orderId and verify order settlement with Payriff
+  if (!orderId) {
+    return NextResponse.redirect(new URL(`/visa/apply?error=missing_order_id&ref=${applicationNumber}`, req.url));
+  }
+
+  const check = await verifyPayriffOrder(orderId);
+  if (!check.isPaid) {
+    return NextResponse.redirect(new URL(`/visa/apply?error=payment_unverified&ref=${applicationNumber}`, req.url));
   }
 
   // Update DB to paid
