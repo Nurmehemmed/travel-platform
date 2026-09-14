@@ -35,10 +35,16 @@ import {
   calculateTransferPrice,
   calculateRoundTripPrice,
 } from "@/lib/transfer-zones";
+import {
+  LOCALIZED_AIRPORTS,
+  LOCALIZED_ZONES,
+  LOCALIZED_AIRPORT_DESCRIPTIONS,
+  LOCALIZED_TRANSFER_FAQS,
+} from "@/lib/pages-i18n";
 
 export default function TransferLandingPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Estimator state
   const [selectedAirport, setSelectedAirport] = useState<AirportCode>("GYD");
@@ -46,6 +52,31 @@ export default function TransferLandingPage() {
   const zones = getZonesByAirport(selectedAirport);
   const [selectedZoneId, setSelectedZoneId] = useState<string>(zones[0]?.id || "GYD-baku-center");
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+
+  // Dynamic vehicle translation helpers
+  const getVehicleLabel = (id: VehicleClass) => {
+    if (id === "sedan") return t.transferPage.sedan;
+    if (id === "suv") return t.transferPage.suv;
+    return t.transferPage.minivan;
+  };
+
+  const getVehicleDesc = (id: VehicleClass) => {
+    if (id === "sedan") return t.transferPage.sedanDesc;
+    if (id === "suv") return t.transferPage.suvDesc;
+    return t.transferPage.minivanDesc;
+  };
+
+  const getVehicleCapacity = (id: VehicleClass) => {
+    if (id === "sedan") return `1–3 ${t.transferPage.paxMax}`;
+    if (id === "suv") return `1–4 ${t.transferPage.paxMax}`;
+    return `4–7 ${t.transferPage.paxMax}`;
+  };
+
+  const getVehicleLuggage = (id: VehicleClass) => {
+    if (id === "sedan") return `2 ${t.transferPage.bagsMax}`;
+    if (id === "suv") return `4 ${t.transferPage.bagsMax}`;
+    return `6 ${t.transferPage.bagsMax}`;
+  };
 
   // When airport changes, reset zone
   const handleAirportChange = (code: AirportCode) => {
@@ -68,32 +99,7 @@ export default function TransferLandingPage() {
     router.push(`/transfer/book?${params.toString()}`);
   };
 
-  const faqs = [
-    {
-      q: "Where will I meet my driver at the airport?",
-      a: "Your driver will be waiting inside the arrival hall directly after luggage claim and customs exit, holding a personalized signboard with your name. You will also receive the driver's contact number before your flight.",
-    },
-    {
-      q: "What if my flight is delayed?",
-      a: "We track your flight number in real-time. Whether your flight is early or delayed by several hours, your driver will adjust their schedule automatically at no extra charge. We also include 60 minutes of complimentary waiting time after your flight lands.",
-    },
-    {
-      q: "Can I pay in cash to the driver upon arrival?",
-      a: "Yes! You can choose to pay securely online by credit card via Payriff, or choose 'Pay on Arrival' in cash (USD, EUR, or AZN) directly to the driver.",
-    },
-    {
-      q: "What is your cancellation policy?",
-      a: "You can cancel or modify your transfer reservation free of charge up to 24 hours prior to the scheduled pickup time. Instant full refunds are issued for online card payments.",
-    },
-    {
-      q: "Do you provide child safety seats?",
-      a: "Yes, infant and child safety seats can be arranged upon request at no additional fee. Simply mention it in the luggage or special requests note when booking.",
-    },
-    {
-      q: "How many pieces of luggage can I bring?",
-      a: "Our standard economy sedans comfortably carry 2 large suitcases plus carry-on bags. If you are traveling with more luggage or sporting equipment, our Minivan or Executive Minibus are ideal choices.",
-    },
-  ];
+  const faqs = LOCALIZED_TRANSFER_FAQS[language] || LOCALIZED_TRANSFER_FAQS.EN;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
@@ -203,7 +209,7 @@ export default function TransferLandingPage() {
               {/* Airport Selector */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                  Airport
+                  {t.transferPage.airport}
                 </label>
                 <select
                   value={selectedAirport}
@@ -212,7 +218,7 @@ export default function TransferLandingPage() {
                 >
                   {AIRPORTS.map((a) => (
                     <option key={a.code} value={a.code}>
-                      {a.fullName}
+                      {LOCALIZED_AIRPORTS[language]?.[a.code] || a.fullName}
                     </option>
                   ))}
                 </select>
@@ -221,7 +227,7 @@ export default function TransferLandingPage() {
               {/* Destination Zone Selector */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                  Destination / Pickup Zone
+                  {t.transferPage.destinationZone}
                 </label>
                 <select
                   value={selectedZoneId}
@@ -230,7 +236,7 @@ export default function TransferLandingPage() {
                 >
                   {zones.map((z) => (
                     <option key={z.id} value={z.id}>
-                      {z.name} {z.distanceKm > 0 ? `(~${z.distanceKm} km)` : "— Custom Quote"}
+                      {LOCALIZED_ZONES[language]?.[z.id] || z.name} {z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}
                     </option>
                   ))}
                 </select>
@@ -257,23 +263,23 @@ export default function TransferLandingPage() {
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-2xl">{vc.icon}</span>
                         <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                          <Users className="h-3 w-3" /> {vc.capacity}
+                          <Users className="h-3 w-3" /> {getVehicleCapacity(vc.id)}
                         </span>
                       </div>
-                      <h3 className="font-bold text-slate-800 text-sm">{vc.label}</h3>
+                      <h3 className="font-bold text-slate-800 text-sm">{getVehicleLabel(vc.id)}</h3>
                       <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
-                        {vc.description}
+                        {getVehicleDesc(vc.id)}
                       </p>
                     </div>
 
                     <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                       <div>
                         <div className="text-[10px] uppercase font-bold text-slate-400">
-                          {direction === "round_trip" ? "Round Trip" : "One-Way"}
+                          {direction === "round_trip" ? t.transferPage.roundTrip.split(" ")[0] : t.transferPage.oneWay}
                         </div>
                         <div className="text-lg font-extrabold text-sky-700">
                           {isCustom ? (
-                            <span className="text-xs font-semibold text-slate-600">Quote on Request</span>
+                            <span className="text-xs font-semibold text-slate-600">{t.transferPage.quoteOnRequest}</span>
                           ) : priceObj ? (
                             `$${priceObj.totalAmount}`
                           ) : (
@@ -286,7 +292,7 @@ export default function TransferLandingPage() {
                         onClick={() => handleBookNow(vc.id)}
                         className="rounded-lg bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 text-xs font-bold transition-all shadow-sm group-hover:scale-105"
                       >
-                        Select
+                        {t.transferPage.selectVehicle}
                       </button>
                     </div>
                   </div>
@@ -301,7 +307,7 @@ export default function TransferLandingPage() {
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <div className="text-xs text-slate-600">
-                  <span className="font-bold text-slate-800">All-Inclusive Fixed Rates:</span> No surge pricing, highway tolls included, parking fees covered.
+                  <span className="font-bold text-slate-800">{t.transferPage.allInclusiveTitle}</span> {t.transferPage.allInclusiveDesc}
                 </div>
               </div>
               <button
@@ -334,9 +340,9 @@ export default function TransferLandingPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-600 text-white mb-4 shadow-sm">
                 <Plane className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base mb-1.5">Real-Time Flight Monitoring</h3>
+              <h3 className="font-bold text-slate-800 text-base mb-1.5">{t.transferPage.f1Title}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                We monitor incoming flights for delays or early arrivals. Your driver is guaranteed to be there whenever your wheels touch down, at no additional fee.
+                {t.transferPage.f1Desc}
               </p>
             </div>
 
@@ -344,9 +350,9 @@ export default function TransferLandingPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-600 text-white mb-4 shadow-sm">
                 <Clock className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base mb-1.5">60 Minutes Free Wait Time</h3>
+              <h3 className="font-bold text-slate-800 text-base mb-1.5">{t.transferPage.f5Title}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Take your time clearing immigration, passport control, and baggage claim. We include a full 60 minutes of complimentary wait time starting from flight touchdown.
+                {t.transferPage.f5Desc}
               </p>
             </div>
 
@@ -354,9 +360,9 @@ export default function TransferLandingPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-600 text-white mb-4 shadow-sm">
                 <ShieldCheck className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base mb-1.5">Meet & Greet Service</h3>
+              <h3 className="font-bold text-slate-800 text-base mb-1.5">{t.transferPage.f3Title}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                No searching through airport taxi ranks. Your driver greets you directly in the arrival hall holding a clear name board and assists with your heavy luggage.
+                {t.transferPage.f3Desc}
               </p>
             </div>
 
@@ -364,9 +370,9 @@ export default function TransferLandingPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-600 text-white mb-4 shadow-sm">
                 <DollarSign className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base mb-1.5">Fixed Upfront Pricing</h3>
+              <h3 className="font-bold text-slate-800 text-base mb-1.5">{t.transferPage.f2Title}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                What you see is what you pay. Zero hidden fees, no surge tariffs in rush hour or bad weather, and all highway tolls and parking charges are included.
+                {t.transferPage.f2Desc}
               </p>
             </div>
 
@@ -374,9 +380,9 @@ export default function TransferLandingPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-600 text-white mb-4 shadow-sm">
                 <CheckCircle2 className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base mb-1.5">Flexible Payment Options</h3>
+              <h3 className="font-bold text-slate-800 text-base mb-1.5">{t.transferPage.f4Title}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Pay in advance via secure online card checkout (Payriff), or simply pay in cash directly to your driver upon arrival in USD, EUR, or Azerbaijani Manat (AZN).
+                {t.transferPage.f4Desc}
               </p>
             </div>
 
@@ -384,9 +390,9 @@ export default function TransferLandingPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-600 text-white mb-4 shadow-sm">
                 <PhoneCall className="h-6 w-6" />
               </div>
-              <h3 className="font-bold text-slate-800 text-base mb-1.5">24/7 Operations Support</h3>
+              <h3 className="font-bold text-slate-800 text-base mb-1.5">{t.transferPage.f6Title}</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Our Baku-based dispatch and support team is on standby around the clock via WhatsApp and telephone to ensure your transfer is seamless from booking to drop-off.
+                {t.transferPage.f6Desc}
               </p>
             </div>
           </div>
@@ -398,7 +404,7 @@ export default function TransferLandingPage() {
         <div className="container-section max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-bold text-sky-600 uppercase tracking-wider">
-              Premium Vehicles & Chauffeurs
+              {t.transferPage.fleetBadge}
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
               {t.transferPage.fleetTitle}
@@ -419,8 +425,8 @@ export default function TransferLandingPage() {
                     <div className="flex items-center gap-3">
                       <div className="text-3xl">{vc.icon}</div>
                       <div>
-                        <h3 className="font-bold text-slate-900 text-lg">{vc.label}</h3>
-                        <p className="text-xs text-slate-500">{vc.description}</p>
+                        <h3 className="font-bold text-slate-900 text-lg">{getVehicleLabel(vc.id)}</h3>
+                        <p className="text-xs text-slate-500">{getVehicleDesc(vc.id)}</p>
                       </div>
                     </div>
                   </div>
@@ -428,11 +434,11 @@ export default function TransferLandingPage() {
                   <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-600 border-y border-slate-100 py-3">
                     <div className="flex items-center gap-1.5">
                       <Users className="h-4 w-4 text-sky-600" />
-                      <span className="font-semibold">{vc.capacity}</span>
+                      <span className="font-semibold">{getVehicleCapacity(vc.id)}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Briefcase className="h-4 w-4 text-sky-600" />
-                      <span className="font-semibold">{vc.luggage}</span>
+                      <span className="font-semibold">{getVehicleLuggage(vc.id)}</span>
                     </div>
                   </div>
 
@@ -448,10 +454,10 @@ export default function TransferLandingPage() {
 
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Starting from</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-400">{t.transferPage.startingFrom}</span>
                     <div className="text-xl font-extrabold text-slate-900">
                       ${vc.baseRate}{" "}
-                      <span className="text-xs font-normal text-slate-500">base + ${vc.perKmRate.toFixed(2)}/km</span>
+                      <span className="text-xs font-normal text-slate-500">{t.transferPage.baseFee} + ${vc.perKmRate.toFixed(2)}/{t.transferPage.perKm}</span>
                     </div>
                   </div>
                   <button
@@ -459,7 +465,7 @@ export default function TransferLandingPage() {
                     onClick={() => handleBookNow(vc.id)}
                     className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
                   >
-                    <span>Book {vc.label}</span>
+                    <span>{t.transferPage.bookVehicle} {getVehicleLabel(vc.id)}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -474,13 +480,13 @@ export default function TransferLandingPage() {
         <div className="container-section max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-bold text-sky-600 uppercase tracking-wider">
-              Nationwide Coverage
+              {t.transferPage.airportsBadge}
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
-              Azerbaijan Airports We Serve
+              {t.transferPage.airportsTitle}
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Door-to-door transfers connecting all international airports with hotels, residences, and business centers.
+              {t.transferPage.airportsDesc}
             </p>
           </div>
 
@@ -497,11 +503,11 @@ export default function TransferLandingPage() {
                     </span>
                     <span className="text-xs font-semibold text-slate-500">{airport.city}</span>
                   </div>
-                  <h3 className="font-bold text-slate-900 text-base">{airport.name}</h3>
+                  <h3 className="font-bold text-slate-900 text-base">
+                    {LOCALIZED_AIRPORTS[language]?.[airport.code] || airport.name}
+                  </h3>
                   <p className="text-xs text-slate-600 mt-2">
-                    {airport.code === "GYD" && "Baku's main hub. 30 km from city center. Dedicated pickup zone at Terminal 1 & 2."}
-                    {airport.code === "GJA" && "Western Azerbaijan gateway. 8 km from Ganja center with transfers to Goygol and Naftalan."}
-                    {airport.code === "NAJ" && "Nakhchivan Autonomous Republic. 7 km from city center with prompt airport greeting."}
+                    {LOCALIZED_AIRPORT_DESCRIPTIONS[language]?.[airport.code] || ""}
                   </p>
                 </div>
 
@@ -514,7 +520,7 @@ export default function TransferLandingPage() {
                     }}
                     className="w-full rounded-xl bg-slate-100 hover:bg-sky-100 text-sky-700 py-2 text-xs font-bold transition-all flex items-center justify-center gap-1.5"
                   >
-                    <span>Book from {airport.code}</span>
+                    <span>{t.transferPage.bookFrom} {airport.code}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -529,10 +535,10 @@ export default function TransferLandingPage() {
         <div className="container-section max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <span className="text-xs font-bold text-sky-600 uppercase tracking-wider">
-              Have Questions?
+              {t.transferPage.faqSubtitle}
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mt-1">
-              Frequently Asked Questions
+              {t.transferPage.faqTitle}
             </h2>
           </div>
 
@@ -572,10 +578,10 @@ export default function TransferLandingPage() {
       <section className="py-16" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Ready to Land Stress-Free in Azerbaijan?
+            {t.transferPage.bottomTitle}
           </h2>
           <p className="mt-3 text-sm sm:text-base text-sky-100/80 max-w-xl mx-auto leading-relaxed">
-            Reserve your airport transfer in under 2 minutes. Instant booking confirmation with driver assignment before takeoff.
+            {t.transferPage.bottomDesc}
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
@@ -583,14 +589,14 @@ export default function TransferLandingPage() {
               className="w-full sm:w-auto rounded-full px-8 py-3 text-sm font-bold text-white transition-all hover:scale-105 shadow-lg flex items-center justify-center gap-2"
               style={{ backgroundColor: "#0284c7" }}
             >
-              <span>Book Your Transfer Now</span>
+              <span>{t.transferPage.bottomBookBtn}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/transfer/track"
               className="w-full sm:w-auto rounded-full border border-sky-300/40 px-6 py-3 text-sm font-semibold text-sky-200 hover:bg-white/10 transition-all text-center"
             >
-              Track Existing Booking
+              {t.transferPage.bottomTrackBtn}
             </Link>
           </div>
         </div>

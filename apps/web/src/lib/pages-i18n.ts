@@ -39,6 +39,29 @@ export interface TransferPageTranslations {
   f4Desc: string;
   faqTitle: string;
   faqSubtitle: string;
+  oneWay: string;
+  selectVehicle: string;
+  quoteOnRequest: string;
+  allInclusiveTitle: string;
+  allInclusiveDesc: string;
+  customQuoteText: string;
+  f5Title: string;
+  f5Desc: string;
+  f6Title: string;
+  f6Desc: string;
+  fleetBadge: string;
+  startingFrom: string;
+  baseFee: string;
+  perKm: string;
+  bookVehicle: string;
+  airportsBadge: string;
+  airportsTitle: string;
+  airportsDesc: string;
+  bookFrom: string;
+  bottomTitle: string;
+  bottomDesc: string;
+  bottomBookBtn: string;
+  bottomTrackBtn: string;
 }
 
 export interface VisaPageTranslations {
@@ -161,6 +184,29 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     f4Desc: "Secure online checkout via Payriff or pay cash directly to your chauffeur on arrival.",
     faqTitle: "Frequently Asked Questions",
     faqSubtitle: "Everything you need to know about our private airport transfers.",
+    oneWay: "One-Way",
+    selectVehicle: "Select",
+    quoteOnRequest: "Quote on Request",
+    allInclusiveTitle: "All-Inclusive Fixed Rates:",
+    allInclusiveDesc: "No surge pricing, highway tolls included, parking fees covered.",
+    customQuoteText: "Custom Quote",
+    f5Title: "60 Minutes Free Wait Time",
+    f5Desc: "Take your time clearing immigration and luggage claim. 60 minutes complimentary wait time from touchdown.",
+    f6Title: "24/7 Operations Support",
+    f6Desc: "Our Baku-based dispatch team is on standby around the clock via WhatsApp and telephone.",
+    fleetBadge: "Premium Vehicles & Chauffeurs",
+    startingFrom: "Starting from",
+    baseFee: "base",
+    perKm: "km",
+    bookVehicle: "Book",
+    airportsBadge: "Nationwide Coverage",
+    airportsTitle: "Azerbaijan Airports We Serve",
+    airportsDesc: "Door-to-door transfers connecting all international airports with hotels, residences, and business centers.",
+    bookFrom: "Book from",
+    bottomTitle: "Ready to Land Stress-Free in Azerbaijan?",
+    bottomDesc: "Reserve your airport transfer in under 2 minutes. Instant booking confirmation with driver assignment before takeoff.",
+    bottomBookBtn: "Book Your Transfer Now",
+    bottomTrackBtn: "Track Existing Booking",
   },
   AZ: {
     headerBadge: "Hava Limanı Transferi",
@@ -190,7 +236,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     suvDesc: "Geniş salon, yüksək rahatlıq və dağ yolları üçün ideal.",
     minivan: "Biznes Minivan",
     minivanDesc: "Ailələr, qruplar və çoxsaylı baqaj üçün maksimum rahatlıq.",
-    paxMax: "Sərnişin",
+    paxMax: "sərnişin",
     bagsMax: "Baqaj",
     whyTitle: "Niyə AddmeTour Transferləri?",
     whyDesc: "Dəqiq, şəffaf və narahatlıqsız qarşılama xidməti.",
@@ -205,6 +251,29 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     f4Desc: "Payriff ilə onlayn təhlükəsiz ödəniş və ya çatanda sürücüyə nağd ödəmə imkanı.",
     faqTitle: "Tez-tez Verilən Suallar",
     faqSubtitle: "Hava limanı transferləri haqqında bütün vacib məlumatlar.",
+    oneWay: "Tək istiqamət",
+    selectVehicle: "Seç",
+    quoteOnRequest: "Sorğu ilə qiymət",
+    allInclusiveTitle: "Hər Şey Daxil Sabit Qiymətlər:",
+    allInclusiveDesc: "Artan tariflər yoxdur, yol ödənişləri və parkinq daxildir.",
+    customQuoteText: "Fərdi Təklif",
+    f5Title: "60 Dəqiqə Pulsuz Gözləmə",
+    f5Desc: "Gömrük və baqaj təhvili zamanı narahat olmayın. Təyyarə enəndən sonra 60 dəqiqə pulsuz gözləmə daxildir.",
+    f6Title: "24/7 Əməliyyat Dəstəyi",
+    f6Desc: "Bakı mərkəzli dəstək komandamız WhatsApp və zəng vasitəsilə gecə-gündüz xidmətinizdədir.",
+    fleetBadge: "Müasir Avtomobillər və Şoferlər",
+    startingFrom: "Başlanğıc qiymət",
+    baseFee: "baza",
+    perKm: "km",
+    bookVehicle: "Sifariş et",
+    airportsBadge: "Bütün Ölkə Ərazisində",
+    airportsTitle: "Xidmət Göstərdiyimiz Hava Limanları",
+    airportsDesc: "Beynəlxalq hava limanlarından otellərə, mənzillərə və biznes mərkəzlərinə birbaşa transferlər.",
+    bookFrom: "Buradan sifariş:",
+    bottomTitle: "Azərbaycana Rahat və Problemsiz Çatmağa Hazırsınız?",
+    bottomDesc: "2 dəqiqə ərzində transferinizi sifariş edin. Uçuşdan əvvəl dərhal təsdiq və sürücü məlumatı.",
+    bottomBookBtn: "İndi Transfer Sifariş Et",
+    bottomTrackBtn: "Mövcud Sifarişi İzlə",
   },
   RU: {
     headerBadge: "Трансфер из аэропорта",
@@ -247,6 +316,29 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     f4Desc: "Безопасная онлайн-оплата Payriff или наличными водителю на месте.",
     faqTitle: "Часто задаваемые вопросы",
     faqSubtitle: "Все детали организации трансфера.",
+    oneWay: "В одну сторону",
+    selectVehicle: "Выбрать",
+    quoteOnRequest: "Цена по запросу",
+    allInclusiveTitle: "Фиксированные тарифы «Всё включено»:",
+    allInclusiveDesc: "Без наценок в час пик, дорожные сборы и парковка включены.",
+    customQuoteText: "По запросу",
+    f5Title: "60 минут бесплатного ожидания",
+    f5Desc: "Не спешите при прохождении паспортного контроля и получении багажа. Включено 60 минут бесплатного ожидания с момента посадки.",
+    f6Title: "Поддержка 24/7",
+    f6Desc: "Наша служба координации в Баку круглосуточно на связи через WhatsApp и по телефону.",
+    fleetBadge: "Премиальный автопарк и водители",
+    startingFrom: "От",
+    baseFee: "база",
+    perKm: "км",
+    bookVehicle: "Забронировать",
+    airportsBadge: "По всей стране",
+    airportsTitle: "Аэропорты Азербайджана, которые мы обслуживаем",
+    airportsDesc: "Трансферы от двери до двери, соединяющие все международные аэропорты с отелями и резиденциями.",
+    bookFrom: "Заказать из",
+    bottomTitle: "Готовы к комфортному прибытию в Азербайджан?",
+    bottomDesc: "Забронируйте трансфер за 2 минуты. Мгновенное подтверждение и назначение водителя до вылета.",
+    bottomBookBtn: "Забронировать трансфер",
+    bottomTrackBtn: "Отследить существующую бронь",
   },
   FR: {
     headerBadge: "Transfert Aéroport",
@@ -276,7 +368,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     suvDesc: "Confort supérieur, grand coffre et tenue de route optimale.",
     minivan: "Minivan Exécutif",
     minivanDesc: "Espace maximal pour familles, groupes et bagages volumineux.",
-    paxMax: "Passagers",
+    paxMax: "passagers",
     bagsMax: "Bagages",
     whyTitle: "Pourquoi Choisir AddmeTour ?",
     whyDesc: "Ponctualité irréprochable et sérénité dès votre atterrissage.",
@@ -290,6 +382,29 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     f4Desc: "Paiement sécurisé par carte bancaire Payriff ou en espèces à l'arrivée.",
     faqTitle: "Questions Fréquentes",
     faqSubtitle: "Tout ce qu'il faut savoir sur vos transferts.",
+    oneWay: "Aller simple",
+    selectVehicle: "Sélectionner",
+    quoteOnRequest: "Sur devis",
+    allInclusiveTitle: "Tarifs Fixes Tout Compris :",
+    allInclusiveDesc: "Aucune majoration de pointe, péages autoroutiers et parking aéroport inclus.",
+    customQuoteText: "Sur devis",
+    f5Title: "60 minutes d'attente gratuite",
+    f5Desc: "Prenez votre temps pour les formalités et la récupération des bagages. 60 minutes d'attente gratuites incluses dès l'atterrissage.",
+    f6Title: "Assistance opérationnelle 24/7",
+    f6Desc: "Notre équipe locale à Bakou est disponible 24h/24 par WhatsApp et téléphone.",
+    fleetBadge: "Flotte haut de gamme & chauffeurs",
+    startingFrom: "À partir de",
+    baseFee: "base",
+    perKm: "km",
+    bookVehicle: "Réserver",
+    airportsBadge: "Couverture nationale",
+    airportsTitle: "Aéroports desservis en Azerbaïdjan",
+    airportsDesc: "Transferts porte-à-porte reliant tous les aéroports internationaux aux hôtels et résidences.",
+    bookFrom: "Réserver depuis",
+    bottomTitle: "Prêt pour une arrivée sans stress en Azerbaïdjan ?",
+    bottomDesc: "Réservez votre transfert en moins de 2 minutes. Confirmation immédiate et chauffeur attitré avant le décollage.",
+    bottomBookBtn: "Réserver votre transfert",
+    bottomTrackBtn: "Suivre une réservation existante",
   },
   AR: {
     headerBadge: "خدمات توصيل المطار",
@@ -331,6 +446,29 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     f4Desc: "دفع آمن بالبطاقة البنكية عبر Payriff أو نقداً للسائق عند الوصول.",
     faqTitle: "الأسئلة الشائعة",
     faqSubtitle: "كل ما تحتاج معرفته حول توصيلات المطار الخاصة.",
+    oneWay: "ذهاب فقط",
+    selectVehicle: "اختيار",
+    quoteOnRequest: "السعر عند الطلب",
+    allInclusiveTitle: "أسعار ثابتة شاملة لجميع الرسوم:",
+    allInclusiveDesc: "لا توجد رسوم ذروة مفاجئة، وتشمل رسوم الطرق السريعة ومواقف المطار.",
+    customQuoteText: "عرض مخصص",
+    f5Title: "60 دقيقة انتظار مجاني",
+    f5Desc: "خذ وقتك في إنهاء إجراءات الجوازات واستلام الأمتعة، 60 دقيقة انتظار مجانية بالكامل من وقت هبوط الطائرة.",
+    f6Title: "دعم وتشغيل على مدار الساعة 24/7",
+    f6Desc: "فريق الدعم في باكو متواجد دائماً لخدمتكم على مدار الساعة عبر واتساب والهاتف.",
+    fleetBadge: "سيارات وسائقون محترفون",
+    startingFrom: "يبدأ من",
+    baseFee: "أساسي",
+    perKm: "كم",
+    bookVehicle: "حجز",
+    airportsBadge: "تغطية شاملة لجميع المناطق",
+    airportsTitle: "مطارات أذربيجان المشمولة بخدماتنا",
+    airportsDesc: "توصيل من الباب إلى الباب يربط جميع المطارات الدولية بالفنادق والوحدات السكنية.",
+    bookFrom: "حجز من",
+    bottomTitle: "جاهز لوصول مريح وخالٍ من المتاعب إلى أذربيجان؟",
+    bottomDesc: "احجز توصيلتك في أقل من دقيقتين. تأكيد فوري وتعيين مسبق للسائق قبل إقلاع رحلتك.",
+    bottomBookBtn: "احجز توصيلتك الآن",
+    bottomTrackBtn: "تتبع حجزك الحالي",
   },
   DE: {
     headerBadge: "Flughafentransfer",
@@ -375,6 +513,29 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     f4Desc: "Sichere Online-Zahlung via Payriff oder Barzahlung direkt beim Fahrer.",
     faqTitle: "Häufig gestellte Fragen",
     faqSubtitle: "Alles Wissenswerte rund um Ihren Transfer.",
+    oneWay: "Einfache Fahrt",
+    selectVehicle: "Auswählen",
+    quoteOnRequest: "Preis auf Anfrage",
+    allInclusiveTitle: "Feste All-Inclusive-Preise:",
+    allInclusiveDesc: "Keine Stoßzeitzuschläge, Autobahngebühren und Parkgebühren inklusive.",
+    customQuoteText: "Individuelles Angebot",
+    f5Title: "60 Minuten kostenfreie Wartezeit",
+    f5Desc: "Nehmen Sie sich Zeit für Passkontrolle und Gepäckausgabe. Volle 60 Minuten kostenlose Wartezeit ab Landung.",
+    f6Title: "24/7 Kundenservice & Disposition",
+    f6Desc: "Unser Einsatzteam in Baku steht Ihnen rund um die Uhr per WhatsApp und Telefon zur Verfügung.",
+    fleetBadge: "Premium-Fahrzeuge & Chauffeure",
+    startingFrom: "Ab",
+    baseFee: "Grundpreis",
+    perKm: "km",
+    bookVehicle: "Buchen",
+    airportsBadge: "Landesweite Abdeckung",
+    airportsTitle: "Bediente Flughäfen in Aserbaidschan",
+    airportsDesc: "Tür-zu-Tür-Transfers von allen internationalen Flughäfen zu Hotels, Apartments und Geschäftszentren.",
+    bookFrom: "Buchen ab",
+    bottomTitle: "Bereit für eine stressfreie Ankunft in Aserbaidschan?",
+    bottomDesc: "Buchen Sie Ihren Flughafentransfer in unter 2 Minuten. Sofortige Bestätigung und Chauffeur-Zuweisung vor Abflug.",
+    bottomBookBtn: "Jetzt Transfer buchen",
+    bottomTrackBtn: "Bestehende Buchung verfolgen",
   },
 };
 
@@ -572,3 +733,310 @@ export const VISA_PAGE_TRANSLATIONS: Record<LanguageCode, VisaPageTranslations> 
     stepsTitle: "So funktioniert es",
   },
 };
+
+export const LOCALIZED_AIRPORTS: Record<LanguageCode, Record<string, string>> = {
+  EN: {
+    GYD: "Heydar Aliyev International Airport (GYD)",
+    GJA: "Ganja Airport (GJA)",
+    NAJ: "Nakhchivan Airport (NAJ)",
+  },
+  AZ: {
+    GYD: "Heydər Əliyev Beynəlxalq Aeroportu (GYD)",
+    GJA: "Gəncə Beynəlxalq Hava Limanı (GJA)",
+    NAJ: "Naxçıvan Beynəlxalq Hava Limanı (NAJ)",
+  },
+  RU: {
+    GYD: "Международный аэропорт Гейдар Алиев (GYD)",
+    GJA: "Международный аэропорт Гянджа (GJA)",
+    NAJ: "Международный аэропорт Нахчыван (NAJ)",
+  },
+  AR: {
+    GYD: "مطار حيدر علييف الدولي (GYD)",
+    GJA: "مطار غنجة الدولي (GJA)",
+    NAJ: "مطار نخجوان الدولي (NAJ)",
+  },
+  FR: {
+    GYD: "Aéroport international Heydar Aliyev (GYD)",
+    GJA: "Aéroport de Gandja (GJA)",
+    NAJ: "Aéroport de Nakhitchevan (NAJ)",
+  },
+  DE: {
+    GYD: "Internationaler Flughafen Heydar Aliyev (GYD)",
+    GJA: "Flughafen Gändschä (GJA)",
+    NAJ: "Flughafen Nachitschewan (NAJ)",
+  },
+};
+
+export const LOCALIZED_ZONES: Record<LanguageCode, Record<string, string>> = {
+  EN: {
+    "GYD-baku-center": "Baku City Center",
+    "GYD-baku-bulvar": "Baku Boulevard / Caspian Waterfront",
+    "GYD-sabail": "Sabail / Flame Towers Area",
+    "GYD-absheron": "Absheron (Novkhani, Pirallahi)",
+    "GYD-sumqayit": "Sumqayit",
+    "GYD-khirdalan": "Khirdalan / Absheron Highway",
+    "GYD-custom": "Custom Destination",
+    "GJA-ganja-center": "Ganja City Center",
+    "GJA-custom": "Custom Destination",
+    "NAJ-nakhchivan-center": "Nakhchivan City Center",
+    "NAJ-custom": "Custom Destination",
+  },
+  AZ: {
+    "GYD-baku-center": "Bakı Şəhər Mərkəzi",
+    "GYD-baku-bulvar": "Bakı Bulvarı / Xəzər Sahili",
+    "GYD-sabail": "Səbail / Alov Qüllələri Ərazisi",
+    "GYD-absheron": "Abşeron (Novxanı, Pirallahı)",
+    "GYD-sumqayit": "Sumqayıt",
+    "GYD-khirdalan": "Xırdalan / Abşeron Magistralı",
+    "GYD-custom": "Fərdi Ünvan / Xüsusi Təyinat",
+    "GJA-ganja-center": "Gəncə Şəhər Mərkəzi",
+    "GJA-custom": "Fərdi Ünvan / Xüsusi Təyinat",
+    "NAJ-nakhchivan-center": "Naxçıvan Şəhər Mərkəzi",
+    "NAJ-custom": "Fərdi Ünvan / Xüsusi Təyinat",
+  },
+  RU: {
+    "GYD-baku-center": "Центр Баку",
+    "GYD-baku-bulvar": "Бакинский бульвар / Набережная",
+    "GYD-sabail": "Сабаил / Район Flame Towers",
+    "GYD-absheron": "Апшерон (Новханы, Пираллахи)",
+    "GYD-sumqayit": "Сумгаит",
+    "GYD-khirdalan": "Хырдалан / Апшеронское шоссе",
+    "GYD-custom": "Индивидуальный адрес",
+    "GJA-ganja-center": "Центр Гянджи",
+    "GJA-custom": "Индивидуальный адрес",
+    "NAJ-nakhchivan-center": "Центр Нахчывана",
+    "NAJ-custom": "Индивидуальный адрес",
+  },
+  AR: {
+    "GYD-baku-center": "وسط مدينة باكو",
+    "GYD-baku-bulvar": "بوليفارد باكو / كورنيش بحر قزوين",
+    "GYD-sabail": "منطقة سبائل / أبراج الشعلة",
+    "GYD-absheron": "أبشيرون (نوخاني، بيرالاهي)",
+    "GYD-sumqayit": "مدينة سومقاييت",
+    "GYD-khirdalan": "خردلان / طريق أبشيرون السريع",
+    "GYD-custom": "وجهة أو فندق مخصص",
+    "GJA-ganja-center": "وسط مدينة غنجة",
+    "GJA-custom": "وجهة مخصصة في غنجة",
+    "NAJ-nakhchivan-center": "وسط مدينة نخجوان",
+    "NAJ-custom": "وجهة مخصصة في نخجوان",
+  },
+  FR: {
+    "GYD-baku-center": "Centre-ville de Bakou",
+    "GYD-baku-bulvar": "Boulevard de Bakou / Front de mer",
+    "GYD-sabail": "Quartier Sabail / Tours Flammes",
+    "GYD-absheron": "Absheron (Novkhani, Pirallahi)",
+    "GYD-sumqayit": "Soumgaït",
+    "GYD-khirdalan": "Khirdalan / Autoroute d'Absheron",
+    "GYD-custom": "Destination personnalisée",
+    "GJA-ganja-center": "Centre-ville de Gandja",
+    "GJA-custom": "Destination personnalisée",
+    "NAJ-nakhchivan-center": "Centre-ville de Nakhitchevan",
+    "NAJ-custom": "Destination personnalisée",
+  },
+  DE: {
+    "GYD-baku-center": "Stadtzentrum Baku",
+    "GYD-baku-bulvar": "Baku Boulevard / Kaspische Uferpromenade",
+    "GYD-sabail": "Sabail / Flame Towers Viertel",
+    "GYD-absheron": "Abscheron (Nowchany, Pirallahi)",
+    "GYD-sumqayit": "Sumqayıt",
+    "GYD-khirdalan": "Xırdalan / Abscheron Autobahn",
+    "GYD-custom": "Individuelle Zieladresse",
+    "GJA-ganja-center": "Stadtzentrum Gändschä",
+    "GJA-custom": "Individuelle Zieladresse",
+    "NAJ-nakhchivan-center": "Stadtzentrum Nachitschewan",
+    "NAJ-custom": "Individuelle Zieladresse",
+  },
+};
+
+export const LOCALIZED_AIRPORT_DESCRIPTIONS: Record<LanguageCode, Record<string, string>> = {
+  EN: {
+    GYD: "Baku's main hub. 30 km from city center. Dedicated pickup zone at Terminal 1 & 2.",
+    GJA: "Western Azerbaijan gateway. 8 km from Ganja center with transfers to Goygol and Naftalan.",
+    NAJ: "Nakhchivan Autonomous Republic. 7 km from city center with prompt airport greeting.",
+  },
+  AZ: {
+    GYD: "Bakının əsas hava qapısı. Mərkəzdən 30 km məsafədə. Terminal 1 və 2-də xüsusi qarşılama zonası.",
+    GJA: "Qərbi Azərbaycanın hava qapısı. Gəncə mərkəzindən 8 km. Göygöl və Naftalana rahat transferlər.",
+    NAJ: "Naxçıvan Muxtar Respublikası. Mərkəzdən 7 km məsafədə, operativ hava limanı qarşılaması.",
+  },
+  RU: {
+    GYD: "Главный хаб Баку. 30 км от центра города. Встреча у Терминалов 1 и 2.",
+    GJA: "Ворота западного Азербайджана. 8 км от центра Гянджи, трансферы в Гёйгёль и Нафталан.",
+    NAJ: "Нахчыванская Автономная Республика. 7 км от центра города с пунктуальной встречей.",
+  },
+  AR: {
+    GYD: "بوابة باكو الرئيسية. يبعد 30 كم عن مركز المدينة مع نقطة استقبال مخصصة في المبنى 1 و 2.",
+    GJA: "بوابة غرب أذربيجان. يبعد 8 كم عن وسط غنجة مع خدمات توصيل إلى غويغول ونفتالان.",
+    NAJ: "جمهورية نخجوان ذاتية الحكم. يبعد 7 كم عن مركز المدينة مع استقبال فوري ومباشر.",
+  },
+  FR: {
+    GYD: "Hub principal de Bakou. À 30 km du centre. Zone de prise en charge dédiée aux terminaux 1 et 2.",
+    GJA: "Porte d'entrée de l'ouest. À 8 km du centre de Gandja avec liaisons vers Goygol et Naftalan.",
+    NAJ: "République autonome du Nakhitchevan. À 7 km du centre-ville avec accueil ponctuel.",
+  },
+  DE: {
+    GYD: "Hauptdrehkreuz von Baku. 30 km vom Zentrum entfernt. Abholzone an Terminal 1 & 2.",
+    GJA: "Tor zum Westen Aserbaidschans. 8 km vom Zentrum Gändschäs mit Transfers nach Goygol und Naftalan.",
+    NAJ: "Autonome Republik Nachitschewan. 7 km vom Stadtzentrum mit persönlicher Abholung.",
+  },
+};
+
+export const LOCALIZED_TRANSFER_FAQS: Record<LanguageCode, Array<{ q: string; a: string }>> = {
+  EN: [
+    {
+      q: "Where will I meet my driver at the airport?",
+      a: "Your driver will be waiting inside the arrival hall directly after luggage claim and customs exit, holding a personalized signboard with your name. You will also receive the driver's contact number before your flight.",
+    },
+    {
+      q: "What if my flight is delayed?",
+      a: "We track your flight number in real-time. Whether your flight is early or delayed by several hours, your driver will adjust their schedule automatically at no extra charge. We also include 60 minutes of complimentary waiting time after your flight lands.",
+    },
+    {
+      q: "Can I pay in cash to the driver upon arrival?",
+      a: "Yes! You can choose to pay securely online by credit card via Payriff, or choose 'Pay on Arrival' in cash (USD, EUR, or AZN) directly to the driver.",
+    },
+    {
+      q: "What is your cancellation policy?",
+      a: "You can cancel or modify your transfer reservation free of charge up to 24 hours prior to the scheduled pickup time. Instant full refunds are issued for online card payments.",
+    },
+    {
+      q: "Do you provide child safety seats?",
+      a: "Yes, infant and child safety seats can be arranged upon request at no additional fee. Simply mention it in the luggage or special requests note when booking.",
+    },
+    {
+      q: "How many pieces of luggage can I bring?",
+      a: "Our standard economy sedans comfortably carry 2 large suitcases plus carry-on bags. If you are traveling with more luggage or sporting equipment, our Minivan or Executive Minibus are ideal choices.",
+    },
+  ],
+  AZ: [
+    {
+      q: "Sürücünü hava limanında harada qarşılayacağam?",
+      a: "Sürücünüz baqaj təhvili və gömrük çıxışından dərhal sonra, əlində adınız yazılmış lövhə ilə sizi gözləyəcək. Həmçinin uçuşdan əvvəl sürücünün əlaqə nömrəsi sizə göndərilir.",
+    },
+    {
+      q: "Uçuşum gecikərsə nə baş verir?",
+      a: "Reysinizi real vaxt rejimində izləyirik. Uçuş tez gəlsə və ya geciksə, sürücümüz cədvəli əlavə ödənişsiz avtomatik uyğunlaşdırır və təyyarə enəndən sonra 60 dəqiqə pulsuz gözləyir.",
+    },
+    {
+      q: "Çatanda sürücüyə nağd ödəniş edə bilərəmmi?",
+      a: "Bəli! Payriff vasitəsilə təhlükəsiz onlayn kartla ödəyə və ya çatanda birbaşa sürücüyə nağd (USD, EUR və ya AZN) ödəniş edə bilərsiniz.",
+    },
+    {
+      q: "Ləğvetmə qaydası necədir?",
+      a: "Qarşılanma vaxtına 24 saat qalmışadək sifarişi ödənişsiz ləğv edə və ya dəyişdirə bilərsiniz. Onlayn ödənişlər tam məbləğdə geri qaytarılır.",
+    },
+    {
+      q: "Uşaq oturacağı təmin edilirmi?",
+      a: "Bəli, körpə və uşaq oturacağı əlavə ödənişsiz təmin edilir. Sadəcə sifariş zamanı qeyd xanasında bunu bildirin.",
+    },
+    {
+      q: "Özümlə nə qədər baqaj götürə bilərəm?",
+      a: "Standart sedanlar 2 böyük çamadan və əl yükü tutur. Əgər daha çox baqajınız varsa, Minivan ən ideal seçimdir.",
+    },
+  ],
+  RU: [
+    {
+      q: "Где меня встретит водитель в аэропорту?",
+      a: "Водитель будет ожидать вас в зале прилета сразу после зоны получения багажа с именной табличкой. Контакты водителя вы получите заранее.",
+    },
+    {
+      q: "Что если мой рейс задерживается?",
+      a: "Мы отслеживаем статус рейса в реальном времени. Водитель приедет точно к моменту посадки без доплат. Также включено 60 минут бесплатного ожидания.",
+    },
+    {
+      q: "Можно ли оплатить наличными водителю?",
+      a: "Да! Вы можете оплатить онлайн картой через Payriff или выбрать оплату наличными водителю на месте (USD, EUR, AZN).",
+    },
+    {
+      q: "Каковы условия отмены бронирования?",
+      a: "Бесплатная отмена или изменение доступны за 24 часа до поездки. При онлайн-оплате средства возвращаются в полном объеме.",
+    },
+    {
+      q: "Предоставляется ли детское кресло?",
+      a: "Да, детские кресла предоставляются бесплатно по запросу. Укажите это в комментарии к бронированию.",
+    },
+    {
+      q: "Сколько багажа можно взять с собой?",
+      a: "В седан помещается 2 больших чемодана и ручная кладь. Для большего объема багажа или компаний рекомендуем минивэн.",
+    },
+  ],
+  AR: [
+    {
+      q: "أين سأقابل السائق في المطار؟",
+      a: "سيكون السائق بانتظارك داخل صالة الوصول بعد استلام الأمتعة ومخرج الجمارك مباشرة، حاملاً لافتة باسمك. كما سنزودك برقم هاتفه قبل موعد الرحلة.",
+    },
+    {
+      q: "ماذا لو تأخرت رحلتي الجوية؟",
+      a: "نقوم بتتبع الرحلة مباشرة عبر رقم الطيران. سواء وصلت مبكراً أو تأخرت لساعات، سيتواجد السائق بالموعد دون أي تكلفة إضافية، مع 60 دقيقة انتظار مجاني.",
+    },
+    {
+      q: "هل يمكنني الدفع نقداً للسائق عند الوصول؟",
+      a: "نعم بكل تأكيد! يمكنك الدفع بالبطاقة عبر Payriff أو اختيار الدفع نقداً عند الوصول مباشرة للسائق بعملات (الدولار أو اليورو أو المانات الأذربيجاني).",
+    },
+    {
+      q: "ما هي سياسة إلغاء الحجز؟",
+      a: "يمكنك إلغاء أو تعديل الحجز مجاناً بالكامل حتى 24 ساعة قبل موعد التوصيل، مع استرداد فوري وكامل للأموال عند الدفع الإلكتروني.",
+    },
+    {
+      q: "هل توفرون مقاعد سلامة للأطفال؟",
+      a: "نعم، نوفر مقاعد للأطفال والرضع مجاناً عند الطلب. فقط اذكر ذلك في ملاحظات الحجز.",
+    },
+    {
+      q: "كم عدد حقائب السفر المسموح بها؟",
+      a: "تتسع سيارة السيدان الاقتصادية لحقيبتي سفر كبيرتين بالإضافة لحقائب اليد. للعائلات والحقائب الأكثر، ننصح باختيار سيارة الميني فان.",
+    },
+  ],
+  FR: [
+    {
+      q: "Où vais-je rencontrer mon chauffeur à l'aéroport ?",
+      a: "Votre chauffeur vous attendra dans le hall des arrivées avec une pancarte à votre nom juste après la sortie des douanes et bagages.",
+    },
+    {
+      q: "Que se passe-t-il si mon vol a du retard ?",
+      a: "Nous suivons votre vol en temps réel. Le chauffeur s'adapte sans frais supplémentaires avec 60 minutes d'attente gratuite incluses.",
+    },
+    {
+      q: "Puis-je payer en espèces au chauffeur à l'arrivée ?",
+      a: "Oui ! Vous pouvez payer en ligne par carte via Payriff ou choisir le paiement en espèces (USD, EUR, AZN) directement auprès du chauffeur.",
+    },
+    {
+      q: "Quelle est votre politique d'annulation ?",
+      a: "Annulation ou modification gratuite jusqu'à 24h avant la prise en charge. Remboursement intégral immédiat en cas de paiement en ligne.",
+    },
+    {
+      q: "Fournissez-vous des sièges auto pour enfants ?",
+      a: "Oui, des sièges enfants sont fournis gratuitement sur simple demande lors de votre réservation.",
+    },
+    {
+      q: "Combien de bagages puis-je emporter ?",
+      a: "Une berline transporte confortablement 2 grandes valises et des bagages à main. Pour plus d'espace, privilégiez le minivan.",
+    },
+  ],
+  DE: [
+    {
+      q: "Wo treffe ich meinen Fahrer am Flughafen?",
+      a: "Ihr Chauffeur erwartet Sie direkt in der Ankunftshalle nach der Gepäckausgabe mit einem personalisierten Namensschild.",
+    },
+    {
+      q: "Was passiert bei Flugverspätungen?",
+      a: "Wir überwachen Ihren Flug live. Ihr Fahrer passt die Abholung kostenfrei an und wartet bis zu 60 Minuten kostenlos nach der Landung.",
+    },
+    {
+      q: "Kann ich bei Ankunft bar beim Fahrer bezahlen?",
+      a: "Ja! Sie können sicher online per Karte über Payriff zahlen oder bequem vor Ort beim Fahrer in bar (USD, EUR oder AZN).",
+    },
+    {
+      q: "Wie sind die Stornierungsbedingungen?",
+      a: "Kostenlose Stornierung und Umbuchung bis zu 24 Stunden vor Abholung mit sofortiger Rückerstattung bei Online-Zahlung.",
+    },
+    {
+      q: "Gibt es Kindersitze?",
+      a: "Ja, Kindersitze stellen wir auf Anfrage gerne kostenlos bereit. Bitte bei der Buchung angeben.",
+    },
+    {
+      q: "Wie viel Gepäck kann mitgenommen werden?",
+      a: "In eine Limousine passen 2 große Koffer plus Handgepäck. Für mehr Gepäck oder Gruppen empfehlen wir den Minivan.",
+    },
+  ],
+};
+

@@ -1205,7 +1205,7 @@ export default function HomePage() {
                           }}
                           className="w-full rounded-xl py-2.5 px-2 text-xs font-bold transition-all duration-200 border border-slate-300 text-slate-800 hover:bg-slate-100 active:scale-98 text-center cursor-pointer shadow-sm"
                         >
-                          📅 Reserve Date
+                          📅 {t.bookingModal.reserveDateBtn}
                         </button>
                         <a
                           href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(
@@ -2027,15 +2027,15 @@ export default function HomePage() {
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4">
                   <Check className="h-8 w-8" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-slate-900 mb-2">Reservation Request Received!</h3>
+                <h3 className="font-display text-xl font-bold text-slate-900 mb-2">{t.bookingModal.confirmedTitle}</h3>
                 {confirmedResNumber && (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-mono font-bold mb-3">
-                    <span>Ref:</span>
+                    <span>{t.bookingModal.referenceLabel}</span>
                     <span>{confirmedResNumber}</span>
                   </div>
                 )}
                 <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-                  Thank you, <strong>{bookingName}</strong>. Our local Baku tour concierge has received your booking for <strong>{bookingModalTour.title}</strong> on <strong>{bookingDate}</strong>. We will confirm your pickup schedule and guide details via WhatsApp shortly.
+                  {t.bookingModal.thankYouPart1} <strong>{bookingName}</strong>. {t.bookingModal.thankYouPart2} <strong>{bookingModalTour.title}</strong> ({bookingDate}). {t.bookingModal.thankYouPart3}
                 </p>
                 <button
                   type="button"
@@ -2047,34 +2047,28 @@ export default function HomePage() {
                   className="rounded-xl px-6 py-2.5 text-xs font-bold text-white shadow-md cursor-pointer"
                   style={{ backgroundColor: "#0f3460" }}
                 >
-                  Done
+                  {t.bookingModal.doneBtn}
                 </button>
               </div>
             ) : (
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
-                    Direct Booking
+                    {t.bookingModal.badge}
                   </span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-slate-900 mb-1">
                   {bookingModalTour.title}
                 </h3>
                 <p className="text-xs text-slate-500 mb-5">
-                  Reserve your private guide and departure date. Pay securely online or upon arrival in Baku.
+                  {t.bookingModal.subtitle}
                 </p>
 
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (!bookingDate || !bookingName.trim() || !bookingPhone.trim()) {
-                      showToast(
-                        language === "AZ"
-                          ? "Zəhmət olmasa bütün xanaları doldurun"
-                          : language === "RU"
-                          ? "Пожалуйста, заполните все поля"
-                          : "Please fill in all fields"
-                      );
+                      showToast(t.bookingModal.fillAllFields);
                       return;
                     }
                     setBookingSubmitting(true);
@@ -2096,18 +2090,12 @@ export default function HomePage() {
                       if (data.success) {
                         setConfirmedResNumber(data.reservationNumber);
                         setBookingSuccess(true);
-                        showToast(
-                          language === "AZ"
-                            ? "Tur rezervasiyası uğurla qeydə alındı!"
-                            : language === "RU"
-                            ? "Бронирование тура успешно отправлено!"
-                            : "Tour reservation submitted successfully!"
-                        );
+                        showToast(t.bookingModal.reservationSuccess);
                       } else {
                         showToast(data.error || "Failed to submit reservation");
                       }
                     } catch (err) {
-                      showToast("Error connecting to server. Please try again or book via WhatsApp.");
+                      showToast(t.bookingModal.networkError);
                     } finally {
                       setBookingSubmitting(false);
                     }
@@ -2116,7 +2104,7 @@ export default function HomePage() {
                 >
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Select Tour Date *
+                      {t.bookingModal.dateLabel}
                     </label>
                     <input
                       type="date"
@@ -2130,16 +2118,16 @@ export default function HomePage() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Number of Guests (Pax)
+                      {t.bookingModal.guestsLabel}
                     </label>
                     <select
                       value={bookingGuests}
                       onChange={(e) => setBookingGuests(Number(e.target.value))}
                       className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
                     >
-                      {[1, 2, 3, 4, 5, 6, 7, 8, "9+ (Custom Group)"].map((n) => (
-                        <option key={n} value={typeof n === "number" ? n : 9}>
-                          {n} {typeof n === "number" ? (n === 1 ? "Guest" : "Guests") : ""}
+                      {[1, 2, 3, 4, 5, 6, 7, 8, t.bookingModal.customGroup].map((n) => (
+                        <option key={String(n)} value={typeof n === "number" ? n : 9}>
+                          {typeof n === "number" ? `${n} ${n === 1 ? t.bookingModal.guest : t.bookingModal.guests}` : n}
                         </option>
                       ))}
                     </select>
@@ -2147,12 +2135,12 @@ export default function HomePage() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Lead Traveler Name *
+                      {t.bookingModal.nameLabel}
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Sarah Jenkins"
+                      placeholder={t.bookingModal.namePlaceholder}
                       value={bookingName}
                       onChange={(e) => setBookingName(e.target.value)}
                       className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
@@ -2161,12 +2149,12 @@ export default function HomePage() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      WhatsApp or Phone *
+                      {t.bookingModal.phoneLabel}
                     </label>
                     <input
                       type="tel"
                       required
-                      placeholder="e.g. +44 7123 456789"
+                      placeholder={t.bookingModal.phonePlaceholder}
                       value={bookingPhone}
                       onChange={(e) => setBookingPhone(e.target.value)}
                       className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
@@ -2175,11 +2163,11 @@ export default function HomePage() {
 
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
                     <div className="flex justify-between font-medium">
-                      <span>Rate per group:</span>
+                      <span>{t.bookingModal.ratePerGroup}</span>
                       <span className="font-bold text-slate-900">${bookingModalTour.price} USD</span>
                     </div>
                     <div className="flex justify-between text-[11px] text-slate-400">
-                      <span>Approx. local rate:</span>
+                      <span>{t.bookingModal.approxLocal}</span>
                       <span>~{(bookingModalTour.price * 1.7).toFixed(0)} AZN</span>
                     </div>
                   </div>
@@ -2190,7 +2178,7 @@ export default function HomePage() {
                     className="w-full rounded-xl py-3 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:opacity-95 cursor-pointer mt-2 disabled:opacity-50"
                     style={{ backgroundColor: "#0f3460" }}
                   >
-                    {bookingSubmitting ? "Submitting Reservation..." : "Confirm Tour Reservation →"}
+                    {bookingSubmitting ? t.bookingModal.submittingBtn : t.bookingModal.submitBtn}
                   </button>
                 </form>
               </div>

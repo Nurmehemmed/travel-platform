@@ -150,6 +150,33 @@ export interface BaseTranslations {
     transfer: string;
     transferSupport: string;
   };
+  bookingModal: {
+    badge: string;
+    subtitle: string;
+    dateLabel: string;
+    guestsLabel: string;
+    guest: string;
+    guests: string;
+    customGroup: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
+    ratePerGroup: string;
+    approxLocal: string;
+    submitBtn: string;
+    submittingBtn: string;
+    confirmedTitle: string;
+    referenceLabel: string;
+    thankYouPart1: string;
+    thankYouPart2: string;
+    thankYouPart3: string;
+    doneBtn: string;
+    reserveDateBtn: string;
+    fillAllFields: string;
+    reservationSuccess: string;
+    networkError: string;
+  };
 }
 
 export interface Translations extends BaseTranslations {
@@ -281,6 +308,33 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       transfer: "Transfer",
       transferSupport: "24/7",
     },
+    bookingModal: {
+      badge: "Direct Booking",
+      subtitle: "Reserve your private guide and departure date. Pay securely online or upon arrival in Baku.",
+      dateLabel: "Select Tour Date *",
+      guestsLabel: "Number of Guests (Pax)",
+      guest: "Guest",
+      guests: "Guests",
+      customGroup: "9+ (Custom Group)",
+      nameLabel: "Lead Traveler Name *",
+      namePlaceholder: "e.g. Sarah Jenkins",
+      phoneLabel: "WhatsApp or Phone *",
+      phonePlaceholder: "e.g. +44 7123 456789",
+      ratePerGroup: "Rate per group:",
+      approxLocal: "Approx. local rate:",
+      submitBtn: "Confirm Tour Reservation →",
+      submittingBtn: "Submitting Reservation...",
+      confirmedTitle: "Reservation Confirmed!",
+      referenceLabel: "Booking Reference:",
+      thankYouPart1: "Thank you,",
+      thankYouPart2: "Our local Baku tour concierge has received your booking for",
+      thankYouPart3: "We will confirm your pickup schedule and guide details via WhatsApp shortly.",
+      doneBtn: "Done",
+      reserveDateBtn: "Reserve Date",
+      fillAllFields: "Please fill in all fields",
+      reservationSuccess: "Tour reservation submitted successfully!",
+      networkError: "Error connecting to server. Please try again or book via WhatsApp.",
+    },
   },
 
   AZ: {
@@ -404,6 +458,33 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       evisaSpeed: "3 saata",
       transfer: "Transfer",
       transferSupport: "24/7",
+    },
+    bookingModal: {
+      badge: "Birbaşa Rezervasiya",
+      subtitle: "Fərdi bələdçinizi və turun tarixini bron edin. Onlayn və ya Bakıya çatanda ödəyin.",
+      dateLabel: "Tur Tarixini Seçin *",
+      guestsLabel: "Qonaq Sayı (Nəfər)",
+      guest: "Qonaq",
+      guests: "Qonaq",
+      customGroup: "9+ (Xüsusi Qrup)",
+      nameLabel: "Əsas Səyahətçinin Adı *",
+      namePlaceholder: "məs. Murad Əliyev",
+      phoneLabel: "WhatsApp və ya Telefon *",
+      phonePlaceholder: "məs. +994 50 123 45 67",
+      ratePerGroup: "Qrup üçün qiymət:",
+      approxLocal: "Təxmini yerli məzənnə:",
+      submitBtn: "Tur Rezervasiyasını Təsdiqlə →",
+      submittingBtn: "Rezervasiya Göndərilir...",
+      confirmedTitle: "Rezervasiya Təsdiqləndi!",
+      referenceLabel: "Rezervasiya Nömrəsi:",
+      thankYouPart1: "Təşəkkür edirik,",
+      thankYouPart2: "Bakı tur menecerimiz aşağıdakı tur üçün müraciətinizi qəbul etdi:",
+      thankYouPart3: "Qarşılanma cədvəli və bələdçi detallarını tezliklə WhatsApp vasitəsilə təsdiqləyəcəyik.",
+      doneBtn: "Tamam",
+      reserveDateBtn: "Tarixi Bron Et",
+      fillAllFields: "Zəhmət olmasa bütün xanaları doldurun",
+      reservationSuccess: "Tur rezervasiyası uğurla qeydə alındı!",
+      networkError: "Serverlə əlaqə xətası. Zəhmət olmasa yenidən cəhd edin və ya WhatsApp ilə əlaqə saxlayın.",
     },
   },
 
@@ -529,6 +610,33 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       transfer: "Трансфер",
       transferSupport: "24/7",
     },
+    bookingModal: {
+      badge: "Прямое бронирование",
+      subtitle: "Забронируйте индивидуального гида и дату тура. Оплата онлайн или при встрече в Баку.",
+      dateLabel: "Выберите дату тура *",
+      guestsLabel: "Количество гостей",
+      guest: "Гость",
+      guests: "Гостей",
+      customGroup: "9+ (Индивидуальная группа)",
+      nameLabel: "Имя основного путешественника *",
+      namePlaceholder: "например, Алексей Смирнов",
+      phoneLabel: "WhatsApp или телефон *",
+      phonePlaceholder: "например, +7 912 345 67 89",
+      ratePerGroup: "Стоимость за группу:",
+      approxLocal: "Примерно в местной валюте:",
+      submitBtn: "Подтвердить бронирование тура →",
+      submittingBtn: "Отправка заявки...",
+      confirmedTitle: "Бронирование подтверждено!",
+      referenceLabel: "Номер бронирования:",
+      thankYouPart1: "Спасибо,",
+      thankYouPart2: "Наш консьерж в Баку получил вашу заявку на тур",
+      thankYouPart3: "Мы свяжемся с вами в WhatsApp в ближайшее время для подтверждения трансфера и деталей гида.",
+      doneBtn: "Готово",
+      reserveDateBtn: "Забронировать дату",
+      fillAllFields: "Пожалуйста, заполните все поля",
+      reservationSuccess: "Бронирование тура успешно отправлено!",
+      networkError: "Ошибка подключения к серверу. Попробуйте еще раз или напишите нам в WhatsApp.",
+    },
   },
 
   FR: {
@@ -652,6 +760,33 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       evisaSpeed: "Rapide 3h",
       transfer: "Transfert",
       transferSupport: "24/7",
+    },
+    bookingModal: {
+      badge: "Réservation Directe",
+      subtitle: "Réservez votre guide privé et la date de départ. Paiement en ligne ou à l'arrivée à Bakou.",
+      dateLabel: "Date de la visite *",
+      guestsLabel: "Nombre de personnes",
+      guest: "Personne",
+      guests: "Personnes",
+      customGroup: "9+ (Groupe sur mesure)",
+      nameLabel: "Nom du voyageur principal *",
+      namePlaceholder: "ex. Thomas Laurent",
+      phoneLabel: "WhatsApp ou Téléphone *",
+      phonePlaceholder: "ex. +33 6 12 34 56 78",
+      ratePerGroup: "Tarif par groupe :",
+      approxLocal: "Tarif local approximatif :",
+      submitBtn: "Confirmer la réservation du tour →",
+      submittingBtn: "Envoi de la demande...",
+      confirmedTitle: "Réservation confirmée !",
+      referenceLabel: "Référence de réservation :",
+      thankYouPart1: "Merci,",
+      thankYouPart2: "Notre concierge local à Bakou a bien reçu votre demande pour",
+      thankYouPart3: "Nous confirmerons rapidement l'heure de prise en charge et le contact de votre guide via WhatsApp.",
+      doneBtn: "Terminé",
+      reserveDateBtn: "Réserver la date",
+      fillAllFields: "Veuillez renseigner tous les champs obligatoires",
+      reservationSuccess: "Réservation enregistrée avec succès !",
+      networkError: "Erreur de connexion au serveur. Réessayez ou contactez-nous par WhatsApp.",
     },
   },
 
@@ -777,6 +912,33 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       transfer: "نقل المطار",
       transferSupport: "24/7",
     },
+    bookingModal: {
+      badge: "حجز مباشر",
+      subtitle: "احجز مرشدك السياحي الخاص وموعد الجولة. ادفع بأمان عبر الإنترنت أو عند وصولك إلى باكو.",
+      dateLabel: "اختر تاريخ الجولة *",
+      guestsLabel: "عدد الضيوف (الأفراد)",
+      guest: "ضيف",
+      guests: "ضيوف",
+      customGroup: "9+ (مجموعة مخصصة)",
+      nameLabel: "اسم المسافر الرئيسي *",
+      namePlaceholder: "مثال: أحمد عبد الله",
+      phoneLabel: "واتساب أو رقم الهاتف *",
+      phonePlaceholder: "مثال: +966 50 123 4567",
+      ratePerGroup: "السعر الإجمالي للمجموعة:",
+      approxLocal: "السعر التقريبي بالعملة المحلية:",
+      submitBtn: "تأكيد حجز الجولة السياحية ←",
+      submittingBtn: "جاري إرسال الحجز...",
+      confirmedTitle: "تم تأكيد طلب الحجز!",
+      referenceLabel: "رقم الحجز المرجعي:",
+      thankYouPart1: "شكراً لك،",
+      thankYouPart2: "تلقى فريق تنظيم الرحلات لدينا في باكو طلب حجز جولة",
+      thankYouPart3: "سنقوم بتأكيد موعد الاستقبال وتفاصيل المرشد السياحي عبر واتساب في أقرب وقت.",
+      doneBtn: "تم",
+      reserveDateBtn: "حجز الموعد",
+      fillAllFields: "يرجى تعبئة جميع الحقول المطلوبة",
+      reservationSuccess: "تم إرسال حجز الجولة بنجاح!",
+      networkError: "خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى أو التواصل عبر واتساب.",
+    },
   },
 
   DE: {
@@ -900,6 +1062,33 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       evisaSpeed: "Express 3h",
       transfer: "Transfer",
       transferSupport: "24/7",
+    },
+    bookingModal: {
+      badge: "Direktbuchung",
+      subtitle: "Sichern Sie sich Ihren privaten Guide und Wunschtermin. Sichere Online-Zahlung oder Barzahlung vor Ort in Baku.",
+      dateLabel: "Tour-Datum auswählen *",
+      guestsLabel: "Anzahl Personen",
+      guest: "Gast",
+      guests: "Gäste",
+      customGroup: "9+ (Individuelle Gruppe)",
+      nameLabel: "Name des Hauptreisenden *",
+      namePlaceholder: "z.B. Michael Schmidt",
+      phoneLabel: "WhatsApp oder Telefonnummer *",
+      phonePlaceholder: "z.B. +49 170 1234567",
+      ratePerGroup: "Preis pro Gruppe:",
+      approxLocal: "Ungefährer lokaler Preis:",
+      submitBtn: "Tour-Reservierung bestätigen →",
+      submittingBtn: "Reservierung wird gesendet...",
+      confirmedTitle: "Reservierung bestätigt!",
+      referenceLabel: "Buchungsreferenz:",
+      thankYouPart1: "Vielen Dank,",
+      thankYouPart2: "Unser Concierge in Baku hat Ihre Reservierung für folgende Tour erhalten:",
+      thankYouPart3: "Wir bestätigen Abholzeit und Kontaktdaten Ihres Guides in Kürze per WhatsApp.",
+      doneBtn: "Fertig",
+      reserveDateBtn: "Termin sichern",
+      fillAllFields: "Bitte füllen Sie alle Pflichtfelder aus",
+      reservationSuccess: "Tour-Reservierung erfolgreich übermittelt!",
+      networkError: "Verbindungsfehler. Bitte erneut versuchen oder direkt per WhatsApp buchen.",
     },
   },
 };

@@ -38,11 +38,37 @@ import {
   getAirportByCode,
   getVehicleConfig,
 } from "@/lib/transfer-zones";
+import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
 
 function TransferBookForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Dynamic vehicle translation helpers
+  const getVehicleLabel = (id: VehicleClass) => {
+    if (id === "sedan") return t.transferPage.sedan;
+    if (id === "suv") return t.transferPage.suv;
+    return t.transferPage.minivan;
+  };
+
+  const getVehicleDesc = (id: VehicleClass) => {
+    if (id === "sedan") return t.transferPage.sedanDesc;
+    if (id === "suv") return t.transferPage.suvDesc;
+    return t.transferPage.minivanDesc;
+  };
+
+  const getVehicleCapacity = (id: VehicleClass) => {
+    if (id === "sedan") return `1–3 ${t.transferPage.paxMax}`;
+    if (id === "suv") return `1–4 ${t.transferPage.paxMax}`;
+    return `4–7 ${t.transferPage.paxMax}`;
+  };
+
+  const getVehicleLuggage = (id: VehicleClass) => {
+    if (id === "sedan") return `2 ${t.transferPage.bagsMax}`;
+    if (id === "suv") return `4 ${t.transferPage.bagsMax}`;
+    return `6 ${t.transferPage.bagsMax}`;
+  };
 
   // Query param defaults
   const paramAirport = (searchParams.get("airport") as AirportCode) || "GYD";
@@ -316,9 +342,9 @@ function TransferBookForm() {
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { id: "arrival", label: "Arrival", desc: "Airport → Hotel / Destination", icon: "🛬" },
-                    { id: "departure", label: "Departure", desc: "Hotel / Address → Airport", icon: "🛫" },
-                    { id: "round_trip", label: "Round Trip", desc: "Both Ways (Save 10%)", icon: "🔄" },
+                    { id: "arrival", label: t.transferPage.arrival.split(" ")[0], desc: t.transferPage.arrival, icon: "🛬" },
+                    { id: "departure", label: t.transferPage.departure.split(" ")[0], desc: t.transferPage.departure, icon: "🛫" },
+                    { id: "round_trip", label: t.transferPage.roundTrip.split(" ")[0], desc: t.transferPage.roundTrip, icon: "🔄" },
                   ].map((d) => (
                     <button
                       key={d.id}
@@ -342,7 +368,7 @@ function TransferBookForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Airport
+                    {t.transferPage.airport}
                   </label>
                   <select
                     value={airport}
@@ -351,7 +377,7 @@ function TransferBookForm() {
                   >
                     {AIRPORTS.map((a) => (
                       <option key={a.code} value={a.code}>
-                        {a.fullName}
+                        {LOCALIZED_AIRPORTS[language]?.[a.code] || a.fullName}
                       </option>
                     ))}
                   </select>
@@ -359,7 +385,7 @@ function TransferBookForm() {
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    Destination Zone
+                    {t.transferPage.destinationZone}
                   </label>
                   <select
                     value={zoneId}
@@ -368,7 +394,7 @@ function TransferBookForm() {
                   >
                     {airportZones.map((z) => (
                       <option key={z.id} value={z.id}>
-                        {z.name} {z.distanceKm > 0 ? `(~${z.distanceKm} km)` : "— Custom Quote"}
+                        {LOCALIZED_ZONES[language]?.[z.id] || z.name} {z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}
                       </option>
                     ))}
                   </select>
@@ -399,7 +425,7 @@ function TransferBookForm() {
               {/* Vehicle Selection Grid */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                  Select Vehicle Class
+                  {t.transferPage.selectVehicle}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {VEHICLE_CLASSES.map((vc) => {
@@ -426,23 +452,23 @@ function TransferBookForm() {
                             <span className="text-2xl">{vc.icon}</span>
                             <div className="text-right">
                               <span className="text-sm font-extrabold text-sky-700">
-                                {isCustomZone ? "Custom Quote" : price ? `$${price.totalAmount}` : "—"}
+                                {isCustomZone ? t.transferPage.quoteOnRequest : price ? `$${price.totalAmount}` : "—"}
                               </span>
                               <div className="text-[9px] uppercase font-bold text-slate-400">
-                                {direction === "round_trip" ? "Total Round Trip" : "One-Way Total"}
+                                {direction === "round_trip" ? t.transferPage.roundTrip.split(" ")[0] : t.transferPage.oneWay}
                               </div>
                             </div>
                           </div>
-                          <h3 className="font-bold text-slate-900 text-sm">{vc.label}</h3>
-                          <p className="text-[11px] text-slate-500 mt-0.5">{vc.description}</p>
+                          <h3 className="font-bold text-slate-900 text-sm">{getVehicleLabel(vc.id)}</h3>
+                          <p className="text-[11px] text-slate-500 mt-0.5">{getVehicleDesc(vc.id)}</p>
                         </div>
 
                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-3 text-[11px] text-slate-600">
                           <span className="flex items-center gap-1 font-medium">
-                            <Users className="h-3 w-3 text-sky-600" /> {vc.capacity}
+                            <Users className="h-3 w-3 text-sky-600" /> {getVehicleCapacity(vc.id)}
                           </span>
                           <span className="flex items-center gap-1 font-medium">
-                            <Briefcase className="h-3 w-3 text-sky-600" /> {vc.luggage}
+                            <Briefcase className="h-3 w-3 text-sky-600" /> {getVehicleLuggage(vc.id)}
                           </span>
                         </div>
                       </div>
