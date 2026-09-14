@@ -47,7 +47,6 @@ export async function GET(req: Request) {
         paymentStatus: visaApplications.paymentStatus,
         asanApplicationId: visaApplications.asanApplicationId,
         evisaPdfUrl: visaApplications.evisaPdfUrl,
-        adminNotes: visaApplications.adminNotes,
         createdAt: visaApplications.createdAt,
         updatedAt: visaApplications.updatedAt,
       })

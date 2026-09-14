@@ -1,9 +1,16 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "addmetour-dev-fallback-secret-2025"
-);
+function getSecretKey(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("FATAL: AUTH_SECRET must be configured in production environment.");
+    }
+    return new TextEncoder().encode("addmetour-dev-fallback-secret-2025");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export const SESSION_COOKIE_NAME = "travel_session";
 
@@ -18,11 +25,12 @@ export interface SessionPayload {
  * Signs a JWT session token valid for 7 days
  */
 export async function signSessionToken(payload: SessionPayload): Promise<string> {
+  const key = getSecretKey();
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(SECRET_KEY);
+    .sign(key);
 }
 
 /**
@@ -30,7 +38,8 @@ export async function signSessionToken(payload: SessionPayload): Promise<string>
  */
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET_KEY);
+    const key = getSecretKey();
+    const { payload } = await jwtVerify(token, key);
     return {
       id: payload.id as string,
       email: payload.email as string,

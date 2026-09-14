@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db, users, bookings } from "@travel/db";
+import { db, users, bookings, recordAuditLog } from "@travel/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth";
 
@@ -58,6 +58,33 @@ export async function PATCH(request: Request) {
       );
     }
 
+    // Check target user exists
+    const [targetUser] = await db
+      .select({ id: users.id, role: users.role, email: users.email })
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    if (!targetUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Last-admin safety guard: never allow demoting the last active administrator
+    if (targetUser.role === "admin" && role !== "admin") {
+      const adminCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(users)
+        .where(eq(users.role, "admin"));
+      const adminCount = Number(adminCountResult[0]?.count || 0);
+
+      if (adminCount <= 1) {
+        return NextResponse.json(
+          { error: "Action blocked: Cannot demote the last remaining administrator on the platform." },
+          { status: 400 }
+        );
+      }
+    }
+
     const [updated] = await db
       .update(users)
       .set({ role })
@@ -68,6 +95,21 @@ export async function PATCH(request: Request) {
         email: users.email,
         role: users.role,
       });
+
+    if (updated) {
+      await recordAuditLog({
+        entityType: "user",
+        entityId: updated.id,
+        action: `user.role_changed_to_${role}`,
+        actorEmail: admin.email,
+        actorRole: "admin",
+        metadata: {
+          targetEmail: updated.email,
+          previousRole: targetUser.role,
+          newRole: role,
+        },
+      });
+    }
 
     return NextResponse.json({ success: true, user: updated });
   } catch (error: any) {

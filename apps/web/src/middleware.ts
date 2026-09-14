@@ -2,9 +2,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const SECRET_KEY = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "addmetour-dev-fallback-secret-2025"
-);
+function getSecretKey(): Uint8Array {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("FATAL: AUTH_SECRET must be configured in production environment.");
+    }
+    return new TextEncoder().encode("addmetour-dev-fallback-secret-2025");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 const SESSION_COOKIE_NAME = "travel_session";
 
@@ -19,7 +26,8 @@ export async function middleware(req: NextRequest) {
 
     if (token) {
       try {
-        const { payload } = await jwtVerify(token, SECRET_KEY);
+        const key = getSecretKey();
+        const { payload } = await jwtVerify(token, key);
         if (payload?.role === "admin") {
           isAdmin = true;
         }

@@ -23,7 +23,6 @@ interface TrackedApplication {
   paymentStatus?: string | null;
   asanApplicationId?: string | null;
   evisaPdfUrl?: string | null;
-  adminNotes?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -329,13 +328,6 @@ export default function VisaTrackPage() {
                 <span className="font-bold text-slate-800">{application.arrivalDate}</span>
               </div>
             </div>
-
-            {application.adminNotes && (
-              <div className="rounded-xl p-3 bg-amber-50 border border-amber-200 text-amber-900 text-xs">
-                <p className="font-bold mb-0.5">Note from Visa Officer:</p>
-                <p>{application.adminNotes}</p>
-              </div>
-            )}
           </div>
         )}
       </main>
