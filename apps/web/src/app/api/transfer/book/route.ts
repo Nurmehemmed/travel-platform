@@ -117,8 +117,21 @@ export async function POST(req: Request) {
 
     // 6. Generate booking reference
     const bookingNumber = generateTransferRef();
+    const cleanEmail = String(email).trim().toLowerCase();
 
-    // 7. Insert DB record
+    // 7. If online payment, initialize payment session FIRST before creating DB record
+    let payriffResult: any = null;
+    if (paymentMethod === "online" && !zone.isCustom) {
+      payriffResult = await createPayriffOrder({
+        applicationNumber: bookingNumber,
+        amount: pricing.totalAmount,
+        currency: "USD",
+        description: `Airport Transfer ${direction} — ${zone.name} (${vehicleClass})`,
+        email: cleanEmail,
+      });
+    }
+
+    // 8. Insert DB record
     await db.insert(transferBookings).values({
       bookingNumber,
       userId: userId || null,
@@ -139,19 +152,20 @@ export async function POST(req: Request) {
       passengerName: String(passengerName).trim(),
       passengerCount: Number(passengerCount),
       phoneNumber: String(phoneNumber).trim(),
-      email: String(email).trim().toLowerCase(),
+      email: cleanEmail,
       luggageNotes: luggageNotes ? String(luggageNotes).trim() : null,
-      paymentMethod,
-      paymentStatus: paymentMethod === "on_arrival" ? "on_arrival" : "pending",
+      paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
+      paymentStatus: (paymentMethod === "on_arrival" || zone.isCustom) ? "on_arrival" : "pending",
       status: "pending",
+      payriffOrderId: payriffResult?.orderId || null,
     });
 
-    // 8. Audit log
+    // 9. Audit log
     await recordAuditLog({
       entityType: "transfer",
       entityId: bookingNumber,
       action: "transfer.booked",
-      actorEmail: String(email).trim().toLowerCase(),
+      actorEmail: cleanEmail,
       actorRole: "customer",
       metadata: {
         direction,
@@ -161,7 +175,8 @@ export async function POST(req: Request) {
         flightNumber,
         flightDate,
         totalAmount: pricing.totalAmount,
-        paymentMethod,
+        paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
+        hasPayriffOrder: !!payriffResult?.orderId,
       },
     });
 
@@ -174,7 +189,7 @@ export async function POST(req: Request) {
       totalAmount: pricing.totalAmount,
     });
 
-    // 9. Handle payment method
+    // 10. Handle on-arrival or custom quote
     if (paymentMethod === "on_arrival" || zone.isCustom) {
       // Fire Telegram alert immediately (no payment required yet)
       sendTelegramTransferAlert({
@@ -192,12 +207,11 @@ export async function POST(req: Request) {
         passengerName: String(passengerName).trim(),
         passengerCount: Number(passengerCount),
         phoneNumber: String(phoneNumber).trim(),
-        email: String(email).trim().toLowerCase(),
+        email: cleanEmail,
         totalAmount: pricing.totalAmount,
         paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
       }).catch(console.error);
 
-      const cleanEmail = String(email).trim().toLowerCase();
       return NextResponse.json({
         success: true,
         bookingNumber,
@@ -208,28 +222,14 @@ export async function POST(req: Request) {
       });
     }
 
-    // 10. Online payment — create Payriff order
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const cleanEmail = String(email).trim().toLowerCase();
-    const payriffResult = await createPayriffOrder({
-      applicationNumber: bookingNumber,
-      amount: pricing.totalAmount,
-      currency: "USD",
-      description: `Airport Transfer ${direction} — ${zone.name} (${vehicleClass})`,
-      email: cleanEmail,
-    });
-
-    // Store orderId in DB
-    await db
-      .update(transferBookings)
-      .set({ payriffOrderId: payriffResult.orderId })
-      .where(eq(transferBookings.bookingNumber, bookingNumber));
-
+    // 11. Online payment return
     return NextResponse.json({
       success: true,
       bookingNumber,
       paymentMethod: "online",
       totalAmount: pricing.totalAmount,
+      isCustomZone: false,
+      orderId: payriffResult.orderId,
       paymentUrl: payriffResult.paymentUrl,
       isMock: payriffResult.isMock,
       trackUrl: `/transfer/track?ref=${encodeURIComponent(bookingNumber)}&email=${encodeURIComponent(cleanEmail)}`,

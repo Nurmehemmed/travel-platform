@@ -189,6 +189,8 @@ function TransferBookForm() {
 
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     if (!agreedTerms) {
       setErrorMessage(tb.errAcceptTerms);
       return;
