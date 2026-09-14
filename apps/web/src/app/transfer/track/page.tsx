@@ -377,7 +377,7 @@ function TransferTrackContent() {
 
               <div className="flex items-center gap-3">
                 <a
-                  href="https://wa.me/994501234567"
+                  href="https://wa.me/994551003146"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs font-semibold text-emerald-700 hover:underline flex items-center gap-1"

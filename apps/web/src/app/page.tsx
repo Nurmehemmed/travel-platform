@@ -1206,7 +1206,7 @@ export default function HomePage() {
                           📅 Reserve Date
                         </button>
                         <a
-                          href={`https://wa.me/994000000000?text=${encodeURIComponent(
+                          href={`https://wa.me/994551003146?text=${encodeURIComponent(
                             `Hello AddmeTour! I would like to book the "${tourTitle}" tour ($${tour.price} USD).`
                           )}`}
                           target="_blank"
@@ -1621,14 +1621,14 @@ export default function HomePage() {
               </p>
             </div>
             <a
-              href="https://wa.me/994000000000"
+              href="https://wa.me/994551003146"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity shrink-0"
               style={{ backgroundColor: "#0f3460" }}
             >
               <MessageCircle className="h-4 w-4 text-[#f59e0b]" />
-              WhatsApp
+              WhatsApp (+994 55 100 31 46)
             </a>
           </div>
         </div>
@@ -1657,7 +1657,7 @@ export default function HomePage() {
               {t.hero.ctaBrowse}
             </Link>
             <a
-              href="https://wa.me/994000000000"
+              href="https://wa.me/994551003146"
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full border-2 border-white px-8 py-4 font-semibold text-sm text-white transition-all duration-200 hover:bg-white hover:text-brand-900 flex items-center gap-2"
@@ -1704,10 +1704,10 @@ export default function HomePage() {
 
       {/* ═══════════════════════════════════════════════════════ FLOATING WHATSAPP BUTTON */}
       <a
-        href="https://wa.me/994000000000"
+        href="https://wa.me/994551003146"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat with us on WhatsApp"
+        aria-label="Chat with us on WhatsApp (+994 55 100 31 46)"
         className="fixed right-4 sm:right-6 bottom-4 sm:bottom-6 z-40 flex h-13 w-13 items-center justify-center rounded-full text-white shadow-xl transition-all duration-300 hover:scale-110 hover:shadow-2xl"
         style={{
           width: "52px",

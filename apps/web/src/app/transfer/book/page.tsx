@@ -687,7 +687,7 @@ function TransferBookForm() {
                   <input
                     type="tel"
                     required
-                    placeholder="+994 50 123 4567 (with country code)"
+                    placeholder="+994 55 100 31 46 (with country code)"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"

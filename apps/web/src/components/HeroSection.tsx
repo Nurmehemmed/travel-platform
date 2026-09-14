@@ -481,7 +481,7 @@ export function HeroSection({ slides = DEFAULT_SLIDES }: HeroSectionProps) {
 
           {/* Segment 3: WhatsApp Support (External Link) */}
           <a
-            href="https://wa.me/994000000000"
+            href="https://wa.me/994551003146"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-emerald-500/20"

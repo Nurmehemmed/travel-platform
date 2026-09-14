@@ -105,7 +105,7 @@ const jsonLd = {
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=630&q=85",
       description:
         "Boutique travel agency in Baku offering authentic small-group and private tours across Azerbaijan.",
-      telephone: "+994000000000",
+      telephone: "+994 55 100 31 46",
       priceRange: "$$",
       address: {
         "@type": "PostalAddress",
