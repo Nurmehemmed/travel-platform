@@ -33,6 +33,7 @@ import {
   Eye,
   LogOut,
   Car,
+  MessageCircle,
 } from "lucide-react";
 
 interface AuditLogItem {
@@ -173,6 +174,23 @@ interface TransferItem {
   createdAt: string;
 }
 
+interface TourReservationItem {
+  id: string;
+  reservationNumber: string;
+  tourId: string;
+  tourTitle: string;
+  tourDate: string;
+  guests: number;
+  travelerName: string;
+  phoneNumber: string;
+  price: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  guideName?: string | null;
+  guidePhone?: string | null;
+  adminNotes?: string | null;
+  createdAt: string;
+}
+
 type TabType = "overview" | "tours" | "bookings" | "users" | "destinations" | "visas" | "transfers" | "audit";
 
 export default function AdminPortalPage() {
@@ -195,15 +213,29 @@ export default function AdminPortalPage() {
   const [destinationsList, setDestinationsList] = useState<DestinationItem[]>([]);
   const [visasList, setVisasList] = useState<VisaItem[]>([]);
   const [transfersList, setTransfersList] = useState<TransferItem[]>([]);
+  const [tourReservationsList, setTourReservationsList] = useState<TourReservationItem[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
 
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState("");
   const [bookingStatusFilter, setBookingStatusFilter] = useState<string>("all");
+  const [tourResStatusFilter, setTourResStatusFilter] = useState<string>("all");
   const [visaStatusFilter, setVisaStatusFilter] = useState<string>("all");
   const [transferStatusFilter, setTransferStatusFilter] = useState<string>("all");
   const [auditEntityFilter, setAuditEntityFilter] = useState<string>("all");
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
+
+  // Lightbox Preview State
+  const [lightboxImage, setLightboxImage] = useState<{ url: string; title: string } | null>(null);
+
+  // Tour Reservation Modal State
+  const [selectedTourRes, setSelectedTourRes] = useState<TourReservationItem | null>(null);
+  const [isTourResModalOpen, setIsTourResModalOpen] = useState(false);
+  const [editTourResStatus, setEditTourResStatus] = useState<TourReservationItem["status"]>("pending");
+  const [editGuideName, setEditGuideName] = useState("");
+  const [editGuidePhone, setEditGuidePhone] = useState("");
+  const [editTourResNotes, setEditTourResNotes] = useState("");
+  const [tourResUpdateLoading, setTourResUpdateLoading] = useState(false);
 
   // Transfer Modal & Dispatch States
   const [selectedTransfer, setSelectedTransfer] = useState<TransferItem | null>(null);
@@ -225,6 +257,57 @@ export default function AdminPortalPage() {
   const [visaUpdateLoading, setVisaUpdateLoading] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
 
+  // SLA and Validity Helpers
+  const getVisaSla = (visa: VisaItem) => {
+    if (visa.visaType !== "urgent") {
+      return <span className="text-[10px] text-slate-500 font-medium">Standard (3d)</span>;
+    }
+    if (visa.status === "approved") {
+      return (
+        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+          ✓ Fulfilled
+        </span>
+      );
+    }
+    if (visa.status === "rejected") {
+      return (
+        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+          Rejected
+        </span>
+      );
+    }
+    const elapsedMinutes = Math.floor((Date.now() - new Date(visa.createdAt).getTime()) / 60000);
+    const remaining = 180 - elapsedMinutes;
+    if (remaining > 0) {
+      return (
+        <span className="text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full inline-flex items-center gap-1 animate-pulse">
+          🔥 SLA: {remaining}m left
+        </span>
+      );
+    }
+    return (
+      <span className="text-[10px] font-bold text-white bg-red-600 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+        🚨 SLA Overdue (+{Math.abs(remaining)}m)
+      </span>
+    );
+  };
+
+  const checkPassportExpiry = (expiryDate: string, arrivalDate: string) => {
+    if (!expiryDate || !arrivalDate) return null;
+    const exp = new Date(expiryDate).getTime();
+    const arr = new Date(arrivalDate).getTime();
+    if (isNaN(exp) || isNaN(arr)) return null;
+    const diffDays = Math.floor((exp - arr) / (1000 * 60 * 60 * 24));
+    if (diffDays < 90) {
+      return {
+        isWarning: true,
+        days: diffDays,
+        message: `Passport expires in ${diffDays} days from arrival (< 90 days required by Migration Service)!`,
+      };
+    }
+    return null;
+  };
+
   // Tour Modal
   const [isNewTourOpen, setIsNewTourOpen] = useState(false);
   const [newTourTitle, setNewTourTitle] = useState("");
@@ -240,7 +323,7 @@ export default function AdminPortalPage() {
   const fetchAllData = async () => {
     try {
       setRefreshing(true);
-      const [statsRes, toursRes, bookingsRes, usersRes, destsRes, visasRes, transfersRes, auditRes] =
+      const [statsRes, toursRes, bookingsRes, usersRes, destsRes, visasRes, transfersRes, auditRes, tourRes] =
         await Promise.all([
           fetch("/api/admin/stats").then((r) => r.json()),
           fetch("/api/admin/tours").then((r) => r.json()),
@@ -250,6 +333,7 @@ export default function AdminPortalPage() {
           fetch("/api/admin/visas").then((r) => r.json()).catch(() => ({ visas: [] })),
           fetch("/api/admin/transfers").then((r) => r.json()).catch(() => ({ transfers: [] })),
           fetch("/api/admin/audit-logs?limit=100").then((r) => r.json()).catch(() => ({ logs: [] })),
+          fetch("/api/tours/reserve").then((r) => r.json()).catch(() => ({ reservations: [] })),
         ]);
 
       if (statsRes?.stats) {
@@ -261,7 +345,7 @@ export default function AdminPortalPage() {
       if (usersRes?.users) setUsersList(usersRes.users);
       if (visasRes?.visas) setVisasList(visasRes.visas);
       if (transfersRes?.transfers) setTransfersList(transfersRes.transfers);
-      if (auditRes?.logs) setAuditLogs(auditRes.logs);
+      if (tourRes?.reservations) setTourReservationsList(tourRes.reservations);
       if (destsRes?.destinations) {
         setDestinationsList(destsRes.destinations);
         if (destsRes.destinations.length > 0 && !newTourDestId) {
@@ -520,6 +604,49 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
       console.error(err);
     } finally {
       setTransferUpdateLoading(false);
+    }
+  };
+
+  const handleOpenTourResModal = (resItem: TourReservationItem) => {
+    setSelectedTourRes(resItem);
+    setEditTourResStatus(resItem.status);
+    setEditGuideName(resItem.guideName || "");
+    setEditGuidePhone(resItem.guidePhone || "");
+    setEditTourResNotes(resItem.adminNotes || "");
+    setIsTourResModalOpen(true);
+  };
+
+  const handleUpdateTourRes = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTourRes) return;
+    try {
+      setTourResUpdateLoading(true);
+      const res = await fetch("/api/tours/reserve", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedTourRes.id,
+          status: editTourResStatus,
+          guideName: editGuideName.trim() || null,
+          guidePhone: editGuidePhone.trim() || null,
+          adminNotes: editTourResNotes.trim() || null,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data?.reservation) {
+        setTourReservationsList((prev) =>
+          prev.map((r) => (r.id === selectedTourRes.id ? { ...r, ...data.reservation } : r))
+        );
+        setIsTourResModalOpen(false);
+        showNotification(`Reservation ${selectedTourRes.reservationNumber} updated!`);
+      } else {
+        alert(data?.error || "Failed to update reservation");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTourResUpdateLoading(false);
     }
   };
 
@@ -1071,104 +1198,259 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
           {/* ═══════════════════════════════════════════════════════ TAB: BOOKINGS */}
           {activeTab === "bookings" && (
-            <div
-              className="rounded-2xl border bg-white shadow-sm overflow-hidden"
-              style={{ borderColor: "#e0f2fe" }}
-            >
-              <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="font-bold text-base text-slate-900 font-display">
-                    Reservations & Bookings ({bookingsList.length})
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Review and confirm incoming bookings from travelers
-                  </p>
+            <div className="space-y-6">
+              {/* ── Direct Tour Reservations & Date Requests ── */}
+              <div
+                className="rounded-2xl border bg-white shadow-sm overflow-hidden"
+                style={{ borderColor: "#e0f2fe" }}
+              >
+                <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="font-bold text-base text-slate-900 font-display">
+                        Direct Tour Date Reservations ({tourReservationsList.length})
+                      </h2>
+                      <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-900 uppercase tracking-wider">
+                        Homepage Inquiries
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Direct inquiries submitted from landing page — assign licensed guides and chauffeurs
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {["all", "pending", "confirmed", "completed", "cancelled"].map((st) => (
+                      <button
+                        key={st}
+                        onClick={() => setTourResStatusFilter(st)}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-colors cursor-pointer ${
+                          tourResStatusFilter === st
+                            ? "bg-[#0f3460] text-white shadow-sm"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        }`}
+                      >
+                        {st}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {["all", "pending", "confirmed", "cancelled"].map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => setBookingStatusFilter(st)}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-colors cursor-pointer ${
-                        bookingStatusFilter === st
-                          ? "bg-slate-900 text-white"
-                          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
+                      <tr>
+                        <th className="px-5 py-3.5">Ref & Date</th>
+                        <th className="px-5 py-3.5">Experience</th>
+                        <th className="px-5 py-3.5">Lead Traveler</th>
+                        <th className="px-5 py-3.5">Price (~AZN)</th>
+                        <th className="px-5 py-3.5">Assigned Guide</th>
+                        <th className="px-5 py-3.5">Status</th>
+                        <th className="px-5 py-3.5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {tourReservationsList
+                        .filter(
+                          (r) =>
+                            tourResStatusFilter === "all" ||
+                            r.status === tourResStatusFilter
+                        )
+                        .map((r) => (
+                          <tr key={r.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-5 py-4">
+                              <span className="font-mono font-bold text-slate-900 block text-xs">
+                                {r.reservationNumber}
+                              </span>
+                              <span className="text-[11px] text-slate-500 block mt-0.5 font-medium">
+                                📅 {r.tourDate}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 font-semibold text-slate-800 max-w-[200px] truncate">
+                              {r.tourTitle}
+                              <span className="text-[11px] text-slate-400 block font-normal">
+                                {r.guests} {r.guests === 1 ? "Guest" : "Guests"}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4">
+                              <p className="font-bold text-slate-900">{r.travelerName}</p>
+                              <a
+                                href={`https://wa.me/${r.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+                                  `Hello ${r.travelerName}! This is AddmeTour regarding your reservation for "${r.tourTitle}" on ${r.tourDate} (Ref: ${r.reservationNumber}).`
+                                )}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-mono font-semibold hover:underline"
+                              >
+                                <MessageCircle className="h-3 w-3" />
+                                {r.phoneNumber}
+                              </a>
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="font-bold text-slate-900 block">${r.price}</span>
+                              <span className="text-[10px] text-slate-400 block">
+                                ~{(Number(r.price) * 1.7).toFixed(0)} AZN
+                              </span>
+                            </td>
+                            <td className="px-5 py-4">
+                              {r.guideName ? (
+                                <div>
+                                  <span className="font-semibold text-slate-800 block text-xs">
+                                    {r.guideName}
+                                  </span>
+                                  {r.guidePhone && (
+                                    <span className="text-[11px] text-slate-500 block font-mono">
+                                      {r.guidePhone}
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                                  No Guide Assigned
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                  r.status === "confirmed"
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : r.status === "completed"
+                                    ? "bg-slate-100 text-slate-800"
+                                    : r.status === "pending"
+                                    ? "bg-amber-100 text-amber-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {r.status}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-right">
+                              <button
+                                onClick={() => handleOpenTourResModal(r)}
+                                className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
+                                style={{ backgroundColor: "#0f3460" }}
+                              >
+                                Assign Guide / Manage
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                  {tourReservationsList.length === 0 && (
+                    <div className="py-10 text-center text-xs text-slate-500">
+                      No direct tour reservations received yet.
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
-                    <tr>
-                      <th className="px-6 py-3.5">Booking ID</th>
-                      <th className="px-6 py-3.5">Customer</th>
-                      <th className="px-6 py-3.5">Tour Experience</th>
-                      <th className="px-6 py-3.5">Travelers</th>
-                      <th className="px-6 py-3.5">Amount</th>
-                      <th className="px-6 py-3.5">Status</th>
-                      <th className="px-6 py-3.5 text-right">Change Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {bookingsList
-                      .filter(
-                        (b) =>
-                          bookingStatusFilter === "all" ||
-                          b.status === bookingStatusFilter
-                      )
-                      .map((b) => (
-                        <tr key={b.id} className="hover:bg-slate-50/60 transition-colors">
-                          <td className="px-6 py-4 font-mono text-slate-400 text-[11px]">
-                            #{b.id.slice(0, 8)}
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="font-bold text-slate-900">{b.userName || "Traveler"}</p>
-                            <p className="text-[11px] text-slate-500">{b.userEmail}</p>
-                          </td>
-                          <td className="px-6 py-4 font-medium text-slate-800 max-w-[200px] truncate">
-                            {b.tourTitle || "Custom Guided Tour"}
-                          </td>
-                          <td className="px-6 py-4 text-slate-600">
-                            {b.travelerCount} Guests
-                          </td>
-                          <td className="px-6 py-4 font-bold text-slate-900">
-                            ${parseFloat(b.totalPrice).toFixed(2)}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                b.status === "confirmed"
-                                  ? "bg-emerald-100 text-emerald-800"
-                                  : b.status === "pending"
-                                  ? "bg-amber-100 text-amber-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {b.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <select
-                              value={b.status}
-                              onChange={(e) => handleUpdateBookingStatus(b.id, e.target.value)}
-                              className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#0f3460] cursor-pointer"
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="confirmed">Confirmed</option>
-                              <option value="cancelled">Cancelled</option>
-                              <option value="refunded">Refunded</option>
-                            </select>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+              {/* ── Registered Portal Account Bookings ── */}
+              <div
+                className="rounded-2xl border bg-white shadow-sm overflow-hidden"
+                style={{ borderColor: "#e0f2fe" }}
+              >
+                <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="font-bold text-base text-slate-900 font-display">
+                      Registered Account Bookings ({bookingsList.length})
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Bookings created by registered users through checkout slots
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {["all", "pending", "confirmed", "cancelled"].map((st) => (
+                      <button
+                        key={st}
+                        onClick={() => setBookingStatusFilter(st)}
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-colors cursor-pointer ${
+                          bookingStatusFilter === st
+                            ? "bg-slate-900 text-white"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        }`}
+                      >
+                        {st}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
+                      <tr>
+                        <th className="px-6 py-3.5">Booking ID</th>
+                        <th className="px-6 py-3.5">Customer</th>
+                        <th className="px-6 py-3.5">Tour Experience</th>
+                        <th className="px-6 py-3.5">Travelers</th>
+                        <th className="px-6 py-3.5">Amount</th>
+                        <th className="px-6 py-3.5">Status</th>
+                        <th className="px-6 py-3.5 text-right">Change Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {bookingsList
+                        .filter(
+                          (b) =>
+                            bookingStatusFilter === "all" ||
+                            b.status === bookingStatusFilter
+                        )
+                        .map((b) => (
+                          <tr key={b.id} className="hover:bg-slate-50/60 transition-colors">
+                            <td className="px-6 py-4 font-mono text-slate-400 text-[11px]">
+                              #{b.id.slice(0, 8)}
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="font-bold text-slate-900">{b.userName || "Traveler"}</p>
+                              <p className="text-[11px] text-slate-500">{b.userEmail}</p>
+                            </td>
+                            <td className="px-6 py-4 font-medium text-slate-800 max-w-[200px] truncate">
+                              {b.tourTitle || "Custom Guided Tour"}
+                            </td>
+                            <td className="px-6 py-4 text-slate-600">
+                              {b.travelerCount} Guests
+                            </td>
+                            <td className="px-6 py-4 font-bold text-slate-900">
+                              ${parseFloat(b.totalPrice).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                  b.status === "confirmed"
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : b.status === "pending"
+                                    ? "bg-amber-100 text-amber-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {b.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <select
+                                value={b.status}
+                                onChange={(e) => handleUpdateBookingStatus(b.id, e.target.value)}
+                                className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#0f3460] cursor-pointer"
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="cancelled">Cancelled</option>
+                                <option value="refunded">Refunded</option>
+                              </select>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                  {bookingsList.length === 0 && (
+                    <div className="py-10 text-center text-xs text-slate-500">
+                      No portal bookings recorded yet.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -1398,15 +1680,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               <span className="font-mono font-bold text-slate-900 block">
                                 {visa.applicationNumber}
                               </span>
-                              <span
-                                className={`inline-block text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 mt-0.5 ${
-                                  visa.visaType === "urgent"
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-slate-100 text-slate-700"
-                                }`}
-                              >
-                                {visa.visaType === "urgent" ? "⚡ Urgent (3h)" : "Standard (3d)"}
-                              </span>
+                              <div className="mt-1 flex flex-col gap-0.5">
+                                {getVisaSla(visa)}
+                              </div>
                             </td>
 
                             <td className="py-3.5 px-4">
@@ -1420,7 +1696,21 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                             <td className="py-3.5 px-4 font-mono">
                               <span className="font-bold text-slate-800 block">{visa.passportNumber}</span>
-                              <span className="text-[10px] text-slate-400">Exp: {visa.passportExpiryDate}</span>
+                              <span className="text-[10px] text-slate-400 block">Exp: {visa.passportExpiryDate}</span>
+                              {(() => {
+                                const expWarning = checkPassportExpiry(visa.passportExpiryDate, visa.arrivalDate);
+                                if (expWarning) {
+                                  return (
+                                    <span
+                                      title={expWarning.message}
+                                      className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.2 rounded mt-0.5"
+                                    >
+                                      ⚠️ Exp &lt; 90d
+                                    </span>
+                                  );
+                                }
+                                return null;
+                              })()}
                             </td>
 
                             <td className="py-3.5 px-4 font-medium text-slate-800">
@@ -1464,7 +1754,33 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             </td>
 
                             <td className="py-3.5 px-4 text-right">
-                              <div className="flex items-center justify-end gap-2">
+                              <div className="flex items-center justify-end gap-1.5">
+                                {visa.passportScanUrl && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setLightboxImage({
+                                        url: visa.passportScanUrl!,
+                                        title: `Passport: ${visa.surname} ${visa.givenNames} (${visa.passportNumber})`,
+                                      })
+                                    }
+                                    title="Preview Passport Document"
+                                    className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-sky-700 transition-colors cursor-pointer"
+                                  >
+                                    <Eye className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                                <a
+                                  href={`https://wa.me/${visa.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+                                    `Hello ${visa.givenNames}! This is AddmeTour regarding your Azerbaijan eVisa order (${visa.applicationNumber}).`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Contact Applicant on WhatsApp"
+                                  className="p-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors cursor-pointer"
+                                >
+                                  <MessageCircle className="h-3.5 w-3.5" />
+                                </a>
                                 <button
                                   onClick={() => handleCopyAsanFormat(visa)}
                                   title="Copy Formatted Data for evisa.gov.az"
@@ -1477,7 +1793,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
                                   style={{ backgroundColor: "#0f3460" }}
                                 >
-                                  Process & Update
+                                  Process
                                 </button>
                               </div>
                             </td>
@@ -1603,14 +1919,25 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             </td>
 
                             <td className="py-3.5 px-4">
-                              <span className="font-mono font-semibold text-slate-800 block">
-                                ✈️ {item.flightNumber}
-                              </span>
-                              <span className="text-[11px] text-slate-600 block">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-mono font-semibold text-slate-800">
+                                  ✈️ {item.flightNumber}
+                                </span>
+                                <a
+                                  href={`https://www.flightradar24.com/data/flights/${item.flightNumber.replace(/\s+/g, "")}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Track Live Flight on FlightRadar24"
+                                  className="inline-flex items-center gap-0.5 text-[9px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1.5 py-0.5 rounded hover:bg-sky-100"
+                                >
+                                  Live ↗
+                                </a>
+                              </div>
+                              <span className="text-[11px] text-slate-600 block mt-0.5">
                                 {item.flightDate} at {item.flightTime}
                               </span>
                               {item.returnFlightNumber && (
-                                <span className="text-[10px] text-slate-400 block font-mono">
+                                <span className="text-[10px] text-slate-400 block font-mono mt-0.5">
                                   ↩️ {item.returnFlightNumber} on {item.returnDate}
                                 </span>
                               )}
@@ -1639,9 +1966,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-0.5">
                                   ✓ Paid Online
                                 </span>
+                              ) : item.paymentStatus === "cash_collected" ? (
+                                <span className="inline-block text-[10px] font-bold text-teal-700 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded mt-0.5">
+                                  💵 Cash Remitted
+                                </span>
                               ) : (
                                 <span className="inline-block text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-0.5">
-                                  💵 Pay on Arrival
+                                  ⚠️ Collect ${item.totalAmount}
                                 </span>
                               )}
                             </td>
@@ -1694,13 +2025,26 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             </td>
 
                             <td className="py-3.5 px-4 text-right">
-                              <button
-                                onClick={() => handleOpenTransferModal(item)}
-                                className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
-                                style={{ backgroundColor: "#0f3460" }}
-                              >
-                                {item.driverName ? "Manage" : "Assign Driver"}
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <a
+                                  href={`https://wa.me/${item.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+                                    `Hello ${item.passengerName}! Your AddmeTour airport transfer is confirmed for flight ${item.flightNumber} (${item.flightDate} at ${item.flightTime}). Chauffeur: ${item.driverName || 'Assigned Driver'} (${item.driverPhone || 'On standby'}). Meetup: Arrival Hall exit after baggage reclaim.`
+                                  )}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Message Passenger on WhatsApp"
+                                  className="p-1.5 rounded-lg border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 transition-colors cursor-pointer"
+                                >
+                                  <MessageCircle className="h-3.5 w-3.5" />
+                                </a>
+                                <button
+                                  onClick={() => handleOpenTransferModal(item)}
+                                  className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
+                                  style={{ backgroundColor: "#0f3460" }}
+                                >
+                                  {item.driverName ? "Manage" : "Assign Driver"}
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -2132,6 +2476,26 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               </span>
             </div>
 
+            {/* SLA and Expiry Warning Banners */}
+            <div className="flex flex-wrap items-center gap-2 my-2">
+              {selectedVisa.visaType === "urgent" && (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700">
+                  {getVisaSla(selectedVisa)}
+                </div>
+              )}
+              {(() => {
+                const warning = checkPassportExpiry(selectedVisa.passportExpiryDate, selectedVisa.arrivalDate);
+                if (warning) {
+                  return (
+                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 border border-amber-300 text-xs font-bold text-amber-800">
+                      ⚠️ {warning.message}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+
             <h3 className="font-display text-2xl font-bold text-slate-900 mb-1">
               Process e-Visa Application
             </h3>
@@ -2204,19 +2568,38 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
 
                 {selectedVisa.passportScanUrl && (
-                  <div className="pt-2 border-t border-slate-100">
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium mb-1">Passport Scan / Photo</span>
-                    <a
-                      href={selectedVisa.passportScanUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0f3460] hover:underline"
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Passport Document</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setLightboxImage({
+                          url: selectedVisa.passportScanUrl!,
+                          title: `Passport Scan: ${selectedVisa.surname} ${selectedVisa.givenNames} (${selectedVisa.passportNumber})`,
+                        })
+                      }
+                      className="inline-flex items-center gap-1 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg cursor-pointer"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View Uploaded Document
-                    </a>
+                      <Eye className="h-3.5 w-3.5" />
+                      Inspect Full Scan ↗
+                    </button>
                   </div>
                 )}
+
+                {/* Direct WhatsApp Contact Button */}
+                <div className="pt-2 border-t border-slate-100">
+                  <a
+                    href={`https://wa.me/${selectedVisa.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `Hello ${selectedVisa.givenNames}! This is AddmeTour regarding your Azerbaijan eVisa application (${selectedVisa.applicationNumber}).`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Message Applicant on WhatsApp
+                  </a>
+                </div>
               </div>
 
               {/* Right Column: Update Status Form */}
@@ -2297,7 +2680,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Transfer Dispatch & Management
+                  Transfer Dispatch & Chauffeur Management
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 font-mono">
                   {selectedTransfer.bookingNumber}
@@ -2339,11 +2722,21 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div>
                   <span className="text-slate-400 block text-[10px] uppercase font-medium">Flight Details</span>
-                  <span className="font-mono font-semibold text-slate-800 block">
-                    ✈️ {selectedTransfer.flightNumber} &middot; {selectedTransfer.flightDate} at {selectedTransfer.flightTime}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-mono font-semibold text-slate-800">
+                      ✈️ {selectedTransfer.flightNumber} &middot; {selectedTransfer.flightDate} at {selectedTransfer.flightTime}
+                    </span>
+                    <a
+                      href={`https://www.flightradar24.com/data/flights/${selectedTransfer.flightNumber.replace(/\s+/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-0.5 text-[10px] font-bold text-sky-600 hover:underline"
+                    >
+                      Track ↗
+                    </a>
+                  </div>
                   {selectedTransfer.returnFlightNumber && (
-                    <span className="font-mono text-slate-600 block text-[11px]">
+                    <span className="font-mono text-slate-600 block text-[11px] mt-0.5">
                       ↩️ Return: {selectedTransfer.returnFlightNumber} on {selectedTransfer.returnDate} at {selectedTransfer.returnTime}
                     </span>
                   )}
@@ -2377,6 +2770,33 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     <span className="text-base font-extrabold text-sky-700">${selectedTransfer.totalAmount}</span>
                   </div>
                 </div>
+
+                {/* Quick WhatsApp Triggers */}
+                <div className="space-y-1.5 pt-2 border-t border-slate-200/60">
+                  <a
+                    href={`https://wa.me/${editDriverPhone.replace(/\D/g, '') || ''}?text=${encodeURIComponent(
+                      `🚖 *ADDMETOUR — CHAUFFEUR DISPATCH*\n• Ref: ${selectedTransfer.bookingNumber}\n• Flight: ${selectedTransfer.flightNumber} (${selectedTransfer.airport} at ${selectedTransfer.flightTime})\n• Route: ${selectedTransfer.pickupZone} ➔ ${selectedTransfer.dropoffAddress}\n• Passenger: ${selectedTransfer.passengerName} (${selectedTransfer.passengerCount} pax)\n• Phone: ${selectedTransfer.phoneNumber}\n• Vehicle: ${selectedTransfer.vehicleClass}\n• Payment: ${selectedTransfer.paymentStatus === 'paid' ? '✅ Paid Online' : `💵 Collect $${selectedTransfer.totalAmount} (~${Math.round(Number(selectedTransfer.totalAmount) * 1.7)} AZN) cash on arrival`}\n• Notes: ${selectedTransfer.luggageNotes || 'None'}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-xl bg-emerald-600 text-white font-bold text-[11px] hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Dispatch Chauffeur via WhatsApp
+                  </a>
+
+                  <a
+                    href={`https://wa.me/${selectedTransfer.phoneNumber.replace(/\D/g, '')}?text=${encodeURIComponent(
+                      `👋 Hello ${selectedTransfer.passengerName}! Your AddmeTour airport transfer is confirmed for flight ${selectedTransfer.flightNumber}:\n• Chauffeur: ${editDriverName || selectedTransfer.driverName || 'Assigned Driver'} (${editDriverPhone || selectedTransfer.driverPhone || 'On standby'})\n• Airport: ${selectedTransfer.airport}\n• Meeting Point: Arrival Hall exit after baggage reclaim (Chauffeur will hold AddmeTour sign with your name).\n• Free Waiting: 60 minutes after actual landing.\nWishing you a safe flight to Baku!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-xl bg-sky-600 text-white font-bold text-[11px] hover:bg-sky-700 transition-colors shadow-sm cursor-pointer"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Notify Passenger via WhatsApp
+                  </a>
+                </div>
               </div>
 
               {/* Right Column: Dispatch Form */}
@@ -2397,7 +2817,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Payment Status</label>
+                  <label className="font-semibold text-slate-700 block mb-1">Payment & Cash Settlement</label>
                   <select
                     value={editTransferPaymentStatus}
                     onChange={(e) => setEditTransferPaymentStatus(e.target.value)}
@@ -2405,7 +2825,8 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   >
                     <option value="pending">Pending</option>
                     <option value="paid">Paid Online</option>
-                    <option value="on_arrival">Pay on Arrival (Cash)</option>
+                    <option value="cash_collected">💵 Cash Collected by Chauffeur & Remitted</option>
+                    <option value="on_arrival">Pay on Arrival (Cash Pending)</option>
                     <option value="refunded">Refunded</option>
                   </select>
                 </div>
@@ -2435,7 +2856,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     onChange={(e) => setEditDriverPhone(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-mono"
                   />
-                  <p className="text-[10px] text-slate-400 mt-0.5">Used for passenger WhatsApp contact button</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Used for chauffeur WhatsApp dispatch</p>
                 </div>
 
                 <div>
@@ -2460,6 +2881,190 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════ TOUR RESERVATION MODAL */}
+      {isTourResModalOpen && selectedTourRes && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto border border-amber-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                  Tour Guide & Date Assignment
+                </span>
+                <h3 className="text-xl font-bold text-slate-900 font-mono mt-1">
+                  {selectedTourRes.reservationNumber}
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsTourResModalOpen(false)}
+                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left: Reservation Summary */}
+              <div className="space-y-3 bg-amber-50/40 p-4 rounded-2xl border border-amber-200/60 text-xs">
+                <div className="font-bold text-slate-700 text-xs uppercase tracking-wider mb-1">
+                  Tour Request Details
+                </div>
+
+                <div>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Tour Experience</span>
+                  <span className="font-bold text-slate-900 text-sm">{selectedTourRes.tourTitle}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Preferred Date</span>
+                    <span className="font-semibold text-slate-800">📅 {selectedTourRes.tourDate}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Party Size</span>
+                    <span className="font-semibold text-slate-800">{selectedTourRes.guests} Guests</span>
+                  </div>
+                </div>
+
+                <div className="border-t border-amber-200/60 pt-2">
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Lead Traveler</span>
+                  <span className="font-semibold text-slate-900 block">{selectedTourRes.travelerName}</span>
+                  <span className="text-slate-600 font-mono block">{selectedTourRes.phoneNumber}</span>
+                </div>
+
+                <div className="border-t border-amber-200/60 pt-2 flex items-center justify-between">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Group Rate</span>
+                    <span className="text-base font-extrabold text-slate-900">${selectedTourRes.price} USD</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Approx. AZN</span>
+                    <span className="text-xs font-bold text-slate-600">~{(Number(selectedTourRes.price) * 1.7).toFixed(0)} AZN</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-amber-200/60">
+                  <a
+                    href={`https://wa.me/${selectedTourRes.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `Hello ${selectedTourRes.travelerName}! This is AddmeTour regarding your tour reservation for "${selectedTourRes.tourTitle}" on ${selectedTourRes.tourDate} (Ref: ${selectedTourRes.reservationNumber}).`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 w-full py-2.5 px-3 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    Chat with Traveler on WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              {/* Right: Guide Assignment Form */}
+              <form onSubmit={handleUpdateTourRes} className="space-y-4 text-xs">
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">Reservation Status</label>
+                  <select
+                    value={editTourResStatus}
+                    onChange={(e) => setEditTourResStatus(e.target.value as any)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
+                  >
+                    <option value="pending">Pending Review</option>
+                    <option value="confirmed">Confirmed (Guide Assigned)</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">Assigned Guide Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Leyla Aliyeva (English Guide)"
+                    value={editGuideName}
+                    onChange={(e) => setEditGuideName(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">Guide Contact / WhatsApp</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. +994 55 987 6543"
+                    value={editGuidePhone}
+                    onChange={(e) => setEditGuidePhone(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">Operational Notes / Hotel Pickup</label>
+                  <textarea
+                    rows={3}
+                    placeholder="e.g. Pickup from Four Seasons at 09:30 AM. Mercedes Sprinter arranged."
+                    value={editTourResNotes}
+                    onChange={(e) => setEditTourResNotes(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={tourResUpdateLoading}
+                    className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity cursor-pointer disabled:opacity-50"
+                    style={{ backgroundColor: "#0f3460" }}
+                  >
+                    {tourResUpdateLoading ? "Saving..." : "Save Reservation & Guide"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════ LIGHTBOX PREVIEW MODAL */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full max-h-[90vh] flex flex-col bg-slate-900 rounded-3xl overflow-hidden border border-slate-700 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800 text-white">
+              <span className="font-semibold text-xs tracking-wide truncate max-w-md">
+                {lightboxImage.title}
+              </span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={lightboxImage.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" /> Full Resolution ↗
+                </a>
+                <button
+                  onClick={() => setLightboxImage(null)}
+                  className="p-1.5 rounded-xl hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <div className="relative w-full h-[70vh] bg-black/50 flex items-center justify-center p-4">
+              <img
+                src={lightboxImage.url}
+                alt={lightboxImage.title}
+                className="max-h-full max-w-full object-contain rounded-lg"
+              />
             </div>
           </div>
         </div>

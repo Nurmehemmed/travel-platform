@@ -239,6 +239,8 @@ export default function HomePage() {
   const [bookingName, setBookingName] = useState("");
   const [bookingPhone, setBookingPhone] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [confirmedResNumber, setConfirmedResNumber] = useState<string | null>(null);
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
 
   // Auth state
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
@@ -2022,12 +2024,22 @@ export default function HomePage() {
                   <Check className="h-8 w-8" />
                 </div>
                 <h3 className="font-display text-xl font-bold text-slate-900 mb-2">Reservation Request Received!</h3>
+                {confirmedResNumber && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-mono font-bold mb-3">
+                    <span>Ref:</span>
+                    <span>{confirmedResNumber}</span>
+                  </div>
+                )}
                 <p className="text-xs text-slate-600 mb-6 leading-relaxed">
                   Thank you, <strong>{bookingName}</strong>. Our local Baku tour concierge has received your booking for <strong>{bookingModalTour.title}</strong> on <strong>{bookingDate}</strong>. We will confirm your pickup schedule and guide details via WhatsApp shortly.
                 </p>
                 <button
                   type="button"
-                  onClick={() => setBookingModalTour(null)}
+                  onClick={() => {
+                    setBookingModalTour(null);
+                    setBookingSuccess(false);
+                    setConfirmedResNumber(null);
+                  }}
                   className="rounded-xl px-6 py-2.5 text-xs font-bold text-white shadow-md cursor-pointer"
                   style={{ backgroundColor: "#0f3460" }}
                 >
@@ -2049,7 +2061,7 @@ export default function HomePage() {
                 </p>
 
                 <form
-                  onSubmit={(e) => {
+                  onSubmit={async (e) => {
                     e.preventDefault();
                     if (!bookingDate || !bookingName.trim() || !bookingPhone.trim()) {
                       showToast(
@@ -2061,14 +2073,40 @@ export default function HomePage() {
                       );
                       return;
                     }
-                    setBookingSuccess(true);
-                    showToast(
-                      language === "AZ"
-                        ? "Tur rezervasiyası uğurla qeydə alındı!"
-                        : language === "RU"
-                        ? "Бронирование тура успешно отправлено!"
-                        : "Tour reservation submitted successfully!"
-                    );
+                    setBookingSubmitting(true);
+                    try {
+                      const res = await fetch("/api/tours/reserve", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          tourId: bookingModalTour.id,
+                          tourTitle: bookingModalTour.title,
+                          tourDate: bookingDate,
+                          guests: bookingGuests,
+                          travelerName: bookingName,
+                          phoneNumber: bookingPhone,
+                          price: bookingModalTour.price,
+                        }),
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setConfirmedResNumber(data.reservationNumber);
+                        setBookingSuccess(true);
+                        showToast(
+                          language === "AZ"
+                            ? "Tur rezervasiyası uğurla qeydə alındı!"
+                            : language === "RU"
+                            ? "Бронирование тура успешно отправлено!"
+                            : "Tour reservation submitted successfully!"
+                        );
+                      } else {
+                        showToast(data.error || "Failed to submit reservation");
+                      }
+                    } catch (err) {
+                      showToast("Error connecting to server. Please try again or book via WhatsApp.");
+                    } finally {
+                      setBookingSubmitting(false);
+                    }
                   }}
                   className="space-y-3.5"
                 >
@@ -2144,10 +2182,11 @@ export default function HomePage() {
 
                   <button
                     type="submit"
-                    className="w-full rounded-xl py-3 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:opacity-95 cursor-pointer mt-2"
+                    disabled={bookingSubmitting}
+                    className="w-full rounded-xl py-3 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:opacity-95 cursor-pointer mt-2 disabled:opacity-50"
                     style={{ backgroundColor: "#0f3460" }}
                   >
-                    Confirm Tour Reservation &rarr;
+                    {bookingSubmitting ? "Submitting Reservation..." : "Confirm Tour Reservation →"}
                   </button>
                 </form>
               </div>

@@ -680,6 +680,31 @@ export const auditLogs = pgTable(
   ]
 );
 
+export const tourReservations = pgTable(
+  "tour_reservations",
+  {
+    id:                uuid("id").primaryKey().defaultRandom(),
+    reservationNumber: varchar("reservation_number", { length: 32 }).notNull().unique(),
+    tourId:            varchar("tour_id", { length: 100 }).notNull(),
+    tourTitle:         varchar("tour_title", { length: 255 }).notNull(),
+    tourDate:          date("tour_date").notNull(),
+    guests:            integer("guests").notNull().default(1),
+    travelerName:      varchar("traveler_name", { length: 200 }).notNull(),
+    phoneNumber:       varchar("phone_number", { length: 50 }).notNull(),
+    price:             numeric("price", { precision: 10, scale: 2 }).notNull(),
+    status:            varchar("status", { length: 30 }).notNull().default("pending"),
+    guideName:         varchar("guide_name", { length: 150 }),
+    guidePhone:        varchar("guide_phone", { length: 50 }),
+    adminNotes:        text("admin_notes"),
+    ...timestamps,
+  },
+  (t) => [
+    index("tour_res_status_idx").on(t.status),
+    index("tour_res_date_idx").on(t.tourDate),
+    uniqueIndex("tour_res_number_idx").on(t.reservationNumber),
+  ]
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Type exports — infer insert/select types from schema for use in app code
 // ─────────────────────────────────────────────────────────────────────────────
@@ -717,3 +742,7 @@ export type NewTransferBooking = typeof transferBookings.$inferInsert;
 
 export type AuditLog           = typeof auditLogs.$inferSelect;
 export type NewAuditLog        = typeof auditLogs.$inferInsert;
+
+export type TourReservation    = typeof tourReservations.$inferSelect;
+export type NewTourReservation = typeof tourReservations.$inferInsert;
+
