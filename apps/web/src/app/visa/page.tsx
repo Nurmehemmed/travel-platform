@@ -26,15 +26,15 @@ export default function VisaLandingPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#f5ede0" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
       {/* ═══════════════════════════════════════════════════════ HEADER */}
-      <header className="sticky top-0 z-50 shadow-sm" style={{ backgroundColor: "#133e35" }}>
+      <header className="sticky top-0 z-50 shadow-sm" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#c9a227" }}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
               <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bold text-lg tracking-tight" style={{ color: "#c9a227" }}>
+            <span className="font-bold text-lg tracking-tight" style={{ color: "#f59e0b" }}>
               addmetour
             </span>
             <span className="hidden sm:inline-block ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-white/10 text-white/90">
@@ -47,14 +47,14 @@ export default function VisaLandingPage() {
               href="/visa/track"
               className="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10"
             >
-              <FileText className="h-3.5 w-3.5 text-[#c9a227]" />
+              <FileText className="h-3.5 w-3.5 text-[#f59e0b]" />
               <span className="hidden sm:inline">Track Application</span>
               <span className="sm:hidden">Track</span>
             </Link>
             <Link
               href="/visa/apply"
               className="rounded-full px-4 py-2 text-xs font-semibold transition-all hover:opacity-95 shadow-md"
-              style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+              style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
               Apply Online
             </Link>
@@ -63,17 +63,17 @@ export default function VisaLandingPage() {
       </header>
 
       {/* ═══════════════════════════════════════════════════════ HERO */}
-      <section className="relative overflow-hidden py-16 md:py-24" style={{ backgroundColor: "#133e35" }}>
+      <section className="relative overflow-hidden py-16 md:py-24" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section relative z-10 text-center max-w-3xl mx-auto">
           <span
             className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-4"
-            style={{ borderColor: "#c9a227", color: "#c9a227", backgroundColor: "rgba(201,162,39,0.15)" }}
+            style={{ borderColor: "#f59e0b", color: "#f59e0b", backgroundColor: "rgba(245,158,11,0.15)" }}
           >
             Official ASAN Visa Compatible &middot; Guaranteed Fast Processing
           </span>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
             Azerbaijan Electronic Visa <br />
-            <span style={{ color: "#c9a227" }}>Simplified & Error-Free</span>
+            <span style={{ color: "#f59e0b" }}>Simplified & Error-Free</span>
           </h1>
           <p className="mt-5 text-base sm:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
             Skip bureaucratic errors and confusing portals. Our certified travel specialists pre-screen your passport,
@@ -83,7 +83,7 @@ export default function VisaLandingPage() {
           {/* Quick Eligibility Checker */}
           <div className="mt-10 rounded-2xl bg-white p-4 sm:p-6 shadow-2xl text-left max-w-2xl mx-auto border border-white/20">
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Globe className="h-4 w-4 text-[#133e35]" />
+              <Globe className="h-4 w-4 text-[#0f3460]" />
               Check Your Nationality Eligibility
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -91,7 +91,7 @@ export default function VisaLandingPage() {
                 <select
                   value={selectedCountry}
                   onChange={(e) => handleCheckEligibility(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#133e35] focus:ring-1 focus:ring-[#133e35] cursor-pointer"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460] cursor-pointer"
                 >
                   <option value="">Select your passport country / citizenship...</option>
                   {COUNTRIES.map((c) => (
@@ -114,7 +114,7 @@ export default function VisaLandingPage() {
                     ? "opacity-50 cursor-not-allowed bg-slate-500"
                     : "hover:opacity-90 cursor-pointer shadow-md"
                 }`}
-                style={eligibilityResult?.category !== "visa_free" ? { backgroundColor: "#133e35" } : {}}
+                style={eligibilityResult?.category !== "visa_free" ? { backgroundColor: "#0f3460" } : {}}
               >
                 Apply Now <ArrowRight className="h-4 w-4" />
               </Link>
@@ -170,7 +170,7 @@ export default function VisaLandingPage() {
       <section className="py-20">
         <div className="container-section">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <p className="section-label mb-2" style={{ color: "#c9a227" }}>Transparent Pricing</p>
+            <p className="section-label mb-2" style={{ color: "#f59e0b" }}>Transparent Pricing</p>
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900">
               Choose Your Processing Speed
             </h2>
@@ -235,18 +235,18 @@ export default function VisaLandingPage() {
             {/* Urgent Tier */}
             <div
               className="rounded-3xl p-8 shadow-xl relative overflow-hidden flex flex-col justify-between text-white"
-              style={{ backgroundColor: "#133e35", border: "2px solid #c9a227" }}
+              style={{ backgroundColor: "#0f3460", border: "2px solid #f59e0b" }}
             >
-              <div className="absolute top-0 right-0 bg-[#c9a227] text-[#0f2e27] text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-bl-xl">
+              <div className="absolute top-0 right-0 bg-[#f59e0b] text-[#061225] text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-bl-xl">
                 ⚡ Most Popular for Quick Trips
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="rounded-full bg-white/10 text-[#c9a227] font-semibold px-3 py-1 text-xs uppercase tracking-wider">
+                  <span className="rounded-full bg-white/10 text-[#f59e0b] font-semibold px-3 py-1 text-xs uppercase tracking-wider">
                     Express Service
                   </span>
-                  <div className="flex items-center gap-1 text-xs font-semibold text-[#c9a227]">
+                  <div className="flex items-center gap-1 text-xs font-semibold text-[#f59e0b]">
                     <Clock className="h-3.5 w-3.5" /> Within 3 Hours
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export default function VisaLandingPage() {
 
                 <div className="mb-6 p-4 rounded-2xl bg-white/10 border border-white/10">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-[#c9a227]">$110</span>
+                    <span className="text-4xl font-bold text-[#f59e0b]">$110</span>
                     <span className="text-xs text-white/70 font-medium">USD / applicant</span>
                   </div>
                   <div className="mt-2 text-[11px] text-white/60 flex justify-between border-t border-white/10 pt-2">
@@ -268,24 +268,24 @@ export default function VisaLandingPage() {
 
                 <ul className="space-y-3 text-xs text-white/80 mb-8">
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#c9a227] shrink-0" /> Priority 3-Hour Government Dispatch
+                    <CheckCircle2 className="h-4 w-4 text-[#f59e0b] shrink-0" /> Priority 3-Hour Government Dispatch
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#c9a227] shrink-0" /> Dedicated 24/7 Visa Officer
+                    <CheckCircle2 className="h-4 w-4 text-[#f59e0b] shrink-0" /> Dedicated 24/7 Visa Officer
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#c9a227] shrink-0" /> Instant Telegram / WhatsApp Confirmation
+                    <CheckCircle2 className="h-4 w-4 text-[#f59e0b] shrink-0" /> Instant Telegram / WhatsApp Confirmation
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#c9a227] shrink-0" /> Direct Airport Check-In Ready PDF
+                    <CheckCircle2 className="h-4 w-4 text-[#f59e0b] shrink-0" /> Direct Airport Check-In Ready PDF
                   </li>
                 </ul>
               </div>
 
               <Link
                 href="/visa/apply?type=urgent"
-                className="w-full rounded-2xl py-3.5 text-center text-xs font-semibold text-[#0f2e27] transition-all hover:opacity-95 shadow-lg cursor-pointer"
-                style={{ backgroundColor: "#c9a227" }}
+                className="w-full rounded-2xl py-3.5 text-center text-xs font-semibold text-[#061225] transition-all hover:opacity-95 shadow-lg cursor-pointer"
+                style={{ backgroundColor: "#f59e0b" }}
               >
                 Apply Urgent (3 Hours) &rarr;
               </Link>
@@ -310,7 +310,7 @@ export default function VisaLandingPage() {
               { num: "04", title: "Receive e-Visa PDF", desc: "Download your official electronic visa sent directly to your email." },
             ].map((step) => (
               <div key={step.num} className="p-6 rounded-2xl bg-slate-50 border border-slate-100 relative">
-                <span className="font-display text-3xl font-bold text-[#c9a227]/40 block mb-2">{step.num}</span>
+                <span className="font-display text-3xl font-bold text-[#f59e0b]/40 block mb-2">{step.num}</span>
                 <h4 className="font-bold text-slate-900 text-sm mb-1">{step.title}</h4>
                 <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
               </div>
@@ -320,7 +320,7 @@ export default function VisaLandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ FOOTER */}
-      <footer className="py-10 text-center text-xs text-slate-500" style={{ backgroundColor: "#faf7f2" }}>
+      <footer className="py-10 text-center text-xs text-slate-500" style={{ backgroundColor: "#f0f9ff" }}>
         <p>&copy; {new Date().getFullYear()} AddmeTour &middot; Official Partner for Azerbaijan Travel & e-Visa Assistance.</p>
         <p className="mt-1">Compatible with the State Agency for Public Service and Social Innovations under the President of the Republic of Azerbaijan (ASAN Visa).</p>
       </footer>

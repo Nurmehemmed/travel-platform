@@ -23,31 +23,31 @@ export default function FloatingVisaButton() {
       <Link
         href="/visa"
         className="group relative flex items-center gap-2 rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-2xl transition-all duration-300 hover:scale-105"
-        style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+        style={{ backgroundColor: "#0ea5e9", color: "#ffffff" }}
       >
         {/* Continuous pulse ring */}
         <span
           className="absolute inset-0 rounded-xl sm:rounded-2xl animate-ping opacity-20 pointer-events-none"
-          style={{ backgroundColor: "#c9a227" }}
+          style={{ backgroundColor: "#0ea5e9" }}
         />
 
         {/* Icon container */}
         <div
           className="relative z-10 flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg sm:rounded-xl shadow-sm"
-          style={{ backgroundColor: "#0f2e27" }}
+          style={{ backgroundColor: "#0f3460" }}
         >
-          <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: "#c9a227" }} />
+          <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: "#38bdf8" }} />
         </div>
 
         {/* Label */}
         <div className="relative z-10 flex flex-col leading-tight">
           <span
             className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider"
-            style={{ color: "#0f2e27" }}
+            style={{ color: "#ffffff" }}
           >
             Azerbaijan
           </span>
-          <span className="text-xs sm:text-sm font-black" style={{ color: "#0f2e27" }}>
+          <span className="text-xs sm:text-sm font-black" style={{ color: "#ffffff" }}>
             e-Visa ↗
           </span>
         </div>
@@ -55,7 +55,7 @@ export default function FloatingVisaButton() {
         {/* Speed badge */}
         <span
           className="relative z-10 self-start rounded-full px-1.5 py-0.5 text-[8px] sm:text-[9px] font-black uppercase tracking-wider whitespace-nowrap"
-          style={{ backgroundColor: "#0f2e27", color: "#c9a227" }}
+          style={{ backgroundColor: "#0f3460", color: "#38bdf8" }}
         >
           3 hrs
         </span>

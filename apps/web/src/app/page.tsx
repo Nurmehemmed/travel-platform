@@ -52,7 +52,7 @@ const TOURS = [
   {
     id: "t1",
     badge: "Best Seller",
-    badgeColor: "bg-[#c9a227] text-[#0f2e27] font-bold shadow-sm",
+    badgeColor: "bg-[#f59e0b] text-[#061225] font-bold shadow-sm",
     image: "/images/baku-old-city.jpg",
     tags: ["Walking", "History", "Culture"],
     rating: 4.9,
@@ -454,17 +454,17 @@ export default function HomePage() {
   const activeHeroSlide = HERO_SLIDES[currentSlide] ?? HERO_SLIDES[0]!;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#f5ede0" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
 
       {/* ═══════════════════════════════════════════════════════ NAVBAR */}
-      <header className="sticky top-0 z-50" style={{ backgroundColor: "#133e35" }}>
+      <header className="sticky top-0 z-50" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#c9a227" }}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
               <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bold text-lg tracking-tight" style={{ color: "#c9a227" }}>
+            <span className="font-bold text-lg tracking-tight" style={{ color: "#f59e0b" }}>
               addmetour
             </span>
           </Link>
@@ -491,19 +491,19 @@ export default function HomePage() {
             <Link
               href="/visa"
               className="relative flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-amber-400/30 group"
-              style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+              style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
               {/* Pulse ring */}
               <span
                 className="absolute inset-0 rounded-full animate-ping opacity-30"
-                style={{ backgroundColor: "#c9a227" }}
+                style={{ backgroundColor: "#f59e0b" }}
               />
               <FileText className="h-3.5 w-3.5 relative z-10" />
               <span className="relative z-10">e-Visa</span>
               {/* "Fast" badge */}
               <span
                 className="relative z-10 ml-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider"
-                style={{ backgroundColor: "#0f2e27", color: "#c9a227" }}
+                style={{ backgroundColor: "#061225", color: "#f59e0b" }}
               >
                 Fast
               </span>
@@ -528,14 +528,14 @@ export default function HomePage() {
             >
               <Heart
                 className={`h-4 w-4 transition-colors ${
-                  savedTourIds.length > 0 ? "fill-[#c9a227] text-[#c9a227]" : "text-white/80"
+                  savedTourIds.length > 0 ? "fill-[#f59e0b] text-[#f59e0b]" : "text-white/80"
                 }`}
               />
               <span className="hidden sm:inline">Saved</span>
               {savedTourIds.length > 0 && (
                 <span
                   className="flex h-4 min-w-4 items-center justify-center rounded-full text-[10px] font-bold px-1"
-                  style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+                  style={{ backgroundColor: "#f59e0b", color: "#061225" }}
                 >
                   {savedTourIds.length}
                 </span>
@@ -547,11 +547,11 @@ export default function HomePage() {
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="flex items-center gap-2 rounded-full py-1.5 px-3 transition-colors hover:bg-white/10 cursor-pointer"
-                  style={{ border: "1px solid rgba(201, 162, 39, 0.4)" }}
+                  style={{ border: "1px solid rgba(245, 158, 11, 0.4)" }}
                 >
                   <div
                     className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
-                    style={{ backgroundColor: "#c9a227" }}
+                    style={{ backgroundColor: "#f59e0b" }}
                   >
                     {currentUser.name
                       ? currentUser.name.charAt(0).toUpperCase()
@@ -567,8 +567,8 @@ export default function HomePage() {
                   <div
                     className="absolute right-0 top-full mt-2 w-56 rounded-2xl p-2 shadow-2xl z-50 animate-scale-up"
                     style={{
-                      backgroundColor: "#faf7f2",
-                      border: "1px solid #e8dfd5",
+                      backgroundColor: "#f0f9ff",
+                      border: "1px solid #e0f2fe",
                     }}
                   >
                     <div className="px-3 py-2 border-b border-slate-200/80 mb-1">
@@ -585,9 +585,9 @@ export default function HomePage() {
                         href="/admin"
                         onClick={() => setUserDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-white transition-opacity hover:opacity-90 mb-1 shadow-sm"
-                        style={{ backgroundColor: "#133e35" }}
+                        style={{ backgroundColor: "#0f3460" }}
                       >
-                        <Shield className="h-3.5 w-3.5 text-[#c9a227]" />
+                        <Shield className="h-3.5 w-3.5 text-[#f59e0b]" />
                         Admin Portal
                       </Link>
                     )}
@@ -603,7 +603,7 @@ export default function HomePage() {
                       className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-black/5 transition-colors cursor-pointer text-left"
                     >
                       <span className="flex items-center gap-2">
-                        <Bookmark className="h-3.5 w-3.5 text-[#c9a227]" />
+                        <Bookmark className="h-3.5 w-3.5 text-[#f59e0b]" />
                         Saved Tours
                       </span>
                       {savedTourIds.length > 0 && (
@@ -644,7 +644,7 @@ export default function HomePage() {
                     setIsAuthOpen(true);
                   }}
                   className="rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer"
-                  style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+                  style={{ backgroundColor: "#f59e0b", color: "#061225" }}
                 >
                   Sign Up
                 </button>
@@ -665,7 +665,7 @@ export default function HomePage() {
 
         {/* Mobile slide-down navigation drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#133e35] animate-fade-in shadow-xl">
+          <div className="md:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
             <div className="flex flex-col space-y-1">
               {[
                 { label: "Tours", href: "#tours" },
@@ -689,13 +689,13 @@ export default function HomePage() {
                 href="/visa"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm shadow-md mt-2 transition-transform active:scale-98"
-                style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+                style={{ backgroundColor: "#f59e0b", color: "#061225" }}
               >
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   <span>Azerbaijan e-Visa</span>
                 </div>
-                <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#0f2e27] text-[#c9a227]">
+                <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#061225] text-[#f59e0b]">
                   Fast 3h
                 </span>
               </Link>
@@ -738,7 +738,7 @@ export default function HomePage() {
           <div key={`badge-${currentSlide}`} className="animate-fade-in pointer-events-auto">
             <span
               className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-6 backdrop-blur-md shadow-sm"
-              style={{ borderColor: "#c9a227", color: "#c9a227", backgroundColor: "rgba(201,162,39,0.22)" }}
+              style={{ borderColor: "#f59e0b", color: "#f59e0b", backgroundColor: "rgba(245,158,11,0.22)" }}
             >
               {activeHeroSlide.badge}
             </span>
@@ -765,7 +765,7 @@ export default function HomePage() {
             <Link
               href={activeHeroSlide.primaryCta.href}
               className="rounded-full px-8 py-3.5 font-semibold text-sm transition-all duration-200 hover:opacity-95 hover:scale-105 hover:shadow-2xl shadow-lg"
-              style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+              style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
               {activeHeroSlide.primaryCta.text}
             </Link>
@@ -812,7 +812,7 @@ export default function HomePage() {
                 style={{
                   width: i === currentSlide ? "2.25rem" : "0.5rem",
                   height: "0.5rem",
-                  backgroundColor: i === currentSlide ? "#c9a227" : "rgba(255,255,255,0.45)",
+                  backgroundColor: i === currentSlide ? "#f59e0b" : "rgba(255,255,255,0.45)",
                 }}
               />
             </button>
@@ -821,7 +821,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ STATS */}
-      <div style={{ backgroundColor: "#133e35" }}>
+      <div style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
             {[
@@ -831,7 +831,7 @@ export default function HomePage() {
               { value: "4.9★", label: "TripAdvisor Rating" },
             ].map((stat) => (
               <div key={stat.label} className="flex flex-col items-center py-6 px-4 text-center">
-                <span className="font-display text-2xl font-bold" style={{ color: "#c9a227" }}>
+                <span className="font-display text-2xl font-bold" style={{ color: "#f59e0b" }}>
                   {stat.value}
                 </span>
                 <span className="mt-1 text-xs text-white/60">{stat.label}</span>
@@ -842,7 +842,7 @@ export default function HomePage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════ SEARCH BAR */}
-      <div style={{ backgroundColor: "#f5ede0" }} className="py-10">
+      <div style={{ backgroundColor: "#f0f9ff" }} className="py-10">
         <div className="container-section">
           <div className="mx-auto max-w-2xl rounded-2xl bg-white shadow-card p-3 flex flex-col sm:flex-row gap-3">
             <div className="flex flex-1 items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
@@ -874,7 +874,7 @@ export default function HomePage() {
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
               className="flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 cursor-pointer"
-              style={{ backgroundColor: "#133e35" }}
+              style={{ backgroundColor: "#0f3460" }}
             >
               <Search className="h-4 w-4" />
               Search
@@ -884,7 +884,7 @@ export default function HomePage() {
       </div>
 
       {/* ═══════════════════════════════════════════════════════ POPULAR TOURS */}
-      <section id="tours" className="py-16" style={{ backgroundColor: "#f5ede0" }}>
+      <section id="tours" className="py-16" style={{ backgroundColor: "#f0f9ff" }}>
         <div className="container-section">
           {/* Header + Filter tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
@@ -902,7 +902,7 @@ export default function HomePage() {
                   className="rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
                   style={
                     activeFilter === f
-                      ? { backgroundColor: "#133e35", color: "#ffffff" }
+                      ? { backgroundColor: "#0f3460", color: "#ffffff" }
                       : { backgroundColor: "#ffffff", color: "#4a5568", border: "1px solid #e2d8cc" }
                   }
                 >
@@ -915,14 +915,14 @@ export default function HomePage() {
                 className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
                 style={
                   activeFilter === "Saved"
-                    ? { backgroundColor: "#133e35", color: "#ffffff" }
+                    ? { backgroundColor: "#0f3460", color: "#ffffff" }
                     : { backgroundColor: "#ffffff", color: "#4a5568", border: "1px solid #e2d8cc" }
                 }
               >
                 <Heart
                   className={`h-3.5 w-3.5 transition-colors ${
                     activeFilter === "Saved"
-                      ? "fill-[#c9a227] text-[#c9a227]"
+                      ? "fill-[#f59e0b] text-[#f59e0b]"
                       : savedTourIds.length > 0
                       ? "fill-red-500 text-red-500"
                       : "text-slate-400"
@@ -1017,8 +1017,8 @@ export default function HomePage() {
                         <Star
                           key={s}
                           className="h-3.5 w-3.5"
-                          fill={s <= Math.floor(tour.rating) ? "#c9a227" : "none"}
-                          stroke="#c9a227"
+                          fill={s <= Math.floor(tour.rating) ? "#f59e0b" : "none"}
+                          stroke="#f59e0b"
                           strokeWidth={1.5}
                         />
                       ))}
@@ -1055,13 +1055,13 @@ export default function HomePage() {
                         )}
                         <p className="text-lg font-bold text-slate-900">
                           <span className="text-sm font-normal text-slate-500">From </span>
-                          <span style={{ color: "#133e35" }}>${tour.price}</span>
+                          <span style={{ color: "#0f3460" }}>${tour.price}</span>
                           <span className="text-xs font-normal text-slate-500"> / person</span>
                         </p>
                       </div>
                       <button
                         className="rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer"
-                        style={{ backgroundColor: "#133e35" }}
+                        style={{ backgroundColor: "#0f3460" }}
                       >
                         Book Now
                       </button>
@@ -1072,7 +1072,7 @@ export default function HomePage() {
             ) : (
               <div className="col-span-full py-16 px-6 text-center bg-white rounded-2xl border border-[#e2d8cc] max-w-md mx-auto shadow-sm">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 mb-4">
-                  <Bookmark className="h-7 w-7 text-[#c9a227]" />
+                  <Bookmark className="h-7 w-7 text-[#f59e0b]" />
                 </div>
                 <h3 className="font-display text-xl font-bold text-slate-900 mb-2">
                   {activeFilter === "Saved" ? "No Saved Tours Yet" : "No Tours Found"}
@@ -1088,7 +1088,7 @@ export default function HomePage() {
                     setSearchQuery("");
                   }}
                   className="rounded-full px-6 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-95 cursor-pointer"
-                  style={{ backgroundColor: "#133e35" }}
+                  style={{ backgroundColor: "#0f3460" }}
                 >
                   Explore All Tours
                 </button>
@@ -1099,17 +1099,17 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ WHY TRAVEL WITH US */}
-      <section id="about" className="py-20" style={{ backgroundColor: "#133e35" }}>
+      <section id="about" className="py-20" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Left: Text + Features */}
             <div>
-              <p className="section-label mb-4" style={{ color: "#c9a227" }}>
+              <p className="section-label mb-4" style={{ color: "#f59e0b" }}>
                 Why Travel With Us
               </p>
               <h2 className="font-display text-4xl font-bold text-white leading-tight mb-6">
                 We Don&apos;t Just Show You Azerbaijan.{" "}
-                <span style={{ color: "#c9a227" }}>We Make You Feel It.</span>
+                <span style={{ color: "#f59e0b" }}>We Make You Feel It.</span>
               </h2>
               <p className="text-white/70 leading-relaxed mb-10">
                 AddmeTour is a Baku-based boutique travel agency founded by passionate local
@@ -1127,9 +1127,9 @@ export default function HomePage() {
                     <div className="flex items-center gap-3 mb-2">
                       <div
                         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                        style={{ backgroundColor: "rgba(201,162,39,0.20)" }}
+                        style={{ backgroundColor: "rgba(245,158,11,0.20)" }}
                       >
-                        <f.icon className="h-4 w-4" style={{ color: "#c9a227" }} />
+                        <f.icon className="h-4 w-4" style={{ color: "#f59e0b" }} />
                       </div>
                       <h3 className="text-sm font-semibold text-white">{f.title}</h3>
                     </div>
@@ -1177,10 +1177,10 @@ export default function HomePage() {
               {/* TripAdvisor badge */}
               <div
                 className="absolute bottom-28 right-4 flex flex-col items-center justify-center rounded-2xl px-4 py-3 shadow-xl"
-                style={{ backgroundColor: "#c9a227" }}
+                style={{ backgroundColor: "#f59e0b" }}
               >
-                <span className="text-2xl font-bold text-[#0f2e27]">4.9</span>
-                <span className="text-xs font-bold text-[#0f2e27]/90">TripAdvisor</span>
+                <span className="text-2xl font-bold text-[#061225]">4.9</span>
+                <span className="text-xs font-bold text-[#061225]/90">TripAdvisor</span>
               </div>
             </div>
           </div>
@@ -1188,7 +1188,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ WHERE WILL YOU GO */}
-      <section id="destinations" className="py-20" style={{ backgroundColor: "#f5ede0" }}>
+      <section id="destinations" className="py-20" style={{ backgroundColor: "#f0f9ff" }}>
         <div className="container-section">
           <div className="text-center mb-12">
             <p className="section-label mb-3">Explore Azerbaijan</p>
@@ -1217,7 +1217,7 @@ export default function HomePage() {
                   <p className="text-sm text-white/70 mt-0.5">{dest.subtitle}</p>
                   <span
                     className="mt-2 inline-flex items-center gap-1 text-xs font-semibold transition-all group-hover:gap-2"
-                    style={{ color: "#c9a227" }}
+                    style={{ color: "#f59e0b" }}
                   >
                     {dest.tours} tours <ArrowRight className="h-3 w-3" />
                   </span>
@@ -1229,7 +1229,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ TESTIMONIALS */}
-      <section id="reviews" className="py-20" style={{ backgroundColor: "#f5ede0" }}>
+      <section id="reviews" className="py-20" style={{ backgroundColor: "#f0f9ff" }}>
         <div className="container-section">
           {/* Header */}
           <div className="text-center mb-12">
@@ -1245,8 +1245,8 @@ export default function HomePage() {
                   <Star
                     key={s}
                     className="h-4 w-4"
-                    fill="#c9a227"
-                    stroke="#c9a227"
+                    fill="#f59e0b"
+                    stroke="#f59e0b"
                   />
                 ))}
               </div>
@@ -1287,7 +1287,7 @@ export default function HomePage() {
                   <div className="flex items-center gap-3">
                     <div
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
-                      style={{ backgroundColor: "#133e35" }}
+                      style={{ backgroundColor: "#0f3460" }}
                     >
                       {t.initials}
                     </div>
@@ -1306,8 +1306,8 @@ export default function HomePage() {
                       <Star
                         key={s}
                         className="h-3 w-3"
-                        fill="#c9a227"
-                        stroke="#c9a227"
+                        fill="#f59e0b"
+                        stroke="#f59e0b"
                       />
                     ))}
                   </div>
@@ -1325,7 +1325,7 @@ export default function HomePage() {
             <p className="section-label mb-3">
               Common Questions
             </p>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4" style={{ color: "#133e35" }}>
+            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4" style={{ color: "#0f3460" }}>
               Frequently Asked Questions
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto text-base md:text-lg">
@@ -1342,7 +1342,7 @@ export default function HomePage() {
                   className="rounded-2xl border transition-all duration-200 overflow-hidden"
                   style={{
                     backgroundColor: "#ffffff",
-                    borderColor: isOpen ? "#c9a227" : "#e8dfd2",
+                    borderColor: isOpen ? "#f59e0b" : "#e8dfd2",
                     boxShadow: isOpen
                       ? "0 10px 25px -5px rgba(19, 62, 53, 0.08)"
                       : "0 1px 3px rgba(0,0,0,0.03)",
@@ -1355,7 +1355,7 @@ export default function HomePage() {
                   >
                     <span
                       className="font-semibold text-base md:text-lg transition-colors"
-                      style={{ color: isOpen ? "#133e35" : "#1e293b" }}
+                      style={{ color: isOpen ? "#0f3460" : "#1e293b" }}
                     >
                       {faq.question}
                     </span>
@@ -1364,8 +1364,8 @@ export default function HomePage() {
                         isOpen ? "rotate-180" : ""
                       }`}
                       style={{
-                        backgroundColor: isOpen ? "#133e35" : "#f5ede0",
-                        color: isOpen ? "#ffffff" : "#133e35",
+                        backgroundColor: isOpen ? "#0f3460" : "#f0f9ff",
+                        color: isOpen ? "#ffffff" : "#0f3460",
                       }}
                     >
                       <ChevronDown className="h-4 w-4" />
@@ -1384,7 +1384,7 @@ export default function HomePage() {
 
           <div
             className="mt-12 text-center p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4"
-            style={{ backgroundColor: "#f0e7d8", border: "1px dashed #c9a227" }}
+            style={{ backgroundColor: "#f0e7d8", border: "1px dashed #f59e0b" }}
           >
             <div className="text-left">
               <h3 className="font-bold text-slate-900 text-base">Have a question not answered here?</h3>
@@ -1397,9 +1397,9 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity shrink-0"
-              style={{ backgroundColor: "#133e35" }}
+              style={{ backgroundColor: "#0f3460" }}
             >
-              <MessageCircle className="h-4 w-4 text-[#c9a227]" />
+              <MessageCircle className="h-4 w-4 text-[#f59e0b]" />
               Chat on WhatsApp
             </a>
           </div>
@@ -1407,13 +1407,13 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ CTA BANNER */}
-      <section className="py-20 relative overflow-hidden" style={{ backgroundColor: "#133e35" }}>
+      <section className="py-20 relative overflow-hidden" style={{ backgroundColor: "#0f3460" }}>
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute -top-20 -left-20 h-80 w-80 rounded-full" style={{ backgroundColor: "#c9a227", filter: "blur(80px)" }} />
-          <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full" style={{ backgroundColor: "#c9a227", filter: "blur(80px)" }} />
+          <div className="absolute -top-20 -left-20 h-80 w-80 rounded-full" style={{ backgroundColor: "#f59e0b", filter: "blur(80px)" }} />
+          <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full" style={{ backgroundColor: "#f59e0b", filter: "blur(80px)" }} />
         </div>
         <div className="container-section relative z-10 text-center">
-          <p className="section-label mb-4" style={{ color: "#c9a227" }}>Ready to Explore?</p>
+          <p className="section-label mb-4" style={{ color: "#f59e0b" }}>Ready to Explore?</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
             Book Your Dream Tour Today
           </h2>
@@ -1424,7 +1424,7 @@ export default function HomePage() {
             <Link
               href="#tours"
               className="rounded-full px-8 py-4 font-semibold text-sm transition-all duration-200 hover:opacity-90 hover:scale-105 hover:shadow-xl"
-              style={{ backgroundColor: "#c9a227", color: "#0f2e27" }}
+              style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
               Browse All Tours
             </Link>
@@ -1442,14 +1442,14 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ FOOTER */}
-      <footer style={{ backgroundColor: "#0f2e27" }} className="py-12">
+      <footer style={{ backgroundColor: "#061225" }} className="py-12">
         <div className="container-section">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#c9a227" }}>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
                 <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
               </div>
-              <span className="font-bold text-lg" style={{ color: "#c9a227" }}>addmetour</span>
+              <span className="font-bold text-lg" style={{ color: "#f59e0b" }}>addmetour</span>
             </div>
             <p className="text-sm text-white/70">
               © 2025 AddmeTour. All rights reserved.
@@ -1508,8 +1508,8 @@ export default function HomePage() {
           <div
             className="relative w-full max-w-[440px] rounded-3xl p-8 shadow-2xl animate-scale-up"
             style={{
-              backgroundColor: "#faf7f2",
-              border: "1px solid #e8dfd5",
+              backgroundColor: "#f0f9ff",
+              border: "1px solid #e0f2fe",
               boxShadow: "0 25px 50px -12px rgba(15, 23, 42, 0.25)",
             }}
           >
@@ -1526,11 +1526,11 @@ export default function HomePage() {
             <div className="flex items-center gap-2 mb-6">
               <div
                 className="flex h-7 w-7 items-center justify-center rounded-full"
-                style={{ backgroundColor: "#c9a227" }}
+                style={{ backgroundColor: "#f59e0b" }}
               >
                 <MapPin className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
               </div>
-              <span className="font-bold text-base tracking-tight" style={{ color: "#c9a227" }}>
+              <span className="font-bold text-base tracking-tight" style={{ color: "#f59e0b" }}>
                 addmetour
               </span>
             </div>
@@ -1549,7 +1549,7 @@ export default function HomePage() {
                     ? "text-white shadow-sm"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
-                style={authMode === "login" ? { backgroundColor: "#133e35" } : {}}
+                style={authMode === "login" ? { backgroundColor: "#0f3460" } : {}}
               >
                 Log In
               </button>
@@ -1565,7 +1565,7 @@ export default function HomePage() {
                     ? "text-white shadow-sm"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
-                style={authMode === "signup" ? { backgroundColor: "#133e35" } : {}}
+                style={authMode === "signup" ? { backgroundColor: "#0f3460" } : {}}
               >
                 Sign Up
               </button>
@@ -1648,7 +1648,7 @@ export default function HomePage() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-[#e2d8cc]" />
               </div>
-              <span className="relative bg-[#faf7f2] px-3 text-[11px] text-slate-400">
+              <span className="relative bg-[#f0f9ff] px-3 text-[11px] text-slate-400">
                 or continue with email
               </span>
             </div>
@@ -1663,7 +1663,7 @@ export default function HomePage() {
                     placeholder="Full name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#133e35] transition-colors"
+                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460] transition-colors"
                   />
                 </div>
               )}
@@ -1675,7 +1675,7 @@ export default function HomePage() {
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#133e35] transition-colors"
+                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460] transition-colors"
                 />
               </div>
 
@@ -1687,7 +1687,7 @@ export default function HomePage() {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 pr-10 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#133e35] transition-colors"
+                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 pr-10 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460] transition-colors"
                   />
                   <button
                     type="button"
@@ -1703,7 +1703,7 @@ export default function HomePage() {
                     <button
                       type="button"
                       className="text-[11px] font-semibold hover:underline cursor-pointer"
-                      style={{ color: "#c9a227" }}
+                      style={{ color: "#f59e0b" }}
                     >
                       Forgot password?
                     </button>
@@ -1715,7 +1715,7 @@ export default function HomePage() {
                 type="submit"
                 disabled={authLoading}
                 className="w-full flex items-center justify-center gap-2 rounded-xl py-3 px-4 text-xs font-semibold text-white transition-all duration-200 hover:opacity-95 shadow-md cursor-pointer mt-3 disabled:opacity-70"
-                style={{ backgroundColor: "#133e35" }}
+                style={{ backgroundColor: "#0f3460" }}
               >
                 {authLoading && <Loader2 className="h-4 w-4 animate-spin text-white" />}
                 {authMode === "login"
@@ -1742,7 +1742,7 @@ export default function HomePage() {
                       setSocialNotice(null);
                     }}
                     className="font-semibold hover:underline cursor-pointer"
-                    style={{ color: "#c9a227" }}
+                    style={{ color: "#f59e0b" }}
                   >
                     Sign up free
                   </button>
@@ -1758,7 +1758,7 @@ export default function HomePage() {
                       setSocialNotice(null);
                     }}
                     className="font-semibold hover:underline cursor-pointer"
-                    style={{ color: "#c9a227" }}
+                    style={{ color: "#f59e0b" }}
                   >
                     Log in
                   </button>
@@ -1772,7 +1772,7 @@ export default function HomePage() {
       {/* Floating Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 rounded-2xl bg-slate-900/95 text-white px-4 py-3 shadow-2xl backdrop-blur-md border border-white/10 animate-fade-in pointer-events-none">
-          <Heart className="h-4 w-4 text-[#c9a227] fill-[#c9a227]" />
+          <Heart className="h-4 w-4 text-[#f59e0b] fill-[#f59e0b]" />
           <span className="text-sm font-medium">{toastMessage}</span>
         </div>
       )}

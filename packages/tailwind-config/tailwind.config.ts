@@ -2,47 +2,60 @@ import type { Config } from "tailwindcss";
 
 /**
  * Shared Tailwind CSS preset for the travel-platform monorepo.
- * Design tokens match the addmetour design: deep forest-green primary,
- * warm gold accent, and a creamy off-white surface palette.
+ * Design tokens: deep navy primary, sky-blue accent, amber gold highlights.
+ * Updated from forest-green to sky/navy palette per brand refresh.
  */
 const config: Omit<Config, "content"> = {
   theme: {
     extend: {
       colors: {
-        // Brand primaries — deep forest / teal green family
+        // Brand primaries — deep navy / ocean blue family
         brand: {
-          50:  "#edfaf5",
-          100: "#d0f0e4",
-          200: "#a4e0cb",
-          300: "#6bc9af",
-          400: "#3aae94",
-          500: "#1d7a65",
-          600: "#196456",
-          700: "#164f44",
-          800: "#133e35",  // primary CTA / navbar bg
-          900: "#0f2e27",
-          950: "#081a16",
+          50:  "#eff6ff",
+          100: "#dbeafe",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#1e6fa5",  // mid-blue
+          600: "#1a5f8e",
+          700: "#164f78",
+          800: "#0f3460",  // primary CTA / navbar bg
+          900: "#061225",  // deep navy
+          950: "#03090f",
         },
-        // Accent — warm gold / amber for prices, highlights & CTAs
+        // Accent — warm amber/gold for prices, highlights & CTAs
         accent: {
-          50:  "#fefbf0",
-          100: "#fef4d3",
-          200: "#fde7a6",
-          300: "#fcd46f",
-          400: "#f9be3e",
-          500: "#c9a227",  // primary gold accent
-          600: "#b08a1a",
-          700: "#8e6d12",
-          800: "#6e540e",
-          900: "#523f0b",
+          50:  "#fffbeb",
+          100: "#fef3c7",
+          200: "#fde68a",
+          300: "#fcd34d",
+          400: "#fbbf24",
+          500: "#f59e0b",  // primary amber accent
+          600: "#d97706",
+          700: "#b45309",
+          800: "#92400e",
+          900: "#78350f",
+        },
+        // Sky-blue highlights
+        sky: {
+          50:  "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9",  // sky-blue accent
+          600: "#0284c7",
+          700: "#0369a1",
+          800: "#075985",
+          900: "#0c4a6e",
         },
         // Semantic surface colors
         surface: {
           DEFAULT: "#ffffff",
-          cream:   "#f5ede0",
-          muted:   "#faf6ef",
-          subtle:  "#f1ebe0",
-          dark:    "#133e35",
+          sky:     "#f0f9ff",
+          muted:   "#f8faff",
+          subtle:  "#e8f4fd",
+          dark:    "#0f3460",
         },
       },
       fontFamily: {
@@ -57,8 +70,10 @@ const config: Omit<Config, "content"> = {
       boxShadow: {
         card:         "0 4px 24px -4px rgba(15, 23, 42, 0.10), 0 1px 4px -1px rgba(15, 23, 42, 0.05)",
         "card-hover": "0 16px 48px -8px rgba(15, 23, 42, 0.18), 0 2px 8px -2px rgba(15, 23, 42, 0.08)",
-        glass:        "0 8px 32px 0 rgba(15, 23, 42, 0.12)",
-        gold:         "0 4px 20px -2px rgba(201, 162, 39, 0.40)",
+        glass:        "0 8px 32px 0 rgba(15, 52, 96, 0.12)",
+        gold:         "0 4px 20px -2px rgba(245, 158, 11, 0.45)",
+        sky:          "0 4px 20px -2px rgba(14, 165, 233, 0.40)",
+        navy:         "0 8px 32px -4px rgba(15, 52, 96, 0.35)",
       },
       keyframes: {
         "fade-in": {

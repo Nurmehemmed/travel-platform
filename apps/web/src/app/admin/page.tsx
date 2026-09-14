@@ -435,7 +435,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
       {/* ═══════════════════════════════════════════════════════ SIDEBAR */}
       <aside
         className="w-full md:w-64 shrink-0 flex flex-col justify-between border-r shadow-sm md:min-h-screen"
-        style={{ backgroundColor: "#133e35", borderColor: "rgba(201, 162, 39, 0.2)" }}
+        style={{ backgroundColor: "#0f3460", borderColor: "rgba(14, 165, 233, 0.2)" }}
       >
         <div>
           {/* Brand Header */}
@@ -443,12 +443,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             <Link href="/" className="flex items-center gap-2.5 group">
               <div
                 className="flex h-9 w-9 items-center justify-center rounded-full shadow-md"
-                style={{ backgroundColor: "#c9a227" }}
+                style={{ backgroundColor: "#f59e0b" }}
               >
                 <MapPin className="h-5 w-5 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <span className="font-bold text-lg tracking-tight block text-[#c9a227] leading-tight">
+                <span className="font-bold text-lg tracking-tight block text-[#f59e0b] leading-tight">
                   addmetour
                 </span>
                 <span className="text-[10px] uppercase tracking-widest text-white/60 font-semibold">
@@ -497,10 +497,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       ? "text-slate-900 shadow-md"
                       : "text-white/80 hover:text-white hover:bg-white/10"
                   }`}
-                  style={isActive ? { backgroundColor: "#c9a227" } : {}}
+                  style={isActive ? { backgroundColor: "#f59e0b" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`h-4 w-4 ${isActive ? "text-slate-900" : "text-[#c9a227]"}`} />
+                    <Icon className={`h-4 w-4 ${isActive ? "text-slate-900" : "text-[#f59e0b]"}`} />
                     <span>{tab.label}</span>
                   </div>
 
@@ -525,7 +525,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
           <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2.5">
             <div
               className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white shrink-0"
-              style={{ backgroundColor: "#c9a227" }}
+              style={{ backgroundColor: "#f59e0b" }}
             >
               ADM
             </div>
@@ -588,7 +588,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               disabled={refreshing}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
             >
-              <RefreshCw className={`h-3.5 w-3.5 text-[#c9a227] ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-3.5 w-3.5 text-[#f59e0b] ${refreshing ? "animate-spin" : ""}`} />
               Refresh Data
             </button>
 
@@ -598,9 +598,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: "#133e35" }}
+                style={{ backgroundColor: "#0f3460" }}
               >
-                <ExternalLink className="h-3.5 w-3.5 text-[#c9a227]" />
+                <ExternalLink className="h-3.5 w-3.5 text-[#f59e0b]" />
                 Open Official evisa.gov.az
               </a>
             )}
@@ -609,9 +609,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               <button
                 onClick={() => setIsNewTourOpen(true)}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
-                style={{ backgroundColor: "#133e35" }}
+                style={{ backgroundColor: "#0f3460" }}
               >
-                <Plus className="h-4 w-4 text-[#c9a227]" />
+                <Plus className="h-4 w-4 text-[#f59e0b]" />
                 Add New Tour
               </button>
             )}
@@ -635,7 +635,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div
                   className="rounded-2xl p-5 border bg-white shadow-sm flex flex-col justify-between"
-                  style={{ borderColor: "#e8dfd5" }}
+                  style={{ borderColor: "#e0f2fe" }}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -657,7 +657,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div
                   className="rounded-2xl p-5 border bg-white shadow-sm flex flex-col justify-between"
-                  style={{ borderColor: "#e8dfd5" }}
+                  style={{ borderColor: "#e0f2fe" }}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -677,7 +677,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div
                   className="rounded-2xl p-5 border bg-white shadow-sm flex flex-col justify-between"
-                  style={{ borderColor: stats.pendingBookings > 0 ? "#f59e0b" : "#e8dfd5" }}
+                  style={{ borderColor: stats.pendingBookings > 0 ? "#f59e0b" : "#e0f2fe" }}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -710,7 +710,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div
                   className="rounded-2xl p-5 border bg-white shadow-sm flex flex-col justify-between"
-                  style={{ borderColor: "#e8dfd5" }}
+                  style={{ borderColor: "#e0f2fe" }}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -734,7 +734,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Recent Bookings Stream */}
               <div
                 className="rounded-2xl border bg-white shadow-sm overflow-hidden"
-                style={{ borderColor: "#e8dfd5" }}
+                style={{ borderColor: "#e0f2fe" }}
               >
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
                   <div>
@@ -747,7 +747,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   </div>
                   <button
                     onClick={() => setActiveTab("bookings")}
-                    className="text-xs font-semibold text-[#c9a227] hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-[#f59e0b] hover:underline cursor-pointer"
                   >
                     View all bookings →
                   </button>
@@ -827,7 +827,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
           {activeTab === "tours" && (
             <div
               className="rounded-2xl border bg-white shadow-sm overflow-hidden"
-              style={{ borderColor: "#e8dfd5" }}
+              style={{ borderColor: "#e0f2fe" }}
             >
               <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -847,7 +847,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       placeholder="Search tours..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-8 pr-4 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-[#133e35]"
+                      className="pl-8 pr-4 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-[#0f3460]"
                     />
                   </div>
                 </div>
@@ -907,7 +907,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           <td className="px-6 py-4">
                             <span
                               className="px-2.5 py-1 rounded-full text-[10px] font-semibold"
-                              style={{ backgroundColor: "#f5ede0", color: "#133e35" }}
+                              style={{ backgroundColor: "#f0f9ff", color: "#0f3460" }}
                             >
                               {t.destinationName || "Azerbaijan"}
                             </span>
@@ -969,7 +969,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
           {activeTab === "bookings" && (
             <div
               className="rounded-2xl border bg-white shadow-sm overflow-hidden"
-              style={{ borderColor: "#e8dfd5" }}
+              style={{ borderColor: "#e0f2fe" }}
             >
               <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -1053,7 +1053,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             <select
                               value={b.status}
                               onChange={(e) => handleUpdateBookingStatus(b.id, e.target.value)}
-                              className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#133e35] cursor-pointer"
+                              className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#0f3460] cursor-pointer"
                             >
                               <option value="pending">Pending</option>
                               <option value="confirmed">Confirmed</option>
@@ -1073,7 +1073,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
           {activeTab === "users" && (
             <div
               className="rounded-2xl border bg-white shadow-sm overflow-hidden"
-              style={{ borderColor: "#e8dfd5" }}
+              style={{ borderColor: "#e0f2fe" }}
             >
               <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -1106,7 +1106,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             <div
                               className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
                               style={{
-                                backgroundColor: u.role === "admin" ? "#133e35" : "#c9a227",
+                                backgroundColor: u.role === "admin" ? "#0f3460" : "#f59e0b",
                               }}
                             >
                               {u.name ? u.name.charAt(0).toUpperCase() : u.email.charAt(0).toUpperCase()}
@@ -1140,7 +1140,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           <select
                             value={u.role}
                             onChange={(e) => handleUpdateUserRole(u.id, e.target.value)}
-                            className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#133e35] cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#0f3460] cursor-pointer"
                           >
                             <option value="customer">Customer</option>
                             <option value="agent">Agent</option>
@@ -1163,7 +1163,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div
                     key={d.id}
                     className="rounded-2xl border bg-white overflow-hidden shadow-sm flex flex-col justify-between"
-                    style={{ borderColor: "#e8dfd5" }}
+                    style={{ borderColor: "#e0f2fe" }}
                   >
                     <div className="relative h-44 w-full bg-slate-100">
                       {d.heroImageUrl && (
@@ -1199,23 +1199,23 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             <div className="space-y-6">
               {/* Stat cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-5 rounded-2xl bg-white border border-[#e8dfd5] shadow-sm">
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
                   <span className="text-[11px] font-semibold text-slate-500 uppercase">Total Visa Orders</span>
                   <p className="text-2xl font-bold font-display text-slate-900 mt-1">{visasList.length}</p>
                 </div>
-                <div className="p-5 rounded-2xl bg-white border border-[#e8dfd5] shadow-sm">
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
                   <span className="text-[11px] font-semibold text-amber-600 uppercase">New / Need Review</span>
                   <p className="text-2xl font-bold font-display text-amber-600 mt-1">
                     {visasList.filter((v) => v.status === "received").length}
                   </p>
                 </div>
-                <div className="p-5 rounded-2xl bg-white border border-[#e8dfd5] shadow-sm">
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
                   <span className="text-[11px] font-semibold text-red-600 uppercase">⚡ Urgent 3-Hour Visas</span>
                   <p className="text-2xl font-bold font-display text-red-600 mt-1">
                     {visasList.filter((v) => v.visaType === "urgent").length}
                   </p>
                 </div>
-                <div className="p-5 rounded-2xl bg-white border border-[#e8dfd5] shadow-sm">
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
                   <span className="text-[11px] font-semibold text-emerald-600 uppercase">Approved & Delivered</span>
                   <p className="text-2xl font-bold font-display text-emerald-600 mt-1">
                     {visasList.filter((v) => v.status === "approved").length}
@@ -1224,7 +1224,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               </div>
 
               {/* Filter & Search Bar */}
-              <div className="p-4 rounded-2xl bg-white border border-[#e8dfd5] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="p-4 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-2 w-full sm:w-80 rounded-xl bg-slate-50 border border-slate-200 px-3 py-2">
                   <Search className="h-4 w-4 text-slate-400 shrink-0" />
                   <input
@@ -1243,7 +1243,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       onClick={() => setVisaStatusFilter(st)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
                         visaStatusFilter === st
-                          ? "bg-[#133e35] text-white shadow-sm"
+                          ? "bg-[#0f3460] text-white shadow-sm"
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
@@ -1258,7 +1258,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               </div>
 
               {/* Visas Table */}
-              <div className="rounded-2xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: "#e8dfd5" }}>
+              <div className="rounded-2xl border bg-white shadow-sm overflow-hidden" style={{ borderColor: "#e0f2fe" }}>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs text-slate-700">
                     <thead className="bg-slate-50 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
@@ -1371,7 +1371,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 <button
                                   onClick={() => handleOpenVisaModal(visa)}
                                   className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
-                                  style={{ backgroundColor: "#133e35" }}
+                                  style={{ backgroundColor: "#0f3460" }}
                                 >
                                   Process & Update
                                 </button>
@@ -1397,10 +1397,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Header Context Banner */}
               <div
                 className="rounded-3xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-                style={{ backgroundColor: "#133e35" }}
+                style={{ backgroundColor: "#0f3460" }}
               >
                 <div className="space-y-1 max-w-2xl">
-                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#c9a227]">
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#f59e0b]">
                     <Shield className="h-4 w-4" />
                     Security & Compliance Audit Trail
                   </div>
@@ -1417,7 +1417,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     disabled={refreshing}
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border border-white/15"
                   >
-                    <RefreshCw className={`h-3.5 w-3.5 text-[#c9a227] ${refreshing ? "animate-spin" : ""}`} />
+                    <RefreshCw className={`h-3.5 w-3.5 text-[#f59e0b] ${refreshing ? "animate-spin" : ""}`} />
                     Refresh Logs
                   </button>
                 </div>
@@ -1503,7 +1503,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       placeholder="Search action, entity ID, email, IP..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-9 pr-3.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#133e35]"
+                      className="w-full pl-9 pr-3.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460]"
                     />
                     {searchQuery && (
                       <button
@@ -1653,7 +1653,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
         >
           <div
             className="relative w-full max-w-[520px] rounded-3xl p-8 shadow-2xl animate-scale-up"
-            style={{ backgroundColor: "#faf7f2", border: "1px solid #e8dfd5" }}
+            style={{ backgroundColor: "#f0f9ff", border: "1px solid #e0f2fe" }}
           >
             <button
               onClick={() => setIsNewTourOpen(false)}
@@ -1678,7 +1678,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   placeholder="e.g. Khinalug High Mountain Expedition"
                   value={newTourTitle}
                   onChange={(e) => setNewTourTitle(e.target.value)}
-                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#133e35]"
+                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
                 />
               </div>
 
@@ -1688,7 +1688,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <select
                     value={newTourDestId}
                     onChange={(e) => setNewTourDestId(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3 py-2 text-slate-800 outline-none focus:border-[#133e35]"
+                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
                   >
                     {destinationsList.map((d) => (
                       <option key={d.id} value={d.id}>
@@ -1706,7 +1706,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     required
                     value={newTourDays}
                     onChange={(e) => setNewTourDays(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#133e35]"
+                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
                   />
                 </div>
               </div>
@@ -1721,7 +1721,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     placeholder="99.00"
                     value={newTourBasePrice}
                     onChange={(e) => setNewTourBasePrice(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#133e35]"
+                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
                   />
                 </div>
 
@@ -1733,7 +1733,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     placeholder="79.00"
                     value={newTourPromoPrice}
                     onChange={(e) => setNewTourPromoPrice(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#133e35]"
+                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
                   />
                 </div>
               </div>
@@ -1745,7 +1745,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   placeholder="https://images.unsplash.com/..."
                   value={newTourImage}
                   onChange={(e) => setNewTourImage(e.target.value)}
-                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#133e35]"
+                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
                 />
               </div>
 
@@ -1757,7 +1757,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   placeholder="Describe the highlights and itinerary..."
                   value={newTourOverview}
                   onChange={(e) => setNewTourOverview(e.target.value)}
-                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#133e35]"
+                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
                 />
               </div>
 
@@ -1765,7 +1765,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 type="submit"
                 disabled={createLoading}
                 className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity mt-2 cursor-pointer disabled:opacity-50"
-                style={{ backgroundColor: "#133e35" }}
+                style={{ backgroundColor: "#0f3460" }}
               >
                 {createLoading ? "Creating Tour..." : "Publish Tour Experience"}
               </button>
@@ -1785,7 +1785,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
         >
           <div
             className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-8 shadow-2xl animate-scale-up"
-            style={{ backgroundColor: "#faf7f2", border: "1px solid #e8dfd5" }}
+            style={{ backgroundColor: "#f0f9ff", border: "1px solid #e0f2fe" }}
           >
             <button
               onClick={() => setIsVisaModalOpen(false)}
@@ -1795,7 +1795,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             </button>
 
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono font-bold text-sm text-[#133e35]">
+              <span className="font-mono font-bold text-sm text-[#0f3460]">
                 {selectedVisa.applicationNumber}
               </span>
               <span
@@ -1822,7 +1822,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <span className="font-bold text-slate-900">Applicant Bio Data</span>
                   <button
                     onClick={() => handleCopyAsanFormat(selectedVisa)}
-                    className="flex items-center gap-1 text-[11px] font-bold text-[#133e35] hover:underline cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] font-bold text-[#0f3460] hover:underline cursor-pointer"
                   >
                     <Copy className="h-3 w-3" />
                     Copy for ASAN
@@ -1885,7 +1885,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       href={selectedVisa.passportScanUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#133e35] hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0f3460] hover:underline"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
                       View Uploaded Document
@@ -1954,7 +1954,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     type="submit"
                     disabled={visaUpdateLoading}
                     className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity cursor-pointer disabled:opacity-50"
-                    style={{ backgroundColor: "#133e35" }}
+                    style={{ backgroundColor: "#0f3460" }}
                   >
                     {visaUpdateLoading ? "Updating Application..." : "Save & Update Status"}
                   </button>
