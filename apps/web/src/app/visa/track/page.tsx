@@ -95,17 +95,17 @@ export default function VisaTrackPage() {
       {/* ═══════════════════════════════════════════════════════ HEADER */}
       <header className="border-b border-black/10 py-4" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section flex items-center justify-between">
-          <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90">
+          <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90 shrink-0">
             <ArrowLeft className="h-4 w-4 text-[#f59e0b]" />
             <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
             <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
-          <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white">
+          <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white truncate max-w-[130px] sm:max-w-none">
             {t.nav.trackVisa}
           </span>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSelector variant="dark" />
-            <Link href="/visa/apply" className="text-xs text-[#f59e0b] hover:underline font-semibold">
+            <Link href="/visa/apply" className="text-xs text-[#f59e0b] hover:underline font-semibold shrink-0 whitespace-nowrap">
               <span className="hidden sm:inline">{t.nav.applyVisa}</span>
               <span className="sm:hidden">{t.nav.applyVisa}</span>
             </Link>

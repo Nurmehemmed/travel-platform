@@ -201,19 +201,19 @@ export default function VisaApplyPage() {
       {/* ═══════════════════════════════════════════════════════ HEADER */}
       <header className="border-b border-black/10 py-4" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section flex items-center justify-between">
-          <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90">
+          <Link href="/visa" className="flex items-center gap-1.5 text-white text-xs font-semibold hover:opacity-90 shrink-0">
             <ArrowLeft className="h-4 w-4 text-[#f59e0b]" />
             <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
             <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white truncate max-w-[140px] sm:max-w-none">
+            <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white truncate max-w-[120px] sm:max-w-none">
               Azerbaijan e-Visa
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSelector variant="dark" />
-            <Link href="/visa/track" className="text-xs text-white/80 hover:text-white">
+            <Link href="/visa/track" className="text-xs text-white/80 hover:text-white hidden sm:inline whitespace-nowrap">
               {t.nav.trackVisa}
             </Link>
           </div>

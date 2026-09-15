@@ -663,7 +663,7 @@ export default function HomePage() {
                     setSocialNotice(null);
                     setIsAuthOpen(true);
                   }}
-                  className="text-xs sm:text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                  className="hidden md:inline-block text-xs sm:text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   {t.nav.signIn}
                 </button>
@@ -674,7 +674,7 @@ export default function HomePage() {
                     setSocialNotice(null);
                     setIsAuthOpen(true);
                   }}
-                  className="rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer whitespace-nowrap shrink-0"
+                  className="hidden sm:inline-block rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer whitespace-nowrap shrink-0"
                   style={{ backgroundColor: "#f59e0b", color: "#061225" }}
                 >
                   {language === "AZ"
@@ -696,7 +696,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex xl:hidden items-center justify-center h-8 w-8 rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer ml-1 shrink-0"
+              className="flex xl:hidden items-center justify-center h-8 w-8 rounded-full text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -755,6 +755,49 @@ export default function HomePage() {
                   GYD · GJA · NAJ
                 </span>
               </Link>
+
+              {/* Auth actions in mobile menu for non-logged in users */}
+              {!currentUser && (
+                <div className="pt-3 border-t border-white/10 mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode("login");
+                      setAuthError(null);
+                      setSocialNotice(null);
+                      setIsAuthOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex-1 py-2 rounded-xl text-xs font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors text-center cursor-pointer"
+                  >
+                    {t.nav.signIn}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode("signup");
+                      setAuthError(null);
+                      setSocialNotice(null);
+                      setIsAuthOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex-1 py-2 rounded-xl text-xs font-bold transition-all hover:opacity-95 shadow-md text-center cursor-pointer"
+                    style={{ backgroundColor: "#f59e0b", color: "#061225" }}
+                  >
+                    {language === "AZ"
+                      ? "Qeydiyyat"
+                      : language === "RU"
+                      ? "Регистрация"
+                      : language === "FR"
+                      ? "S'inscrire"
+                      : language === "AR"
+                      ? "إنشاء حساب"
+                      : language === "DE"
+                      ? "Registrieren"
+                      : "Sign Up"}
+                  </button>
+                </div>
+              )}
 
               {/* Language selection in mobile menu */}
               <div className="pt-3 border-t border-white/10 mt-3">

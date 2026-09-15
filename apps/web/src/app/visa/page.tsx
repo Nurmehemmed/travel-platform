@@ -45,26 +45,26 @@ export default function VisaLandingPage() {
             </span>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSelector variant="dark" />
             <Link
               href="/transfer"
-              className="text-xs font-semibold text-sky-200 hover:text-white transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 hover:bg-sky-500/20 shrink-0 whitespace-nowrap"
+              className="hidden md:flex text-xs font-semibold text-sky-200 hover:text-white transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 hover:bg-sky-500/20 shrink-0 whitespace-nowrap"
             >
               <Car className="h-3.5 w-3.5 text-sky-300 shrink-0" />
               <span>{t.nav.transfer}</span>
             </Link>
             <Link
               href="/visa/track"
-              className="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full hover:bg-white/10"
+              className="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full hover:bg-white/10 shrink-0"
+              title={t.nav.trackVisa}
             >
-              <FileText className="h-3.5 w-3.5 text-[#f59e0b]" />
-              <span className="hidden sm:inline">{t.nav.trackVisa}</span>
-              <span className="sm:hidden">{t.nav.trackVisa}</span>
+              <FileText className="h-3.5 w-3.5 text-[#f59e0b] shrink-0" />
+              <span className="hidden sm:inline whitespace-nowrap">{t.nav.trackVisa}</span>
             </Link>
             <Link
               href="/visa/apply"
-              className="rounded-full px-4 py-2 text-xs font-semibold transition-all hover:opacity-95 shadow-md"
+              className="rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold transition-all hover:opacity-95 shadow-md shrink-0 whitespace-nowrap"
               style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
               {t.nav.applyVisa}
@@ -74,7 +74,7 @@ export default function VisaLandingPage() {
       </header>
 
       {/* ═══════════════════════════════════════════════════════ HERO */}
-      <section className="relative overflow-hidden py-16 md:py-24" style={{ backgroundColor: "#0f3460" }}>
+      <section className="relative overflow-hidden py-12 sm:py-16 md:py-24" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section relative z-10 text-center max-w-3xl mx-auto">
           <span
             className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-4"
@@ -82,7 +82,7 @@ export default function VisaLandingPage() {
           >
             {t.visaPage.heroBadge}
           </span>
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
+          <h1 className="font-display text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight break-words">
             {t.visaPage.heroTitle} <br />
             <span style={{ color: "#f59e0b" }}>{t.visaPage.heroSubtitle}</span>
           </h1>
