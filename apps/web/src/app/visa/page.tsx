@@ -50,20 +50,20 @@ export default function VisaLandingPage() {
             : "bg-[#0f3460] border-b border-transparent shadow-none"
         }`}
       >
-        <div className="container-section flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="container-section flex h-16 items-center justify-between gap-2">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
               <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bold text-lg tracking-tight" style={{ color: "#f59e0b" }}>
+            <span className="font-bold text-base sm:text-lg tracking-tight" style={{ color: "#f59e0b" }}>
               addmetour
             </span>
-            <span className="hidden sm:inline-block ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-white/10 text-white/90">
+            <span className="hidden md:inline-block ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-white/10 text-white/90 whitespace-nowrap">
               {t.visaPage.headerBadge}
             </span>
           </Link>
 
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             <LanguageSelector variant="dark" />
             <Link
               href="/transfer"
@@ -74,18 +74,21 @@ export default function VisaLandingPage() {
             </Link>
             <Link
               href="/visa/track"
-              className="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full hover:bg-white/10 shrink-0"
+              className="text-xs font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full hover:bg-white/10 shrink-0"
               title={t.nav.trackVisa}
+              aria-label={t.nav.trackVisa}
             >
               <FileText className="h-3.5 w-3.5 text-[#f59e0b] shrink-0" />
               <span className="hidden sm:inline whitespace-nowrap">{t.nav.trackVisa}</span>
             </Link>
             <Link
               href="/visa/apply"
-              className="rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold transition-all hover:opacity-95 shadow-md shrink-0 whitespace-nowrap"
+              aria-label="Apply for Azerbaijan ASAN e-Visa"
+              className="rounded-full px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold transition-all hover:opacity-95 shadow-md shrink-0 whitespace-nowrap"
               style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
-              {t.nav.applyVisa}
+              <span className="hidden sm:inline">{t.nav.applyVisa}</span>
+              <span className="sm:hidden">{t.visaPage.applyNow || "Apply"}</span>
             </Link>
           </div>
         </div>

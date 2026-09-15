@@ -36,7 +36,7 @@ export default function FloatingTravelServices() {
         <Link
           href="/transfer"
           aria-label="Book Baku Airport Transfer (GYD)"
-          className="group flex items-center gap-2 sm:gap-2.5 rounded-full pl-2.5 pr-3 py-1.5 sm:pl-3 sm:pr-4 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-sky-300/50 shrink-0"
+          className="group flex items-center gap-1.5 sm:gap-2.5 rounded-full pl-2 sm:pl-3 pr-2.5 sm:pr-4 py-1.5 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-sky-300/50 shrink-0"
           style={{
             backgroundColor: "rgba(15, 52, 96, 0.94)",
             boxShadow: "0 10px 30px -5px rgba(2, 132, 199, 0.4)",
@@ -64,7 +64,7 @@ export default function FloatingTravelServices() {
         <Link
           href="/visa"
           aria-label="Official Azerbaijan ASAN e-Visa Online Application"
-          className="group flex items-center gap-2 sm:gap-2.5 rounded-full pl-2.5 pr-3 py-1.5 sm:pl-3 sm:pr-4 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-amber-300/50 shrink-0"
+          className="group flex items-center gap-1.5 sm:gap-2.5 rounded-full pl-2 sm:pl-3 pr-2.5 sm:pr-4 py-1.5 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-amber-300/50 shrink-0"
           style={{
             backgroundColor: "rgba(15, 52, 96, 0.94)",
             boxShadow: "0 10px 30px -5px rgba(245, 158, 11, 0.4)",

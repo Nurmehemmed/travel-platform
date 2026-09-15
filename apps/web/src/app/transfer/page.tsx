@@ -131,20 +131,20 @@ export default function TransferLandingPage() {
             : "bg-[#0f3460] border-b border-transparent shadow-none"
         }`}
       >
-        <div className="container-section flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full shadow-inner" style={{ backgroundColor: "#0ea5e9" }}>
-              <Car className="h-5 w-5 text-white" strokeWidth={2.5} />
+        <div className="container-section flex h-16 items-center justify-between gap-2">
+          <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full shadow-inner" style={{ backgroundColor: "#0ea5e9" }}>
+              <Car className="h-4 w-4 sm:h-5 sm:w-5 text-white" strokeWidth={2.5} />
             </div>
-            <span className="font-bold text-lg sm:text-xl tracking-tight text-white">
+            <span className="font-bold text-base sm:text-xl tracking-tight text-white">
               addmetour
             </span>
-            <span className="hidden sm:inline-block ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-sky-400/20 text-sky-200 border border-sky-300/30 whitespace-nowrap">
+            <span className="hidden md:inline-block ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-sky-400/20 text-sky-200 border border-sky-300/30 whitespace-nowrap">
               {t.transferPage.headerBadge}
             </span>
           </Link>
 
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             <LanguageSelector variant="dark" />
             <Link
               href="/visa"
@@ -155,19 +155,22 @@ export default function TransferLandingPage() {
             </Link>
             <Link
               href="/transfer/track"
-              className="text-xs font-semibold text-sky-100 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full hover:bg-white/10 shrink-0"
+              className="text-xs font-semibold text-sky-100 hover:text-white transition-colors flex items-center gap-1 sm:gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full hover:bg-white/10 shrink-0"
               title={t.nav.trackTransfer}
+              aria-label={t.nav.trackTransfer}
             >
               <Search className="h-3.5 w-3.5 text-sky-300 shrink-0" />
               <span className="hidden sm:inline whitespace-nowrap">{t.nav.trackTransfer}</span>
             </Link>
             <Link
               href="/transfer/book"
-              className="rounded-full px-3 sm:px-5 py-1.5 sm:py-2 text-xs font-bold transition-all duration-200 hover:scale-105 shadow-md flex items-center gap-1.5 text-white shrink-0 whitespace-nowrap"
+              aria-label="Book Airport Transfer"
+              className="rounded-full px-2.5 sm:px-5 py-1.5 sm:py-2 text-xs font-bold transition-all duration-200 hover:scale-105 shadow-md flex items-center gap-1 sm:gap-1.5 text-white shrink-0 whitespace-nowrap"
               style={{ backgroundColor: "#0284c7" }}
             >
-              <span>{t.nav.bookTransfer}</span>
-              <ArrowRight className="h-3.5 w-3.5 shrink-0" />
+              <span className="hidden sm:inline">{t.nav.bookTransfer}</span>
+              <span className="sm:hidden">{t.tours.bookNow || "Book"}</span>
+              <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
             </Link>
           </div>
         </div>

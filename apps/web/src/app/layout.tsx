@@ -281,7 +281,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen antialiased w-full relative">
+      <body className="min-h-screen antialiased w-full relative overflow-x-clip">
         <SettingsProvider>
           <AnnouncementBanner />
           <LanguageProvider>
