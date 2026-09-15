@@ -1167,6 +1167,11 @@ export interface TransferBookTranslations {
   errValidEmail: string;
   errValidPhone: string;
   errAcceptTerms: string;
+  errAddressRequired: string;
+  errFlightNumRequired: string;
+  errFlightDateRequired: string;
+  errFlightTimeRequired: string;
+  errReturnFlightRequired: string;
 }
 
 export const TRANSFER_BOOK_TRANSLATIONS: Record<string, TransferBookTranslations> = {
@@ -1248,6 +1253,11 @@ export const TRANSFER_BOOK_TRANSLATIONS: Record<string, TransferBookTranslations
     errValidEmail: "Please enter a valid email address for booking confirmation.",
     errValidPhone: "Please enter a valid telephone or WhatsApp number with country code.",
     errAcceptTerms: "Please accept the terms and conditions to complete your reservation.",
+    errAddressRequired: "Please enter your pickup or destination address / hotel.",
+    errFlightNumRequired: "Please enter your flight number.",
+    errFlightDateRequired: "Please select your flight date.",
+    errFlightTimeRequired: "Please select your estimated flight time.",
+    errReturnFlightRequired: "Please complete all return flight details (number, date, time).",
   },
   AZ: {
     step1Nav: "Marşrut və Nəqliyyat",
@@ -1327,6 +1337,11 @@ export const TRANSFER_BOOK_TRANSLATIONS: Record<string, TransferBookTranslations
     errValidEmail: "Rezervasiya təsdiqi üçün düzgün e-poçt ünvanı daxil edin.",
     errValidPhone: "Ölkə kodu ilə birlikdə düzgün əlaqə və ya WhatsApp nömrəsi daxil edin.",
     errAcceptTerms: "Rezervasiyanı tamamlamaq üçün qaydalarla razılaşmalısınız.",
+    errAddressRequired: "Zəhmət olmasa götürülmə və ya təyinat ünvanını / oteli qeyd edin.",
+    errFlightNumRequired: "Zəhmət olmasa reys nömrənizi qeyd edin.",
+    errFlightDateRequired: "Zəhmət olmasa uçuş tarixini seçin.",
+    errFlightTimeRequired: "Zəhmət olmasa təxmini uçuş vaxtını seçin.",
+    errReturnFlightRequired: "Zəhmət olmasa qayıdış reysinin bütün məlumatlarını (nömrə, tarix, vaxt) tamamlayın.",
   },
   RU: {
     step1Nav: "Маршрут и Авто",
@@ -1406,6 +1421,11 @@ export const TRANSFER_BOOK_TRANSLATIONS: Record<string, TransferBookTranslations
     errValidEmail: "Пожалуйста, введите корректный адрес электронной почты.",
     errValidPhone: "Пожалуйста, укажите номер телефона или WhatsApp с кодом страны.",
     errAcceptTerms: "Для оформления брони необходимо принять условия предоставления услуг.",
+    errAddressRequired: "Пожалуйста, укажите адрес посадки или назначения / отель.",
+    errFlightNumRequired: "Пожалуйста, укажите номер рейса.",
+    errFlightDateRequired: "Пожалуйста, выберите дату рейса.",
+    errFlightTimeRequired: "Пожалуйста, укажите расчетное время рейса.",
+    errReturnFlightRequired: "Пожалуйста, заполните все данные обратного рейса (номер, дата, время).",
   },
   FR: {
     step1Nav: "Trajet & Véhicule",
@@ -1485,6 +1505,11 @@ export const TRANSFER_BOOK_TRANSLATIONS: Record<string, TransferBookTranslations
     errValidEmail: "Veuillez indiquer une adresse e-mail valide.",
     errValidPhone: "Veuillez indiquer un numéro de téléphone ou WhatsApp valide avec l'indicatif pays.",
     errAcceptTerms: "Veuillez accepter les conditions générales pour finaliser votre réservation.",
+    errAddressRequired: "Veuillez indiquer votre adresse ou hôtel de prise en charge / destination.",
+    errFlightNumRequired: "Veuillez renseigner votre numéro de vol.",
+    errFlightDateRequired: "Veuillez sélectionner la date du vol.",
+    errFlightTimeRequired: "Veuillez sélectionner l'heure estimée du vol.",
+    errReturnFlightRequired: "Veuillez compléter toutes les informations du vol retour (numéro, date, heure).",
   },
   AR: {
     step1Nav: "المسار والسيارة",
@@ -1564,6 +1589,11 @@ export const TRANSFER_BOOK_TRANSLATIONS: Record<string, TransferBookTranslations
     errValidEmail: "يرجى إدخال عنوان بريد إلكتروني صحيح لتأكيد الحجز.",
     errValidPhone: "يرجى إدخال رقم هاتف أو واتساب صحيح مع الرمز الدولي.",
     errAcceptTerms: "يرجى الموافقة على الشروط والأحكام لإتمام حجز التوصيل.",
+    errAddressRequired: "يرجى إدخال عنوان أو فندق التوصيل أو المغادرة.",
+    errFlightNumRequired: "يرجى إدخال رقم الرحلة الجوية.",
+    errFlightDateRequired: "يرجى تحديد تاريخ الرحلة.",
+    errFlightTimeRequired: "يرجى تحديد وقت الرحلة المتوقع.",
+    errReturnFlightRequired: "يرجى إكمال جميع بيانات رحلة العودة (الرقم، التاريخ، والوقت).",
   },
   DE: {
     step1Nav: "Route & Fahrzeug",
@@ -1643,6 +1673,11 @@ export const TRANSFER_BOOK_TRANSLATIONS: Record<string, TransferBookTranslations
     errValidEmail: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
     errValidPhone: "Bitte geben Sie eine gültige Telefon- oder WhatsApp-Nummer mit Ländervorwahl ein.",
     errAcceptTerms: "Bitte akzeptieren Sie die Geschäftsbedingungen, um die Buchung abzuschließen.",
+    errAddressRequired: "Bitte geben Sie Ihre Abhol- bzw. Zieladresse oder das Hotel an.",
+    errFlightNumRequired: "Bitte geben Sie Ihre Flugnummer ein.",
+    errFlightDateRequired: "Bitte wählen Sie das Flugdatum aus.",
+    errFlightTimeRequired: "Bitte wählen Sie die voraussichtliche Flugzeit aus.",
+    errReturnFlightRequired: "Bitte vervollständigen Sie alle Angaben zum Rückflug (Nummer, Datum, Zeit).",
   },
 };
 

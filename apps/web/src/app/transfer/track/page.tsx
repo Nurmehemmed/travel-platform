@@ -56,7 +56,7 @@ interface BookingData {
 }
 
 function TransferTrackContent() {
-  const { t, language } = useLanguage();
+  const { t, language, showToast } = useLanguage();
   const searchParams = useSearchParams();
   const tt = (TRANSFER_TRACK_TRANSLATIONS[language] || TRANSFER_TRACK_TRANSLATIONS.EN)!;
   const initialRef = searchParams.get("ref") || "";
@@ -75,7 +75,9 @@ function TransferTrackContent() {
     const cleanEmail = email.trim().toLowerCase();
 
     if (!cleanRef || !cleanEmail) {
-      setError(tt.enterEmailPrompt || "Please provide both your booking reference and email address.");
+      const msg = tt.enterEmailPrompt || "Please provide both your booking reference and email address.";
+      setError(msg);
+      showToast(msg, "warning");
       return;
     }
 
@@ -95,7 +97,9 @@ function TransferTrackContent() {
       setBooking(data);
     } catch (err: any) {
       setBooking(null);
-      setError(err?.message || tt.notFound || "Failed to find booking.");
+      const msg = err?.message || tt.notFound || "Failed to find booking.";
+      setError(msg);
+      showToast(msg, "error");
     } finally {
       setLoading(false);
     }

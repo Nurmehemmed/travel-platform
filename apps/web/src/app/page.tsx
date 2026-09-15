@@ -2120,7 +2120,7 @@ export default function HomePage() {
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (!bookingDate || !bookingName.trim() || !bookingPhone.trim()) {
-                      showToast(t.bookingModal.fillAllFields);
+                      showToast(t.bookingModal.fillAllFields, "warning");
                       return;
                     }
                     setBookingSubmitting(true);
@@ -2142,12 +2142,12 @@ export default function HomePage() {
                       if (data.success) {
                         setConfirmedResNumber(data.reservationNumber);
                         setBookingSuccess(true);
-                        showToast(t.bookingModal.reservationSuccess);
+                        showToast(t.bookingModal.reservationSuccess, "success");
                       } else {
-                        showToast(data.error || "Failed to submit reservation");
+                        showToast(data.error || "Failed to submit reservation", "error");
                       }
                     } catch (err) {
-                      showToast(t.bookingModal.networkError);
+                      showToast(t.bookingModal.networkError, "error");
                     } finally {
                       setBookingSubmitting(false);
                     }

@@ -43,7 +43,7 @@ import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES, TRANSFER_BOOK_TRANSLATIONS } from 
 function TransferBookForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t, language } = useLanguage();
+  const { t, language, showToast } = useLanguage();
   const tb = (TRANSFER_BOOK_TRANSLATIONS[language] || TRANSFER_BOOK_TRANSLATIONS.EN)!;
 
   // Dynamic vehicle translation helpers
@@ -106,6 +106,22 @@ function TransferBookForm() {
   const [agreedTerms, setAgreedTerms] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [invalidField, setInvalidField] = useState<string | null>(null);
+
+  const triggerValidationError = (msg: string, fieldId?: string) => {
+    setErrorMessage(msg);
+    showToast(msg, "error");
+    if (fieldId) {
+      setInvalidField(fieldId);
+      setTimeout(() => {
+        const el = document.getElementById(fieldId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          el.focus();
+        }
+      }, 80);
+    }
+  };
 
   // Sync available zones when airport changes
   const airportZones = getZonesByAirport(airport);
@@ -132,12 +148,9 @@ function TransferBookForm() {
   // Validation per step
   const handleNextFromStep1 = () => {
     setErrorMessage(null);
+    setInvalidField(null);
     if (!dropoffAddress.trim()) {
-      setErrorMessage(
-        direction === "departure"
-          ? tb.pickupAddressLabel
-          : tb.dropoffAddressLabel
-      );
+      triggerValidationError(tb.errAddressRequired, "dropoffAddress");
       return;
     }
     setStep(2);
@@ -146,21 +159,30 @@ function TransferBookForm() {
 
   const handleNextFromStep2 = () => {
     setErrorMessage(null);
+    setInvalidField(null);
     if (!flightNumber.trim()) {
-      setErrorMessage(tb.flightNumLabel);
+      triggerValidationError(tb.errFlightNumRequired, "flightNumber");
       return;
     }
     if (!flightDate) {
-      setErrorMessage(tb.flightDateLabel);
+      triggerValidationError(tb.errFlightDateRequired, "flightDate");
       return;
     }
     if (!flightTime) {
-      setErrorMessage(tb.flightTimeLabel);
+      triggerValidationError(tb.errFlightTimeRequired, "flightTime");
       return;
     }
     if (direction === "round_trip") {
-      if (!returnFlightNumber.trim() || !returnDate || !returnTime) {
-        setErrorMessage(tb.retFlightInfo);
+      if (!returnFlightNumber.trim()) {
+        triggerValidationError(tb.errReturnFlightRequired, "returnFlightNumber");
+        return;
+      }
+      if (!returnDate) {
+        triggerValidationError(tb.errReturnFlightRequired, "returnDate");
+        return;
+      }
+      if (!returnTime) {
+        triggerValidationError(tb.errReturnFlightRequired, "returnTime");
         return;
       }
     }
@@ -170,17 +192,18 @@ function TransferBookForm() {
 
   const handleNextFromStep3 = () => {
     setErrorMessage(null);
+    setInvalidField(null);
     if (!passengerName.trim()) {
-      setErrorMessage(tb.errEnterName);
+      triggerValidationError(tb.errEnterName, "passengerName");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      setErrorMessage(tb.errValidEmail);
+      triggerValidationError(tb.errValidEmail, "email");
       return;
     }
     if (!phoneNumber.trim() || phoneNumber.trim().length < 6) {
-      setErrorMessage(tb.errValidPhone);
+      triggerValidationError(tb.errValidPhone, "phoneNumber");
       return;
     }
     setStep(4);
@@ -192,12 +215,13 @@ function TransferBookForm() {
     if (isSubmitting) return;
 
     if (!agreedTerms) {
-      setErrorMessage(tb.errAcceptTerms);
+      triggerValidationError(tb.errAcceptTerms, "agreedTerms");
       return;
     }
 
     setIsSubmitting(true);
     setErrorMessage(null);
+    setInvalidField(null);
 
     try {
       const payload = {
@@ -243,7 +267,9 @@ function TransferBookForm() {
 
     } catch (err: any) {
       console.error("Booking error:", err);
-      setErrorMessage(err?.message || "An unexpected error occurred. Please try again.");
+      const msg = err?.message || "An unexpected error occurred. Please try again.";
+      setErrorMessage(msg);
+      showToast(msg, "error");
       setIsSubmitting(false);
     }
   };
@@ -321,9 +347,22 @@ function TransferBookForm() {
 
         {/* Error Notification */}
         {errorMessage && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700 flex items-start gap-2.5 animate-shake">
-            <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-            <span>{errorMessage}</span>
+          <div id="top-error-banner" className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700 flex items-start justify-between gap-2.5 animate-shake">
+            <div className="flex items-start gap-2.5">
+              <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setErrorMessage(null);
+                setInvalidField(null);
+              }}
+              className="text-red-400 hover:text-red-600 p-0.5 text-xs font-bold shrink-0"
+              aria-label="Dismiss error"
+            >
+              ✕
+            </button>
           </div>
         )}
 
@@ -413,17 +452,33 @@ function TransferBookForm() {
                 <div className="relative">
                   <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                   <input
+                    id="dropoffAddress"
                     type="text"
                     required
                     placeholder={tb.addressPlaceholder}
                     value={dropoffAddress}
-                    onChange={(e) => setDropoffAddress(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                    onChange={(e) => {
+                      setDropoffAddress(e.target.value);
+                      if (invalidField === "dropoffAddress") setInvalidField(null);
+                      if (errorMessage) setErrorMessage(null);
+                    }}
+                    className={`w-full rounded-xl border pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                      invalidField === "dropoffAddress"
+                        ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                        : "border-slate-200 bg-slate-50 focus:border-sky-500 focus:bg-white focus:ring-sky-100"
+                    }`}
                   />
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  {tb.addressHelp}
-                </p>
+                {invalidField === "dropoffAddress" ? (
+                  <p className="text-[11px] font-semibold text-red-600 mt-1.5 flex items-center gap-1 animate-shake">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    <span>{tb.errAddressRequired}</span>
+                  </p>
+                ) : (
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    {tb.addressHelp}
+                  </p>
+                )}
               </div>
 
               {/* Vehicle Selection Grid */}
@@ -481,12 +536,20 @@ function TransferBookForm() {
                 </div>
               </div>
 
-              {/* Action Button */}
-              <div className="pt-4 flex justify-end">
+              {/* Action Button & Bottom Inline Feedback */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100">
+                {errorMessage ? (
+                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+                    <span>{errorMessage}</span>
+                  </div>
+                ) : (
+                  <div />
+                )}
                 <button
                   type="button"
                   onClick={handleNextFromStep1}
-                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm shrink-0"
                 >
                   <span>{tb.btnContinueFlight}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -520,12 +583,21 @@ function TransferBookForm() {
                       {tb.flightNumLabel}
                     </label>
                     <input
+                      id="flightNumber"
                       type="text"
                       required
                       placeholder={tb.flightNumPlaceholder}
                       value={flightNumber}
-                      onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      onChange={(e) => {
+                        setFlightNumber(e.target.value.toUpperCase());
+                        if (invalidField === "flightNumber") setInvalidField(null);
+                        if (errorMessage) setErrorMessage(null);
+                      }}
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                        invalidField === "flightNumber"
+                          ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                          : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
+                      }`}
                     />
                     <span className="block text-[11px] text-slate-400 mt-1">
                       {tb.flightTrackHint}
@@ -537,11 +609,20 @@ function TransferBookForm() {
                       {tb.flightDateLabel}
                     </label>
                     <input
+                      id="flightDate"
                       type="date"
                       required
                       value={flightDate}
-                      onChange={(e) => setFlightDate(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      onChange={(e) => {
+                        setFlightDate(e.target.value);
+                        if (invalidField === "flightDate") setInvalidField(null);
+                        if (errorMessage) setErrorMessage(null);
+                      }}
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
+                        invalidField === "flightDate"
+                          ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                          : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
+                      }`}
                     />
                   </div>
 
@@ -550,11 +631,20 @@ function TransferBookForm() {
                       {tb.flightTimeLabel}
                     </label>
                     <input
+                      id="flightTime"
                       type="time"
                       required
                       value={flightTime}
-                      onChange={(e) => setFlightTime(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      onChange={(e) => {
+                        setFlightTime(e.target.value);
+                        if (invalidField === "flightTime") setInvalidField(null);
+                        if (errorMessage) setErrorMessage(null);
+                      }}
+                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
+                        invalidField === "flightTime"
+                          ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                          : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
+                      }`}
                     />
                   </div>
                 </div>
@@ -574,12 +664,21 @@ function TransferBookForm() {
                         {tb.retFlightNumLabel}
                       </label>
                       <input
+                        id="returnFlightNumber"
                         type="text"
                         required
                         placeholder="e.g. J2 075"
                         value={returnFlightNumber}
-                        onChange={(e) => setReturnFlightNumber(e.target.value.toUpperCase())}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        onChange={(e) => {
+                          setReturnFlightNumber(e.target.value.toUpperCase());
+                          if (invalidField === "returnFlightNumber") setInvalidField(null);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                          invalidField === "returnFlightNumber"
+                            ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                            : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
+                        }`}
                       />
                     </div>
 
@@ -588,11 +687,20 @@ function TransferBookForm() {
                         {tb.retFlightDateLabel}
                       </label>
                       <input
+                        id="returnDate"
                         type="date"
                         required
                         value={returnDate}
-                        onChange={(e) => setReturnDate(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        onChange={(e) => {
+                          setReturnDate(e.target.value);
+                          if (invalidField === "returnDate") setInvalidField(null);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
+                          invalidField === "returnDate"
+                            ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                            : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
+                        }`}
                       />
                     </div>
 
@@ -601,11 +709,20 @@ function TransferBookForm() {
                         {tb.retFlightTimeLabel}
                       </label>
                       <input
+                        id="returnTime"
                         type="time"
                         required
                         value={returnTime}
-                        onChange={(e) => setReturnTime(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
+                        onChange={(e) => {
+                          setReturnTime(e.target.value);
+                          if (invalidField === "returnTime") setInvalidField(null);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
+                          invalidField === "returnTime"
+                            ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                            : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
+                        }`}
                       />
                     </div>
                   </div>
@@ -620,20 +737,30 @@ function TransferBookForm() {
                 </div>
               </div>
 
-              {/* Step 2 Buttons */}
-              <div className="pt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
+              {/* Step 2 Buttons & Bottom Inline Feedback */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => {
+                    setErrorMessage(null);
+                    setInvalidField(null);
+                    setStep(1);
+                  }}
                   className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
                 </button>
+                {errorMessage && (
+                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={handleNextFromStep2}
-                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm shrink-0"
                 >
                   <span>{tb.btnContinuePax}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -658,12 +785,21 @@ function TransferBookForm() {
                     {tb.leadPassengerLabel}
                   </label>
                   <input
+                    id="passengerName"
                     type="text"
                     required
                     placeholder={tb.leadPassengerPlaceholder}
                     value={passengerName}
-                    onChange={(e) => setPassengerName(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                    onChange={(e) => {
+                      setPassengerName(e.target.value);
+                      if (invalidField === "passengerName") setInvalidField(null);
+                      if (errorMessage) setErrorMessage(null);
+                    }}
+                    className={`w-full rounded-xl border px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                      invalidField === "passengerName"
+                        ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                        : "border-slate-200 bg-slate-50 focus:border-sky-500 focus:bg-white focus:ring-sky-100"
+                    }`}
                   />
                   <p className="text-[10px] text-slate-500 mt-1">
                     {tb.nameSignHint}
@@ -700,12 +836,21 @@ function TransferBookForm() {
                     {tb.emailLabel}
                   </label>
                   <input
+                    id="email"
                     type="email"
                     required
                     placeholder={tb.emailPlaceholder}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (invalidField === "email") setInvalidField(null);
+                      if (errorMessage) setErrorMessage(null);
+                    }}
+                    className={`w-full rounded-xl border px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                      invalidField === "email"
+                        ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                        : "border-slate-200 bg-slate-50 focus:border-sky-500 focus:bg-white focus:ring-sky-100"
+                    }`}
                   />
                 </div>
 
@@ -714,12 +859,21 @@ function TransferBookForm() {
                     {tb.phoneLabel}
                   </label>
                   <input
+                    id="phoneNumber"
                     type="tel"
                     required
                     placeholder={tb.phonePlaceholder}
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
+                    onChange={(e) => {
+                      setPhoneNumber(e.target.value);
+                      if (invalidField === "phoneNumber") setInvalidField(null);
+                      if (errorMessage) setErrorMessage(null);
+                    }}
+                    className={`w-full rounded-xl border px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                      invalidField === "phoneNumber"
+                        ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
+                        : "border-slate-200 bg-slate-50 focus:border-sky-500 focus:bg-white focus:ring-sky-100"
+                    }`}
                   />
                   <p className="text-[10px] text-slate-500 mt-1">
                     {tb.phoneHint}
@@ -740,20 +894,30 @@ function TransferBookForm() {
                 />
               </div>
 
-              {/* Step 3 Buttons */}
-              <div className="pt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
+              {/* Step 3 Buttons & Bottom Inline Feedback */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
+                  onClick={() => {
+                    setErrorMessage(null);
+                    setInvalidField(null);
+                    setStep(2);
+                  }}
                   className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
                 </button>
+                {errorMessage && (
+                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={handleNextFromStep3}
-                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm shrink-0"
                 >
                   <span>{tb.btnContinueReview}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -912,12 +1076,23 @@ function TransferBookForm() {
               )}
 
               {/* Terms checkbox */}
-              <div className="flex items-start gap-2 pt-2">
+              <div
+                id="agreedTerms"
+                className={`flex items-start gap-2.5 p-3.5 rounded-xl border transition-all ${
+                  invalidField === "agreedTerms"
+                    ? "border-red-400 bg-red-50/60 ring-2 ring-red-200 animate-shake"
+                    : "border-transparent"
+                }`}
+              >
                 <input
                   type="checkbox"
                   id="transferTerms"
                   checked={agreedTerms}
-                  onChange={(e) => setAgreedTerms(e.target.checked)}
+                  onChange={(e) => {
+                    setAgreedTerms(e.target.checked);
+                    if (invalidField === "agreedTerms") setInvalidField(null);
+                    if (errorMessage) setErrorMessage(null);
+                  }}
                   className="mt-0.5 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
                 <label htmlFor="transferTerms" className="text-xs text-slate-600 leading-relaxed cursor-pointer">
@@ -925,22 +1100,33 @@ function TransferBookForm() {
                 </label>
               </div>
 
-              {/* Step 4 Buttons */}
-              <div className="pt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
+              {/* Step 4 Buttons & Bottom Inline Feedback */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100">
                 <button
                   type="button"
                   disabled={isSubmitting}
-                  onClick={() => setStep(3)}
+                  onClick={() => {
+                    setErrorMessage(null);
+                    setInvalidField(null);
+                    setStep(3);
+                  }}
                   className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5 disabled:opacity-50"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
                 </button>
 
+                {errorMessage && (
+                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  disabled={isSubmitting || !agreedTerms}
-                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                 >
                   {isSubmitting ? (
                     <>

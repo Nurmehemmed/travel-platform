@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from "react";
+import { AlertCircle, AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
 import {
   TRANSFER_PAGE_TRANSLATIONS,
   VISA_PAGE_TRANSLATIONS,
@@ -1093,6 +1094,19 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
   },
 };
 
+export type ToastType = "success" | "error" | "warning" | "info";
+
+export interface ToastOptions {
+  type?: ToastType;
+  duration?: number;
+}
+
+export interface ToastData {
+  id: number;
+  message: string;
+  type: ToastType;
+}
+
 interface LanguageContextType {
   language: LanguageCode;
   setLanguage: (lang: LanguageCode, suppressToast?: boolean) => void;
@@ -1101,7 +1115,9 @@ interface LanguageContextType {
   isRtl: boolean;
   languages: LanguageInfo[];
   toastMessage: string | null;
-  showToast: (msg: string) => void;
+  toastData: ToastData | null;
+  showToast: (msg: string, typeOrOptions?: ToastType | ToastOptions) => void;
+  hideToast: () => void;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -1109,17 +1125,43 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>("EN");
   const [mounted, setMounted] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastData, setToastData] = useState<ToastData | null>(null);
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const showToast = useCallback((msg: string) => {
+  const hideToast = useCallback(() => {
     if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToastData(null);
+  }, []);
+
+  const showToast = useCallback((msg: string, typeOrOptions?: ToastType | ToastOptions) => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+
+    let type: ToastType = "success";
+    let duration = 3500;
+
+    if (typeof typeOrOptions === "string") {
+      type = typeOrOptions;
+    } else if (typeOrOptions && typeof typeOrOptions === "object") {
+      if (typeOrOptions.type) type = typeOrOptions.type;
+      if (typeOrOptions.duration) duration = typeOrOptions.duration;
+    }
+
+    if (type === "error") {
+      duration = 5500;
+    } else if (type === "warning") {
+      duration = 4500;
+    }
+
     // Defer to next tick so it never interrupts or collides with render phase
     setTimeout(() => {
-      setToastMessage(msg);
+      setToastData({
+        id: Date.now(),
+        message: msg,
+        type,
+      });
       toastTimeoutRef.current = setTimeout(() => {
-        setToastMessage(null);
-      }, 2800);
+        setToastData(null);
+      }, duration);
     }, 0);
   }, []);
 
@@ -1160,7 +1202,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           : lang === "DE"
           ? `Sprache geändert: ${label}`
           : `Language set to ${label}`;
-      showToast(msg);
+      showToast(msg, "info");
     }
   }, [showToast]);
 
@@ -1198,31 +1240,64 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         currentLangInfo,
         isRtl,
         languages: LANGUAGES,
-        toastMessage,
+        toastMessage: toastData?.message || null,
+        toastData,
         showToast,
+        hideToast,
       }}
     >
       {children}
       {/* Global Floating Toast Notification */}
-      {toastMessage && (
+      {toastData && (
         <div
-          role="status"
-          aria-live="polite"
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 animate-bounce-in pointer-events-none print:hidden"
+          role={toastData.type === "error" ? "alert" : "status"}
+          aria-live={toastData.type === "error" ? "assertive" : "polite"}
+          className={`fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[99999] pointer-events-auto max-w-[92vw] sm:max-w-lg w-max print:hidden animate-toast-in transition-all duration-200 ${
+            toastData.type === "error" ? "animate-shake" : ""
+          }`}
         >
-          <div className="flex items-center gap-2.5 rounded-full bg-[#0f3460] px-5 py-2.5 text-white shadow-2xl backdrop-blur-md border border-white/20">
-            <svg
-              className="h-4 w-4 text-[#f59e0b] shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={3}
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <div
+            className={`flex items-center gap-3 rounded-2xl px-4 py-3 sm:px-5 sm:py-3.5 text-white shadow-2xl backdrop-blur-xl border transition-all ${
+              toastData.type === "error"
+                ? "bg-slate-900/95 border-red-500/60 shadow-red-950/50 ring-2 ring-red-500/30"
+                : toastData.type === "warning"
+                ? "bg-slate-900/95 border-amber-500/60 shadow-amber-950/50 ring-2 ring-amber-500/30"
+                : toastData.type === "info"
+                ? "bg-[#0f3460]/95 border-sky-400/50 shadow-sky-950/50 ring-1 ring-sky-400/30"
+                : "bg-[#0f3460]/95 border-emerald-500/50 shadow-emerald-950/50 ring-1 ring-emerald-500/30"
+            }`}
+          >
+            <div
+              className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl ${
+                toastData.type === "error"
+                  ? "bg-red-500/20 text-red-400 ring-1 ring-red-500/40"
+                  : toastData.type === "warning"
+                  ? "bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40"
+                  : toastData.type === "info"
+                  ? "bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40"
+                  : "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/40"
+              }`}
             >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            <span className="text-sm font-semibold">{toastMessage}</span>
+              {toastData.type === "error" && <AlertCircle className="h-4 w-4 sm:h-4.5 sm:w-4.5" strokeWidth={2.5} />}
+              {toastData.type === "warning" && <AlertTriangle className="h-4 w-4 sm:h-4.5 sm:w-4.5" strokeWidth={2.5} />}
+              {toastData.type === "info" && <Info className="h-4 w-4 sm:h-4.5 sm:w-4.5" strokeWidth={2.5} />}
+              {toastData.type === "success" && <CheckCircle2 className="h-4 w-4 sm:h-4.5 sm:w-4.5" strokeWidth={2.5} />}
+            </div>
+
+            <div className="flex flex-col pr-1">
+              <span className="text-xs sm:text-sm font-semibold tracking-normal text-slate-100 leading-snug">
+                {toastData.message}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={hideToast}
+              aria-label="Close notification"
+              className="ml-auto -mr-1 flex h-6 w-6 items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         </div>
       )}
@@ -1249,7 +1324,9 @@ export function useLanguage() {
       isRtl: false,
       languages: LANGUAGES,
       toastMessage: null,
+      toastData: null,
       showToast: () => {},
+      hideToast: () => {},
     };
   }
   return context;

@@ -102,3 +102,29 @@
   }
 }
 
+/* ─── Validation & Toast Animations ───────────────────────────────────────── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: shake 0.45s ease-in-out;
+}
+
+@keyframes toast-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
