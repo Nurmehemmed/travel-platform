@@ -105,11 +105,10 @@ function TransferBookForm() {
   const [paymentMethod, setPaymentMethod] = useState<"online" | "on_arrival">("online");
   const [agreedTerms, setAgreedTerms] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [invalidField, setInvalidField] = useState<string | null>(null);
 
   const triggerValidationError = (msg: string, fieldId?: string) => {
-    setErrorMessage(msg);
     showToast(msg, "error");
     if (fieldId) {
       setInvalidField(fieldId);
@@ -147,7 +146,7 @@ function TransferBookForm() {
 
   // Validation per step
   const handleNextFromStep1 = () => {
-    setErrorMessage(null);
+
     setInvalidField(null);
     if (!dropoffAddress.trim()) {
       triggerValidationError(tb.errAddressRequired, "dropoffAddress");
@@ -158,7 +157,7 @@ function TransferBookForm() {
   };
 
   const handleNextFromStep2 = () => {
-    setErrorMessage(null);
+
     setInvalidField(null);
     if (!flightNumber.trim()) {
       triggerValidationError(tb.errFlightNumRequired, "flightNumber");
@@ -191,7 +190,7 @@ function TransferBookForm() {
   };
 
   const handleNextFromStep3 = () => {
-    setErrorMessage(null);
+
     setInvalidField(null);
     if (!passengerName.trim()) {
       triggerValidationError(tb.errEnterName, "passengerName");
@@ -220,7 +219,7 @@ function TransferBookForm() {
     }
 
     setIsSubmitting(true);
-    setErrorMessage(null);
+
     setInvalidField(null);
 
     try {
@@ -268,7 +267,6 @@ function TransferBookForm() {
     } catch (err: any) {
       console.error("Booking error:", err);
       const msg = err?.message || "An unexpected error occurred. Please try again.";
-      setErrorMessage(msg);
       showToast(msg, "error");
       setIsSubmitting(false);
     }
@@ -345,26 +343,7 @@ function TransferBookForm() {
           </div>
         </div>
 
-        {/* Error Notification */}
-        {errorMessage && (
-          <div id="top-error-banner" className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-700 flex items-start justify-between gap-2.5 animate-shake">
-            <div className="flex items-start gap-2.5">
-              <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setErrorMessage(null);
-                setInvalidField(null);
-              }}
-              className="text-red-400 hover:text-red-600 p-0.5 text-xs font-bold shrink-0"
-              aria-label="Dismiss error"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+
 
         {/* Form Body */}
         <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-md border border-sky-100">
@@ -460,7 +439,7 @@ function TransferBookForm() {
                     onChange={(e) => {
                       setDropoffAddress(e.target.value);
                       if (invalidField === "dropoffAddress") setInvalidField(null);
-                      if (errorMessage) setErrorMessage(null);
+
                     }}
                     className={`w-full rounded-xl border pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       invalidField === "dropoffAddress"
@@ -536,16 +515,8 @@ function TransferBookForm() {
                 </div>
               </div>
 
-              {/* Action Button & Bottom Inline Feedback */}
-              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-100">
-                {errorMessage ? (
-                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
-                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
-                    <span>{errorMessage}</span>
-                  </div>
-                ) : (
-                  <div />
-                )}
+              {/* Action Button */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-end gap-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={handleNextFromStep1}
@@ -591,7 +562,7 @@ function TransferBookForm() {
                       onChange={(e) => {
                         setFlightNumber(e.target.value.toUpperCase());
                         if (invalidField === "flightNumber") setInvalidField(null);
-                        if (errorMessage) setErrorMessage(null);
+
                       }}
                       className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                         invalidField === "flightNumber"
@@ -616,7 +587,7 @@ function TransferBookForm() {
                       onChange={(e) => {
                         setFlightDate(e.target.value);
                         if (invalidField === "flightDate") setInvalidField(null);
-                        if (errorMessage) setErrorMessage(null);
+
                       }}
                       className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
                         invalidField === "flightDate"
@@ -638,7 +609,7 @@ function TransferBookForm() {
                       onChange={(e) => {
                         setFlightTime(e.target.value);
                         if (invalidField === "flightTime") setInvalidField(null);
-                        if (errorMessage) setErrorMessage(null);
+
                       }}
                       className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
                         invalidField === "flightTime"
@@ -672,7 +643,7 @@ function TransferBookForm() {
                         onChange={(e) => {
                           setReturnFlightNumber(e.target.value.toUpperCase());
                           if (invalidField === "returnFlightNumber") setInvalidField(null);
-                          if (errorMessage) setErrorMessage(null);
+
                         }}
                         className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-semibold text-slate-800 uppercase placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                           invalidField === "returnFlightNumber"
@@ -694,7 +665,7 @@ function TransferBookForm() {
                         onChange={(e) => {
                           setReturnDate(e.target.value);
                           if (invalidField === "returnDate") setInvalidField(null);
-                          if (errorMessage) setErrorMessage(null);
+
                         }}
                         className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
                           invalidField === "returnDate"
@@ -716,7 +687,7 @@ function TransferBookForm() {
                         onChange={(e) => {
                           setReturnTime(e.target.value);
                           if (invalidField === "returnTime") setInvalidField(null);
-                          if (errorMessage) setErrorMessage(null);
+
                         }}
                         className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
                           invalidField === "returnTime"
@@ -742,7 +713,7 @@ function TransferBookForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    setErrorMessage(null);
+
                     setInvalidField(null);
                     setStep(1);
                   }}
@@ -751,12 +722,7 @@ function TransferBookForm() {
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
                 </button>
-                {errorMessage && (
-                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
-                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
+
                 <button
                   type="button"
                   onClick={handleNextFromStep2}
@@ -793,7 +759,7 @@ function TransferBookForm() {
                     onChange={(e) => {
                       setPassengerName(e.target.value);
                       if (invalidField === "passengerName") setInvalidField(null);
-                      if (errorMessage) setErrorMessage(null);
+
                     }}
                     className={`w-full rounded-xl border px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       invalidField === "passengerName"
@@ -844,7 +810,7 @@ function TransferBookForm() {
                     onChange={(e) => {
                       setEmail(e.target.value);
                       if (invalidField === "email") setInvalidField(null);
-                      if (errorMessage) setErrorMessage(null);
+
                     }}
                     className={`w-full rounded-xl border px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       invalidField === "email"
@@ -867,7 +833,7 @@ function TransferBookForm() {
                     onChange={(e) => {
                       setPhoneNumber(e.target.value);
                       if (invalidField === "phoneNumber") setInvalidField(null);
-                      if (errorMessage) setErrorMessage(null);
+
                     }}
                     className={`w-full rounded-xl border px-3.5 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       invalidField === "phoneNumber"
@@ -899,7 +865,7 @@ function TransferBookForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    setErrorMessage(null);
+
                     setInvalidField(null);
                     setStep(2);
                   }}
@@ -908,12 +874,7 @@ function TransferBookForm() {
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
                 </button>
-                {errorMessage && (
-                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
-                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
+
                 <button
                   type="button"
                   onClick={handleNextFromStep3}
@@ -1091,7 +1052,7 @@ function TransferBookForm() {
                   onChange={(e) => {
                     setAgreedTerms(e.target.checked);
                     if (invalidField === "agreedTerms") setInvalidField(null);
-                    if (errorMessage) setErrorMessage(null);
+
                   }}
                   className="mt-0.5 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
@@ -1106,7 +1067,7 @@ function TransferBookForm() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => {
-                    setErrorMessage(null);
+
                     setInvalidField(null);
                     setStep(3);
                   }}
@@ -1116,12 +1077,7 @@ function TransferBookForm() {
                   <span>{tb.btnBack}</span>
                 </button>
 
-                {errorMessage && (
-                  <div className="text-xs font-semibold text-red-600 flex items-center gap-1.5 bg-red-50 py-2.5 px-3.5 rounded-xl border border-red-200 animate-shake">
-                    <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
+
 
                 <button
                   type="submit"

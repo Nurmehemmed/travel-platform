@@ -46,7 +46,7 @@ export default function VisaApplyPage() {
 
   // Loading & Submission
   const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [completedRef, setCompletedRef] = useState<string | null>(null);
 
   // Check URL query parameters on mount
@@ -88,14 +88,13 @@ export default function VisaApplyPage() {
   };
 
   const triggerValidationError = (msg: string) => {
-    setErrorMessage(msg);
     showToast(msg, "error");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Validate Step Transitions
   const handleNext = () => {
-    setErrorMessage(null);
+
 
     if (step === 1) {
       if (!nationality) {
@@ -152,7 +151,7 @@ export default function VisaApplyPage() {
 
   // Submit Application
   const handleSubmitApplication = async () => {
-    setErrorMessage(null);
+
     setSubmitting(true);
 
     try {
@@ -266,12 +265,7 @@ export default function VisaApplyPage() {
       <main className="container-section py-10 max-w-2xl mx-auto">
         {/* SEO: Single h1 per page for heading hierarchy */}
         <h1 className="sr-only">Apply for Azerbaijan e-Visa Online — Official ASAN Visa Application</h1>
-        {errorMessage && (
-          <div className="mb-6 rounded-2xl p-4 bg-red-50 border border-red-200 text-red-800 text-xs flex items-start gap-3 animate-shake">
-            <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
-            <div>{errorMessage}</div>
-          </div>
-        )}
+
 
         {/* ── STEP 1: Nationality & Tier ─────────────────────────── */}
         {step === 1 && (
