@@ -486,7 +486,7 @@ function TransferBookForm() {
                 <button
                   type="button"
                   onClick={handleNextFromStep1}
-                  className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
                 >
                   <span>{tb.btnContinueFlight}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -621,11 +621,11 @@ function TransferBookForm() {
               </div>
 
               {/* Step 2 Buttons */}
-              <div className="pt-4 flex items-center justify-between">
+              <div className="pt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
+                  className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
@@ -633,7 +633,7 @@ function TransferBookForm() {
                 <button
                   type="button"
                   onClick={handleNextFromStep2}
-                  className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
                 >
                   <span>{tb.btnContinuePax}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -741,11 +741,11 @@ function TransferBookForm() {
               </div>
 
               {/* Step 3 Buttons */}
-              <div className="pt-4 flex items-center justify-between">
+              <div className="pt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
+                  className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
@@ -753,7 +753,7 @@ function TransferBookForm() {
                 <button
                   type="button"
                   onClick={handleNextFromStep3}
-                  className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
                 >
                   <span>{tb.btnContinueReview}</span>
                   <ArrowRight className="h-4 w-4" />
@@ -926,12 +926,12 @@ function TransferBookForm() {
               </div>
 
               {/* Step 4 Buttons */}
-              <div className="pt-4 flex items-center justify-between">
+              <div className="pt-4 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
                 <button
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => setStep(3)}
-                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5 disabled:opacity-50"
+                  className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5 disabled:opacity-50"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
@@ -940,7 +940,7 @@ function TransferBookForm() {
                 <button
                   type="submit"
                   disabled={isSubmitting || !agreedTerms}
-                  className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>

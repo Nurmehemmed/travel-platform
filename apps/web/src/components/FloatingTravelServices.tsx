@@ -9,8 +9,16 @@ export default function FloatingTravelServices() {
   const pathname = usePathname();
   const { t } = useLanguage();
 
-  // Hide completely on admin portal
-  if (pathname.startsWith("/admin")) return null;
+  // Hide completely on admin portal, booking wizards, payment, and tracking funnels
+  const isExcluded =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/transfer/book") ||
+    pathname.startsWith("/transfer/track") ||
+    pathname.startsWith("/visa/apply") ||
+    pathname.startsWith("/visa/pay") ||
+    pathname.startsWith("/visa/track");
+
+  if (isExcluded) return null;
 
   const isVisaPage = pathname.startsWith("/visa");
   const isTransferPage = pathname.startsWith("/transfer");
