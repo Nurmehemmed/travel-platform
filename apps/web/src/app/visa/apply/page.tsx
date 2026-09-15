@@ -12,7 +12,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 
 export default function VisaApplyPage() {
-  const { t, showToast } = useLanguage();
+  const { t, showToast, language } = useLanguage();
   const router = useRouter();
 
   // Wizard Step: 1 = Nationality & Tier, 2 = Travel, 3 = Personal & Passport, 4 = Review & Pay, 5 = Success
@@ -98,22 +98,22 @@ export default function VisaApplyPage() {
 
     if (step === 1) {
       if (!nationality) {
-        triggerValidationError("Please select your country of citizenship.");
+        triggerValidationError(t.visaPage.errSelectCitizenship);
         return;
       }
       if (isVisaFree) {
-        triggerValidationError("Citizens of this country enter Azerbaijan visa-free. You do not need to apply!");
+        triggerValidationError(t.visaPage.errVisaFree);
         return;
       }
       if (isEmbassyRequired) {
-        triggerValidationError("Citizens of this country are not eligible for an ASAN e-Visa under Azerbaijani immigration regulations. You must apply directly at an Embassy or Consulate of the Republic of Azerbaijan.");
+        triggerValidationError(t.visaPage.errEmbassyRequired);
         return;
       }
       setStep(2);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else if (step === 2) {
       if (!arrivalDate || !stayAddress.trim()) {
-        triggerValidationError("Please enter your expected arrival date and accommodation address in Azerbaijan.");
+        triggerValidationError(t.visaPage.errTravelInfo);
         return;
       }
       setStep(3);
@@ -133,14 +133,14 @@ export default function VisaApplyPage() {
         !passportIssueDate ||
         !passportExpiryDate
       ) {
-        triggerValidationError("Please fill in all personal and passport fields as shown on your official document.");
+        triggerValidationError(t.visaPage.errFillAllFields);
         return;
       }
 
       // Passport validity check
       const check = validatePassportValidity(arrivalDate, passportExpiryDate);
       if (!check.valid) {
-        triggerValidationError(check.message || "Passport expiration date is invalid.");
+        triggerValidationError(t.visaPage.errPassportMinValidity);
         return;
       }
 
@@ -185,7 +185,7 @@ export default function VisaApplyPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        const msg = data?.error || "Failed to submit application.";
+        const msg = data?.error || t.visaPage.errSubmitFailed;
         triggerValidationError(msg);
         setSubmitting(false);
         return;
@@ -199,7 +199,7 @@ export default function VisaApplyPage() {
       setCompletedRef(data.applicationNumber);
       setStep(5);
     } catch (err: any) {
-      const msg = err?.message || "Network error. Please try again.";
+      const msg = err?.message || t.visaPage.errNetworkError;
       triggerValidationError(msg);
     } finally {
       setSubmitting(false);

@@ -93,6 +93,18 @@ export interface VisaPageTranslations {
   trackNow: string;
   requirementsTitle: string;
   stepsTitle: string;
+  // Validation error messages
+  errSelectCitizenship: string;
+  errVisaFree: string;
+  errEmbassyRequired: string;
+  errTravelInfo: string;
+  errFillAllFields: string;
+  errPassportExpired: string;
+  errPassportDatesRequired: string;
+  errInvalidDateFormat: string;
+  errPassportMinValidity: string;
+  errSubmitFailed: string;
+  errNetworkError: string;
 }
 
 export interface NavExtraTranslations {
@@ -578,6 +590,17 @@ export const VISA_PAGE_TRANSLATIONS: Record<LanguageCode, VisaPageTranslations> 
     trackNow: "Track Status",
     requirementsTitle: "Application Requirements",
     stepsTitle: "How It Works",
+    errSelectCitizenship: "Please select your country of citizenship.",
+    errVisaFree: "Citizens of this country enter Azerbaijan visa-free. You do not need to apply!",
+    errEmbassyRequired: "Citizens of this country are not eligible for an ASAN e-Visa under Azerbaijani immigration regulations. You must apply directly at an Embassy or Consulate of the Republic of Azerbaijan.",
+    errTravelInfo: "Please enter your expected arrival date and accommodation address in Azerbaijan.",
+    errFillAllFields: "Please fill in all personal and passport fields as shown on your official document.",
+    errPassportExpired: "Passport expiration date is invalid.",
+    errPassportDatesRequired: "Arrival date and passport expiry date are required.",
+    errInvalidDateFormat: "Invalid date format.",
+    errPassportMinValidity: "Azerbaijan immigration requires your passport to be valid for at least 3 months (90 days) after your arrival date. Please check your passport expiry.",
+    errSubmitFailed: "Failed to submit application. Please try again.",
+    errNetworkError: "Network error. Please check your connection and try again.",
   },
   AZ: {
     headerBadge: "e-Viza Xidməti",
@@ -610,6 +633,17 @@ export const VISA_PAGE_TRANSLATIONS: Record<LanguageCode, VisaPageTranslations> 
     trackNow: "Statusu Yoxla",
     requirementsTitle: "Tələb Olunan Sənədlər",
     stepsTitle: "Necə İşləyir?",
+    errSelectCitizenship: "Zəhmət olmasa vətəndaşlıq ölkənizi seçin.",
+    errVisaFree: "Bu ölkənin vətəndaşları Azərbaycana vizasız daxil ola bilər. Müraciətə ehtiyac yoxdur!",
+    errEmbassyRequired: "Bu ölkənin vətəndaşları ASAN e-Viza üçün uyğun deyil. Zəhmət olmasa Azərbaycan Respublikasının Səfirliyinə və ya Konsulluğuna birbaşa müraciət edin.",
+    errTravelInfo: "Zəhmət olmasa gözlənilən gəliş tarixinizi və Azərbaycanda qalacağınız ünvanı daxil edin.",
+    errFillAllFields: "Zəhmət olmasa bütün şəxsi və pasport məlumatlarını rəsmi sənədinizdəki kimi doldurun.",
+    errPassportExpired: "Pasportun bitmə tarixi etibarsızdır.",
+    errPassportDatesRequired: "Gəliş tarixi və pasportun bitmə tarixi tələb olunur.",
+    errInvalidDateFormat: "Yanlış tarix formatı.",
+    errPassportMinValidity: "Azərbaycan immiqrasiyası gəliş tarixindən ən azı 3 ay (90 gün) sonraya qədər etibarlı pasport tələb edir. Zəhmət olmasa pasportunuzun bitmə tarixini yoxlayın.",
+    errSubmitFailed: "Müraciətin göndərilməsi uğursuz oldu. Zəhmət olmasa yenidən cəhd edin.",
+    errNetworkError: "Şəbəkə xətası. Zəhmət olmasa bağlantınızı yoxlayın və yenidən cəhd edin.",
   },
   RU: {
     headerBadge: "Сервис e-Визы",
@@ -642,6 +676,17 @@ export const VISA_PAGE_TRANSLATIONS: Record<LanguageCode, VisaPageTranslations> 
     trackNow: "Проверить статус",
     requirementsTitle: "Требования к документам",
     stepsTitle: "Как это работает",
+    errSelectCitizenship: "Пожалуйста, выберите страну гражданства.",
+    errVisaFree: "Граждане этой страны въезжают в Азербайджан без визы. Подавать заявку не требуется!",
+    errEmbassyRequired: "Граждане этой страны не могут получить электронную визу ASAN. Необходимо обратиться непосредственно в посольство или консульство Азербайджанской Республики.",
+    errTravelInfo: "Пожалуйста, укажите ожидаемую дату прибытия и адрес проживания в Азербайджане.",
+    errFillAllFields: "Пожалуйста, заполните все личные данные и паспортные данные в соответствии с вашим официальным документом.",
+    errPassportExpired: "Срок действия паспорта недействителен.",
+    errPassportDatesRequired: "Дата прибытия и срок действия паспорта обязательны.",
+    errInvalidDateFormat: "Неверный формат даты.",
+    errPassportMinValidity: "Иммиграционные правила Азербайджана требуют, чтобы срок действия паспорта составлял не менее 3 месяцев (90 дней) после даты прибытия. Пожалуйста, проверьте срок действия паспорта.",
+    errSubmitFailed: "Не удалось отправить заявку. Пожалуйста, попробуйте снова.",
+    errNetworkError: "Ошибка сети. Пожалуйста, проверьте подключение и попробуйте снова.",
   },
   FR: {
     headerBadge: "Service e-Visa",
@@ -674,6 +719,17 @@ export const VISA_PAGE_TRANSLATIONS: Record<LanguageCode, VisaPageTranslations> 
     trackNow: "Vérifier le statut",
     requirementsTitle: "Documents requis",
     stepsTitle: "Comment ça marche",
+    errSelectCitizenship: "Veuillez sélectionner votre pays de citoyenneté.",
+    errVisaFree: "Les citoyens de ce pays entrent en Azerbaïdjan sans visa. Aucune demande nécessaire !",
+    errEmbassyRequired: "Les citoyens de ce pays ne sont pas éligibles au e-Visa ASAN selon la réglementation azerbaïdjanaise. Veuillez vous adresser directement à une ambassade ou un consulat de la République d'Azerbaïdjan.",
+    errTravelInfo: "Veuillez indiquer votre date d'arrivée prévue et votre adresse d'hébergement en Azerbaïdjan.",
+    errFillAllFields: "Veuillez remplir tous les champs personnels et passeport conformément à votre document officiel.",
+    errPassportExpired: "La date d'expiration du passeport n'est pas valide.",
+    errPassportDatesRequired: "La date d'arrivée et la date d'expiration du passeport sont requises.",
+    errInvalidDateFormat: "Format de date invalide.",
+    errPassportMinValidity: "L'immigration azerbaïdjanaise exige que votre passeport soit valide au moins 3 mois (90 jours) après votre date d'arrivée. Veuillez vérifier la date d'expiration de votre passeport.",
+    errSubmitFailed: "Échec de l'envoi de la demande. Veuillez réessayer.",
+    errNetworkError: "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
   },
   AR: {
     headerBadge: "خدمة التأشيرة الإلكترونية",
@@ -706,6 +762,17 @@ export const VISA_PAGE_TRANSLATIONS: Record<LanguageCode, VisaPageTranslations> 
     trackNow: "تحقق من الحالة",
     requirementsTitle: "متطلبات التقديم",
     stepsTitle: "خطوات الحصول على التأشيرة",
+    errSelectCitizenship: "يرجى اختيار بلد جنسيتك.",
+    errVisaFree: "مواطنو هذا البلد يدخلون أذربيجان بدون تأشيرة. لا حاجة لتقديم طلب!",
+    errEmbassyRequired: "مواطنو هذا البلد غير مؤهلين للحصول على تأشيرة ASAN الإلكترونية. يرجى التقدم مباشرة لدى سفارة أو قنصلية جمهورية أذربيجان.",
+    errTravelInfo: "يرجى إدخال تاريخ الوصول المتوقع وعنوان الإقامة في أذربيجان.",
+    errFillAllFields: "يرجى ملء جميع البيانات الشخصية وبيانات جواز السفر كما هي في مستندك الرسمي.",
+    errPassportExpired: "تاريخ انتهاء جواز السفر غير صالح.",
+    errPassportDatesRequired: "تاريخ الوصول وتاريخ انتهاء جواز السفر مطلوبان.",
+    errInvalidDateFormat: "تنسيق التاريخ غير صالح.",
+    errPassportMinValidity: "تتطلب هيئة الهجرة الأذربيجانية أن يكون جواز سفرك ساري المفعول لمدة 3 أشهر (90 يوماً) على الأقل بعد تاريخ وصولك. يرجى التحقق من تاريخ انتهاء جواز سفرك.",
+    errSubmitFailed: "فشل في إرسال الطلب. يرجى المحاولة مرة أخرى.",
+    errNetworkError: "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
   },
   DE: {
     headerBadge: "e-Visum Service",
@@ -738,6 +805,17 @@ export const VISA_PAGE_TRANSLATIONS: Record<LanguageCode, VisaPageTranslations> 
     trackNow: "Status prüfen",
     requirementsTitle: "Erforderliche Unterlagen",
     stepsTitle: "So funktioniert es",
+    errSelectCitizenship: "Bitte wählen Sie Ihr Staatsangehörigkeitsland.",
+    errVisaFree: "Bürger dieses Landes reisen visumfrei nach Aserbaidschan ein. Ein Antrag ist nicht erforderlich!",
+    errEmbassyRequired: "Bürger dieses Landes sind nicht für ein ASAN e-Visum berechtigt. Bitte wenden Sie sich direkt an eine Botschaft oder ein Konsulat der Republik Aserbaidschan.",
+    errTravelInfo: "Bitte geben Sie Ihr voraussichtliches Ankunftsdatum und Ihre Unterkunftsadresse in Aserbaidschan ein.",
+    errFillAllFields: "Bitte füllen Sie alle persönlichen Daten und Passdaten gemäß Ihrem offiziellen Dokument aus.",
+    errPassportExpired: "Das Ablaufdatum des Reisepasses ist ungültig.",
+    errPassportDatesRequired: "Ankunftsdatum und Ablaufdatum des Reisepasses sind erforderlich.",
+    errInvalidDateFormat: "Ungültiges Datumsformat.",
+    errPassportMinValidity: "Die aserbaidschanische Einreisebehörde verlangt, dass Ihr Reisepass mindestens 3 Monate (90 Tage) nach Ihrem Ankunftsdatum gültig sein muss. Bitte überprüfen Sie das Ablaufdatum Ihres Reisepasses.",
+    errSubmitFailed: "Antrag konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    errNetworkError: "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
   },
 };
 
