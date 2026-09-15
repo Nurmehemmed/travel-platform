@@ -213,7 +213,7 @@ export function CustomSelect({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder={searchPlaceholder}
-                  className="w-full bg-transparent text-xs text-slate-800 placeholder-slate-400 outline-none"
+                  className="w-full bg-transparent text-base sm:text-xs text-slate-800 placeholder-slate-400 outline-none"
                   onClick={(e) => e.stopPropagation()}
                 />
                 {searchTerm && (

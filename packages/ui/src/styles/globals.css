@@ -63,6 +63,15 @@
     outline: none;
   }
 
+  /* Prevent iOS Safari auto-zoom on form field focus by ensuring minimum 16px font on mobile */
+  @media screen and (max-width: 767px) {
+    input,
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+
   input:focus,
   input:focus-visible,
   textarea:focus,
