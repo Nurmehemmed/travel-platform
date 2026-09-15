@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://addmetour.com";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+  "https://addmetour.com";
 
 export const metadata: Metadata = {
   title: "Azerbaijan e-Visa Service — Fast Official ASAN Visa Processing",
   description:
-    "Apply for your Azerbaijan electronic visa (ASAN e-Visa) online. Get your e-Visa in 3 hours (urgent) or 3 business days (standard). Over 95 eligible countries including USA, UK, EU, Canada, Australia, India, and UAE. Trusted by 2,400+ travelers.",
+    "Official Azerbaijan ASAN e-Visa online service. Urgent 3-hour or 3-day standard processing for 95+ eligible countries. Fast, secure application.",
   keywords: [
     "Azerbaijan visa",
     "Azerbaijan e-visa",
@@ -29,15 +33,15 @@ export const metadata: Metadata = {
     "ASAN visa application online",
   ],
   alternates: {
-    canonical: `${APP_URL}/visa`,
+    canonical: "/visa",
     languages: {
-      "en-US": `${APP_URL}/visa?lang=en`,
-      "az-AZ": `${APP_URL}/visa?lang=az`,
-      "ru-RU": `${APP_URL}/visa?lang=ru`,
-      "fr-FR": `${APP_URL}/visa?lang=fr`,
-      "ar-SA": `${APP_URL}/visa?lang=ar`,
-      "de-DE": `${APP_URL}/visa?lang=de`,
-      "x-default": `${APP_URL}/visa`,
+      en: "/visa",
+      az: "/visa?lang=az",
+      ru: "/visa?lang=ru",
+      fr: "/visa?lang=fr",
+      ar: "/visa?lang=ar",
+      de: "/visa?lang=de",
+      "x-default": "/visa",
     },
   },
   openGraph: {

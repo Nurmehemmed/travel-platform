@@ -7,7 +7,11 @@ import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://addmetour.com";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+  "https://addmetour.com";
 
 export const metadata: Metadata = {
   title: {
@@ -15,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | AddmeTour",
   },
   description:
-    "Discover Azerbaijan with AddmeTour. Boutique private & small-group tours across Baku, the Great Caucasus, Gobustan, Sheki, and Absheron. 4.9★ TripAdvisor rating. Instant WhatsApp booking.",
+    "Discover Azerbaijan with AddmeTour. Boutique private & small-group tours across Baku, the Caucasus, Sheki & Gobustan. 4.9★ rated. Instant WhatsApp booking.",
   keywords: [
     "Azerbaijan tours",
     "Baku tours",
@@ -37,12 +41,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
     languages: {
-      "en-US": "/?lang=en",
-      "az-AZ": "/?lang=az",
-      "ru-RU": "/?lang=ru",
-      "fr-FR": "/?lang=fr",
-      "ar-SA": "/?lang=ar",
-      "de-DE": "/?lang=de",
+      en: "/",
+      az: "/?lang=az",
+      ru: "/?lang=ru",
+      fr: "/?lang=fr",
+      ar: "/?lang=ar",
+      de: "/?lang=de",
       "x-default": "/",
     },
   },

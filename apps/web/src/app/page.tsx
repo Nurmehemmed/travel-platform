@@ -1694,7 +1694,17 @@ export default function HomePage() {
         <div className="container-section relative z-10 text-center">
           <p className="section-label mb-4" style={{ color: "#f59e0b" }}>{t.hero.badge}</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
-            {t.hero.titlePart1} {t.hero.titlePart2}
+            {language === "AZ"
+              ? "Azərbaycanı Bizimlə Kəşf Edin"
+              : language === "RU"
+              ? "Откройте для себя Азербайджан с нами"
+              : language === "FR"
+              ? "Explorez l'Azerbaïdjan avec nous"
+              : language === "AR"
+              ? "استكشف أذربيجان معنا اليوم"
+              : language === "DE"
+              ? "Entdecken Sie Aserbaidschan mit uns"
+              : "Ready to Explore Azerbaijan?"}
           </h2>
           <p className="text-white/60 max-w-xl mx-auto mb-10">
             {t.hero.subtitle}

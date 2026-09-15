@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://addmetour.com";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+  "https://addmetour.com";
 
 export const metadata: Metadata = {
   title: "Airport Transfer — Baku, Ganja & Nakhchivan | AddmeTour",
   description:
-    "Book your airport transfer in Azerbaijan with a professional driver. Fixed prices, meet & greet, flight tracking. All airports: Heydar Aliyev (GYD), Ganja (GJA), Nakhchivan (NAJ). Economy to Executive vehicles.",
+    "Book private airport transfers in Baku (GYD), Ganja & Nakhchivan. Fixed prices, flight monitoring, meet & greet, and 24/7 support in Azerbaijan.",
   keywords: [
     "Azerbaijan airport transfer",
     "Baku airport taxi",
@@ -20,15 +24,15 @@ export const metadata: Metadata = {
     "AddmeTour transfer",
   ],
   alternates: {
-    canonical: `${APP_URL}/transfer`,
+    canonical: "/transfer",
     languages: {
-      "en-US": `${APP_URL}/transfer?lang=en`,
-      "az-AZ": `${APP_URL}/transfer?lang=az`,
-      "ru-RU": `${APP_URL}/transfer?lang=ru`,
-      "fr-FR": `${APP_URL}/transfer?lang=fr`,
-      "ar-SA": `${APP_URL}/transfer?lang=ar`,
-      "de-DE": `${APP_URL}/transfer?lang=de`,
-      "x-default": `${APP_URL}/transfer`,
+      en: "/transfer",
+      az: "/transfer?lang=az",
+      ru: "/transfer?lang=ru",
+      fr: "/transfer?lang=fr",
+      ar: "/transfer?lang=ar",
+      de: "/transfer?lang=de",
+      "x-default": "/transfer",
     },
   },
   openGraph: {

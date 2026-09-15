@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://addmetour.com";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+  "https://addmetour.com";
 
 export const metadata: Metadata = {
   title: "Apply for Azerbaijan e-Visa — Online ASAN Visa Application Form",
   description:
-    "Complete your Azerbaijan e-Visa application online in under 5 minutes. Fill in passport details, upload your photo, choose standard (3-day) or urgent (3-hour) processing, and receive your approved visa by email.",
+    "Apply for your official Azerbaijan ASAN e-Visa online in minutes. Standard (3-day) and urgent (3-hour) processing. Safe, secure application.",
   keywords: [
     "apply Azerbaijan visa online",
     "Azerbaijan visa application form",
@@ -18,7 +22,7 @@ export const metadata: Metadata = {
     "how to apply Azerbaijan visa",
   ],
   alternates: {
-    canonical: `${APP_URL}/visa/apply`,
+    canonical: "/visa/apply",
   },
   openGraph: {
     type: "website",

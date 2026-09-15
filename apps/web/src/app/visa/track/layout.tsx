@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://addmetour.com";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
+  "https://addmetour.com";
 
 export const metadata: Metadata = {
   title: "Track Your Azerbaijan e-Visa Application — Live Status Updates",
   description:
-    "Check the real-time status of your Azerbaijan e-Visa application. Enter your reference number and email to see live progress: Received → Verified → Submitted to Government → Approved. Download your official e-Visa PDF when ready.",
+    "Track the real-time status of your Azerbaijan e-Visa application. Enter your reference number to check progress and download your approved PDF.",
   keywords: [
     "track Azerbaijan visa",
     "Azerbaijan visa status",
@@ -17,7 +21,7 @@ export const metadata: Metadata = {
     "Azerbaijan visa PDF download",
   ],
   alternates: {
-    canonical: `${APP_URL}/visa/track`,
+    canonical: "/visa/track",
   },
   openGraph: {
     type: "website",
