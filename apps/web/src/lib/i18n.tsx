@@ -1283,6 +1283,38 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+export function detectBrowserLanguage(): LanguageCode {
+  if (typeof window === "undefined" || typeof navigator === "undefined") return "EN";
+
+  const navLangs = navigator.languages && navigator.languages.length > 0
+    ? navigator.languages
+    : [navigator.language || ""];
+
+  for (const rawLang of navLangs) {
+    if (!rawLang) continue;
+    const lower = rawLang.toLowerCase().trim();
+    if (lower.startsWith("az")) return "AZ";
+    if (
+      lower.startsWith("ru") ||
+      lower.startsWith("be") ||
+      lower.startsWith("uk") ||
+      lower.startsWith("kk") ||
+      lower.startsWith("uz") ||
+      lower.startsWith("ky") ||
+      lower.startsWith("tg")
+    ) {
+      return "RU";
+    }
+    if (lower.startsWith("tr")) return "AZ";
+    if (lower.startsWith("ar")) return "AR";
+    if (lower.startsWith("fr")) return "FR";
+    if (lower.startsWith("de")) return "DE";
+    if (lower.startsWith("en")) return "EN";
+  }
+
+  return "EN";
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>("EN");
   const [mounted, setMounted] = useState(false);
@@ -1332,6 +1364,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem("travel_language") as LanguageCode;
       if (saved && TRANSLATIONS[saved]) {
         setLanguageState(saved);
+        if (typeof document !== "undefined") {
+          document.documentElement.lang = saved.toLowerCase();
+        }
+      } else {
+        const detected = detectBrowserLanguage();
+        if (detected && TRANSLATIONS[detected]) {
+          setLanguageState(detected);
+          if (typeof document !== "undefined") {
+            document.documentElement.lang = detected.toLowerCase();
+          }
+        }
       }
     } catch {}
   }, []);
