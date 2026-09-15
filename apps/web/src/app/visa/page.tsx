@@ -95,7 +95,7 @@ export default function VisaLandingPage() {
       </header>
 
       {/* ═══════════════════════════════════════════════════════ HERO */}
-      <section className="relative overflow-hidden py-12 sm:py-16 md:py-24" style={{ backgroundColor: "#0f3460" }}>
+      <section className="relative z-10 py-12 sm:py-16 md:py-24" style={{ backgroundColor: "#0f3460" }}>
         <div className="container-section relative z-10 text-center max-w-3xl mx-auto">
           <span
             className="inline-block rounded-full border px-4 py-1.5 text-xs font-semibold uppercase tracking-widest mb-4"

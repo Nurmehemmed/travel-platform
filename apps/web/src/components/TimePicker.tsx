@@ -202,7 +202,7 @@ export function TimePicker({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div ref={containerRef} className={`relative w-full ${isOpen ? "z-40" : "z-10"}`}>
       {/* ── Trigger Button / Input ── */}
       <button
         type="button"

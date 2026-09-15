@@ -252,7 +252,7 @@ export function DatePicker({
   const yearsList = Array.from({ length: endYear - startYear + 1 }, (_, i) => endYear - i);
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div ref={containerRef} className={`relative w-full ${isOpen ? "z-40" : "z-10"}`}>
       {/* ── Trigger Button / Input ── */}
       <button
         type="button"

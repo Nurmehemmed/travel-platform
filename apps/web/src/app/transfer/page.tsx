@@ -177,10 +177,12 @@ export default function TransferLandingPage() {
       </header>
 
       {/* ═══════════════════════════════════════════════════════ HERO */}
-      <section className="relative overflow-hidden py-12 sm:py-16 md:py-24" style={{ backgroundColor: "#0f3460" }}>
-        {/* Background glow effects */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative z-10 py-12 sm:py-16 md:py-24" style={{ backgroundColor: "#0f3460" }}>
+        {/* Background glow effects container */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+        </div>
 
         <div className="container-section relative z-10 max-w-5xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
