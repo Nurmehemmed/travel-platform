@@ -81,6 +81,17 @@ function TransferBookForm() {
   const paramVehicle = (searchParams.get("vehicle") as VehicleClass) || "sedan";
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Scroll listener for sticky header glassmorphism
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Step 1: Route & Vehicle
   const [airport, setAirport] = useState<AirportCode>(paramAirport);
@@ -278,7 +289,13 @@ function TransferBookForm() {
   return (
     <div className="min-h-screen pb-20" style={{ backgroundColor: "#f0f9ff" }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 shadow-md backdrop-blur-md" style={{ backgroundColor: "#0f3460" }}>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10"
+            : "bg-[#0f3460] border-b border-transparent shadow-none"
+        }`}
+      >
         <div className="container-section flex h-16 items-center justify-between">
           <Link href="/transfer" className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "#0ea5e9" }}>

@@ -266,6 +266,17 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Scroll listener for sticky header glassmorphism
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleCopyLink = () => {
     if (typeof window !== "undefined") {
@@ -507,7 +518,13 @@ export default function HomePage() {
     <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
 
       {/* ═══════════════════════════════════════════════════════ NAVBAR */}
-      <header className="sticky top-0 z-50" style={{ backgroundColor: "#0f3460" }}>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10"
+            : "bg-[#0f3460] border-b border-transparent shadow-none"
+        }`}
+      >
         <div className="container-section flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">

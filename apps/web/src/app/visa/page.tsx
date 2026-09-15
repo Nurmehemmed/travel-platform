@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ShieldCheck, Clock, CheckCircle2, AlertCircle, ArrowRight,
@@ -16,6 +16,17 @@ export default function VisaLandingPage() {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [eligibilityResult, setEligibilityResult] = useState<ReturnType<typeof getCountryEligibility> | null>(null);
   const [hasChecked, setHasChecked] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Scroll listener for sticky header glassmorphism
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleCheckEligibility = (countryName: string) => {
     setSelectedCountry(countryName);
@@ -32,7 +43,13 @@ export default function VisaLandingPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
       {/* ═══════════════════════════════════════════════════════ HEADER */}
-      <header className="sticky top-0 z-50 shadow-sm" style={{ backgroundColor: "#0f3460" }}>
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10"
+            : "bg-[#0f3460] border-b border-transparent shadow-none"
+        }`}
+      >
         <div className="container-section flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
