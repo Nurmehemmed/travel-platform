@@ -308,9 +308,17 @@ function TransferBookForm() {
       {/* Main Form Container */}
       <div className="container-section max-w-4xl mx-auto pt-8">
         {/* Progress Stepper */}
-        <div className="mb-8 rounded-2xl bg-white p-4 shadow-sm border border-sky-100">
+        <div className="mb-8 rounded-2xl bg-white p-4 sm:p-5 shadow-sm border border-sky-100">
           <div className="flex items-center justify-between relative">
-            <div className="absolute top-1/2 left-6 right-6 h-0.5 bg-slate-200 -translate-y-1/2 z-0 hidden sm:block" />
+            {/* Background connecting track */}
+            <div className="absolute top-[18px] left-[12.5%] right-[12.5%] h-0.5 bg-slate-200 -translate-y-1/2 z-0 hidden sm:block" />
+            {/* Active completed progress fill */}
+            <div
+              className="absolute top-[18px] left-[12.5%] h-0.5 bg-emerald-500 -translate-y-1/2 z-0 transition-all duration-500 hidden sm:block"
+              style={{
+                width: `${((Math.min(step, 4) - 1) / 3) * 75}%`,
+              }}
+            />
             {[
               { num: 1, title: tb.step1Nav },
               { num: 2, title: tb.step2Nav },
@@ -324,17 +332,17 @@ function TransferBookForm() {
                   <div
                     className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold transition-all shadow-sm ${
                       isDone
-                        ? "bg-emerald-500 text-white"
+                        ? "bg-emerald-500 text-white shadow-emerald-200"
                         : isCurrent
-                        ? "bg-sky-600 text-white ring-4 ring-sky-100"
-                        : "bg-slate-100 text-slate-400"
+                        ? "bg-sky-600 text-white ring-4 ring-sky-100 shadow-sky-200"
+                        : "bg-slate-100 text-slate-400 border border-slate-200"
                     }`}
                   >
                     {isDone ? <Check className="h-4 w-4 stroke-[3]" /> : s.num}
                   </div>
                   <span
-                    className={`mt-1.5 text-[11px] font-semibold text-center hidden sm:block ${
-                      isCurrent ? "text-sky-700" : isDone ? "text-slate-700" : "text-slate-400"
+                    className={`mt-2 text-[11px] font-semibold text-center hidden sm:block ${
+                      isCurrent ? "text-sky-700 font-bold" : isDone ? "text-slate-700" : "text-slate-400"
                     }`}
                   >
                     {s.title}

@@ -238,16 +238,22 @@ export default function VisaApplyPage() {
         <div className="bg-white border-b border-slate-200 py-3 sm:py-4">
           <div className="container-section max-w-2xl mx-auto">
             <div className="flex items-center justify-between relative">
-              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -translate-y-1/2 -z-0" />
+              <div className="absolute top-[14px] sm:top-[16px] left-[12.5%] right-[12.5%] h-0.5 bg-slate-200 -translate-y-1/2 z-0" />
+              <div
+                className="absolute top-[14px] sm:top-[16px] left-[12.5%] h-0.5 bg-[#0f3460] -translate-y-1/2 z-0 transition-all duration-300"
+                style={{
+                  width: `${((Math.min(step, 4) - 1) / 3) * 75}%`,
+                }}
+              />
               {[
                 { num: 1, label: va.step1Nav },
                 { num: 2, label: va.step2Nav },
                 { num: 3, label: va.step3Nav },
                 { num: 4, label: va.step4Nav },
               ].map((s) => (
-                <div key={s.num} className="relative z-10 flex flex-col items-center bg-white px-1 sm:px-2">
+                <div key={s.num} className="relative z-10 flex flex-col items-center flex-1 bg-transparent px-1 sm:px-2">
                   <div
-                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-xs font-bold transition-colors"
+                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-xs font-bold transition-colors shadow-sm"
                     style={
                       step >= s.num
                         ? { backgroundColor: "#0f3460", color: "#ffffff" }
