@@ -253,7 +253,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="font-body overflow-x-hidden max-w-full"
+      className="font-body"
       suppressHydrationWarning
     >
       <head>
@@ -281,7 +281,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen antialiased overflow-x-hidden max-w-full w-full relative">
+      <body className="min-h-screen antialiased w-full relative">
         <SettingsProvider>
           <AnnouncementBanner />
           <LanguageProvider>
