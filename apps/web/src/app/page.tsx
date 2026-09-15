@@ -1015,7 +1015,7 @@ export default function HomePage() {
       <div style={{ backgroundColor: "#f0f9ff" }} className="py-10">
         <div className="container-section">
           <div className="mx-auto max-w-2xl rounded-2xl bg-white shadow-card p-3 flex flex-col sm:flex-row gap-3">
-            <div className="flex flex-1 items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
+            <div className="flex flex-1 items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 focus-within:ring-2 focus-within:ring-sky-500/30 transition-all">
               <Search className="h-4 w-4 text-slate-400 shrink-0" />
               <input
                 type="text"
@@ -1023,15 +1023,15 @@ export default function HomePage() {
                 aria-label={t.search.placeholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none"
+                className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none"
               />
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 sm:w-auto sm:min-w-[180px]">
+            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 sm:w-auto sm:min-w-[180px] focus-within:ring-2 focus-within:ring-sky-500/30 transition-all">
               <select
                 value={activeDuration}
                 onChange={(e) => setActiveDuration(e.target.value)}
                 aria-label={t.search.durationLabel}
-                className="flex-1 bg-transparent text-sm text-slate-700 outline-none cursor-pointer"
+                className="flex-1 bg-transparent text-sm text-slate-700 border-none outline-none cursor-pointer focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none"
               >
                 {[
                   { val: "Any duration", label: t.search.durationAll },
