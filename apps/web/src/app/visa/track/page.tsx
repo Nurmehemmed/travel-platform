@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { VISA_TRACK_TRANSLATIONS } from "@/lib/pages-i18n";
 import { VisaTrackingSkeleton } from "@/components/Skeletons";
 
 interface TrackedApplication {
@@ -29,7 +30,8 @@ interface TrackedApplication {
 }
 
 export default function VisaTrackPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const vt = (VISA_TRACK_TRANSLATIONS[language] || VISA_TRACK_TRANSLATIONS.EN)!;
   const [refInput, setRefInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,13 +71,13 @@ export default function VisaTrackPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data?.error || "Could not locate application.");
+        setError(data?.error || vt.errNotFound);
         setApplication(null);
       } else {
         setApplication(data.application);
       }
     } catch (err: any) {
-      setError("Network error while searching for application.");
+      setError(vt.errNetwork);
     } finally {
       setLoading(false);
     }
@@ -84,7 +86,7 @@ export default function VisaTrackPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!refInput.trim() || !emailInput.trim()) {
-      setError("Please provide both your Application Reference (e.g. AZV-123456) and Email.");
+      setError(vt.errProvideBoth);
       return;
     }
     fetchTracking(refInput.trim(), emailInput.trim());
@@ -117,35 +119,35 @@ export default function VisaTrackPage() {
         {/* Lookup Box */}
         <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 mb-8">
           <h1 className="font-display text-2xl font-bold text-slate-900 mb-1">
-            Check Your e-Visa Status
+            {vt.lookupTitle}
           </h1>
           <p className="text-xs text-slate-500 mb-6">
-            Enter your 9-character application reference number and the email address used during submission.
+            {vt.lookupDesc}
           </p>
 
           <form onSubmit={handleSearch} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Application Reference *
+                {vt.refLabel}
               </label>
               <input
                 type="text"
                 value={refInput}
                 onChange={(e) => setRefInput(e.target.value)}
-                placeholder="e.g. AZV-784219"
+                placeholder={vt.refPlaceholder}
                 className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none uppercase font-mono"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                Email Address *
+                {vt.emailLabel}
               </label>
               <input
                 type="email"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="e.g. traveler@example.com"
+                placeholder={vt.emailPlaceholder}
                 className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none"
               />
             </div>
@@ -164,7 +166,7 @@ export default function VisaTrackPage() {
               style={{ backgroundColor: "#0f3460" }}
             >
               <Search className="h-4 w-4" />
-              {loading ? "Searching Records..." : "Check Status"}
+              {loading ? vt.btnSearching : vt.btnSearch}
             </button>
           </form>
         </div>
@@ -176,9 +178,9 @@ export default function VisaTrackPage() {
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-emerald-900">Payment Confirmed via Payriff</h3>
+              <h3 className="font-bold text-sm text-emerald-900">{vt.justPaidTitle}</h3>
               <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
-                Thank you! Your transaction has been authorized and securely cleared through Payriff 3D-Secure. Your application is now in our priority immigration review queue.
+                {vt.justPaidDesc}
               </p>
             </div>
           </div>
@@ -192,16 +194,16 @@ export default function VisaTrackPage() {
           <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 animate-fade-in space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
-                <p className="text-[11px] text-slate-400 font-semibold uppercase">Application Reference</p>
+                <p className="text-[11px] text-slate-400 font-semibold uppercase">{vt.refHeader}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <p className="font-mono text-xl font-bold text-[#0f3460]">{application.applicationNumber}</p>
                   {application.paymentStatus === "paid" ? (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                      ✓ Paid (${application.totalAmount} USD)
+                      {vt.statusPaid} (${application.totalAmount} USD)
                     </span>
                   ) : (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                      Payment Pending
+                      {vt.statusPaymentPending}
                     </span>
                   )}
                 </div>
@@ -210,22 +212,22 @@ export default function VisaTrackPage() {
               <div>
                 {application.status === "received" && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900">
-                    <Clock className="h-3.5 w-3.5" /> Under Quality Review
+                    <Clock className="h-3.5 w-3.5" /> {vt.statusQualityReview}
                   </span>
                 )}
                 {application.status === "submitted_to_govt" && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900">
-                    <Clock className="h-3.5 w-3.5" /> Processing at ASAN Visa
+                    <Clock className="h-3.5 w-3.5" /> {vt.statusAsanProcessing}
                   </span>
                 )}
                 {application.status === "approved" && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Approved & Issued
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> {vt.statusApproved}
                   </span>
                 )}
                 {application.status === "rejected" && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-900">
-                    <AlertCircle className="h-3.5 w-3.5 text-red-600" /> Action Required
+                    <AlertCircle className="h-3.5 w-3.5 text-red-600" /> {vt.statusActionRequired}
                   </span>
                 )}
               </div>
@@ -237,10 +239,10 @@ export default function VisaTrackPage() {
                 <div>
                   <h4 className="font-bold text-sm text-emerald-900 mb-1 flex items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                    Official Electronic Visa Ready
+                    {vt.approvedBannerTitle}
                   </h4>
                   <p className="text-xs text-emerald-800 leading-relaxed">
-                    Your single-entry e-Visa has been verified and issued by the State Migration Service of Azerbaijan.
+                    {vt.approvedBannerDesc}
                   </p>
                 </div>
                 {application.evisaPdfUrl ? (
@@ -252,11 +254,11 @@ export default function VisaTrackPage() {
                     style={{ backgroundColor: "#0f3460" }}
                   >
                     <Download className="h-4 w-4" />
-                    Download PDF e-Visa
+                    {vt.btnDownloadPdf}
                   </a>
                 ) : (
                   <span className="text-xs font-medium text-emerald-800 italic">
-                    PDF file sent to {application.email}
+                    {vt.pdfSentTo} {application.email}
                   </span>
                 )}
               </div>
@@ -265,30 +267,30 @@ export default function VisaTrackPage() {
             {/* Progress Timeline */}
             <div className="py-2">
               <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500 mb-4">
-                Application Progress
+                {vt.progressTitle}
               </h3>
               <div className="space-y-4">
                 {[
                   {
-                    title: "Application & Payment Received",
-                    desc: "Order confirmed in AddmeTour visa system.",
+                    title: vt.step1Title,
+                    desc: vt.step1Desc,
                     done: true,
                   },
                   {
-                    title: "Document & Passport Verification",
-                    desc: "Passport details and photo validated against ASAN immigration criteria.",
+                    title: vt.step2Title,
+                    desc: vt.step2Desc,
                     done: application.status !== "received",
                   },
                   {
-                    title: "Submitted to Government (evisa.gov.az)",
+                    title: vt.step3Title,
                     desc: application.asanApplicationId
-                      ? `Government Application Ref: ${application.asanApplicationId}`
-                      : "Transmitted to the State Migration Service of Azerbaijan.",
+                      ? `${vt.step3DescPrefix} ${application.asanApplicationId}`
+                      : vt.step3DescGovt,
                     done: application.status === "submitted_to_govt" || application.status === "approved",
                   },
                   {
-                    title: "e-Visa Approved & Issued",
-                    desc: "Electronic visa PDF generated and delivered.",
+                    title: vt.step4Title,
+                    desc: vt.step4Desc,
                     done: application.status === "approved",
                   },
                 ].map((step, idx) => (
@@ -316,19 +318,19 @@ export default function VisaTrackPage() {
             {/* Applicant Summary */}
             <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200 text-xs space-y-2">
               <div className="flex justify-between">
-                <span className="text-slate-500">Applicant:</span>
+                <span className="text-slate-500">{vt.summaryApplicant}</span>
                 <span className="font-bold text-slate-800">{application.surname} {application.givenNames}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Citizenship:</span>
+                <span className="text-slate-500">{vt.summaryCitizenship}</span>
                 <span className="font-bold text-slate-800">{application.nationality}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Service Speed:</span>
-                <span className="font-bold text-slate-800 uppercase">{application.visaType} ({application.visaType === "urgent" ? "3 Hours" : "3 Days"})</span>
+                <span className="text-slate-500">{vt.summarySpeed}</span>
+                <span className="font-bold text-slate-800 uppercase">{application.visaType} ({application.visaType === "urgent" ? vt.timeHours : vt.timeDays})</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Arrival Date:</span>
+                <span className="text-slate-500">{vt.summaryArrivalDate}</span>
                 <span className="font-bold text-slate-800">{application.arrivalDate}</span>
               </div>
             </div>

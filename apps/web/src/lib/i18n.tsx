@@ -178,6 +178,29 @@ export interface BaseTranslations {
     reservationSuccess: string;
     networkError: string;
   };
+  auth: {
+    loginTab: string;
+    signupTab: string;
+    welcomeBack: string;
+    createAccount: string;
+    loginSubtitle: string;
+    signupSubtitle: string;
+    continueGoogle: string;
+    continueApple: string;
+    orEmail: string;
+    fullNamePlaceholder: string;
+    emailPlaceholder: string;
+    passwordPlaceholder: string;
+    forgotPassword: string;
+    loginBtn: string;
+    loggingIn: string;
+    createAccountBtn: string;
+    creatingAccount: string;
+    noAccount: string;
+    signUpFree: string;
+    haveAccount: string;
+    logInLink: string;
+  };
 }
 
 export interface Translations extends BaseTranslations {
@@ -336,6 +359,29 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       reservationSuccess: "Tour reservation submitted successfully!",
       networkError: "Error connecting to server. Please try again or book via WhatsApp.",
     },
+    auth: {
+      loginTab: "Log In",
+      signupTab: "Sign Up",
+      welcomeBack: "Welcome back",
+      createAccount: "Create an account",
+      loginSubtitle: "Sign in to manage your bookings and saved tours.",
+      signupSubtitle: "Sign up to track reservations, get member discounts & more.",
+      continueGoogle: "Continue with Google",
+      continueApple: "Continue with Apple",
+      orEmail: "or continue with email",
+      fullNamePlaceholder: "Full name",
+      emailPlaceholder: "Email address",
+      passwordPlaceholder: "Password",
+      forgotPassword: "Forgot password?",
+      loginBtn: "Log In",
+      loggingIn: "Signing In...",
+      createAccountBtn: "Create Account",
+      creatingAccount: "Creating Account...",
+      noAccount: "Don't have an account?",
+      signUpFree: "Sign up free",
+      haveAccount: "Already have an account?",
+      logInLink: "Log in",
+    },
   },
 
   AZ: {
@@ -486,6 +532,29 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       fillAllFields: "Zəhmət olmasa bütün xanaları doldurun",
       reservationSuccess: "Tur rezervasiyası uğurla qeydə alındı!",
       networkError: "Serverlə əlaqə xətası. Zəhmət olmasa yenidən cəhd edin və ya WhatsApp ilə əlaqə saxlayın.",
+    },
+    auth: {
+      loginTab: "Daxil ol",
+      signupTab: "Qeydiyyat",
+      welcomeBack: "Xoş gəlmisiniz",
+      createAccount: "Hesab yaradın",
+      loginSubtitle: "Rezervasiyalarınızı və yadda saxlanılan turları idarə etmək üçün daxil olun.",
+      signupSubtitle: "Rezervasiyaları izləmək və xüsusi endirimlər əldə etmək üçün qeydiyyatdan keçin.",
+      continueGoogle: "Google ilə davam edin",
+      continueApple: "Apple ilə davam edin",
+      orEmail: "və ya e-poçt ilə davam edin",
+      fullNamePlaceholder: "Tam adınız",
+      emailPlaceholder: "E-poçt ünvanı",
+      passwordPlaceholder: "Şifrə",
+      forgotPassword: "Şifrəni unutmusunuz?",
+      loginBtn: "Daxil ol",
+      loggingIn: "Daxil olunur...",
+      createAccountBtn: "Hesab yarat",
+      creatingAccount: "Hesab yaradılır...",
+      noAccount: "Hesabınız yoxdur?",
+      signUpFree: "Pulsuz qeydiyyatdan keçin",
+      haveAccount: "Artıq hesabınız var?",
+      logInLink: "Daxil olun",
     },
   },
 
@@ -638,6 +707,29 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       reservationSuccess: "Бронирование тура успешно отправлено!",
       networkError: "Ошибка подключения к серверу. Попробуйте еще раз или напишите нам в WhatsApp.",
     },
+    auth: {
+      loginTab: "Войти",
+      signupTab: "Регистрация",
+      welcomeBack: "С возвращением",
+      createAccount: "Создать аккаунт",
+      loginSubtitle: "Войдите, чтобы управлять бронированиями и сохраненными турами.",
+      signupSubtitle: "Зарегистрируйтесь, чтобы отслеживать бронирования и получать скидки.",
+      continueGoogle: "Продолжить с Google",
+      continueApple: "Продолжить с Apple",
+      orEmail: "или продолжить с email",
+      fullNamePlaceholder: "Полное имя",
+      emailPlaceholder: "Адрес эл. почты",
+      passwordPlaceholder: "Пароль",
+      forgotPassword: "Забыли пароль?",
+      loginBtn: "Войти",
+      loggingIn: "Вход...",
+      createAccountBtn: "Создать аккаунт",
+      creatingAccount: "Создание аккаунта...",
+      noAccount: "Нет аккаунта?",
+      signUpFree: "Зарегистрироваться бесплатно",
+      haveAccount: "Уже есть аккаунт?",
+      logInLink: "Войти",
+    },
   },
 
   FR: {
@@ -788,6 +880,29 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       fillAllFields: "Veuillez renseigner tous les champs obligatoires",
       reservationSuccess: "Réservation enregistrée avec succès !",
       networkError: "Erreur de connexion au serveur. Réessayez ou contactez-nous par WhatsApp.",
+    },
+    auth: {
+      loginTab: "Connexion",
+      signupTab: "Inscription",
+      welcomeBack: "Bon retour",
+      createAccount: "Créer un compte",
+      loginSubtitle: "Connectez-vous pour gérer vos réservations et circuits enregistrés.",
+      signupSubtitle: "Inscrivez-vous pour suivre vos réservations et obtenir des réductions.",
+      continueGoogle: "Continuer avec Google",
+      continueApple: "Continuer avec Apple",
+      orEmail: "ou continuer par e-mail",
+      fullNamePlaceholder: "Nom complet",
+      emailPlaceholder: "Adresse e-mail",
+      passwordPlaceholder: "Mot de passe",
+      forgotPassword: "Mot de passe oublié ?",
+      loginBtn: "Se connecter",
+      loggingIn: "Connexion en cours...",
+      createAccountBtn: "Créer un compte",
+      creatingAccount: "Création du compte...",
+      noAccount: "Vous n'avez pas de compte ?",
+      signUpFree: "Inscrivez-vous gratuitement",
+      haveAccount: "Vous avez déjà un compte ?",
+      logInLink: "Se connecter",
     },
   },
 
@@ -940,6 +1055,29 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       reservationSuccess: "تم إرسال حجز الجولة بنجاح!",
       networkError: "خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى أو التواصل عبر واتساب.",
     },
+    auth: {
+      loginTab: "تسجيل الدخول",
+      signupTab: "إنشاء حساب",
+      welcomeBack: "مرحبًا بعودتك",
+      createAccount: "إنشاء حساب جديد",
+      loginSubtitle: "سجل الدخول لإدارة حجوزاتك وجولاتك المحفوظة.",
+      signupSubtitle: "سجل الآن لتتبع الحجوزات والحصول على خصومات حصرية.",
+      continueGoogle: "المتابعة باستخدام Google",
+      continueApple: "المتابعة باستخدام Apple",
+      orEmail: "أو المتابعة عبر البريد الإلكتروني",
+      fullNamePlaceholder: "الاسم الكامل",
+      emailPlaceholder: "البريد الإلكتروني",
+      passwordPlaceholder: "كلمة المرور",
+      forgotPassword: "هل نسيت كلمة المرور؟",
+      loginBtn: "تسجيل الدخول",
+      loggingIn: "جاري تسجيل الدخول...",
+      createAccountBtn: "إنشاء حساب",
+      creatingAccount: "جاري إنشاء الحساب...",
+      noAccount: "ليس لديك حساب؟",
+      signUpFree: "سجل مجانًا",
+      haveAccount: "هل لديك حساب بالفعل؟",
+      logInLink: "تسجيل الدخول",
+    },
   },
 
   DE: {
@@ -1090,6 +1228,29 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       fillAllFields: "Bitte füllen Sie alle Pflichtfelder aus",
       reservationSuccess: "Tour-Reservierung erfolgreich übermittelt!",
       networkError: "Verbindungsfehler. Bitte erneut versuchen oder direkt per WhatsApp buchen.",
+    },
+    auth: {
+      loginTab: "Anmelden",
+      signupTab: "Registrieren",
+      welcomeBack: "Willkommen zurück",
+      createAccount: "Konto erstellen",
+      loginSubtitle: "Melden Sie sich an, um Ihre Buchungen und Touren zu verwalten.",
+      signupSubtitle: "Registrieren Sie sich, um Reservierungen zu verfolgen und Rabatte zu erhalten.",
+      continueGoogle: "Mit Google fortfahren",
+      continueApple: "Mit Apple fortfahren",
+      orEmail: "oder mit E-Mail fortfahren",
+      fullNamePlaceholder: "Vollständiger Name",
+      emailPlaceholder: "E-Mail-Adresse",
+      passwordPlaceholder: "Passwort",
+      forgotPassword: "Passwort vergessen?",
+      loginBtn: "Anmelden",
+      loggingIn: "Wird angemeldet...",
+      createAccountBtn: "Konto erstellen",
+      creatingAccount: "Konto wird erstellt...",
+      noAccount: "Noch kein Konto?",
+      signUpFree: "Kostenlos registrieren",
+      haveAccount: "Bereits ein Konto?",
+      logInLink: "Anmelden",
     },
   },
 };

@@ -10,9 +10,11 @@ import {
 import { COUNTRIES, getCountryEligibility, validatePassportValidity } from "@/lib/visa-countries";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { VISA_APPLY_TRANSLATIONS } from "@/lib/pages-i18n";
 
 export default function VisaApplyPage() {
   const { t, showToast, language } = useLanguage();
+  const va = (VISA_APPLY_TRANSLATIONS[language] || VISA_APPLY_TRANSLATIONS.EN)!;
   const router = useRouter();
 
   // Wizard Step: 1 = Nationality & Tier, 2 = Travel, 3 = Personal & Passport, 4 = Review & Pay, 5 = Success
@@ -237,10 +239,10 @@ export default function VisaApplyPage() {
             <div className="flex items-center justify-between relative">
               <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -translate-y-1/2 -z-0" />
               {[
-                { num: 1, label: "Citizenship" },
-                { num: 2, label: "Travel Info" },
-                { num: 3, label: "Passport" },
-                { num: 4, label: "Review & Pay" },
+                { num: 1, label: va.step1Nav },
+                { num: 2, label: va.step2Nav },
+                { num: 3, label: va.step3Nav },
+                { num: 4, label: va.step4Nav },
               ].map((s) => (
                 <div key={s.num} className="relative z-10 flex flex-col items-center bg-white px-1 sm:px-2">
                   <div
@@ -271,16 +273,16 @@ export default function VisaApplyPage() {
         {step === 1 && (
           <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
-              Select Your Nationality
+              {va.step1Title}
             </h2>
             <p className="text-xs text-slate-500 mb-6">
-              Select the country that issued the passport you will use to travel to Azerbaijan.
+              {va.step1Desc}
             </p>
 
             <div className="space-y-5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Nationality / Citizenship *
+                  {va.nationalityLabel}
                 </label>
                 <select
                   value={nationality}
@@ -290,10 +292,10 @@ export default function VisaApplyPage() {
                   }}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
                 >
-                  <option value="">Select your passport country...</option>
+                  <option value="">{va.nationalityPlaceholder}</option>
                   {COUNTRIES.map((c) => (
                     <option key={c.code} value={c.name}>
-                      {c.name} {c.category === "visa_free" ? "(Visa-Free)" : c.category === "embassy_required" ? "(Consular / Embassy Visa)" : ""}
+                      {c.name} {c.category === "visa_free" ? va.visaFreeTag : c.category === "embassy_required" ? va.consularTag : ""}
                     </option>
                   ))}
                 </select>
@@ -304,9 +306,9 @@ export default function VisaApplyPage() {
                 <div className="rounded-2xl p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-bold">No Visa Required for {nationality}!</p>
+                    <p className="font-bold">{va.noVisaRequiredTitle.replace("{nationality}", nationality)}</p>
                     <p className="mt-1">
-                      {selectedCountryInfo?.notes || "You can travel directly to Azerbaijan with your valid passport."}
+                      {selectedCountryInfo?.notes || va.noVisaRequiredDescFallback}
                     </p>
                   </div>
                 </div>
@@ -317,9 +319,9 @@ export default function VisaApplyPage() {
                 <div className="rounded-2xl p-4 bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-3">
                   <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-bold">Consular Visa Required for {nationality}</p>
+                    <p className="font-bold">{va.consularVisaTitle.replace("{nationality}", nationality)}</p>
                     <p className="mt-1">
-                      Citizens of {nationality} are not eligible for the online ASAN electronic visa (e-Visa) under Republic of Azerbaijan immigration regulations. You must apply for a visa directly at an Embassy or Consulate of the Republic of Azerbaijan.
+                      {va.consularVisaDesc.replace(/\{nationality\}/g, nationality)}
                     </p>
                   </div>
                 </div>
@@ -327,23 +329,23 @@ export default function VisaApplyPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Travel Document Type
+                  {va.travelDocLabel}
                 </label>
                 <select
                   value={passportType}
                   onChange={(e) => setPassportType(e.target.value)}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none"
                 >
-                  <option value="Ordinary passport">Ordinary passport (Standard tourist)</option>
-                  <option value="Service passport">Service passport</option>
-                  <option value="Diplomatic passport">Diplomatic passport</option>
+                  <option value="Ordinary passport">{va.docOrdinary}</option>
+                  <option value="Service passport">{va.docService}</option>
+                  <option value="Diplomatic passport">{va.docDiplomatic}</option>
                 </select>
               </div>
 
               {/* Processing Speed Radio Group */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
-                  Select Processing Speed
+                  {va.speedLabel}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div
@@ -355,12 +357,12 @@ export default function VisaApplyPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-sm text-slate-900">Standard</span>
+                      <span className="font-bold text-sm text-slate-900">{va.standardTitle}</span>
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
-                        3 Business Days
+                        {va.standardTime}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 mb-2">Regular tourist processing.</p>
+                    <p className="text-xs text-slate-500 mb-2">{va.standardDesc}</p>
                     <p className="font-bold text-lg text-[#0f3460]">$59 <span className="text-xs font-normal text-slate-500">USD</span></p>
                   </div>
 
@@ -373,15 +375,15 @@ export default function VisaApplyPage() {
                     }`}
                   >
                     <span className="absolute top-0 right-0 bg-[#f59e0b] text-[#061225] text-[9px] font-extrabold px-2 py-0.5 rounded-bl-lg">
-                      ⚡ FASTEST
+                      {va.fastestBadge}
                     </span>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-sm text-slate-900">Urgent</span>
+                      <span className="font-bold text-sm text-slate-900">{va.urgentTitle}</span>
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-900">
-                        Within 3 Hours
+                        {va.urgentTime}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 mb-2">Express emergency turnaround.</p>
+                    <p className="text-xs text-slate-500 mb-2">{va.urgentDesc}</p>
                     <p className="font-bold text-lg text-[#0f3460]">$110 <span className="text-xs font-normal text-slate-500">USD</span></p>
                   </div>
                 </div>
@@ -394,7 +396,7 @@ export default function VisaApplyPage() {
                 className="w-full rounded-2xl py-4 text-sm font-semibold text-white transition-all hover:opacity-95 shadow-lg disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 mt-6"
                 style={{ backgroundColor: "#0f3460" }}
               >
-                Continue to Travel Information <ArrowRight className="h-4 w-4" />
+                {va.btnContinueTravel} <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -404,16 +406,16 @@ export default function VisaApplyPage() {
         {step === 2 && (
           <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
-              Travel Information
+              {va.step2Title}
             </h2>
             <p className="text-xs text-slate-500 mb-6">
-              Enter your anticipated entry date and where you will stay in Azerbaijan.
+              {va.step2Desc}
             </p>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Expected Arrival Date *
+                  {va.arrivalDateLabel}
                 </label>
                 <input
                   type="date"
@@ -422,40 +424,40 @@ export default function VisaApplyPage() {
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Your e-Visa will be valid for 90 days starting from this arrival date.
+                  {va.arrivalDateHint}
                 </p>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Purpose of Visit *
+                  {va.purposeLabel}
                 </label>
                 <select
                   value={purposeOfVisit}
                   onChange={(e) => setPurposeOfVisit(e.target.value)}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none"
                 >
-                  <option value="Tourism">Tourism / Sightseeing</option>
-                  <option value="Business">Business / Conference</option>
-                  <option value="Culture">Cultural & Historical</option>
-                  <option value="Sports">Sports / Events</option>
-                  <option value="Personal">Personal Visit / Friends</option>
+                  <option value="Tourism">{va.purposeTourism}</option>
+                  <option value="Business">{va.purposeBusiness}</option>
+                  <option value="Culture">{va.purposeCulture}</option>
+                  <option value="Sports">{va.purposeSports}</option>
+                  <option value="Personal">{va.purposePersonal}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Accommodation / Stay Address in Azerbaijan *
+                  {va.addressLabel}
                 </label>
                 <textarea
                   rows={3}
                   value={stayAddress}
                   onChange={(e) => setStayAddress(e.target.value)}
-                  placeholder="e.g. Four Seasons Hotel Baku, 1 Neftchilar Avenue, Baku or private address"
+                  placeholder={va.addressPlaceholder}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Required by Azerbaijan Immigration. Hotel booking address is acceptable.
+                  {va.addressHint}
                 </p>
               </div>
 
@@ -465,7 +467,7 @@ export default function VisaApplyPage() {
                   onClick={() => setStep(1)}
                   className="rounded-xl px-5 py-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Back
+                  {va.btnBack}
                 </button>
                 <button
                   type="button"
@@ -473,7 +475,7 @@ export default function VisaApplyPage() {
                   className="flex-1 rounded-xl py-3 text-xs font-semibold text-white transition-opacity hover:opacity-95 shadow-md cursor-pointer flex items-center justify-center gap-2"
                   style={{ backgroundColor: "#0f3460" }}
                 >
-                  Continue to Personal & Passport Info <ArrowRight className="h-4 w-4" />
+                  {va.btnContinuePersonal} <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -484,35 +486,35 @@ export default function VisaApplyPage() {
         {step === 3 && (
           <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
-              Personal & Passport Details
+              {va.step3Title}
             </h2>
             <p className="text-xs text-slate-500 mb-6">
-              Must match the machine-readable zone (MRZ) of your passport exactly.
+              {va.step3Desc}
             </p>
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Surname (Last Name) *
+                    {va.surnameLabel}
                   </label>
                   <input
                     type="text"
                     value={surname}
                     onChange={(e) => setSurname(e.target.value)}
-                    placeholder="e.g. SMITH"
+                    placeholder={va.surnamePlaceholder}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none uppercase"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Given Names (First & Middle) *
+                    {va.givenNamesLabel}
                   </label>
                   <input
                     type="text"
                     value={givenNames}
                     onChange={(e) => setGivenNames(e.target.value)}
-                    placeholder="e.g. JOHN MICHAEL"
+                    placeholder={va.givenNamesPlaceholder}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none uppercase"
                   />
                 </div>
@@ -521,20 +523,20 @@ export default function VisaApplyPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Gender *
+                    {va.genderLabel}
                   </label>
                   <select
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
                   >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
+                    <option value="Male">{va.genderMale}</option>
+                    <option value="Female">{va.genderFemale}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Date of Birth *
+                    {va.birthDateLabel}
                   </label>
                   <input
                     type="date"
@@ -545,13 +547,13 @@ export default function VisaApplyPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Place of Birth (City) *
+                    {va.birthPlaceLabel}
                   </label>
                   <input
                     type="text"
                     value={birthPlace}
                     onChange={(e) => setBirthPlace(e.target.value)}
-                    placeholder="e.g. London"
+                    placeholder={va.birthPlacePlaceholder}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
                   />
                 </div>
@@ -560,25 +562,25 @@ export default function VisaApplyPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Occupation / Profession *
+                    {va.occupationLabel}
                   </label>
                   <input
                     type="text"
                     value={occupation}
                     onChange={(e) => setOccupation(e.target.value)}
-                    placeholder="e.g. Software Engineer / Accountant"
+                    placeholder={va.occupationPlaceholder}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                    Phone / WhatsApp Number *
+                    {va.phoneLabel}
                   </label>
                   <input
                     type="tel"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="e.g. +1 555 123 4567"
+                    placeholder={va.phonePlaceholder}
                     className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
                   />
                 </div>
@@ -586,26 +588,26 @@ export default function VisaApplyPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Email Address * (For e-Visa PDF Delivery)
+                  {va.emailLabel}
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. traveler@example.com"
+                  placeholder={va.emailPlaceholder}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Permanent Residential Address *
+                  {va.resAddressLabel}
                 </label>
                 <input
                   type="text"
                   value={residentialAddress}
                   onChange={(e) => setResidentialAddress(e.target.value)}
-                  placeholder="e.g. 123 Baker Street, London, United Kingdom"
+                  placeholder={va.resAddressPlaceholder}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
                 />
               </div>
@@ -614,25 +616,25 @@ export default function VisaApplyPage() {
               <div className="pt-4 border-t border-slate-200">
                 <h3 className="font-bold text-sm text-slate-900 mb-3 flex items-center gap-1.5">
                   <Shield className="h-4 w-4 text-[#f59e0b]" />
-                  Passport Details
+                  {va.passportSectionTitle}
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Passport Number *
+                      {va.passportNumLabel}
                     </label>
                     <input
                       type="text"
                       value={passportNumber}
                       onChange={(e) => setPassportNumber(e.target.value)}
-                      placeholder="e.g. A12345678"
+                      placeholder={va.passportNumPlaceholder}
                       className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none uppercase font-mono"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Issue Date *
+                      {va.issueDateLabel}
                     </label>
                     <input
                       type="date"
@@ -643,7 +645,7 @@ export default function VisaApplyPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Expiry Date *
+                      {va.expiryDateLabel}
                     </label>
                     <input
                       type="date"
@@ -654,14 +656,14 @@ export default function VisaApplyPage() {
                   </div>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1">
-                  ⚠️ Must be valid for at least 3 months (90 days) beyond your arrival date in Azerbaijan.
+                  {va.passportValidityWarning}
                 </p>
               </div>
 
               {/* Passport Photo Upload */}
               <div className="pt-4">
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                  Upload Passport Bio-Page Photo / Scan
+                  {va.uploadLabel}
                 </label>
                 <div className="rounded-2xl border-2 border-dashed border-slate-300 p-4 text-center bg-slate-50 hover:bg-slate-100/50 transition-colors relative">
                   <input
@@ -677,13 +679,13 @@ export default function VisaApplyPage() {
                         alt="Passport Preview"
                         className="h-32 object-contain rounded-lg border border-slate-200 mb-2 shadow-sm"
                       />
-                      <p className="text-xs text-emerald-600 font-semibold">✓ Document attached. Click to change.</p>
+                      <p className="text-xs text-emerald-600 font-semibold">{va.uploadAttached}</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center py-4">
                       <Upload className="h-7 w-7 text-slate-400 mb-2" />
-                      <p className="text-xs font-semibold text-slate-700">Click to upload or drag & drop</p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">JPG, PNG, or PDF of the main photo page (max 5MB)</p>
+                      <p className="text-xs font-semibold text-slate-700">{va.uploadDropzoneTitle}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{va.uploadDropzoneDesc}</p>
                     </div>
                   )}
                 </div>
@@ -695,7 +697,7 @@ export default function VisaApplyPage() {
                   onClick={() => setStep(2)}
                   className="rounded-xl px-5 py-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Back
+                  {va.btnBack}
                 </button>
                 <button
                   type="button"
@@ -703,7 +705,7 @@ export default function VisaApplyPage() {
                   className="flex-1 rounded-xl py-3 text-xs font-semibold text-white transition-opacity hover:opacity-95 shadow-md cursor-pointer flex items-center justify-center gap-2"
                   style={{ backgroundColor: "#0f3460" }}
                 >
-                  Review Order & Complete <ArrowRight className="h-4 w-4" />
+                  {va.btnContinueReview} <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -714,37 +716,37 @@ export default function VisaApplyPage() {
         {step === 4 && (
           <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200">
             <h2 className="font-display text-2xl font-bold text-slate-900 mb-1">
-              Review & Submit Application
+              {va.step4Title}
             </h2>
             <p className="text-xs text-slate-500 mb-6">
-              Please double check all information. Typos will delay official government issuance.
+              {va.step4Desc}
             </p>
 
             <div className="space-y-6">
               {/* Summary Box */}
               <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200 space-y-3 text-xs">
                 <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                  <span className="text-slate-500">Applicant Name:</span>
+                  <span className="text-slate-500">{va.summaryApplicant}</span>
                   <span className="font-bold text-slate-900">{surname.toUpperCase()} {givenNames.toUpperCase()}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                  <span className="text-slate-500">Nationality:</span>
+                  <span className="text-slate-500">{va.summaryNationality}</span>
                   <span className="font-bold text-slate-900">{nationality}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                  <span className="text-slate-500">Passport Number:</span>
+                  <span className="text-slate-500">{va.summaryPassportNum}</span>
                   <span className="font-mono font-bold text-slate-900">{passportNumber.toUpperCase()}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                  <span className="text-slate-500">Arrival Date:</span>
+                  <span className="text-slate-500">{va.summaryArrivalDate}</span>
                   <span className="font-bold text-slate-900">{arrivalDate}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200/60 pb-2">
-                  <span className="text-slate-500">Service Speed:</span>
-                  <span className="font-bold text-[#0f3460] uppercase">{visaType} ({visaType === "urgent" ? "3 Hours" : "3 Days"})</span>
+                  <span className="text-slate-500">{va.summarySpeed}</span>
+                  <span className="font-bold text-[#0f3460] uppercase">{visaType} ({visaType === "urgent" ? va.timeHours : va.timeDays})</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Delivery Email:</span>
+                  <span className="text-slate-500">{va.summaryEmail}</span>
                   <span className="font-bold text-slate-900">{email}</span>
                 </div>
               </div>
@@ -752,15 +754,15 @@ export default function VisaApplyPage() {
               {/* Price Breakdown */}
               <div className="rounded-2xl p-4 border border-[#f59e0b]/40 bg-amber-50/40">
                 <div className="flex justify-between text-xs text-slate-600 mb-1.5">
-                  <span>Official Government ASAN Fee:</span>
+                  <span>{va.asanFeeLabel}</span>
                   <span>${govFee}.00 USD</span>
                 </div>
                 <div className="flex justify-between text-xs text-slate-600 mb-2">
-                  <span>Concierge Pre-Screen & Submission:</span>
+                  <span>{va.conciergeFeeLabel}</span>
                   <span>${serviceFee}.00 USD</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-slate-900 border-t border-amber-200 pt-2">
-                  <span>Total Amount Due:</span>
+                  <span>{va.totalAmountLabel}</span>
                   <div className="text-right">
                     <span style={{ color: "#0f3460" }}>${totalAmount}.00 USD</span>
                     <span className="block text-[11px] font-normal text-slate-500">
@@ -769,7 +771,7 @@ export default function VisaApplyPage() {
                   </div>
                 </div>
                 <p className="text-[10px] text-slate-500 mt-2 border-t border-amber-100 pt-1.5 leading-relaxed">
-                  💳 Payment processed via Payriff at the official Central Bank of Azerbaijan peg (1 USD = 1.70 AZN). No hidden merchant conversion markups.
+                  {va.payriffNote}
                 </p>
               </div>
 
@@ -780,7 +782,7 @@ export default function VisaApplyPage() {
                   disabled={submitting}
                   className="rounded-xl px-5 py-3 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Edit Details
+                  {va.btnEditDetails}
                 </button>
                 <button
                   type="button"
@@ -792,17 +794,17 @@ export default function VisaApplyPage() {
                   {submitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin text-white" />
-                      Connecting to Payriff Gateway...
+                      {va.btnConnectingPayriff}
                     </>
                   ) : (
-                    <>Pay with Payriff (${totalAmount}.00 USD) &rarr;</>
+                    <>{va.btnPayPayriff} (${totalAmount}.00 USD) &rarr;</>
                   )}
                 </button>
               </div>
 
               <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400 pt-1">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                <span>Secured by <b>payriff</b> 3D-Secure &bull; Visa &bull; Mastercard &bull; Apple Pay</span>
+                <span>{va.securedBy}</span>
               </div>
             </div>
           </div>
@@ -816,21 +818,21 @@ export default function VisaApplyPage() {
             </div>
 
             <span className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 mb-2 inline-block">
-              Payment & Application Confirmed
+              {va.step5ConfirmedBadge}
             </span>
 
             <h2 className="font-display text-3xl font-bold text-slate-900 mt-2 mb-2">
-              Application Received!
+              {va.step5Title}
             </h2>
             <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed mb-6">
-              Our visa operations officers have been alerted via Telegram and are reviewing your passport information against official ASAN immigration criteria.
+              {va.step5Desc}
             </p>
 
             <div className="rounded-2xl p-5 bg-slate-50 border border-slate-200 max-w-sm mx-auto mb-8 text-left">
-              <p className="text-[11px] text-slate-400 uppercase font-semibold">Your Tracking Reference</p>
+              <p className="text-[11px] text-slate-400 uppercase font-semibold">{va.refLabel}</p>
               <p className="font-mono text-2xl font-bold text-[#0f3460] my-1">{completedRef}</p>
               <p className="text-xs text-slate-500">
-                A confirmation has been sent to <b>{email}</b>. Keep this reference to track your live status.
+                {va.refNoticePre} <b>{email}</b>. {va.refNoticePost}
               </p>
             </div>
 
@@ -840,13 +842,13 @@ export default function VisaApplyPage() {
                 className="w-full sm:w-auto rounded-xl px-6 py-3 text-xs font-semibold text-white shadow-md transition-opacity hover:opacity-95"
                 style={{ backgroundColor: "#0f3460" }}
               >
-                Track Live Status
+                {va.btnTrackLive}
               </Link>
               <Link
                 href="/"
                 className="w-full sm:w-auto rounded-xl px-6 py-3 text-xs font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors"
               >
-                Return to Homepage
+                {va.btnHome}
               </Link>
             </div>
           </div>
