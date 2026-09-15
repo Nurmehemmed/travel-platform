@@ -9,6 +9,7 @@ import {
 import { COUNTRIES, getCountryEligibility } from "@/lib/visa-countries";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { CustomSelect } from "@/components/CustomSelect";
 
 export default function VisaLandingPage() {
   const { t } = useLanguage();
@@ -98,18 +99,16 @@ export default function VisaLandingPage() {
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <select
+                <CustomSelect
                   value={selectedCountry}
-                  onChange={(e) => handleCheckEligibility(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460] cursor-pointer"
-                >
-                  <option value="">{t.visaPage.selectCountry}</option>
-                  {COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.name}>
-                      {c.name} {c.category === "visa_free" ? "(Visa-Free)" : ""}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleCheckEligibility(val)}
+                  searchable={true}
+                  placeholder={t.visaPage.selectCountry}
+                  options={COUNTRIES.map((c) => ({
+                    value: c.name,
+                    label: `${c.name} ${c.category === "visa_free" ? "(Visa-Free)" : ""}`.trim(),
+                  }))}
+                />
               </div>
               <Link
                 href={

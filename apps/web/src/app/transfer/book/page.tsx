@@ -41,6 +41,7 @@ import {
 import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES, TRANSFER_BOOK_TRANSLATIONS } from "@/lib/pages-i18n";
 import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
+import { CustomSelect } from "@/components/CustomSelect";
 
 function TransferBookForm() {
   const router = useRouter();
@@ -402,34 +403,29 @@ function TransferBookForm() {
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                     {t.transferPage.airport}
                   </label>
-                  <select
+                  <CustomSelect
                     value={airport}
-                    onChange={(e) => setAirport(e.target.value as AirportCode)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-medium text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
-                  >
-                    {AIRPORTS.map((a) => (
-                      <option key={a.code} value={a.code}>
-                        {LOCALIZED_AIRPORTS[language]?.[a.code] || a.fullName}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setAirport(val as AirportCode)}
+                    options={AIRPORTS.map((a) => ({
+                      value: a.code,
+                      label: LOCALIZED_AIRPORTS[language]?.[a.code] || a.fullName,
+                      badge: a.code,
+                    }))}
+                  />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                     {t.transferPage.destinationZone}
                   </label>
-                  <select
+                  <CustomSelect
                     value={zoneId}
-                    onChange={(e) => setZoneId(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-medium text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
-                  >
-                    {airportZones.map((z) => (
-                      <option key={z.id} value={z.id}>
-                        {LOCALIZED_ZONES[language]?.[z.id] || z.name} {z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setZoneId(val)}
+                    options={airportZones.map((z) => ({
+                      value: z.id,
+                      label: `${LOCALIZED_ZONES[language]?.[z.id] || z.name} ${z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}`,
+                    }))}
+                  />
                 </div>
               </div>
 
@@ -768,17 +764,14 @@ function TransferBookForm() {
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                     {tb.paxCountLabel}
                   </label>
-                  <select
+                  <CustomSelect
                     value={passengerCount}
-                    onChange={(e) => setPassengerCount(Number(e.target.value))}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-medium text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? tb.paxUnitSingle : tb.paxUnitPlural}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setPassengerCount(Number(val))}
+                    options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => ({
+                      value: num,
+                      label: `${num} ${num === 1 ? tb.paxUnitSingle : tb.paxUnitPlural}`,
+                    }))}
+                  />
                   {currentVehicle && passengerCount > currentVehicle.maxPax && (
                     <div className="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-start gap-2">
                       <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />

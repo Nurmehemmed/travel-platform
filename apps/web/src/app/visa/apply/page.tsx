@@ -12,6 +12,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 import { VISA_APPLY_TRANSLATIONS } from "@/lib/pages-i18n";
 import { DatePicker } from "@/components/DatePicker";
+import { CustomSelect } from "@/components/CustomSelect";
 
 export default function VisaApplyPage() {
   const { t, showToast, language } = useLanguage();
@@ -291,21 +292,19 @@ export default function VisaApplyPage() {
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                   {va.nationalityLabel}
                 </label>
-                <select
+                <CustomSelect
                   value={nationality}
-                  onChange={(e) => {
-                    setNationality(e.target.value);
-                    setBirthCountry(e.target.value);
+                  onChange={(val) => {
+                    setNationality(val);
+                    setBirthCountry(val);
                   }}
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
-                >
-                  <option value="">{va.nationalityPlaceholder}</option>
-                  {COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.name}>
-                      {c.name} {c.category === "visa_free" ? va.visaFreeTag : c.category === "embassy_required" ? va.consularTag : ""}
-                    </option>
-                  ))}
-                </select>
+                  searchable={true}
+                  placeholder={va.nationalityPlaceholder}
+                  options={COUNTRIES.map((c) => ({
+                    value: c.name,
+                    label: `${c.name} ${c.category === "visa_free" ? va.visaFreeTag : c.category === "embassy_required" ? va.consularTag : ""}`.trim(),
+                  }))}
+                />
               </div>
 
               {/* Visa-Free Warning */}
@@ -338,15 +337,15 @@ export default function VisaApplyPage() {
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                   {va.travelDocLabel}
                 </label>
-                <select
+                <CustomSelect
                   value={passportType}
-                  onChange={(e) => setPassportType(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none"
-                >
-                  <option value="Ordinary passport">{va.docOrdinary}</option>
-                  <option value="Service passport">{va.docService}</option>
-                  <option value="Diplomatic passport">{va.docDiplomatic}</option>
-                </select>
+                  onChange={(val) => setPassportType(val)}
+                  options={[
+                    { value: "Ordinary passport", label: va.docOrdinary },
+                    { value: "Service passport", label: va.docService },
+                    { value: "Diplomatic passport", label: va.docDiplomatic },
+                  ]}
+                />
               </div>
 
               {/* Processing Speed Radio Group */}
@@ -440,17 +439,17 @@ export default function VisaApplyPage() {
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                   {va.purposeLabel}
                 </label>
-                <select
+                <CustomSelect
                   value={purposeOfVisit}
-                  onChange={(e) => setPurposeOfVisit(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none"
-                >
-                  <option value="Tourism">{va.purposeTourism}</option>
-                  <option value="Business">{va.purposeBusiness}</option>
-                  <option value="Culture">{va.purposeCulture}</option>
-                  <option value="Sports">{va.purposeSports}</option>
-                  <option value="Personal">{va.purposePersonal}</option>
-                </select>
+                  onChange={(val) => setPurposeOfVisit(val)}
+                  options={[
+                    { value: "Tourism", label: va.purposeTourism },
+                    { value: "Business", label: va.purposeBusiness },
+                    { value: "Culture", label: va.purposeCulture },
+                    { value: "Sports", label: va.purposeSports },
+                    { value: "Personal", label: va.purposePersonal },
+                  ]}
+                />
               </div>
 
               <div>
@@ -533,14 +532,14 @@ export default function VisaApplyPage() {
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                     {va.genderLabel}
                   </label>
-                  <select
+                  <CustomSelect
                     value={gender}
-                    onChange={(e) => setGender(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
-                  >
-                    <option value="Male">{va.genderMale}</option>
-                    <option value="Female">{va.genderFemale}</option>
-                  </select>
+                    onChange={(val) => setGender(val)}
+                    options={[
+                      { value: "Male", label: va.genderMale },
+                      { value: "Female", label: va.genderFemale },
+                    ]}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">

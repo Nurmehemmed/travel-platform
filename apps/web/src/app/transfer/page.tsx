@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { CustomSelect } from "@/components/CustomSelect";
 import {
   AIRPORTS,
   VEHICLE_CLASSES,
@@ -230,17 +231,14 @@ export default function TransferLandingPage() {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                   {t.transferPage.airport}
                 </label>
-                <select
+                <CustomSelect
                   value={selectedAirport}
-                  onChange={(e) => handleAirportChange(e.target.value as AirportCode)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
-                >
-                  {AIRPORTS.map((a) => (
-                    <option key={a.code} value={a.code}>
-                      {LOCALIZED_AIRPORTS[language]?.[a.code] || a.fullName}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => handleAirportChange(val as AirportCode)}
+                  options={AIRPORTS.map((a) => ({
+                    value: a.code,
+                    label: LOCALIZED_AIRPORTS[language]?.[a.code] || a.fullName,
+                  }))}
+                />
               </div>
 
               {/* Destination Zone Selector */}
@@ -248,17 +246,14 @@ export default function TransferLandingPage() {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
                   {t.transferPage.destinationZone}
                 </label>
-                <select
+                <CustomSelect
                   value={selectedZoneId}
-                  onChange={(e) => setSelectedZoneId(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-100"
-                >
-                  {zones.map((z) => (
-                    <option key={z.id} value={z.id}>
-                      {LOCALIZED_ZONES[language]?.[z.id] || z.name} {z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setSelectedZoneId(val)}
+                  options={zones.map((z) => ({
+                    value: z.id,
+                    label: `${LOCALIZED_ZONES[language]?.[z.id] || z.name} ${z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}`,
+                  }))}
+                />
               </div>
             </div>
 

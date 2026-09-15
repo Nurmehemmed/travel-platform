@@ -19,6 +19,7 @@ import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS, getLocalized
 import { useSiteSettings } from "@/lib/settings-context";
 import { TourCardsSkeleton } from "@/components/Skeletons";
 import { DatePicker } from "@/components/DatePicker";
+import { CustomSelect } from "@/components/CustomSelect";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -1027,24 +1028,19 @@ export default function HomePage() {
                 className="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none"
               />
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 sm:w-auto sm:min-w-[180px] focus-within:ring-2 focus-within:ring-sky-500/30 transition-all">
-              <select
+            <div className="sm:w-auto sm:min-w-[180px]">
+              <CustomSelect
                 value={activeDuration}
-                onChange={(e) => setActiveDuration(e.target.value)}
-                aria-label={t.search.durationLabel}
-                className="flex-1 bg-transparent text-sm text-slate-700 border-none outline-none cursor-pointer focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 shadow-none"
-              >
-                {[
+                onChange={(val) => setActiveDuration(val)}
+                ariaLabel={t.search.durationLabel}
+                triggerClassName="bg-slate-50 border-none py-3"
+                options={[
                   { val: "Any duration", label: t.search.durationAll },
                   { val: "Half day (1–4h)", label: t.search.durationHalf },
                   { val: "Full day (5–8h)", label: t.search.durationFull },
                   { val: "Multi-day", label: t.search.durationMulti },
-                ].map((d) => (
-                  <option key={d.val} value={d.val}>
-                    {d.label}
-                  </option>
-                ))}
-              </select>
+                ]}
+              />
             </div>
             <button
               onClick={() => {
@@ -2171,17 +2167,14 @@ export default function HomePage() {
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       {t.bookingModal.guestsLabel}
                     </label>
-                    <select
+                    <CustomSelect
                       value={bookingGuests}
-                      onChange={(e) => setBookingGuests(Number(e.target.value))}
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
-                    >
-                      {[1, 2, 3, 4, 5, 6, 7, 8, t.bookingModal.customGroup].map((n) => (
-                        <option key={String(n)} value={typeof n === "number" ? n : 9}>
-                          {typeof n === "number" ? `${n} ${n === 1 ? t.bookingModal.guest : t.bookingModal.guests}` : n}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => setBookingGuests(Number(val))}
+                      options={[1, 2, 3, 4, 5, 6, 7, 8, t.bookingModal.customGroup].map((n) => ({
+                        value: typeof n === "number" ? n : 9,
+                        label: typeof n === "number" ? `${n} ${n === 1 ? t.bookingModal.guest : t.bookingModal.guests}` : String(n),
+                      }))}
+                    />
                   </div>
 
                   <div>
