@@ -11,7 +11,8 @@ import Link from "next/link";
 import {
   MapPin, Search, Clock, Users, Star, ChevronDown, ChevronLeft, ChevronRight,
   Zap, Shield, MessageCircle, Award, ArrowRight, Globe,
-  Eye, EyeOff, X, Menu, LogOut, User as UserIcon, Loader2, AlertCircle, Bookmark, Heart, FileText, Car, Check
+  Eye, EyeOff, X, Menu, LogOut, User as UserIcon, Loader2, AlertCircle, Bookmark, Heart, FileText, Car, Check,
+  Share2, Copy, Sparkles, CheckCheck
 } from "lucide-react";
 import { useLanguage, LanguageCode } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -264,6 +265,23 @@ export default function HomePage() {
   const { language, setLanguage, t, currentLangInfo, isRtl, languages, showToast } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.origin);
+      setShareCopied(true);
+      showToast(
+        language === "AZ"
+          ? "Keçid kopyalandı!"
+          : language === "RU"
+          ? "Ссылка скопирована!"
+          : "Link copied to clipboard!",
+        "success"
+      );
+      setTimeout(() => setShareCopied(false), 3000);
+    }
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -1251,6 +1269,7 @@ export default function HomePage() {
                             setBookingModalTour({ id: tour.id, title: tourTitle, price: tour.price });
                             setBookingSuccess(false);
                           }}
+                          aria-label={`Reserve date for ${tourTitle} ($${tour.price} USD)`}
                           className="w-full rounded-xl py-2.5 px-2 text-xs font-bold transition-all duration-200 border border-slate-300 text-slate-800 hover:bg-slate-100 active:scale-98 text-center cursor-pointer shadow-sm"
                         >
                           📅 {t.bookingModal.reserveDateBtn}
@@ -1261,6 +1280,7 @@ export default function HomePage() {
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label={`Book ${tourTitle} tour on WhatsApp ($${tour.price} USD)`}
                           className="w-full rounded-xl py-2.5 px-2 text-xs font-bold text-white transition-all duration-200 hover:opacity-95 active:scale-98 text-center cursor-pointer shadow-sm flex items-center justify-center gap-1"
                           style={{ backgroundColor: "#0f3460" }}
                         >
@@ -1314,8 +1334,18 @@ export default function HomePage() {
               <h2 className="font-display text-4xl font-bold text-white leading-tight mb-6">
                 {t.whyUs.title}
               </h2>
-              <p className="text-white/70 leading-relaxed mb-10">
-                {t.whyUs.subtitle}
+              <p className="text-white/80 leading-relaxed mb-10 text-base">
+                {language === "AZ"
+                  ? "AddmeTour ilə Azərbaycanın əsl ruhunu kəşf edin. Biz qədim İpək Yolu irsini, zəngin mətbəxi və Qafqazın əsrarəngiz təbiətini birləşdirən xüsusi fərdi və kiçik qruplar üçün unikal səyahətlər təşkil edirik."
+                  : language === "RU"
+                  ? "Откройте для себя истинную душу Азербайджана с AddmeTour. Мы создаем индивидуальные и авторские экскурсии, объединяя древнее наследие Шелкового пути и кавказское гостеприимство."
+                  : language === "FR"
+                  ? "Découvrez l'âme authentique de l'Azerbaïdjan avec AddmeTour. Nous concevons des circuits sur mesure alliant patrimoine historique et paysages grandioses du Caucase."
+                  : language === "AR"
+                  ? "اكتشف روح وسحر أذربيجان الحقيقية مع AddmeTour. نصمم رحلات سياحية خاصة تجمع بين عبق طريق الحرير وضيافة القوقاز الأصيلة."
+                  : language === "DE"
+                  ? "Entdecken Sie die Seele Aserbaidschans mit AddmeTour. Wir gestalten maßgeschneiderte Touren, die Seidenstraßen-Kultur mit herrlicher Kaukasus-Natur verbinden."
+                  : "Discover the true soul of Azerbaijan with AddmeTour. We curate handcrafted private excursions and small-group journeys that blend centuries-old Silk Road heritage with authentic Caucasus hospitality."}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
@@ -1414,6 +1444,7 @@ export default function HomePage() {
               <Link
                 key={dest.slug}
                 href="#tours"
+                aria-label={`Explore ${dest.name} tours in Azerbaijan`}
                 onClick={() => {
                   setActiveFilter("All");
                   setSearchQuery(dest.slug);
@@ -1539,6 +1570,152 @@ export default function HomePage() {
               </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════ DISCOVER AZERBAIJAN TRAVEL GUIDE & HIGHLIGHTS */}
+      <section id="guide" className="py-20" style={{ backgroundColor: "#ffffff" }}>
+        <div className="container-section">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <p className="section-label mb-3" style={{ color: "#0f3460" }}>
+              {language === "AZ"
+                ? "SƏYAHƏT BƏLƏDÇİSİ"
+                : language === "RU"
+                ? "ПУТЕВОДИТЕЛЬ ПО СТРАНЕ"
+                : language === "FR"
+                ? "GUIDE DE VOYAGE"
+                : language === "AR"
+                ? "دليل السفر السياحي"
+                : language === "DE"
+                ? "REISEFÜHRER"
+                : "TRAVEL GUIDE & HIGHLIGHTS"}
+            </p>
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-slate-900 mb-4">
+              {language === "AZ"
+                ? "Odlar Yurdu Azərbaycanın Əsas Məkanları"
+                : language === "RU"
+                ? "Откройте душу Азербайджана: Главные достопримечательности"
+                : language === "FR"
+                ? "Découvrez l'âme de l'Azerbaïdjan : Incontournables"
+                : language === "AR"
+                ? "اكتشف روح وسحر أذربيجان: أهم المعالم والتجارب"
+                : language === "DE"
+                ? "Entdecken Sie die Seele Aserbaidschans: Die Höhepunkte"
+                : "Discover the Soul of Azerbaijan: Unmissable Highlights"}
+            </h2>
+            <p className="text-slate-600 text-sm md:text-base leading-relaxed">
+              {language === "AZ"
+                ? "Xəzər sahilindəki qədim İçərişəhərdən Böyük Qafqazın qarlı zirvələrinə qədər — zəngin İpək Yolu irsi, qədim palçıq vulkanları və əfsanəvi qonaqpərvərlik sizi gözləyir."
+                : language === "RU"
+                ? "От жемчужины Каспия Баку до величественных вершин Большого Кавказа — древнее наследие Шелкового пути, грязевые вулканы и легендарное кавказское гостеприимство."
+                : language === "FR"
+                ? "Des ruelles historiques de Bakou aux sommets du Grand Caucase : découvrez les trésors de la Route de la Soie, les volcans de boue et l'hospitalité légendaire."
+                : language === "AR"
+                ? "من أزقة باكو التاريخية إلى قمم جبال القوقاز الشاهقة: تراث طريق الحرير العريق، البراكين الطينية النادرة، وكرم الضيافة الأذربيجاني الأصيل."
+                : language === "DE"
+                ? "Von den historischen Gassen Bakus bis zu den Gipfeln des Großen Kaukasus: Erleben Sie das Erbe der Seidenstraße, Schlammvulkane und herzliche Gastfreundschaft."
+                : "From the ancient stone streets of Baku to the majestic heights of the Great Caucasus — explore UNESCO Silk Road treasures, otherworldly mud volcanoes, and legendary Caucasian warmth."}
+            </p>
+          </div>
+
+          {/* 4 Thematic Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {[
+              {
+                icon: "🏰",
+                title: language === "AZ" ? "Qədim Bakı & Abşeron" : language === "RU" ? "Старый Баку и Апшерон" : language === "FR" ? "Bakou & Absheron" : language === "AR" ? "باكو القديمة وأبشيرون" : language === "DE" ? "Baku & Absheron" : "Baku & Absheron Heritage",
+                desc: language === "AZ"
+                  ? "YUNESKO mirası İçərişəhər, Qız Qalası, Şirvanşahlar Sarayı və əbədi yanan Atəşgah məbədi ilə Yanardağın alovları."
+                  : language === "RU"
+                  ? "ЮНЕСКО Ичеришехер, Девичья башня, Дворец Ширваншахов, огненный храм Атешгях и горящая гора Янардаг."
+                  : language === "FR"
+                  ? "La vieille ville d'Icherisheher (UNESCO), la tour de la Vierge, le temple du feu d'Ateshgah et le mont flamboyant Yanar Dag."
+                  : language === "AR"
+                  ? "المدينة القديمة إيشري شهر المدرجة في اليونسكو، برج العذراء، قصر الشروانشاهات، ومعبد النار التاريخي أتشكاه."
+                  : language === "DE"
+                  ? "UNESCO-Altstadt Icherisheher, Jungfrauenturm, Schirwanschah-Palast, Feuertempel Ateshgah und brennender Berg Yanar Dag."
+                  : "Explore UNESCO Icherisheher, the iconic Maiden Tower, Shirvanshahs Palace, Zoroastrian Fire Temple Ateshgah, and Yanar Dag burning mountain.",
+              },
+              {
+                icon: "🏔️",
+                title: language === "AZ" ? "Böyük Qafqaz Zirvələri" : language === "RU" ? "Вершины Большого Кавказа" : language === "FR" ? "Montagnes du Caucase" : language === "AR" ? "قمم جبال القوقاز" : language === "DE" ? "Großer Kaukasus" : "Great Caucasus Wonders",
+                desc: language === "AZ"
+                  ? "Şahdağın qarlı yamacları, Qəbələnin zümrüd meşələri, Nohur gölü və Lahıc sənətkarlıq kəndinin daş cığırları."
+                  : language === "RU"
+                  ? "Горнолыжные курорты Шахдага, изумрудные леса Габалы, высокогорное озеро Нохур и ремесленный поселок Лагич."
+                  : language === "FR"
+                  ? "Les pistes alpines de Shahdag, les forêts émeraude de Gabala, le lac Nohur et le village artisanal de Lahidj."
+                  : language === "AR"
+                  ? "منتجعات شاهداغ الجبلية، غابات غابالا الساحرة، بحيرة نوهور الخلابة، وقرية الحرفيين التاريخية لاهيج."
+                  : language === "DE"
+                  ? "Schneebedeckte Hänge von Shahdag, smaragdgrüne Wälder in Gabala, Nohur-See und das historische Handwerkerdorf Lahij."
+                  : "Ascend to alpine heights at Shahdag, cruise peaceful Lake Nohur in Gabala, and stroll cobblestone craft alleys of ancient Lahij.",
+              },
+              {
+                icon: "🌋",
+                title: language === "AZ" ? "Qobustan & Palçıq Vulkanları" : language === "RU" ? "Гобустан и Вулканы" : language === "FR" ? "Gobustan & Volcans" : language === "AR" ? "غوبوستان والبراكين الطينية" : language === "DE" ? "Gobustan & Vulkane" : "Gobustan & Mud Volcanoes",
+                desc: language === "AZ"
+                  ? "6000-dən çox qədim qayaüstü rəsm, qədim yaşayış məskənləri və dünyanın ən sıx palçıq vulkanı kompleksi."
+                  : language === "RU"
+                  ? "Более 6000 древних наскальных петроглифов ЮНЕСКО и уникальное скопление активных грязевых вулканов мира."
+                  : language === "FR"
+                  ? "Plus de 6000 pétroglyphes préhistoriques classés à l'UNESCO et le plus grand complexe de volcans de boue au monde."
+                  : language === "AR"
+                  ? "أكثر من 6000 نقش صخري أثري تعود للعصر الحجري ونصف براكين الطين النشطة في العالم بأسره."
+                  : language === "DE"
+                  ? "Über 6.000 prähistorische Felszeichnungen (UNESCO) und mehr als die Hälfte aller aktiven Schlammvulkane der Erde."
+                  : "Discover 6,000+ prehistoric UNESCO petroglyphs and experience bubbling lunar mud volcanoes on the Caspian rim.",
+              },
+              {
+                icon: "📜",
+                title: language === "AZ" ? "İpək Yolu & Şəki Xirqəsi" : language === "RU" ? "Шелковый путь и Шеки" : language === "FR" ? "Route de la Soie & Sheki" : language === "AR" ? "طريق الحرير وقصر شاكي" : language === "DE" ? "Seidenstraße & Sheki" : "Silk Road Legacy & Sheki",
+                desc: language === "AZ"
+                  ? "Məşhur Şəki Xan Sarayının şəbəkə pəncərələri, tarixi karvansaralar, paxlava və ənənəvi ipəkçilik mərkəzləri."
+                  : language === "RU"
+                  ? "Дворец шекинских ханов с витражами шебеке, караван-сараи XVII века, местная пахлава и шелкоткачество."
+                  : language === "FR"
+                  ? "Le somptueux palais des Khans de Sheki avec ses vitraux shebeke, ses caravansérails médiévaux et sa soie raffinée."
+                  : language === "AR"
+                  ? "قصر خانات شاكي الشهير بزجاج الشبيكة الملون بدون مسامير، الخانات الأثرية، وصناعة الحرير والحلويات التقليدية."
+                  : language === "DE"
+                  ? "Der Palast der Khane von Sheki mit filigranen Shebeke-Fenstern, mittelalterliche Karawansereien und edle Seide."
+                  : "Marvel at the 18th-century Palace of Sheki Khans with intricate stained-glass shebeke, medieval caravanserais, and sweet baklava.",
+              },
+            ].map((p) => (
+              <div
+                key={p.title}
+                className="rounded-2xl bg-slate-50 border border-slate-200/80 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-white"
+              >
+                <div>
+                  <div className="text-3xl mb-4">{p.icon}</div>
+                  <h3 className="font-display text-lg font-bold text-slate-900 mb-2">{p.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{p.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Visitor Tips Bar */}
+          <div className="rounded-3xl p-8 bg-gradient-to-br from-[#0f3460] to-[#16213e] text-white shadow-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">💵 {language === "AZ" ? "Valyuta & Ödəniş" : language === "RU" ? "Валюта и карты" : language === "FR" ? "Monnaie" : language === "AR" ? "العملة والبطاقات" : language === "DE" ? "Währung" : "Currency & Cards"}</span>
+                <p className="text-xs text-white/80 mt-1">Azerbaijani Manat (AZN). Visa and Mastercard are accepted in hotels, restaurants, and malls across Baku.</p>
+              </div>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">☀️ {language === "AZ" ? "Ən Yaxşı Mövsüm" : language === "RU" ? "Лучший сезон" : language === "FR" ? "Meilleure saison" : language === "AR" ? "أفضل أوقات الزيارة" : language === "DE" ? "Beste Reisezeit" : "Best Travel Season"}</span>
+                <p className="text-xs text-white/80 mt-1">Spring (April–June) for pleasant blooming weather; Autumn (September–November) for wine harvest and golden foliage.</p>
+              </div>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">⚡ {language === "AZ" ? "ASAN e-Viza" : language === "RU" ? "Электронная виза" : language === "FR" ? "e-Visa officiel" : language === "AR" ? "التأشيرة الإلكترونية" : language === "DE" ? "e-Visum" : "Official e-Visa"}</span>
+                <p className="text-xs text-white/80 mt-1">Citizens from 95+ countries can obtain an official ASAN electronic visa online within 3 hours to 3 days.</p>
+              </div>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">🫖 {language === "AZ" ? "Qonaqpərvərlik & Təhlükəsizlik" : language === "RU" ? "Безопасность и чай" : language === "FR" ? "Hospitalité & Sécurité" : language === "AR" ? "الضيافة والأمان" : language === "DE" ? "Gastfreundschaft" : "Hospitality & Safety"}</span>
+                <p className="text-xs text-white/80 mt-1">Azerbaijan is ranked among the world's safest travel destinations with world-famous traditional tea ceremonies.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1731,33 +1908,202 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ FOOTER */}
-      <footer style={{ backgroundColor: "#061225" }} className="py-12">
+      <footer style={{ backgroundColor: "#061225" }} className="pt-16 pb-12 text-white border-t border-white/10">
         <div className="container-section">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
-                <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+            {/* Col 1: Brand & Bio */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
+                  <MapPin className="h-5 w-5 text-white" strokeWidth={2.5} />
+                </div>
+                <span className="font-bold text-xl tracking-tight" style={{ color: "#f59e0b" }}>addmetour</span>
               </div>
-              <span className="font-bold text-lg" style={{ color: "#f59e0b" }}>addmetour</span>
+              <p className="text-xs text-white/70 leading-relaxed mb-6">
+                Discover the soul of Azerbaijan with boutique private tours, 24/7 airport pickups, and expedited 3-hour official e-Visas. Handcrafted with local passion.
+              </p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} className="h-3.5 w-3.5 fill-[#f59e0b] text-[#f59e0b]" />
+                  ))}
+                </div>
+                <span className="text-xs font-bold text-white">4.9/5</span>
+                <span className="text-[11px] text-white/60">TripAdvisor</span>
+              </div>
             </div>
-            <p className="text-sm text-white/70">
-              {t.footer.rights}
-            </p>
+
+            {/* Col 2: Navigation Links */}
+            <div>
+              <h3 className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
+                {language === "AZ" ? "Sürətli Keçidlər" : language === "RU" ? "Навигация" : "Quick Links"}
+              </h3>
+              <ul className="space-y-2.5 text-xs text-white/70">
+                <li>
+                  <Link href="#tours" aria-label="Browse popular Azerbaijan tours" className="hover:text-amber-400 transition-colors">
+                    {t.nav.tours}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#destinations" aria-label="View Azerbaijan destinations" className="hover:text-amber-400 transition-colors">
+                    {t.nav.destinations}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/visa" aria-label="Official Azerbaijan e-Visa application" className="hover:text-amber-400 transition-colors">
+                    {t.nav.evisa} (ASAN Visa)
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/transfer" aria-label="Book airport transfer in Baku" className="hover:text-amber-400 transition-colors">
+                    {t.nav.transfer}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#about" aria-label="Why travel with AddmeTour" className="hover:text-amber-400 transition-colors">
+                    {t.nav.about}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#reviews" aria-label="Read authentic traveler reviews" className="hover:text-amber-400 transition-colors">
+                    {t.nav.reviews}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#faq" aria-label="Frequently asked travel questions" className="hover:text-amber-400 transition-colors">
+                    {t.nav.faq}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Col 3: Contact & Support */}
+            <div>
+              <h3 className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
+                {t.footer.contact}
+              </h3>
+              <div className="space-y-3 text-xs text-white/70">
+                <p className="flex items-center gap-2">
+                  <span className="text-amber-400">📍</span> Nizami St, Baku, Azerbaijan
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-amber-400">💬</span> WhatsApp: {siteConfig.contact.whatsappPhone}
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="text-amber-400">✉️</span> support@addmetour.com
+                </p>
+                <p className="text-[11px] text-white/50 pt-1">
+                  {t.footer.supportAvailable}
+                </p>
+              </div>
+            </div>
+
+            {/* Col 4: Social Channels & Share Bar */}
+            <div>
+              <h3 className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
+                {language === "AZ" ? "Bizi İzləyin & Paylaşın" : language === "RU" ? "Соцсети и Поделиться" : "Follow & Share"}
+              </h3>
+              
+              {/* Social Channels */}
+              <div className="flex items-center gap-2 mb-6">
+                <a
+                  href={`https://wa.me/${siteConfig.contact.whatsappClean}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Connect with AddmeTour on WhatsApp"
+                  title="WhatsApp"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#25D366] hover:text-white transition-all duration-200"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://t.me/addmetour"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow AddmeTour on Telegram"
+                  title="Telegram"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#0088cc] hover:text-white transition-all duration-200"
+                >
+                  <Globe className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://instagram.com/addmetour"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow AddmeTour on Instagram"
+                  title="Instagram"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#E1306C] hover:text-white transition-all duration-200"
+                >
+                  <Star className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://facebook.com/addmetour"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow AddmeTour on Facebook"
+                  title="Facebook"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#1877F2] hover:text-white transition-all duration-200"
+                >
+                  <Award className="h-4 w-4" />
+                </a>
+              </div>
+
+              {/* Social Share Toolbar */}
+              <div className="rounded-2xl bg-white/5 border border-white/10 p-3.5">
+                <span className="block text-[11px] font-semibold text-white/80 mb-2.5 flex items-center gap-1.5">
+                  <Share2 className="h-3.5 w-3.5 text-amber-400" />
+                  {language === "AZ" ? "Səhifəni Paylaşın" : language === "RU" ? "Поделиться сайтом" : "Share this Page"}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Discover Azerbaijan with AddmeTour: https://addmetour.vercel.app")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Share AddmeTour on WhatsApp"
+                    className="flex-1 rounded-lg py-1.5 bg-[#25D366]/20 hover:bg-[#25D366] text-white text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1"
+                  >
+                    WA
+                  </a>
+                  <a
+                    href={`https://t.me/share/url?url=${encodeURIComponent("https://addmetour.vercel.app")}&text=${encodeURIComponent("Discover Azerbaijan Tours & Travel Experiences")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Share AddmeTour on Telegram"
+                    className="flex-1 rounded-lg py-1.5 bg-[#0088cc]/20 hover:bg-[#0088cc] text-white text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1"
+                  >
+                    TG
+                  </a>
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://addmetour.vercel.app")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Share AddmeTour on Facebook"
+                    className="flex-1 rounded-lg py-1.5 bg-[#1877F2]/20 hover:bg-[#1877F2] text-white text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1"
+                  >
+                    FB
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    aria-label="Copy website link to clipboard"
+                    className="flex-1 rounded-lg py-1.5 bg-white/10 hover:bg-white/20 text-white text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    {shareCopied ? <CheckCheck className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                    <span>{shareCopied ? "OK" : "Copy"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row */}
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
+            <p>{t.footer.rights}</p>
             <div className="flex items-center gap-6">
-              {[
-                { label: t.nav.tours, href: "#tours" },
-                { label: t.nav.destinations, href: "#destinations" },
-                { label: t.nav.evisa, href: "/visa" },
-                { label: t.nav.transfer, href: "/transfer" },
-                { label: t.nav.about, href: "#about" },
-                { label: t.nav.reviews, href: "#reviews" },
-                { label: t.nav.faq, href: "#faq" },
-                { label: t.nav.adminPortal, href: "/admin" },
-              ].map((item) => (
-                <Link key={item.href} href={item.href} className="text-sm text-white/75 hover:text-white transition-colors">
-                  {item.label}
-                </Link>
-              ))}
+              <Link href="/admin" aria-label="Admin Management Portal" className="hover:text-white transition-colors">
+                {t.nav.adminPortal}
+              </Link>
             </div>
           </div>
         </div>
