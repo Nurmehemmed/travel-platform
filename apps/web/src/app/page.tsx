@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useLanguage, LanguageCode } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS } from "@/lib/tours-i18n";
+import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS, getLocalizedTour } from "@/lib/tours-i18n";
 import { useSiteSettings } from "@/lib/settings-context";
 import { TourCardsSkeleton } from "@/components/Skeletons";
 
@@ -1134,13 +1134,13 @@ export default function HomePage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredTours.length > 0 ? (
                 filteredTours.map((tour) => {
-                const localizedTour = LOCALIZED_TOURS[language]?.[tour.id] || LOCALIZED_TOURS.EN[tour.id] || tour;
-                const tourTitle = localizedTour.title || tour.title;
-                const tourDesc = localizedTour.desc || tour.desc;
-                const tourDuration = localizedTour.duration || tour.duration;
-                const tourGroupSize = localizedTour.groupSize || tour.groupSize;
-                const tourBadge = localizedTour.badge || tour.badge;
-                const tourTags = localizedTour.tags || tour.tags;
+                const localizedTour = getLocalizedTour(tour, language);
+                const tourTitle = localizedTour.title;
+                const tourDesc = localizedTour.desc;
+                const tourDuration = localizedTour.duration;
+                const tourGroupSize = localizedTour.groupSize;
+                const tourBadge = localizedTour.badge;
+                const tourTags = localizedTour.tags;
 
                 return (
                 <div
@@ -2109,7 +2109,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-slate-900 mb-1">
-                  {bookingModalTour.title}
+                  {getLocalizedTour(bookingModalTour, language).title}
                 </h3>
                 <p className="text-xs text-slate-500 mb-5">
                   {t.bookingModal.subtitle}

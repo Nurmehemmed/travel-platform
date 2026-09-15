@@ -526,3 +526,216 @@ export const LOCALIZED_TESTIMONIALS: Record<LanguageCode, LocalizedTestimonial[]
     },
   ],
 };
+
+export const BADGE_TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
+  EN: {
+    "Best Seller": "Best Seller",
+    "New Experience": "New Experience",
+    "Popular": "Popular",
+    "Limited Deal": "Limited Deal",
+    "Top Rated": "Top Rated",
+  },
+  AZ: {
+    "Best Seller": "Ən Çox Satılan",
+    "New Experience": "Yeni Təcrübə",
+    "Popular": "Məşhur",
+    "Limited Deal": "Xüsusi Təklif",
+    "Top Rated": "Ən Yüksək Reytinq",
+  },
+  RU: {
+    "Best Seller": "Хит продаж",
+    "New Experience": "Новый опыт",
+    "Popular": "Популярный",
+    "Limited Deal": "Спецпредложение",
+    "Top Rated": "Высокий рейтинг",
+  },
+  FR: {
+    "Best Seller": "Meilleure Vente",
+    "New Experience": "Nouvelle Expérience",
+    "Popular": "Populaire",
+    "Limited Deal": "Offre Limitée",
+    "Top Rated": "Mieux Noté",
+  },
+  AR: {
+    "Best Seller": "الأكثر مبيعاً",
+    "New Experience": "تجربة جديدة",
+    "Popular": "شائع",
+    "Limited Deal": "عرض محدود",
+    "Top Rated": "الأعلى تقييماً",
+  },
+  DE: {
+    "Best Seller": "Bestseller",
+    "New Experience": "Neue Erfahrung",
+    "Popular": "Beliebt",
+    "Limited Deal": "Limitiertes Angebot",
+    "Top Rated": "Bestbewertet",
+  },
+};
+
+export const TAG_TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
+  EN: {
+    Walking: "Walking",
+    History: "History",
+    Culture: "Culture",
+    Nature: "Nature",
+    Private: "Private",
+    Overnight: "Overnight",
+    Scenery: "Scenery",
+    Architecture: "Architecture",
+    Photography: "Photography",
+    Guided: "Guided",
+    Adventure: "Adventure",
+    Sheki: "Sheki",
+    Gobustan: "Gobustan",
+    Baku: "Baku",
+    City: "City",
+    "Day Trip": "Day Trip",
+  },
+  AZ: {
+    Walking: "Piyada",
+    History: "Tarix",
+    Culture: "Mədəniyyət",
+    Nature: "Təbiət",
+    Private: "Fərdi",
+    Overnight: "Gecələməli",
+    Scenery: "Mənzərə",
+    Architecture: "Memarlıq",
+    Photography: "Fotoqrafiya",
+    Guided: "Bələdçili",
+    Adventure: "Macəra",
+    Sheki: "Şəki",
+    Gobustan: "Qobustan",
+    Baku: "Bakı",
+    City: "Şəhər",
+    "Day Trip": "Birgünlük",
+  },
+  RU: {
+    Walking: "Пешеходный",
+    History: "История",
+    Culture: "Культура",
+    Nature: "Природа",
+    Private: "Индивидуальный",
+    Overnight: "С ночевкой",
+    Scenery: "Пейзажи",
+    Architecture: "Архитектура",
+    Photography: "Фотография",
+    Guided: "С гидом",
+    Adventure: "Приключения",
+    Sheki: "Шеки",
+    Gobustan: "Гобустан",
+    Baku: "Баку",
+    City: "Город",
+    "Day Trip": "Однодневный",
+  },
+  FR: {
+    Walking: "À pied",
+    History: "Histoire",
+    Culture: "Culture",
+    Nature: "Nature",
+    Private: "Privé",
+    Overnight: "Avec nuitée",
+    Scenery: "Paysages",
+    Architecture: "Architecture",
+    Photography: "Photographie",
+    Guided: "Avec guide",
+    Adventure: "Aventure",
+    Sheki: "Chéki",
+    Gobustan: "Goboustan",
+    Baku: "Bakou",
+    City: "Ville",
+    "Day Trip": "Excursion d'un jour",
+  },
+  AR: {
+    Walking: "مشي",
+    History: "تاريخ",
+    Culture: "ثقافة",
+    Nature: "طبيعة",
+    Private: "خاص",
+    Overnight: "مع مبيت",
+    Scenery: "مناظر",
+    Architecture: "عمارة",
+    Photography: "تصوير",
+    Guided: "مع مرشد",
+    Adventure: "مغامرة",
+    Sheki: "شاكي",
+    Gobustan: "قوبوستان",
+    Baku: "باكو",
+    City: "مدينة",
+    "Day Trip": "رحلة يومية",
+  },
+  DE: {
+    Walking: "Zu Fuß",
+    History: "Geschichte",
+    Culture: "Kultur",
+    Nature: "Natur",
+    Private: "Privat",
+    Overnight: "Mit Übernachtung",
+    Scenery: "Landschaft",
+    Architecture: "Architektur",
+    Photography: "Fotografie",
+    Guided: "Geführt",
+    Adventure: "Abenteuer",
+    Sheki: "Schäki",
+    Gobustan: "Gobustan",
+    Baku: "Baku",
+    City: "Stadt",
+    "Day Trip": "Tagesausflug",
+  },
+};
+
+export interface LocalizedTourResult {
+  title: string;
+  desc: string;
+  duration: string;
+  groupSize: string;
+  badge?: string | undefined;
+  tags: string[];
+}
+
+export function getLocalizedTour(tour: any, lang: LanguageCode): LocalizedTourResult {
+  if (!tour) {
+    return {
+      title: "",
+      desc: "",
+      duration: "",
+      groupSize: "",
+      badge: undefined,
+      tags: [],
+    };
+  }
+
+  // 1. Direct ID match
+  let matched: LocalizedTourData | undefined = LOCALIZED_TOURS[lang]?.[tour.id];
+
+  // 2. Slug / Title fuzzy match if tour is from database
+  if (!matched) {
+    const titleLower = (tour.title || "").toLowerCase();
+    const slugLower = (tour.slug || "").toLowerCase();
+    let key: string | null = null;
+    if (titleLower.includes("old city") || slugLower.includes("old-city") || slugLower.includes("baku-old")) key = "t1";
+    else if (titleLower.includes("absheron") || slugLower.includes("absheron")) key = "t2";
+    else if (titleLower.includes("sheki") || slugLower.includes("sheki")) key = "t3";
+    else if (titleLower.includes("modern baku") || titleLower.includes("architecture") || slugLower.includes("modern-baku")) key = "t4";
+    else if (titleLower.includes("gobustan") || slugLower.includes("gobustan")) key = "t5";
+    else if (titleLower.includes("caucasus") || titleLower.includes("mountain") || slugLower.includes("caucasus") || titleLower.includes("highlands")) key = "t6";
+
+    if (key && LOCALIZED_TOURS[lang]?.[key]) {
+      matched = LOCALIZED_TOURS[lang][key];
+    }
+  }
+
+  const rawBadge = matched?.badge || tour.badge;
+  const translatedBadge = rawBadge ? (BADGE_TRANSLATIONS[lang]?.[rawBadge] || rawBadge) : undefined;
+
+  const rawTags: string[] = matched?.tags || tour.tags || [];
+  const translatedTags: string[] = rawTags.map((tag: string) => TAG_TRANSLATIONS[lang]?.[tag] || tag);
+
+  return {
+    title: matched?.title || tour.title || "",
+    desc: matched?.desc || tour.desc || tour.overview || "",
+    duration: matched?.duration || tour.duration || (tour.durationDays ? `${tour.durationDays} ${lang === "RU" ? "дн." : lang === "AZ" ? "gün" : "days"}` : ""),
+    groupSize: matched?.groupSize || tour.groupSize || (tour.maxGroupSize ? `${lang === "RU" ? "До" : lang === "AZ" ? "qədər" : "Up to"} ${tour.maxGroupSize}` : ""),
+    badge: translatedBadge,
+    tags: translatedTags,
+  };
+}
