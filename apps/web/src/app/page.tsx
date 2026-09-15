@@ -18,6 +18,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS, getLocalizedTour } from "@/lib/tours-i18n";
 import { useSiteSettings } from "@/lib/settings-context";
 import { TourCardsSkeleton } from "@/components/Skeletons";
+import { DatePicker } from "@/components/DatePicker";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -2157,13 +2158,12 @@ export default function HomePage() {
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       {t.bookingModal.dateLabel}
                     </label>
-                    <input
-                      type="date"
+                    <DatePicker
                       required
-                      min={new Date().toISOString().split("T")[0]}
+                      minDate={new Date().toISOString().split("T")[0]}
                       value={bookingDate}
-                      onChange={(e) => setBookingDate(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                      placeholder={t.bookingModal.dateLabel}
+                      onChange={(val) => setBookingDate(val)}
                     />
                   </div>
 

@@ -11,6 +11,7 @@ import { COUNTRIES, getCountryEligibility, validatePassportValidity } from "@/li
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 import { VISA_APPLY_TRANSLATIONS } from "@/lib/pages-i18n";
+import { DatePicker } from "@/components/DatePicker";
 
 export default function VisaApplyPage() {
   const { t, showToast, language } = useLanguage();
@@ -417,11 +418,12 @@ export default function VisaApplyPage() {
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                   {va.arrivalDateLabel}
                 </label>
-                <input
-                  type="date"
+                <DatePicker
+                  required
+                  minDate={new Date().toISOString().split("T")[0]}
                   value={arrivalDate}
-                  onChange={(e) => setArrivalDate(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-[#0f3460]"
+                  placeholder={va.arrivalDateLabel}
+                  onChange={(val) => setArrivalDate(val)}
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
                   {va.arrivalDateHint}
@@ -538,11 +540,12 @@ export default function VisaApplyPage() {
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                     {va.birthDateLabel}
                   </label>
-                  <input
-                    type="date"
+                  <DatePicker
+                    required
+                    maxDate={new Date().toISOString().split("T")[0]}
                     value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
+                    placeholder={va.birthDateLabel}
+                    onChange={(val) => setBirthDate(val)}
                   />
                 </div>
                 <div>
@@ -636,22 +639,24 @@ export default function VisaApplyPage() {
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                       {va.issueDateLabel}
                     </label>
-                    <input
-                      type="date"
+                    <DatePicker
+                      required
+                      maxDate={new Date().toISOString().split("T")[0]}
                       value={passportIssueDate}
-                      onChange={(e) => setPassportIssueDate(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
+                      placeholder={va.issueDateLabel}
+                      onChange={(val) => setPassportIssueDate(val)}
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                       {va.expiryDateLabel}
                     </label>
-                    <input
-                      type="date"
+                    <DatePicker
+                      required
+                      minDate={new Date().toISOString().split("T")[0]}
                       value={passportExpiryDate}
-                      onChange={(e) => setPassportExpiryDate(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 outline-none"
+                      placeholder={va.expiryDateLabel}
+                      onChange={(val) => setPassportExpiryDate(val)}
                     />
                   </div>
                 </div>

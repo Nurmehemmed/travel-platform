@@ -39,6 +39,7 @@ import {
   getVehicleConfig,
 } from "@/lib/transfer-zones";
 import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES, TRANSFER_BOOK_TRANSLATIONS } from "@/lib/pages-i18n";
+import { DatePicker } from "@/components/DatePicker";
 
 function TransferBookForm() {
   const router = useRouter();
@@ -579,21 +580,17 @@ function TransferBookForm() {
                     <label className="block text-xs font-bold text-slate-700 mb-1">
                       {tb.flightDateLabel}
                     </label>
-                    <input
+                    <DatePicker
                       id="flightDate"
-                      type="date"
                       required
                       value={flightDate}
-                      onChange={(e) => {
-                        setFlightDate(e.target.value);
+                      minDate={new Date().toISOString().split("T")[0]}
+                      placeholder={tb.flightDateLabel}
+                      hasError={invalidField === "flightDate"}
+                      onChange={(val) => {
+                        setFlightDate(val);
                         if (invalidField === "flightDate") setInvalidField(null);
-
                       }}
-                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
-                        invalidField === "flightDate"
-                          ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
-                          : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
-                      }`}
                     />
                   </div>
 
@@ -657,21 +654,17 @@ function TransferBookForm() {
                       <label className="block text-xs font-bold text-slate-700 mb-1">
                         {tb.retFlightDateLabel}
                       </label>
-                      <input
+                      <DatePicker
                         id="returnDate"
-                        type="date"
                         required
                         value={returnDate}
-                        onChange={(e) => {
-                          setReturnDate(e.target.value);
+                        minDate={flightDate || new Date().toISOString().split("T")[0]}
+                        placeholder={tb.retFlightDateLabel}
+                        hasError={invalidField === "returnDate"}
+                        onChange={(val) => {
+                          setReturnDate(val);
                           if (invalidField === "returnDate") setInvalidField(null);
-
                         }}
-                        className={`w-full rounded-xl border px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 transition-all ${
-                          invalidField === "returnDate"
-                            ? "border-red-400 ring-2 ring-red-200 bg-red-50/40 animate-shake"
-                            : "border-slate-200 bg-white focus:border-sky-500 focus:ring-sky-100"
-                        }`}
                       />
                     </div>
 
