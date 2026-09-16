@@ -39,6 +39,9 @@ import {
   Mail,
   Megaphone,
   Save,
+  Pencil,
+  Globe,
+  Image as ImageIcon,
 } from "lucide-react";
 import { StatsCardsSkeleton, TableSkeleton } from "@/components/Skeletons";
 
@@ -278,6 +281,17 @@ export default function AdminPortalPage() {
   const [editNotes, setEditNotes] = useState("");
   const [visaUpdateLoading, setVisaUpdateLoading] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
+
+  // Destination Modal & Management States
+  const [isDestinationModalOpen, setIsDestinationModalOpen] = useState(false);
+  const [destinationModalMode, setDestinationModalMode] = useState<"create" | "edit">("create");
+  const [editingDestinationId, setEditingDestinationId] = useState<string | null>(null);
+  const [destFormName, setDestFormName] = useState("");
+  const [destFormCountry, setDestFormCountry] = useState("Azerbaijan");
+  const [destFormSlug, setDestFormSlug] = useState("");
+  const [destFormHeroImage, setDestFormHeroImage] = useState("");
+  const [destSaving, setDestSaving] = useState(false);
+  const [destSearchQuery, setDestSearchQuery] = useState("");
 
   // SLA and Validity Helpers
   const getVisaSla = (visa: VisaItem) => {
@@ -719,6 +733,184 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
     }
   };
 
+  // Destination Management Presets & Handlers
+  const AZERBAIJAN_DESTINATION_PRESETS = [
+    {
+      name: "Baku",
+      country: "Azerbaijan",
+      slug: "baku",
+      image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1000&q=80",
+      desc: "Old City, Maiden Tower & Flame Towers",
+    },
+    {
+      name: "Sheki",
+      country: "Azerbaijan",
+      slug: "sheki",
+      image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1000&q=80",
+      desc: "Khan Palace & Silk Road Heritage",
+    },
+    {
+      name: "Gobustan",
+      country: "Azerbaijan",
+      slug: "gobustan",
+      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1000&q=80",
+      desc: "Mud Volcanoes & Prehistoric Rock Art",
+    },
+    {
+      name: "Absheron",
+      country: "Azerbaijan",
+      slug: "absheron",
+      image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1000&q=80",
+      desc: "Ateshgah Fire Temple & Yanar Dag",
+    },
+    {
+      name: "Gabala",
+      country: "Azerbaijan",
+      slug: "gabala",
+      image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1000&q=80",
+      desc: "Tufandag Mountains & Nohur Lake",
+    },
+    {
+      name: "Quba",
+      country: "Azerbaijan",
+      slug: "quba",
+      image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1000&q=80",
+      desc: "Caucasus Foothills & Red Village",
+    },
+    {
+      name: "Shusha",
+      country: "Azerbaijan",
+      slug: "shusha",
+      image: "https://images.unsplash.com/photo-1511497584788-87676104235f?w=1000&q=80",
+      desc: "Cultural Capital & Jidir Duzu",
+    },
+    {
+      name: "Shahdag",
+      country: "Azerbaijan",
+      slug: "shahdag",
+      image: "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1000&q=80",
+      desc: "Alpine Ski Resort & Peak Panoramas",
+    },
+    {
+      name: "Ganja",
+      country: "Azerbaijan",
+      slug: "ganja",
+      image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1000&q=80",
+      desc: "Nizami Heritage & Lake Goygol",
+    },
+    {
+      name: "Lankaran",
+      country: "Azerbaijan",
+      slug: "lankaran",
+      image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1000&q=80",
+      desc: "Caspian Subtropical Tea & Citrus Hills",
+    },
+  ];
+
+  const handleOpenCreateDestination = () => {
+    setDestinationModalMode("create");
+    setEditingDestinationId(null);
+    setDestFormName("");
+    setDestFormCountry("Azerbaijan");
+    setDestFormSlug("");
+    setDestFormHeroImage(AZERBAIJAN_DESTINATION_PRESETS[0]!.image);
+    setIsDestinationModalOpen(true);
+  };
+
+  const handleOpenEditDestination = (d: DestinationItem) => {
+    setDestinationModalMode("edit");
+    setEditingDestinationId(d.id);
+    setDestFormName(d.name);
+    setDestFormCountry(d.country || "Azerbaijan");
+    setDestFormSlug(d.slug);
+    setDestFormHeroImage(d.heroImageUrl || "");
+    setIsDestinationModalOpen(true);
+  };
+
+  const handleSelectPresetDestination = (preset: typeof AZERBAIJAN_DESTINATION_PRESETS[0]) => {
+    setDestFormName(preset.name);
+    setDestFormCountry(preset.country);
+    if (destinationModalMode === "create") {
+      setDestFormSlug(preset.slug);
+    }
+    setDestFormHeroImage(preset.image);
+  };
+
+  const handleSaveDestination = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!destFormName.trim()) {
+      alert("Please enter a destination name");
+      return;
+    }
+    setDestSaving(true);
+    try {
+      if (destinationModalMode === "create") {
+        const res = await fetch("/api/admin/destinations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: destFormName.trim(),
+            country: destFormCountry.trim() || "Azerbaijan",
+            customSlug: destFormSlug.trim(),
+            heroImageUrl: destFormHeroImage.trim(),
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to create destination");
+        setDestinationsList((prev) => [data.destination, ...prev]);
+        showNotification(`Destination "${destFormName}" added successfully!`);
+      } else {
+        const res = await fetch("/api/admin/destinations", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: editingDestinationId,
+            name: destFormName.trim(),
+            country: destFormCountry.trim() || "Azerbaijan",
+            slug: destFormSlug.trim(),
+            heroImageUrl: destFormHeroImage.trim(),
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to update destination");
+        setDestinationsList((prev) =>
+          prev.map((item) => (item.id === editingDestinationId ? data.destination : item))
+        );
+        showNotification(`Destination "${destFormName}" updated successfully!`);
+      }
+      setIsDestinationModalOpen(false);
+    } catch (err: any) {
+      alert(err.message || "Failed to save destination");
+    } finally {
+      setDestSaving(false);
+    }
+  };
+
+  const handleDeleteDestination = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete destination "${name}"? This action cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/admin/destinations?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete destination");
+      setDestinationsList((prev) => prev.filter((d) => d.id !== id));
+      showNotification(`Destination "${name}" deleted.`);
+    } catch (err: any) {
+      alert(err.message || "Failed to delete destination");
+    }
+  };
+
+  const filteredDestinations = destinationsList.filter((d) => {
+    if (!destSearchQuery.trim()) return true;
+    const q = destSearchQuery.toLowerCase();
+    return (
+      d.name.toLowerCase().includes(q) ||
+      d.country.toLowerCase().includes(q) ||
+      d.slug.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ backgroundColor: "#f8f5f0" }}>
       {/* ═══════════════════════════════════════════════════════ SIDEBAR */}
@@ -917,6 +1109,17 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 <ExternalLink className="h-3.5 w-3.5 text-[#f59e0b]" />
                 Open Official evisa.gov.az
               </a>
+            )}
+
+            {activeTab === "destinations" && (
+              <button
+                onClick={handleOpenCreateDestination}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
+                style={{ backgroundColor: "#0f3460" }}
+              >
+                <Plus className="h-4 w-4 text-[#f59e0b]" />
+                Add Destination
+              </button>
             )}
 
             {activeTab === "tours" && (
@@ -1634,39 +1837,210 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
           {/* ═══════════════════════════════════════════════════════ TAB: DESTINATIONS */}
           {activeTab === "destinations" && (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {destinationsList.map((d) => (
-                  <div
-                    key={d.id}
-                    className="rounded-2xl border bg-white overflow-hidden shadow-sm flex flex-col justify-between"
-                    style={{ borderColor: "#e0f2fe" }}
+              {/* Stat Summary Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Destinations</span>
+                    <p className="text-2xl font-bold font-display text-slate-900 mt-1">{destinationsList.length}</p>
+                    <span className="text-[11px] text-slate-400 mt-0.5 block">Cataloged regions</span>
+                  </div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 border border-sky-100">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider">Azerbaijan Regions</span>
+                    <p className="text-2xl font-bold font-display text-amber-600 mt-1">
+                      {destinationsList.filter((d) => d.country?.toLowerCase().includes("azerbaijan")).length}
+                    </p>
+                    <span className="text-[11px] text-amber-600/70 mt-0.5 block">Baku, Sheki, Gobustan & more</span>
+                  </div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-100">
+                    <Globe className="h-5 w-5" />
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">Linked Tours</span>
+                    <p className="text-2xl font-bold font-display text-emerald-600 mt-1">
+                      {destinationsList.reduce((acc, d) => acc + (d.tourCount || 0), 0)}
+                    </p>
+                    <span className="text-[11px] text-emerald-600/70 mt-0.5 block">Active tour packages</span>
+                  </div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+                    <Compass className="h-5 w-5" />
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider">Top Destination</span>
+                    <p className="text-lg font-bold font-display text-indigo-900 mt-1 truncate max-w-[150px]">
+                      {destinationsList.length > 0
+                        ? [...destinationsList].sort((a, b) => (b.tourCount || 0) - (a.tourCount || 0))[0]?.name || "Baku"
+                        : "None"}
+                    </p>
+                    <span className="text-[11px] text-indigo-600/70 mt-0.5 block">
+                      {destinationsList.length > 0
+                        ? `${[...destinationsList].sort((a, b) => (b.tourCount || 0) - (a.tourCount || 0))[0]?.tourCount || 0} active packages`
+                        : "0 packages"}
+                    </span>
+                  </div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Search & Actions Toolbar */}
+              <div className="p-4 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="relative flex-1 w-full max-w-md">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={destSearchQuery}
+                    onChange={(e) => setDestSearchQuery(e.target.value)}
+                    placeholder="Search destinations by name, region or slug..."
+                    className="w-full pl-10 pr-9 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0f3460] bg-slate-50 focus:bg-white transition-all"
+                  />
+                  {destSearchQuery && (
+                    <button
+                      onClick={() => setDestSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                  <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
+                    Showing {filteredDestinations.length} of {destinationsList.length} destinations
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleOpenCreateDestination}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md hover:opacity-90 transition-all cursor-pointer whitespace-nowrap"
+                    style={{ backgroundColor: "#0f3460" }}
                   >
-                    <div className="relative h-44 w-full bg-slate-100">
-                      {d.heroImageUrl && (
-                        <Image
-                          src={d.heroImageUrl}
-                          alt={d.name}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                      <div className="absolute bottom-3 left-4 text-white">
-                        <h3 className="font-bold text-lg font-display">{d.name}</h3>
-                        <p className="text-xs text-white/70">{d.country}</p>
+                    <Plus className="h-4 w-4 text-[#f59e0b]" />
+                    <span>Add New Destination</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Destination Cards Grid */}
+              {filteredDestinations.length === 0 ? (
+                <div className="p-12 rounded-2xl bg-white border border-[#e0f2fe] text-center space-y-3">
+                  <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                    <MapPin className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-bold text-base text-slate-800">No Destinations Found</h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    {destSearchQuery
+                      ? `No destinations matched "${destSearchQuery}". Try a different keyword.`
+                      : "No destinations have been created yet. Click below to add your first destination."}
+                  </p>
+                  {destSearchQuery ? (
+                    <button
+                      onClick={() => setDestSearchQuery("")}
+                      className="px-4 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-colors"
+                    >
+                      Clear Search
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleOpenCreateDestination}
+                      className="px-4 py-2 rounded-xl bg-[#0f3460] text-white text-xs font-bold shadow-sm"
+                    >
+                      Add Destination
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredDestinations.map((d) => (
+                    <div
+                      key={d.id}
+                      className="group rounded-2xl border bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between border-[#e0f2fe] hover:border-sky-300"
+                    >
+                      {/* Image Header with Gradient Overlay */}
+                      <div className="relative h-48 w-full bg-slate-900 overflow-hidden">
+                        {d.heroImageUrl ? (
+                          <img
+                            src={d.heroImageUrl}
+                            alt={d.name}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center bg-slate-800 text-slate-500">
+                            <ImageIcon className="h-10 w-10" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+
+                        {/* Top Badges */}
+                        <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2">
+                          <span className="rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono text-white/90 border border-white/15">
+                            /{d.slug}
+                          </span>
+                          <span className="rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-400/30 px-2 py-0.5 text-[10px] font-bold text-amber-200">
+                            🇦🇿 {d.country}
+                          </span>
+                        </div>
+
+                        {/* Bottom Overlay Title */}
+                        <div className="absolute bottom-3 left-4 right-4 text-white">
+                          <h3 className="font-bold text-xl font-display leading-tight drop-shadow-md">
+                            {d.name}
+                          </h3>
+                        </div>
+                      </div>
+
+                      {/* Card Body & Action Controls */}
+                      <div className="p-4 bg-white space-y-3">
+                        <div className="flex items-center justify-between pt-1">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 text-xs font-bold border border-sky-200/80">
+                            <Compass className="h-3.5 w-3.5 text-sky-600" />
+                            {d.tourCount} {d.tourCount === 1 ? "Active Tour" : "Active Tours"}
+                          </span>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEditDestination(d)}
+                              className="p-1.5 rounded-lg border border-slate-200 hover:border-sky-400 text-slate-600 hover:text-sky-600 hover:bg-sky-50 transition-colors shadow-xs cursor-pointer"
+                              title={`Edit ${d.name}`}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteDestination(d.id, d.name)}
+                              className="p-1.5 rounded-lg border border-slate-200 hover:border-red-400 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors shadow-xs cursor-pointer"
+                              title={`Delete ${d.name}`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                            <Link
+                              href={`/#destinations`}
+                              target="_blank"
+                              className="p-1.5 rounded-lg border border-slate-200 hover:border-amber-400 text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors shadow-xs"
+                              title="View destination on live website"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </Link>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="p-4 flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-600">
-                        {d.tourCount} Active Tours
-                      </span>
-                      <span className="text-[11px] font-mono text-slate-400">
-                        /{d.slug}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -3637,6 +4011,205 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════ DESTINATION CREATE / EDIT MODAL */}
+      {isDestinationModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto border border-sky-100">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 border border-sky-100">
+                  <MapPin className="h-5 w-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">
+                    {destinationModalMode === "create" ? "New Region" : "Update Region"}
+                  </span>
+                  <h3 className="text-xl font-bold font-display text-slate-900 mt-0.5">
+                    {destinationModalMode === "create" ? "Add New Destination" : `Edit Destination: ${destFormName}`}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDestinationModalOpen(false)}
+                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Quick Presets Picker */}
+            <div className="space-y-2 bg-sky-50/50 p-3.5 rounded-2xl border border-sky-100">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                  Quick Azerbaijan Presets (1-Click Fill)
+                </span>
+                <span className="text-[10px] text-sky-600 font-medium">Click to auto-fill</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {AZERBAIJAN_DESTINATION_PRESETS.map((p) => {
+                  const isSelected = destFormName.toLowerCase() === p.name.toLowerCase();
+                  return (
+                    <button
+                      key={p.slug}
+                      type="button"
+                      onClick={() => handleSelectPresetDestination(p)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer flex items-center gap-1 ${
+                        isSelected
+                          ? "bg-sky-600 text-white border-sky-600 shadow-xs"
+                          : "bg-white text-slate-700 border-sky-200 hover:border-sky-400 hover:bg-sky-100/50"
+                      }`}
+                    >
+                      <span>🇦🇿</span>
+                      <span>{p.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSaveDestination} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Destination Name */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Destination / City Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={destFormName}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setDestFormName(val);
+                      if (destinationModalMode === "create" && (!destFormSlug || destFormSlug === destFormName.toLowerCase().replace(/[^a-z0-9]+/g, "-"))) {
+                        setDestFormSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""));
+                      }
+                    }}
+                    placeholder="e.g. Gobustan, Gabala, Sheki"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-base sm:text-xs text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460]"
+                  />
+                </div>
+
+                {/* Country */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Country
+                  </label>
+                  <input
+                    type="text"
+                    value={destFormCountry}
+                    onChange={(e) => setDestFormCountry(e.target.value)}
+                    placeholder="e.g. Azerbaijan"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-base sm:text-xs text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Slug */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    URL Slug
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-mono text-slate-400">
+                      /
+                    </span>
+                    <input
+                      type="text"
+                      value={destFormSlug}
+                      onChange={(e) => setDestFormSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ""))}
+                      placeholder="e.g. gobustan"
+                      className="w-full pl-7 pr-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-base sm:text-xs text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460]"
+                    />
+                  </div>
+                  <span className="text-[10px] text-slate-400 mt-1 block">Used for routing and tour filtering tags.</span>
+                </div>
+
+                {/* Hero Image URL */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Featured Hero Image URL
+                  </label>
+                  <input
+                    type="url"
+                    value={destFormHeroImage}
+                    onChange={(e) => setDestFormHeroImage(e.target.value)}
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-base sm:text-xs text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460]"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">High quality landscape orientation photo (16:9 or 4:3).</span>
+                </div>
+              </div>
+
+              {/* Live Preview Card */}
+              {destFormHeroImage && (
+                <div className="space-y-1.5">
+                  <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">Live Image Preview</span>
+                  <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 shadow-inner">
+                    <img
+                      src={destFormHeroImage}
+                      alt="Destination Preview"
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1548013146-72479768bada?w=1000&q=80";
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-[10px] font-mono text-white">
+                        /{destFormSlug || "slug"}
+                      </span>
+                      <span className="rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-400/30 px-2 py-0.5 text-[10px] font-bold text-amber-200">
+                        🇦🇿 {destFormCountry || "Azerbaijan"}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-3 left-4 text-white">
+                      <p className="font-bold text-lg font-display drop-shadow-md">
+                        {destFormName || "Destination Preview"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsDestinationModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={destSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold text-white shadow-md hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                  style={{ backgroundColor: "#0f3460" }}
+                >
+                  {destSaving ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin text-amber-400" />
+                      <span>Saving Destination...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 text-amber-400" />
+                      <span>{destinationModalMode === "create" ? "Create Destination" : "Save Changes"}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
