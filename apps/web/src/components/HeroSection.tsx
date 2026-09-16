@@ -293,7 +293,9 @@ export function HeroSection({ slides = DEFAULT_SLIDES }: HeroSectionProps) {
                   {...(slide.blurDataUrl
                     ? { placeholder: "blur" as const, blurDataURL: slide.blurDataUrl }
                     : {})}
-                  className="object-cover object-center"
+                  className={`object-cover object-center ${
+                    idx === currentSlide ? "animate-ken-burns" : "scale-100"
+                  }`}
                 />
               </div>
             );

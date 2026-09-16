@@ -177,3 +177,22 @@
   animation: toast-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ─── Hero Cinematic Ken Burns Animation ──────────────────────────────────── */
+@keyframes kenburns-slow {
+  0% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.07) translate3d(-0.8%, -0.8%, 0);
+  }
+  100% {
+    transform: scale(1.03) translate3d(0.8%, 0.4%, 0);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenburns-slow 14s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+  will-change: transform;
+}
+
+

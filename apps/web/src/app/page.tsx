@@ -964,8 +964,8 @@ export default function HomePage() {
                   fill
                   sizes="100vw"
                   style={{ objectFit: "cover" }}
-                  className={`object-cover object-center transition-transform duration-10000 ease-out ${
-                    index === currentSlide ? "scale-105" : "scale-100"
+                  className={`object-cover object-center transition-opacity duration-700 ${
+                    index === currentSlide ? "animate-ken-burns" : "scale-100"
                   }`}
                   priority={index === 0}
                 />
