@@ -330,16 +330,23 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
       </header>
 
       {/* ── Hero Title ── */}
-      <section className="bg-[#0f3460] text-white py-10 sm:py-14 border-b border-white/10 relative overflow-hidden">
+      <section className="bg-gradient-to-b from-[#0a203d] via-[#0f3460] to-[#0f3460] text-white py-12 sm:py-16 border-b border-white/10 relative overflow-hidden">
+        {/* Ambient Glowing Blobs */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+
         <div className="container-section text-center max-w-3xl mx-auto relative z-10">
-          <span className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30 mb-3">
-            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+          <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold bg-amber-400/15 text-amber-300 border border-amber-400/30 mb-3.5 shadow-sm backdrop-blur-md">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
             <span>100% Tailored Private Journeys</span>
           </span>
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-            Design Your Dream Caucasus Itinerary
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            Design Your Dream{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-amber-400">
+              Caucasus Itinerary
+            </span>
           </h1>
-          <p className="text-sm sm:text-base text-white/70 mt-3 max-w-xl mx-auto">
+          <p className="text-sm sm:text-base text-slate-200 mt-3.5 max-w-xl mx-auto font-normal leading-relaxed">
             Choose your days, preferred destinations, luxury hotels, and private Mercedes chauffeur. Get an instant quote in 60 seconds.
           </p>
         </div>
