@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "@travel/ui/styles";
 import FloatingTravelServices from "@/components/FloatingTravelServices";
+import FloatingCustomItinerary from "@/components/FloatingCustomItinerary";
 import { LanguageProvider } from "@/lib/i18n";
 import { SettingsProvider } from "@/lib/settings-context";
 import { CurrencyProvider } from "@/lib/currency-context";
@@ -295,6 +296,7 @@ export default function RootLayout({
           <LanguageProvider>
             <CurrencyProvider>
               {children}
+              <FloatingCustomItinerary />
               <FloatingTravelServices />
             </CurrencyProvider>
           </LanguageProvider>
