@@ -600,11 +600,11 @@ export default function HomePage() {
 
           {/* Right side — always shrink-0 so controls stay visible */}
           <div className="flex items-center gap-1.5 sm:gap-2 relative shrink-0">
-            {/* Interactive Language Selector */}
-            <LanguageSelector variant="dark" />
-
-            {/* Currency Switcher */}
-            <CurrencySelector variant="dark" />
+            {/* Interactive Language & Currency Selectors (Desktop Navbar only; on mobile, cleanly accessible in drawer) */}
+            <div className="hidden xl:flex items-center gap-1.5 sm:gap-2">
+              <LanguageSelector variant="dark" />
+              <CurrencySelector variant="dark" />
+            </div>
 
             {/* Saved Tours quick button in Navbar */}
             <button
