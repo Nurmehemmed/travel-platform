@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@travel/ui/styles";
 import FloatingTravelServices from "@/components/FloatingTravelServices";
 import FloatingCustomItinerary from "@/components/FloatingCustomItinerary";
+import { CookieConsent } from "@/components/CookieConsent";
 import { LanguageProvider } from "@/lib/i18n";
 import { SettingsProvider } from "@/lib/settings-context";
 import { CurrencyProvider } from "@/lib/currency-context";
@@ -298,6 +299,7 @@ export default function RootLayout({
               {children}
               <FloatingCustomItinerary />
               <FloatingTravelServices />
+              <CookieConsent />
             </CurrencyProvider>
           </LanguageProvider>
         </SettingsProvider>

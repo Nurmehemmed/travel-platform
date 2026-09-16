@@ -54,6 +54,7 @@ ${header}
     const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(5000),
       body: JSON.stringify({
         chat_id: chatId,
         text,
@@ -90,6 +91,7 @@ export async function sendTelegramAlert(message: string): Promise<boolean> {
     const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(5000),
       body: JSON.stringify({
         chat_id: chatId,
         text: message,
@@ -201,6 +203,7 @@ ${vehicleLabel}
     const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(5000),
       body: JSON.stringify({
         chat_id: chatId,
         text,

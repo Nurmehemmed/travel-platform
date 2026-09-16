@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db, transferBookings } from "@travel/db";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { verifyPayriffOrder } from "@/lib/payriff";
 import { sendTelegramTransferAlert } from "@/lib/telegram";
 import { getAirportByCode } from "@/lib/transfer-zones";
@@ -42,43 +42,52 @@ export async function GET(req: Request) {
     );
   }
 
-  // Look up and update the booking
-  const booking = await db.query.transferBookings.findFirst({
-    where: eq(transferBookings.bookingNumber, bookingNumber),
-  });
-
-  if (booking) {
-    await db
+  // Atomic idempotent update
+  const updated = await db.transaction(async (tx) => {
+    const [row] = await tx
       .update(transferBookings)
       .set({
         paymentStatus: "paid",
         status: "pending",
-        payriffOrderId: orderId || booking.payriffOrderId,
+        payriffOrderId: orderId,
         adminNotes: `Payriff Order verified: ${orderId || "OK"}`,
         updatedAt: new Date(),
       })
-      .where(eq(transferBookings.bookingNumber, bookingNumber));
+      .where(
+        and(
+          eq(transferBookings.bookingNumber, bookingNumber),
+          ne(transferBookings.paymentStatus, "paid")
+        )
+      )
+      .returning();
+    return row;
+  });
 
-    const airportInfo = getAirportByCode(booking.airport as "GYD" | "GJA" | "NAJ");
+  const booking = updated || (await db.query.transferBookings.findFirst({
+    where: eq(transferBookings.bookingNumber, bookingNumber),
+  }));
 
-    // Fire Telegram transfer alert
+  if (updated) {
+    const airportInfo = getAirportByCode(updated.airport as "GYD" | "GJA" | "NAJ");
+
+    // Fire Telegram transfer alert only on initial transition to paid
     sendTelegramTransferAlert({
-      bookingNumber:      booking.bookingNumber,
-      direction:          booking.direction,
-      airport:            airportInfo?.fullName ?? booking.airport,
-      pickupZone:         booking.pickupZone,
-      dropoffAddress:     booking.dropoffAddress,
-      vehicleClass:       booking.vehicleClass,
-      flightNumber:       booking.flightNumber,
-      flightDate:         booking.flightDate,
-      flightTime:         booking.flightTime,
-      returnFlightNumber: booking.returnFlightNumber ?? undefined,
-      returnDate:         booking.returnDate ?? undefined,
-      passengerName:      booking.passengerName,
-      passengerCount:     booking.passengerCount,
-      phoneNumber:        booking.phoneNumber,
-      email:              booking.email,
-      totalAmount:        booking.totalAmount,
+      bookingNumber:      updated.bookingNumber,
+      direction:          updated.direction,
+      airport:            airportInfo?.fullName ?? updated.airport,
+      pickupZone:         updated.pickupZone,
+      dropoffAddress:     updated.dropoffAddress,
+      vehicleClass:       updated.vehicleClass,
+      flightNumber:       updated.flightNumber,
+      flightDate:         updated.flightDate,
+      flightTime:         updated.flightTime,
+      returnFlightNumber: updated.returnFlightNumber ?? undefined,
+      returnDate:         updated.returnDate ?? undefined,
+      passengerName:      updated.passengerName,
+      passengerCount:     updated.passengerCount,
+      phoneNumber:        updated.phoneNumber,
+      email:              updated.email,
+      totalAmount:        updated.totalAmount,
       paymentMethod:      "online",
     }).catch(console.error);
   }
@@ -117,12 +126,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Payment verification failed with provider" }, { status: 400 });
     }
 
-    const booking = await db.query.transferBookings.findFirst({
-      where: eq(transferBookings.bookingNumber, bookingNumber),
-    });
-
-    if (booking && booking.paymentStatus !== "paid") {
-      await db
+    // Atomic idempotent update
+    const updated = await db.transaction(async (tx) => {
+      const [row] = await tx
         .update(transferBookings)
         .set({
           paymentStatus: "paid",
@@ -131,33 +137,42 @@ export async function POST(req: Request) {
           adminNotes: `Payriff Webhook Verified: Order ${orderId} (${check.rawStatus || "APPROVED"})`,
           updatedAt: new Date(),
         })
-        .where(eq(transferBookings.bookingNumber, bookingNumber));
+        .where(
+          and(
+            eq(transferBookings.bookingNumber, bookingNumber),
+            ne(transferBookings.paymentStatus, "paid")
+          )
+        )
+        .returning();
+      return row;
+    });
 
-      const airportInfo = getAirportByCode(booking.airport as "GYD" | "GJA" | "NAJ");
+    if (updated) {
+      const airportInfo = getAirportByCode(updated.airport as "GYD" | "GJA" | "NAJ");
 
-      // Fire Telegram alert
+      // Fire Telegram alert only on initial transition to paid
       sendTelegramTransferAlert({
-        bookingNumber:      booking.bookingNumber,
-        direction:          booking.direction,
-        airport:            airportInfo?.fullName ?? booking.airport,
-        pickupZone:         booking.pickupZone,
-        dropoffAddress:     booking.dropoffAddress,
-        vehicleClass:       booking.vehicleClass,
-        flightNumber:       booking.flightNumber,
-        flightDate:         booking.flightDate,
-        flightTime:         booking.flightTime,
-        returnFlightNumber: booking.returnFlightNumber ?? undefined,
-        returnDate:         booking.returnDate ?? undefined,
-        passengerName:      booking.passengerName,
-        passengerCount:     booking.passengerCount,
-        phoneNumber:        booking.phoneNumber,
-        email:              booking.email,
-        totalAmount:        booking.totalAmount,
+        bookingNumber:      updated.bookingNumber,
+        direction:          updated.direction,
+        airport:            airportInfo?.fullName ?? updated.airport,
+        pickupZone:         updated.pickupZone,
+        dropoffAddress:     updated.dropoffAddress,
+        vehicleClass:       updated.vehicleClass,
+        flightNumber:       updated.flightNumber,
+        flightDate:         updated.flightDate,
+        flightTime:         updated.flightTime,
+        returnFlightNumber: updated.returnFlightNumber ?? undefined,
+        returnDate:         updated.returnDate ?? undefined,
+        passengerName:      updated.passengerName,
+        passengerCount:     updated.passengerCount,
+        phoneNumber:        updated.phoneNumber,
+        email:              updated.email,
+        totalAmount:        updated.totalAmount,
         paymentMethod:      "online",
       }).catch(console.error);
     }
 
-    return NextResponse.json({ success: true, verified: true });
+    return NextResponse.json({ success: true, verified: true, duplicate: !updated });
   } catch (err: unknown) {
     console.error("Transfer Payriff Webhook Error:", err);
     return NextResponse.json(

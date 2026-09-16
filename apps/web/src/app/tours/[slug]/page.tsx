@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { constructMetadata } from "@/lib/seo";
 import { TOURS_CATALOG, getTourBySlug, getAllTourSlugs } from "@/lib/tours-data";
 import TourDetailClient from "./TourDetailClient";
 
@@ -16,40 +17,18 @@ export async function generateMetadata({ params }: TourPageProps): Promise<Metad
   const tour = getTourBySlug(slug);
 
   if (!tour) {
-    return {
-      title: "Tour Not Found | AddmeTour",
-    };
+    return constructMetadata({
+      title: "Tour Not Found",
+      noIndex: true,
+    });
   }
 
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://addmetour.com";
-  const pageUrl = `${APP_URL}/tours/${tour.slug}`;
-
-  return {
-    title: `${tour.title} — AddmeTour Azerbaijan`,
+  return constructMetadata({
+    title: `${tour.title} — Handcrafted Azerbaijan Tours`,
     description: tour.desc,
-    alternates: {
-      canonical: pageUrl,
-    },
-    openGraph: {
-      title: `${tour.title} | Handcrafted Azerbaijan Tours`,
-      description: tour.tagline,
-      url: pageUrl,
-      images: [
-        {
-          url: tour.heroImage.startsWith("http") ? tour.heroImage : `${APP_URL}${tour.heroImage}`,
-          width: 1200,
-          height: 630,
-          alt: tour.title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: tour.title,
-      description: tour.tagline,
-      images: [tour.heroImage],
-    },
-  };
+    path: `/tours/${tour.slug}`,
+    image: tour.heroImage,
+  });
 }
 
 export default async function TourDetailPage({ params }: TourPageProps) {

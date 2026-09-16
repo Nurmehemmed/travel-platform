@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { db, visaApplications, recordAuditLog } from "@travel/db";
 import { sendTelegramVisaAlert } from "@/lib/telegram";
+import { sendVisaConfirmationEmail } from "@/lib/email";
+import { validateBotProtection } from "@/lib/anti-bot";
 import { validatePassportValidity } from "@/lib/visa-countries";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
@@ -18,6 +20,20 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    // 2. Anti-Bot and Fraud Defense Layer
+    const botCheck = await validateBotProtection({
+      honeypotValue: body.company_website || body.hp_field,
+      formStartedAt: body.formStartedAt,
+      turnstileToken: body.turnstileToken,
+      clientIp: ip,
+    });
+    if (botCheck.isBot) {
+      return NextResponse.json(
+        { error: "Automated submission detected. If this is a mistake, please refresh and try again." },
+        { status: 403 }
+      );
+    }
 
     const {
       nationality,
@@ -127,54 +143,59 @@ export async function POST(req: Request) {
       email,
     });
 
-    const [inserted] = await db
-      .insert(visaApplications)
-      .values({
-        applicationNumber,
-        visaType: isUrgent ? "urgent" : "standard",
-        status: "received",
-        nationality,
-        passportType,
-        arrivalDate,
-        purposeOfVisit,
-        stayAddress,
-        surname: surname.trim().toUpperCase(),
-        givenNames: givenNames.trim().toUpperCase(),
-        gender,
-        birthDate,
-        birthCountry,
-        birthPlace,
-        occupation,
-        phoneNumber,
-        email: email.trim().toLowerCase(),
-        residentialAddress,
-        passportNumber: passportNumber.trim().toUpperCase(),
-        passportIssueDate,
-        passportExpiryDate,
-        passportScanUrl: passportScanUrl || null,
-        photoUrl: photoUrl || null,
-        govFee,
-        serviceFee,
-        totalAmount,
-        paymentStatus: "pending_payment",
-        adminNotes: `Payriff Order ID: ${payriffOrder.orderId}`,
-      })
-      .returning();
+    const inserted = await db.transaction(async (tx) => {
+      const [row] = await tx
+        .insert(visaApplications)
+        .values({
+          applicationNumber,
+          visaType: isUrgent ? "urgent" : "standard",
+          status: "received",
+          nationality,
+          passportType,
+          arrivalDate,
+          purposeOfVisit,
+          stayAddress,
+          surname: surname.trim().toUpperCase(),
+          givenNames: givenNames.trim().toUpperCase(),
+          gender,
+          birthDate,
+          birthCountry,
+          birthPlace,
+          occupation,
+          phoneNumber,
+          email: email.trim().toLowerCase(),
+          residentialAddress,
+          passportNumber: passportNumber.trim().toUpperCase(),
+          passportIssueDate,
+          passportExpiryDate,
+          passportScanUrl: passportScanUrl || null,
+          photoUrl: photoUrl || null,
+          govFee,
+          serviceFee,
+          totalAmount,
+          paymentStatus: "pending_payment",
+          adminNotes: `Payriff Order ID: ${payriffOrder.orderId}`,
+        })
+        .returning();
 
-    // Record audit event
-    await recordAuditLog({
-      entityType: "visa",
-      entityId: applicationNumber,
-      action: "submitted",
-      actorEmail: email,
-      actorRole: "customer",
-      metadata: {
-        visaType: isUrgent ? "urgent" : "standard",
-        totalAmount,
-        nationality,
-        arrivalDate,
-        payriffOrderId: payriffOrder.orderId,
-      },
+      if (row) {
+        await recordAuditLog({
+          entityType: "visa",
+          entityId: applicationNumber,
+          action: "submitted",
+          actorEmail: email,
+          actorRole: "customer",
+          metadata: {
+            visaType: isUrgent ? "urgent" : "standard",
+            totalAmount,
+            nationality,
+            arrivalDate,
+            payriffOrderId: payriffOrder.orderId,
+          },
+        });
+      }
+
+      return row;
     });
 
     logger.info(`Visa application submitted: ${applicationNumber}`, {
@@ -183,6 +204,16 @@ export async function POST(req: Request) {
       totalAmount,
       nationality,
     });
+
+    // Asynchronously send customer confirmation email
+    sendVisaConfirmationEmail({
+      to: email.trim().toLowerCase(),
+      applicantName: `${givenNames.trim()} ${surname.trim()}`,
+      referenceNumber: applicationNumber,
+      visaType: isUrgent ? "urgent" : "standard",
+      arrivalDate,
+      totalAmount: Number(totalAmount),
+    }).catch((err) => console.warn("[Non-fatal visa confirmation email error]:", err));
 
     return NextResponse.json({
       success: true,

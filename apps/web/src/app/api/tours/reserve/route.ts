@@ -125,38 +125,44 @@ export async function POST(req: Request) {
         ? tourDate.split("T")[0]
         : new Date(tourDate).toISOString().split("T")[0]) || new Date().toISOString().slice(0, 10);
 
-    const [created] = await db
-      .insert(tourReservations)
-      .values({
-        reservationNumber,
-        tourId: String(tourId),
-        tourTitle: String(tourTitle),
-        tourDate: tourDateStr,
-        guests: guestCount,
-        travelerName: String(travelerName).trim(),
-        phoneNumber: String(phoneNumber).trim(),
-        price: String(trustedUnitPrice.toFixed(2)),
-        status: "pending",
-      })
-      .returning();
+    const created = await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(tourReservations)
+        .values({
+          reservationNumber,
+          tourId: String(tourId),
+          tourTitle: String(tourTitle),
+          tourDate: tourDateStr,
+          guests: guestCount,
+          travelerName: String(travelerName).trim(),
+          phoneNumber: String(phoneNumber).trim(),
+          price: String(trustedUnitPrice!.toFixed(2)),
+          status: "pending",
+        })
+        .returning();
+
+      if (inserted) {
+        await recordAuditLog({
+          entityType: "tour",
+          entityId: inserted.reservationNumber,
+          action: "reservation_created",
+          actorRole: "customer",
+          metadata: {
+            tourTitle,
+            tourDate,
+            guests: guestCount,
+            travelerName,
+            phoneNumber,
+            verifiedPrice: trustedUnitPrice,
+            clientIp,
+          },
+        });
+      }
+
+      return inserted;
+    });
 
     if (created) {
-      await recordAuditLog({
-        entityType: "tour",
-        entityId: created.reservationNumber,
-        action: "reservation_created",
-        actorRole: "customer",
-        metadata: {
-          tourTitle,
-          tourDate,
-          guests: guestCount,
-          travelerName,
-          phoneNumber,
-          verifiedPrice: trustedUnitPrice,
-          clientIp,
-        },
-      });
-
       log.info(`New tour reservation created: ${created.reservationNumber}`, {
         reservationNumber: created.reservationNumber,
         tourTitle,

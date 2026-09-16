@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db, transferBookings, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
 import { sendTelegramTransferAlert } from "@/lib/telegram";
+import { sendTransferConfirmationEmail } from "@/lib/email";
+import { validateBotProtection } from "@/lib/anti-bot";
 import { createPayriffOrder } from "@/lib/payriff";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
@@ -27,6 +29,20 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    // 2. Anti-Bot and Fraud Defense Layer
+    const botCheck = await validateBotProtection({
+      honeypotValue: body.company_website || body.hp_field,
+      formStartedAt: body.formStartedAt,
+      turnstileToken: body.turnstileToken,
+      clientIp: ip,
+    });
+    if (botCheck.isBot) {
+      return NextResponse.json(
+        { error: "Automated submission detected. If this is a mistake, please refresh and try again." },
+        { status: 403 }
+      );
+    }
 
     const {
       direction,
@@ -131,53 +147,54 @@ export async function POST(req: Request) {
       });
     }
 
-    // 8. Insert DB record
-    await db.insert(transferBookings).values({
-      bookingNumber,
-      userId: userId || null,
-      direction,
-      airport,
-      pickupZone: zone.name,
-      dropoffAddress: String(dropoffAddress).trim(),
-      distanceKm: String(zone.distanceKm),
-      vehicleClass,
-      basePrice: String(pricing.basePrice.toFixed(2)),
-      totalAmount: String(pricing.totalAmount.toFixed(2)),
-      flightNumber: String(flightNumber).trim().toUpperCase(),
-      flightDate,
-      flightTime,
-      returnFlightNumber: returnFlightNumber ? String(returnFlightNumber).trim().toUpperCase() : null,
-      returnDate: returnDate || null,
-      returnTime: returnTime || null,
-      passengerName: String(passengerName).trim(),
-      passengerCount: Number(passengerCount),
-      phoneNumber: String(phoneNumber).trim(),
-      email: cleanEmail,
-      luggageNotes: luggageNotes ? String(luggageNotes).trim() : null,
-      paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
-      paymentStatus: (paymentMethod === "on_arrival" || zone.isCustom) ? "on_arrival" : "pending",
-      status: "pending",
-      payriffOrderId: payriffResult?.orderId || null,
-    });
-
-    // 9. Audit log
-    await recordAuditLog({
-      entityType: "transfer",
-      entityId: bookingNumber,
-      action: "transfer.booked",
-      actorEmail: cleanEmail,
-      actorRole: "customer",
-      metadata: {
+    // 8. Insert DB record & Audit Log atomically
+    await db.transaction(async (tx) => {
+      await tx.insert(transferBookings).values({
+        bookingNumber,
+        userId: userId || null,
         direction,
         airport,
-        zone: zone.name,
+        pickupZone: zone.name,
+        dropoffAddress: String(dropoffAddress).trim(),
+        distanceKm: String(zone.distanceKm),
         vehicleClass,
-        flightNumber,
+        basePrice: String(pricing.basePrice.toFixed(2)),
+        totalAmount: String(pricing.totalAmount.toFixed(2)),
+        flightNumber: String(flightNumber).trim().toUpperCase(),
         flightDate,
-        totalAmount: pricing.totalAmount,
+        flightTime,
+        returnFlightNumber: returnFlightNumber ? String(returnFlightNumber).trim().toUpperCase() : null,
+        returnDate: returnDate || null,
+        returnTime: returnTime || null,
+        passengerName: String(passengerName).trim(),
+        passengerCount: Number(passengerCount),
+        phoneNumber: String(phoneNumber).trim(),
+        email: cleanEmail,
+        luggageNotes: luggageNotes ? String(luggageNotes).trim() : null,
         paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
-        hasPayriffOrder: !!payriffResult?.orderId,
-      },
+        paymentStatus: (paymentMethod === "on_arrival" || zone.isCustom) ? "on_arrival" : "pending",
+        status: "pending",
+        payriffOrderId: payriffResult?.orderId || null,
+      });
+
+      await recordAuditLog({
+        entityType: "transfer",
+        entityId: bookingNumber,
+        action: "transfer.booked",
+        actorEmail: cleanEmail,
+        actorRole: "customer",
+        metadata: {
+          direction,
+          airport,
+          zone: zone.name,
+          vehicleClass,
+          flightNumber,
+          flightDate,
+          totalAmount: pricing.totalAmount,
+          paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
+          hasPayriffOrder: !!payriffResult?.orderId,
+        },
+      });
     });
 
     logger.info("transfer_booked", {
@@ -188,6 +205,19 @@ export async function POST(req: Request) {
       paymentMethod,
       totalAmount: pricing.totalAmount,
     });
+
+    // Asynchronously dispatch confirmation email to customer
+    sendTransferConfirmationEmail({
+      to: cleanEmail,
+      passengerName: String(passengerName).trim(),
+      bookingNumber,
+      direction,
+      airport: airportInfo?.fullName ?? airport,
+      pickupZone: zone.name,
+      flightNumber: String(flightNumber).trim().toUpperCase(),
+      flightDate,
+      totalAmount: pricing.totalAmount,
+    }).catch((err) => console.warn("[Non-fatal transfer confirmation email error]:", err));
 
     // 10. Handle on-arrival or custom quote
     if (paymentMethod === "on_arrival" || zone.isCustom) {

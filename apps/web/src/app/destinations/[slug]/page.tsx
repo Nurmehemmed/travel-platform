@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { constructMetadata } from "@/lib/seo";
 import { DESTINATIONS_CATALOG, getDestinationBySlug, getAllDestinationSlugs } from "@/lib/destinations-data";
 import { TOURS_CATALOG } from "@/lib/tours-data";
 import DestinationDetailClient from "./DestinationDetailClient";
@@ -17,34 +18,18 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
   const dest = getDestinationBySlug(slug);
 
   if (!dest) {
-    return {
-      title: "Destination Not Found | AddmeTour",
-    };
+    return constructMetadata({
+      title: "Destination Not Found",
+      noIndex: true,
+    });
   }
 
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://addmetour.com";
-  const pageUrl = `${APP_URL}/destinations/${dest.slug}`;
-
-  return {
-    title: `${dest.name} Travel Guide & Handcrafted Tours — AddmeTour`,
+  return constructMetadata({
+    title: `${dest.name} Travel Guide & Handcrafted Tours`,
     description: dest.overview,
-    alternates: {
-      canonical: pageUrl,
-    },
-    openGraph: {
-      title: `${dest.name} | Complete Travel Guide & Tours`,
-      description: dest.subtitle,
-      url: pageUrl,
-      images: [
-        {
-          url: dest.heroImage.startsWith("http") ? dest.heroImage : `${APP_URL}${dest.heroImage}`,
-          width: 1200,
-          height: 630,
-          alt: `${dest.name} Azerbaijan`,
-        },
-      ],
-    },
-  };
+    path: `/destinations/${dest.slug}`,
+    image: dest.heroImage,
+  });
 }
 
 export default async function DestinationDetailPage({ params }: DestinationPageProps) {

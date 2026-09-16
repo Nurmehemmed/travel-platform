@@ -74,46 +74,51 @@ export async function POST(req: Request) {
       ? destinations
       : ["Baku Old City & Modern Marvels"];
 
-    // 2. Insert into Neon PostgreSQL database via Drizzle ORM
-    const [created] = await db
-      .insert(customItineraries)
-      .values({
-        referenceCode,
-        travelerName,
-        email,
-        phoneNumber,
-        durationDays: duration,
-        arrivalDate: arrivalDateStr,
-        adults: adultCount,
-        children: childCount,
-        hotelTier: hotelTier || "4-Star Comfort",
-        vehicleClass: vehicleClass || "Mercedes VIP Van",
-        destinations: selectedDests,
-        estimatedPriceUsd: String(priceUsd.toFixed(2)),
-        currency: currency || "USD",
-        specialRequests: customer?.notes || null,
-        status: "pending",
-      })
-      .returning();
-
-    // 3. Record Audit Log
-    if (created) {
-      await recordAuditLog({
-        entityType: "tour",
-        entityId: created.referenceCode,
-        action: "custom_itinerary_created",
-        actorRole: "customer",
-        metadata: {
-          referenceCode: created.referenceCode,
+    // 2. Insert into Neon PostgreSQL database & Audit Log atomically
+    const created = await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(customItineraries)
+        .values({
+          referenceCode,
           travelerName,
           email,
+          phoneNumber,
           durationDays: duration,
           arrivalDate: arrivalDateStr,
-          estimatedPriceUSD: priceUsd,
-          clientIp,
-        },
-      });
+          adults: adultCount,
+          children: childCount,
+          hotelTier: hotelTier || "4-Star Comfort",
+          vehicleClass: vehicleClass || "Mercedes VIP Van",
+          destinations: selectedDests,
+          estimatedPriceUsd: String(priceUsd.toFixed(2)),
+          currency: currency || "USD",
+          specialRequests: customer?.notes || null,
+          status: "pending",
+        })
+        .returning();
 
+      if (inserted) {
+        await recordAuditLog({
+          entityType: "tour",
+          entityId: inserted.referenceCode,
+          action: "custom_itinerary_created",
+          actorRole: "customer",
+          metadata: {
+            referenceCode: inserted.referenceCode,
+            travelerName,
+            email,
+            durationDays: duration,
+            arrivalDate: arrivalDateStr,
+            estimatedPriceUSD: priceUsd,
+            clientIp,
+          },
+        });
+      }
+
+      return inserted;
+    });
+
+    if (created) {
       log.info(`New custom itinerary inquiry saved: ${created.referenceCode}`, {
         referenceCode: created.referenceCode,
         travelerName,

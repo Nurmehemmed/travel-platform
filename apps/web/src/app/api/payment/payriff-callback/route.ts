@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db, visaApplications } from "@travel/db";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { verifyPayriffOrder } from "@/lib/payriff";
 import { sendTelegramVisaAlert } from "@/lib/telegram";
 
@@ -29,13 +29,9 @@ export async function GET(req: Request) {
     return NextResponse.redirect(new URL(`/visa/apply?error=payment_unverified&ref=${applicationNumber}`, req.url));
   }
 
-  // Update DB to paid
-  const app = await db.query.visaApplications.findFirst({
-    where: eq(visaApplications.applicationNumber, applicationNumber),
-  });
-
-  if (app) {
-    await db
+  // Atomic idempotent update
+  const updated = await db.transaction(async (tx) => {
+    const [row] = await tx
       .update(visaApplications)
       .set({
         paymentStatus: "paid",
@@ -43,18 +39,31 @@ export async function GET(req: Request) {
         adminNotes: `Payriff Order verified: ${orderId || "OK"}`,
         updatedAt: new Date(),
       })
-      .where(eq(visaApplications.applicationNumber, applicationNumber));
+      .where(
+        and(
+          eq(visaApplications.applicationNumber, applicationNumber),
+          ne(visaApplications.paymentStatus, "paid")
+        )
+      )
+      .returning();
+    return row;
+  });
 
+  const app = updated || (await db.query.visaApplications.findFirst({
+    where: eq(visaApplications.applicationNumber, applicationNumber),
+  }));
+
+  if (updated) {
     sendTelegramVisaAlert({
-      applicationNumber: app.applicationNumber,
-      visaType: app.visaType,
-      applicantName: `${app.surname} ${app.givenNames}`,
-      nationality: app.nationality,
-      passportNumber: app.passportNumber,
-      arrivalDate: app.arrivalDate,
-      totalAmount: app.totalAmount,
-      email: app.email,
-      phoneNumber: app.phoneNumber,
+      applicationNumber: updated.applicationNumber,
+      visaType: updated.visaType,
+      applicantName: `${updated.surname} ${updated.givenNames}`,
+      nationality: updated.nationality,
+      passportNumber: updated.passportNumber,
+      arrivalDate: updated.arrivalDate,
+      totalAmount: updated.totalAmount,
+      email: updated.email,
+      phoneNumber: updated.phoneNumber,
     }).catch(console.error);
   }
 
@@ -67,7 +76,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  // Webhook listener from Payriff — hardened with server-to-server verification
+  // Webhook listener from Payriff — hardened with server-to-server verification & idempotency
   try {
     const body = await req.json();
     const orderId = body.orderId || body.payload?.orderId;
@@ -89,12 +98,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Payment verification failed with provider" }, { status: 400 });
     }
 
-    const app = await db.query.visaApplications.findFirst({
-      where: eq(visaApplications.applicationNumber, applicationNumber),
-    });
-
-    if (app && app.paymentStatus !== "paid") {
-      await db
+    // Atomic idempotent update (guards against parallel duplicate webhook deliveries)
+    const updated = await db.transaction(async (tx) => {
+      const [row] = await tx
         .update(visaApplications)
         .set({
           paymentStatus: "paid",
@@ -102,23 +108,32 @@ export async function POST(req: Request) {
           adminNotes: `Payriff Webhook Verified: Order ${orderId} (${check.rawStatus || "APPROVED"})`,
           updatedAt: new Date(),
         })
-        .where(eq(visaApplications.applicationNumber, applicationNumber));
+        .where(
+          and(
+            eq(visaApplications.applicationNumber, applicationNumber),
+            ne(visaApplications.paymentStatus, "paid")
+          )
+        )
+        .returning();
+      return row;
+    });
 
-      // Alert operations
+    if (updated) {
+      // Alert operations only on initial transition to paid
       sendTelegramVisaAlert({
-        applicationNumber: app.applicationNumber,
-        visaType: app.visaType,
-        applicantName: `${app.surname} ${app.givenNames}`,
-        nationality: app.nationality,
-        passportNumber: app.passportNumber,
-        arrivalDate: app.arrivalDate,
-        totalAmount: app.totalAmount,
-        email: app.email,
-        phoneNumber: app.phoneNumber,
+        applicationNumber: updated.applicationNumber,
+        visaType: updated.visaType,
+        applicantName: `${updated.surname} ${updated.givenNames}`,
+        nationality: updated.nationality,
+        passportNumber: updated.passportNumber,
+        arrivalDate: updated.arrivalDate,
+        totalAmount: updated.totalAmount,
+        email: updated.email,
+        phoneNumber: updated.phoneNumber,
       }).catch(console.error);
     }
 
-    return NextResponse.json({ success: true, verified: true });
+    return NextResponse.json({ success: true, verified: true, duplicate: !updated });
   } catch (err: any) {
     console.error("Payriff Webhook Error:", err);
     return NextResponse.json({ error: err.message || "Internal error" }, { status: 400 });
