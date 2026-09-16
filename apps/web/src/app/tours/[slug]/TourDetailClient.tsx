@@ -79,6 +79,7 @@ export default function TourDetailClient({ tour, relatedTours }: TourDetailClien
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>(["lunch"]);
+  const [isAddonsOpen, setIsAddonsOpen] = useState(false);
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -511,8 +512,8 @@ Please confirm guide availability and pickup details.`;
           </div>
 
           {/* ═══════════════════════════════════════════════════════ RIGHT STICKY SIDEBAR: BOOKING ENGINE */}
-          <div className="lg:sticky lg:top-20 space-y-4">
-            <div className="bg-white rounded-3xl p-6 border-2 border-amber-400/80 shadow-xl relative overflow-hidden">
+          <div className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-6.5rem)] lg:overflow-y-auto space-y-4 pr-0.5">
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border-2 border-amber-400/80 shadow-xl relative overflow-hidden">
               <div className="flex items-baseline justify-between mb-4">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total from</span>
@@ -597,49 +598,67 @@ Please confirm guide availability and pickup details.`;
                   </div>
                 </div>
 
-                {/* High Margin Add-Ons Checklist */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5 flex items-center justify-between">
-                    <span>3. Enhance Your Experience</span>
-                    <span className="text-[10px] text-amber-600 font-bold">Popular Upgrades</span>
-                  </label>
-                  <div className="space-y-2">
-                    {TOUR_ADD_ONS.map((addon) => {
-                      const isChecked = selectedAddOnIds.includes(addon.id);
-                      const IconComp = addon.icon;
-                      const calculatedAddonUSD = addon.perPerson ? addon.priceUSD * totalGuests : addon.priceUSD;
+                {/* High Margin Add-Ons Checklist with Collapsible Design */}
+                <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-2.5 sm:p-3 transition-all">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddonsOpen(!isAddonsOpen)}
+                    className="w-full flex items-center justify-between text-left cursor-pointer group"
+                    aria-expanded={isAddonsOpen}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                        3. Add-Ons & Upgrades
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                        {selectedAddOnIds.length > 0 ? `${selectedAddOnIds.length} Selected` : "Optional"}
+                      </span>
+                      <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${isAddonsOpen ? "rotate-180" : ""}`} />
+                    </div>
+                  </button>
 
-                      return (
-                        <div
-                          key={addon.id}
-                          onClick={() => toggleAddOn(addon.id)}
-                          className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-2 ${
-                            isChecked
-                              ? "bg-amber-50/70 border-amber-400"
-                              : "bg-white border-slate-200 hover:border-slate-300"
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <div className={`mt-0.5 h-4 w-4 rounded flex items-center justify-center border ${
-                              isChecked ? "bg-amber-500 border-amber-600 text-white" : "border-slate-300 bg-white"
-                            }`}>
-                              {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <IconComp className="h-3.5 w-3.5 text-slate-500" />
-                                <span className="text-xs font-bold text-slate-800">{addon.name}</span>
+                  {isAddonsOpen && (
+                    <div className="space-y-2 mt-2.5 pt-2.5 border-t border-slate-200/70 animate-in fade-in duration-200">
+                      {TOUR_ADD_ONS.map((addon) => {
+                        const isChecked = selectedAddOnIds.includes(addon.id);
+                        const IconComp = addon.icon;
+                        const calculatedAddonUSD = addon.perPerson ? addon.priceUSD * totalGuests : addon.priceUSD;
+
+                        return (
+                          <div
+                            key={addon.id}
+                            onClick={() => toggleAddOn(addon.id)}
+                            className={`p-2 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-2 ${
+                              isChecked
+                                ? "bg-amber-50/70 border-amber-400"
+                                : "bg-white border-slate-200 hover:border-slate-300"
+                            }`}
+                          >
+                            <div className="flex items-start gap-2">
+                              <div className={`mt-0.5 h-4 w-4 rounded flex items-center justify-center border ${
+                                isChecked ? "bg-amber-500 border-amber-600 text-white" : "border-slate-300 bg-white"
+                              }`}>
+                                {isChecked && <Check className="h-3 w-3 stroke-[3]" />}
                               </div>
-                              <p className="text-[10px] text-slate-500 leading-tight mt-0.5">{addon.desc}</p>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <IconComp className="h-3.5 w-3.5 text-slate-500" />
+                                  <span className="text-xs font-bold text-slate-800">{addon.name}</span>
+                                </div>
+                                <p className="text-[10px] text-slate-500 leading-tight mt-0.5">{addon.desc}</p>
+                              </div>
                             </div>
+                            <span className="text-xs font-black text-slate-900 shrink-0 whitespace-nowrap">
+                              +{formatPrice(calculatedAddonUSD)}
+                            </span>
                           </div>
-                          <span className="text-xs font-black text-slate-900 shrink-0 whitespace-nowrap">
-                            +{formatPrice(calculatedAddonUSD)}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -742,6 +761,38 @@ Please confirm guide availability and pickup details.`;
           </div>
         </section>
       </main>
+
+      {/* ═══════════════════════════════════════════════════════ MOBILE STICKY ACTION BAR */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#0b1329]/95 backdrop-blur-xl border-t border-white/15 p-3.5 z-40 shadow-2xl flex items-center justify-between gap-3 safe-area-pb">
+        <div>
+          <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">
+            Total ({adults} Guests)
+          </span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-xl font-black text-amber-400">{formatPrice(grandTotalUSD)}</span>
+            <span className="text-[10px] text-slate-400">total</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 text-xs font-black shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+          >
+            <Calendar className="h-3.5 w-3.5" />
+            <span>Reserve Now</span>
+          </button>
+          <a
+            href={buildWhatsAppMessage()}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Book via WhatsApp"
+            className="p-2.5 rounded-xl bg-emerald-500 text-white shadow-md active:scale-95 flex items-center justify-center cursor-pointer"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
 
       {/* ═══════════════════════════════════════════════════════ RESERVATION MODAL */}
       {isModalOpen && (

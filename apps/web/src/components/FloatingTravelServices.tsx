@@ -14,6 +14,7 @@ export default function FloatingTravelServices() {
   // Hide completely on admin portal, booking wizards, payment, and tracking funnels
   const isExcluded =
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/tours/") ||
     pathname.startsWith("/transfer/book") ||
     pathname.startsWith("/transfer/track") ||
     pathname.startsWith("/visa/apply") ||

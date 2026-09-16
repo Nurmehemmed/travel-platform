@@ -50,6 +50,7 @@ export default function FloatingCustomItinerary() {
     pathname.startsWith("/custom-itinerary") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/voucher") ||
+    pathname.startsWith("/tours/") ||
     pathname.startsWith("/transfer/book") ||
     pathname.startsWith("/transfer/track") ||
     pathname.startsWith("/visa/apply") ||
