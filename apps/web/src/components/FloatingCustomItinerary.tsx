@@ -68,24 +68,24 @@ export default function FloatingCustomItinerary() {
       <Link
         href="/custom-itinerary"
         aria-label="Build your custom private Azerbaijan and Caucasus itinerary"
-        className="group relative flex items-center gap-2 sm:gap-2.5 rounded-full pl-2 sm:pl-2.5 pr-3 sm:pr-4 py-1.5 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-amber-400/40 hover:border-amber-300 bg-[#0f3460]/95 hover:bg-[#133e73] text-white"
+        className="group relative flex items-center rounded-full p-1.5 sm:pl-2.5 sm:pr-4 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-amber-400/40 hover:border-amber-300 bg-[#0f3460]/95 hover:bg-[#133e73] text-white"
         style={{
           boxShadow:
             "0 12px 35px -5px rgba(15, 52, 96, 0.6), 0 0 20px -5px rgba(245, 158, 11, 0.35)",
         }}
       >
         {/* Glowing Icon Container */}
-        <div className="relative flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-bold shadow-md transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
-          <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 font-bold shadow-md transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
+          <Sparkles className="h-4 w-4" />
           <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
           </span>
         </div>
 
-        {/* Text Details */}
-        <div className="flex flex-col text-left leading-none">
-          <span className="hidden sm:block text-[9px] font-bold uppercase tracking-wider text-amber-300/90">
+        {/* Text Details - Visible on sm screens and up */}
+        <div className="hidden sm:flex flex-col text-left leading-none sm:ml-2">
+          <span className="text-[9px] font-bold uppercase tracking-wider text-amber-300/90">
             {t.subtitle}
           </span>
           <span className="text-xs sm:text-sm font-black text-white sm:mt-0.5 flex items-center gap-1">
