@@ -1413,6 +1413,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (mounted && typeof document !== "undefined") {
       document.documentElement.lang = language.toLowerCase();
+      document.documentElement.dir = language === "AR" ? "rtl" : "ltr";
     }
   }, [language, mounted]);
 

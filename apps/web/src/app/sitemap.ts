@@ -1,19 +1,47 @@
 import type { MetadataRoute } from "next";
+import { TOURS_CATALOG } from "@/lib/tours-data";
+import { DESTINATIONS_CATALOG } from "@/lib/destinations-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://addmetour.com";
   const now = new Date();
 
+  // Signature Tour URLs
+  const tourUrls: MetadataRoute.Sitemap = TOURS_CATALOG.map((tour) => ({
+    url: `${baseUrl}/tours/${tour.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
+  }));
+
+  // Destination Guide URLs
+  const destinationUrls: MetadataRoute.Sitemap = DESTINATIONS_CATALOG.map((dest) => ({
+    url: `${baseUrl}/destinations/${dest.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.85,
+  }));
+
   return [
-    // ─── Core Pages ───────────────────────────────────────────────────
+    // ─── Core & High Conversion Pages ─────────────────────────────────
     {
       url: baseUrl,
       lastModified: now,
       changeFrequency: "daily",
       priority: 1.0,
     },
+    {
+      url: `${baseUrl}/custom-itinerary`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.95,
+    },
 
-    // ─── Airport Transfer Services (high-value conversion pages) ───────
+    // ─── Tours and Destinations ───────────────────────────────────────
+    ...tourUrls,
+    ...destinationUrls,
+
+    // ─── Airport Transfer Services ────────────────────────────────────
     {
       url: `${baseUrl}/transfer`,
       lastModified: now,
@@ -33,7 +61,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
 
-    // ─── e-Visa Service (high-value conversion pages) ─────────────────
+    // ─── e-Visa Service ───────────────────────────────────────────────
     {
       url: `${baseUrl}/visa`,
       lastModified: now,

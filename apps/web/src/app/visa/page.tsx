@@ -8,11 +8,14 @@ import {
 } from "lucide-react";
 import { COUNTRIES, getCountryEligibility } from "@/lib/visa-countries";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { CurrencySelector } from "@/components/CurrencySelector";
 import { useLanguage } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency-context";
 import { CustomSelect } from "@/components/CustomSelect";
 
 export default function VisaLandingPage() {
   const { t } = useLanguage();
+  const { formatPrice, currency, activeCurrency } = useCurrency();
   const [selectedCountry, setSelectedCountry] = useState("");
   const [eligibilityResult, setEligibilityResult] = useState<ReturnType<typeof getCountryEligibility> | null>(null);
   const [hasChecked, setHasChecked] = useState(false);
@@ -65,6 +68,7 @@ export default function VisaLandingPage() {
 
           <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             <LanguageSelector variant="dark" />
+            <CurrencySelector variant="dark" />
             <Link
               href="/transfer"
               className="hidden md:flex text-xs font-semibold text-sky-200 hover:text-white transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 hover:bg-sky-500/20 shrink-0 whitespace-nowrap"
@@ -228,12 +232,12 @@ export default function VisaLandingPage() {
 
                 <div className="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-slate-900">$59</span>
-                    <span className="text-xs text-slate-500 font-medium">USD / applicant</span>
+                    <span className="text-4xl font-bold text-slate-900">{formatPrice(59)}</span>
+                    <span className="text-xs text-slate-500 font-medium">{activeCurrency.code} / applicant</span>
                   </div>
                   <div className="mt-2 text-[11px] text-slate-500 flex justify-between border-t border-slate-200/60 pt-2">
-                    <span>Govt Fee: $26.00</span>
-                    <span>Concierge Fee: $33.00</span>
+                    <span>Govt Fee: {formatPrice(26)}</span>
+                    <span>Concierge: {formatPrice(33)}</span>
                   </div>
                 </div>
 
@@ -286,12 +290,12 @@ export default function VisaLandingPage() {
 
                 <div className="mb-6 p-4 rounded-2xl bg-white/10 border border-white/10">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-[#f59e0b]">$110</span>
-                    <span className="text-xs text-white/70 font-medium">USD / applicant</span>
+                    <span className="text-4xl font-bold text-[#f59e0b]">{formatPrice(110)}</span>
+                    <span className="text-xs text-white/70 font-medium">{activeCurrency.code} / applicant</span>
                   </div>
                   <div className="mt-2 text-[11px] text-white/60 flex justify-between border-t border-white/10 pt-2">
-                    <span>Govt Fee: $61.00</span>
-                    <span>Rush Concierge Fee: $49.00</span>
+                    <span>Govt Fee: {formatPrice(61)}</span>
+                    <span>Rush Concierge: {formatPrice(49)}</span>
                   </div>
                 </div>
 

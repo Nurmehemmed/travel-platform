@@ -705,6 +705,67 @@ export const tourReservations = pgTable(
   ]
 );
 
+export const customItineraries = pgTable(
+  "custom_itineraries",
+  {
+    id:                uuid("id").primaryKey().defaultRandom(),
+    referenceCode:     varchar("reference_code", { length: 32 }).notNull().unique(),
+    userId:            text("user_id").references(() => users.id, { onDelete: "set null" }),
+
+    // Contact & Traveler
+    travelerName:      varchar("traveler_name", { length: 200 }).notNull(),
+    email:             varchar("email", { length: 255 }).notNull(),
+    phoneNumber:       varchar("phone_number", { length: 50 }).notNull(),
+
+    // Itinerary parameters
+    durationDays:      integer("duration_days").notNull().default(5),
+    arrivalDate:       date("arrival_date").notNull(),
+    adults:            integer("adults").notNull().default(2),
+    children:          integer("children").notNull().default(0),
+    hotelTier:         varchar("hotel_tier", { length: 100 }).notNull(),
+    vehicleClass:      varchar("vehicle_class", { length: 100 }).notNull(),
+    destinations:      jsonb("destinations").notNull().$type<string[]>(),
+
+    // Pricing & Budget
+    estimatedPriceUsd: numeric("estimated_price_usd", { precision: 10, scale: 2 }).notNull(),
+    currency:          varchar("currency", { length: 10 }).notNull().default("USD"),
+    specialRequests:   text("special_requests"),
+
+    // Status & Admin
+    status:            varchar("status", { length: 30 }).notNull().default("pending"),
+    adminNotes:        text("admin_notes"),
+    ...timestamps,
+  },
+  (t) => [
+    index("custom_itin_status_idx").on(t.status),
+    index("custom_itin_date_idx").on(t.arrivalDate),
+    uniqueIndex("custom_itin_ref_idx").on(t.referenceCode),
+  ]
+);
+
+export const customItinerariesRelations = relations(customItineraries, ({ one }) => ({
+  user: one(users, {
+    fields: [customItineraries.userId],
+    references: [users.id],
+  }),
+}));
+
+export const siteSettings = pgTable(
+  "site_settings",
+  {
+    key:         varchar("key", { length: 100 }).primaryKey(),
+    value:       jsonb("value").notNull(),
+    category:    varchar("category", { length: 50 }).notNull().default("general"),
+    label:       varchar("label", { length: 255 }).notNull(),
+    description: text("description"),
+    updatedAt:   timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    updatedBy:   varchar("updated_by", { length: 255 }),
+  },
+  (t) => [
+    index("site_settings_category_idx").on(t.category),
+  ]
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Type exports — infer insert/select types from schema for use in app code
 // ─────────────────────────────────────────────────────────────────────────────
@@ -746,22 +807,10 @@ export type NewAuditLog        = typeof auditLogs.$inferInsert;
 export type TourReservation    = typeof tourReservations.$inferSelect;
 export type NewTourReservation = typeof tourReservations.$inferInsert;
 
-export const siteSettings = pgTable(
-  "site_settings",
-  {
-    key:         varchar("key", { length: 100 }).primaryKey(),
-    value:       jsonb("value").notNull(),
-    category:    varchar("category", { length: 50 }).notNull().default("general"),
-    label:       varchar("label", { length: 255 }).notNull(),
-    description: text("description"),
-    updatedAt:   timestamp("updated_at", { withTimezone: true }).defaultNow(),
-    updatedBy:   varchar("updated_by", { length: 255 }),
-  },
-  (t) => [
-    index("site_settings_category_idx").on(t.category),
-  ]
-);
+export type CustomItinerary    = typeof customItineraries.$inferSelect;
+export type NewCustomItinerary = typeof customItineraries.$inferInsert;
 
 export type SiteSetting        = typeof siteSettings.$inferSelect;
 export type NewSiteSetting     = typeof siteSettings.$inferInsert;
+
 

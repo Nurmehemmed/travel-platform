@@ -24,7 +24,9 @@ import {
   FileText
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
+import CurrencySelector from "@/components/CurrencySelector";
 import { useLanguage } from "@/lib/i18n";
+import { useCurrency } from "@/lib/currency-context";
 import { CustomSelect } from "@/components/CustomSelect";
 import {
   AIRPORTS,
@@ -48,6 +50,7 @@ import {
 export default function TransferLandingPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
+  const { formatPrice } = useCurrency();
 
   // Estimator state
   const [selectedAirport, setSelectedAirport] = useState<AirportCode>("GYD");
@@ -146,6 +149,7 @@ export default function TransferLandingPage() {
 
           <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             <LanguageSelector variant="dark" />
+            <CurrencySelector variant="dark" />
             <Link
               href="/visa"
               className="hidden md:flex text-xs font-semibold text-amber-200 hover:text-white transition-colors items-center gap-1.5 px-3 py-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 hover:bg-amber-500/20 shrink-0 whitespace-nowrap"
@@ -317,7 +321,7 @@ export default function TransferLandingPage() {
                           {isCustom ? (
                             <span className="text-xs font-semibold text-slate-600">{t.transferPage.quoteOnRequest}</span>
                           ) : priceObj ? (
-                            `$${priceObj.totalAmount}`
+                            formatPrice(priceObj.totalAmount)
                           ) : (
                             "—"
                           )}

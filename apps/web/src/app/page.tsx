@@ -12,10 +12,12 @@ import {
   MapPin, Search, Clock, Users, Star, ChevronDown, ChevronLeft, ChevronRight,
   Zap, Shield, MessageCircle, Award, ArrowRight, Globe,
   Eye, EyeOff, X, Menu, LogOut, User as UserIcon, Loader2, AlertCircle, Bookmark, Heart, FileText, Car, Check,
-  Share2, Copy, Sparkles, CheckCheck
+  Share2, Copy, Sparkles, CheckCheck, DollarSign, TrendingUp, Download, BadgeCheck, ThumbsUp
 } from "lucide-react";
 import { useLanguage, LanguageCode } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { CurrencySelector } from "@/components/CurrencySelector";
+import { useCurrency, CURRENCIES, CurrencyCode } from "@/lib/currency-context";
 import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS, getLocalizedTour } from "@/lib/tours-i18n";
 import { useSiteSettings } from "@/lib/settings-context";
 import { TourCardsSkeleton } from "@/components/Skeletons";
@@ -59,7 +61,8 @@ const HERO_SLIDES = [
 const TOURS = [
   {
     id: "t1",
-    badge: "Best Seller",
+    slug: "baku-old-city-walking-tour",
+    badge: "Bestseller",
     badgeColor: "bg-[#f59e0b] text-[#061225] font-bold shadow-sm",
     image: "/images/baku-old-city.jpg",
     tags: ["Walking", "History", "Culture"],
@@ -75,6 +78,7 @@ const TOURS = [
   },
   {
     id: "t2",
+    slug: "absheron-peninsula-day-trip",
     badge: "Popular",
     badgeColor: "bg-brand-800 text-white",
     image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1200&q=80",
@@ -91,6 +95,7 @@ const TOURS = [
   },
   {
     id: "t3",
+    slug: "sheki-cultural-journey",
     badge: "Limited Deal",
     badgeColor: "bg-red-600 text-white",
     image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
@@ -107,6 +112,7 @@ const TOURS = [
   },
   {
     id: "t4",
+    slug: "modern-baku-architecture-tour",
     badge: null,
     badgeColor: "",
     image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1200&q=80",
@@ -123,6 +129,7 @@ const TOURS = [
   },
   {
     id: "t5",
+    slug: "gobustan-petroglyphs-mud-volcanoes",
     badge: "Top Rated",
     badgeColor: "bg-brand-800 text-white",
     image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=1200&q=80",
@@ -139,6 +146,7 @@ const TOURS = [
   },
   {
     id: "t6",
+    slug: "caucasus-mountain-highlands",
     badge: "Adventure",
     badgeColor: "bg-white text-slate-900 shadow-sm font-semibold",
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
@@ -267,6 +275,7 @@ export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { currency, setCurrency, activeCurrency, currencies, formatPrice, formatPriceWithSubtext } = useCurrency();
 
   // Scroll listener for sticky header glassmorphism
   useEffect(() => {
@@ -519,15 +528,16 @@ export default function HomePage() {
 
       {/* ═══════════════════════════════════════════════════════ NAVBAR */}
       <header
+        dir={isRtl ? "rtl" : "ltr"}
         className={`sticky top-0 z-50 transition-all duration-300 ${
           isScrolled
             ? "bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10"
             : "bg-[#0f3460] border-b border-transparent shadow-none"
         }`}
       >
-        <div className="container-section flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+        <div className="container-section flex h-16 items-center justify-between gap-3">
+          {/* Logo — always shrink-0 so it never gets crushed */}
+          <Link href="/" className="flex shrink-0 items-center gap-2 group">
             <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
               <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
             </div>
@@ -536,8 +546,8 @@ export default function HomePage() {
             </span>
           </Link>
 
-          {/* Nav links */}
-          <nav className="hidden xl:flex items-center gap-5 shrink-0">
+          {/* Nav links — min-w-0 so it can shrink for long translations, no shrink-0 */}
+          <nav className="hidden xl:flex items-center gap-3 min-w-0 flex-1 justify-center">
             {[
               { label: t.nav.tours, href: "#tours" },
               { label: t.nav.destinations, href: "#destinations" },
@@ -554,33 +564,47 @@ export default function HomePage() {
               </Link>
             ))}
 
-            {/* ── e-Visa subdued outlined CTA ── */}
+            {/* ── e-Visa CTA — icon+text at 2xl+, icon-only at xl ── */}
             <Link
               href="/visa"
               className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-white/10 hover:text-white whitespace-nowrap shrink-0"
+              title={t.nav.evisa}
             >
               <FileText className="h-3.5 w-3.5 shrink-0 text-slate-300" />
-              <span>{t.nav.evisa}</span>
-              {/* Subtle badge */}
-              <span className="ml-0.5 rounded bg-white/15 px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-slate-300 shrink-0">
+              <span className="hidden 2xl:inline">{t.nav.evisa}</span>
+              <span className="hidden 2xl:inline ms-0.5 rounded bg-white/15 px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-slate-300 shrink-0">
                 {t.nav.fastBadge}
               </span>
             </Link>
 
-            {/* ── Airport Transfer CTA ── */}
+            {/* ── Airport Transfer CTA — icon+text at 2xl+, icon-only at xl ── */}
             <Link
               href="/transfer"
               className="flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-sky-500/15 px-3 py-1 text-xs font-semibold text-sky-200 backdrop-blur-sm transition-all duration-200 hover:border-sky-300 hover:bg-sky-500/25 hover:text-white whitespace-nowrap shrink-0"
+              title={t.nav.transfer}
             >
               <Car className="h-3.5 w-3.5 text-sky-300 shrink-0" />
-              <span>{t.nav.transfer}</span>
+              <span className="hidden 2xl:inline">{t.nav.transfer}</span>
+            </Link>
+
+            {/* ── Custom Itinerary CTA — icon+text at 2xl+, icon-only at xl ── */}
+            <Link
+              href="/custom-itinerary"
+              className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-200 backdrop-blur-sm transition-all duration-200 hover:border-amber-300 hover:bg-amber-500/25 hover:text-white whitespace-nowrap shrink-0"
+              title="Custom Tour Builder"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+              <span className="hidden 2xl:inline">Custom Planner</span>
             </Link>
           </nav>
 
-          {/* Right side */}
-          <div className="flex items-center gap-2 sm:gap-3 relative shrink-0">
+          {/* Right side — always shrink-0 so controls stay visible */}
+          <div className="flex items-center gap-1.5 sm:gap-2 relative shrink-0">
             {/* Interactive Language Selector */}
             <LanguageSelector variant="dark" />
+
+            {/* Currency Switcher */}
+            <CurrencySelector variant="dark" />
 
             {/* Saved Tours quick button in Navbar */}
             <button
@@ -633,7 +657,7 @@ export default function HomePage() {
 
                 {userDropdownOpen && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-56 rounded-2xl p-2 shadow-2xl z-50 animate-scale-up"
+                    className="absolute end-0 top-full mt-2 w-56 rounded-2xl p-2 shadow-2xl z-50 animate-scale-up"
                     style={{
                       backgroundColor: "#f0f9ff",
                       border: "1px solid #e0f2fe",
@@ -743,7 +767,7 @@ export default function HomePage() {
 
         {/* Mobile slide-down navigation drawer */}
         {mobileMenuOpen && (
-          <div className="xl:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
+          <div dir={isRtl ? "rtl" : "ltr"} className="xl:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
             <div className="flex flex-col space-y-1">
               {[
                 { label: t.nav.tours, href: "#tours" },
@@ -790,6 +814,21 @@ export default function HomePage() {
                 </div>
                 <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white">
                   GYD · GJA · NAJ
+                </span>
+              </Link>
+
+              {/* Custom Itinerary link in mobile menu */}
+              <Link
+                href="/custom-itinerary"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm shadow-md mt-1 transition-transform active:scale-98 bg-gradient-to-r from-amber-500 to-amber-600 text-[#061225]"
+              >
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-[#061225]" />
+                  <span>Custom Tour Planner</span>
+                </div>
+                <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#061225] text-amber-400">
+                  Interactive
                 </span>
               </Link>
 
@@ -863,6 +902,39 @@ export default function HomePage() {
                           <span>{lang.nativeLabel}</span>
                         </span>
                         {isSelected && <Check className="h-3.5 w-3.5 text-white" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Currency selection in mobile menu */}
+              <div className="pt-3 border-t border-white/10 mt-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white/50 block mb-2 px-1">
+                  Select Currency
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {currencies.map((c) => {
+                    const isSelected = currency === c.code;
+                    return (
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => {
+                          setCurrency(c.code);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-amber-500 text-[#061225] font-bold shadow-sm"
+                            : "bg-white/5 text-white/80 hover:bg-white/10"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="font-bold">{c.symbol}</span>
+                          <span>{c.code}</span>
+                        </span>
+                        {isSelected && <Check className="h-3.5 w-3.5 text-[#061225]" />}
                       </button>
                     );
                   })}
@@ -1028,20 +1100,43 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════ STATS */}
-      <div style={{ backgroundColor: "#0f3460" }}>
+      <div style={{ backgroundColor: "#0c2d54" }}>
         <div className="container-section">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
+          <div className="grid grid-cols-3 md:grid-cols-6 divide-x divide-white/10">
             {[
-              { value: "2,400+", label: t.hero.statHappy },
-              { value: "50+", label: t.hero.statTours },
-              { value: "15+", label: t.hero.statGuides },
-              { value: "4.9★", label: t.hero.statRating },
+              { value: "3,500+", label: language === "AZ" ? "Məmnun Səyahətçi" : language === "RU" ? "Довольных туристов" : language === "AR" ? "مسافر سعيد" : "Happy Travelers" },
+              { value: "50+",    label: language === "AZ" ? "Özəl Tur" : language === "RU" ? "Авторских туров" : language === "AR" ? "برنامج سياحي" : "Unique Tours" },
+              { value: "15+",    label: language === "AZ" ? "Yerli Bələdçi" : language === "RU" ? "Местных гидов" : language === "AR" ? "مرشد خبير" : "Expert Guides" },
+              { value: "99.2%", label: language === "AZ" ? "Viza Təsdiqi" : language === "RU" ? "Одобрение виз" : language === "AR" ? "معدل الموافقة" : "Visa Approval" },
+              { value: "⚡ 3h", label: language === "AZ" ? "Sürətli e-Viza" : language === "RU" ? "Экспресс e-Виза" : language === "AR" ? "تأشيرة سريعة" : "Express e-Visa" },
+              { value: "4.9★",  label: language === "AZ" ? "TripAdvisor" : language === "RU" ? "TripAdvisor" : language === "AR" ? "تريب أدفايزر" : "TripAdvisor" },
             ].map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center py-6 px-4 text-center">
-                <span className="font-display text-2xl font-bold" style={{ color: "#f59e0b" }}>
+              <div key={stat.label} className="flex flex-col items-center py-5 px-3 text-center">
+                <span className="font-display text-xl font-bold" style={{ color: "#f59e0b" }}>
                   {stat.value}
                 </span>
-                <span className="mt-1 text-xs text-white/60">{stat.label}</span>
+                <span className="mt-1 text-[10px] text-white/55 leading-tight">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════ TRUST STRIP */}
+      <div style={{ backgroundColor: "#071d3b" }} className="overflow-hidden border-t border-white/5">
+        <div className="container-section">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 py-4">
+            {[
+              { icon: "🏛️", text: language === "AZ" ? "Rəsmi ASAN e-Viza Tərəfdaşı" : language === "RU" ? "Официальный партнёр ASAN e-Visa" : language === "AR" ? "شريك رسمي لتأشيرة ASAN" : "Official ASAN e-Visa Partner" },
+              { icon: "🔒", text: language === "AZ" ? "SSL Şifrəli & Təhlükəsiz Ödəniş" : language === "RU" ? "SSL защита и безопасная оплата" : language === "AR" ? "SSL آمن ومدفوعات مشفرة" : "SSL Secured & Safe Payments" },
+              { icon: "⭐", text: language === "AZ" ? "4.9 TripAdvisor · 600+ Rəy" : language === "RU" ? "4.9 TripAdvisor · 600+ отзывов" : language === "AR" ? "4.9 تريب أدفايزر · +600 تقييم" : "4.9 TripAdvisor · 600+ Reviews" },
+              { icon: "💬", text: language === "AZ" ? "24/7 VIP WhatsApp Dəstəyi" : language === "RU" ? "Поддержка 24/7 в WhatsApp" : language === "AR" ? "دعم واتساب VIP على مدار الساعة" : "24/7 VIP WhatsApp Support" },
+              { icon: "📋", text: language === "AZ" ? "Lisenziyalı Azərbaycan Turizm Agentliyi" : language === "RU" ? "Лицензированное туристическое агентство" : language === "AR" ? "وكالة سياحية معتمدة" : "Licensed Azerbaijan Tourism Agency" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2 text-[11px] text-white/60 whitespace-nowrap">
+                <span className="text-sm">{item.icon}</span>
+                <span>{item.text}</span>
+                {i < 4 && <span className="hidden md:inline text-white/20 ml-4">|</span>}
               </div>
             ))}
           </div>
@@ -1243,9 +1338,11 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                    <h3 className="font-display text-lg font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-amber-600 transition-colors">
-                      {tourTitle}
-                    </h3>
+                    <Link href={`/tours/${tour.slug || "baku-old-city-walking-tour"}`}>
+                      <h3 className="font-display text-lg font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-amber-600 transition-colors hover:underline">
+                        {tourTitle}
+                      </h3>
+                    </Link>
                     <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2 min-h-[2.75rem]">
                       {tourDesc}
                     </p>
@@ -1266,16 +1363,16 @@ export default function HomePage() {
                         <div>
                           {tour.originalPrice && (
                             <span className="text-xs text-slate-400 line-through mr-1.5">
-                              ${tour.originalPrice}
+                              {formatPrice(tour.originalPrice)}
                             </span>
                           )}
                           <span className="text-lg font-black text-slate-900">
-                            ${tour.price}
+                            {formatPrice(tour.price)}
                           </span>
                           <span className="text-[11px] text-slate-500"> / {t.tours.groupSize}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400 font-medium">
-                          ~{(tour.price * 1.7).toFixed(0)} AZN
+                        <span className="text-[10px] text-slate-500 font-medium">
+                          {formatPriceWithSubtext(tour.price).secondary}
                         </span>
                       </div>
 
@@ -1286,18 +1383,18 @@ export default function HomePage() {
                             setBookingModalTour({ id: tour.id, title: tourTitle, price: tour.price });
                             setBookingSuccess(false);
                           }}
-                          aria-label={`Reserve date for ${tourTitle} ($${tour.price} USD)`}
+                          aria-label={`Reserve date for ${tourTitle} (${formatPrice(tour.price)})`}
                           className="w-full rounded-xl py-2.5 px-2 text-xs font-bold transition-all duration-200 border border-slate-300 text-slate-800 hover:bg-slate-100 active:scale-98 text-center cursor-pointer shadow-sm"
                         >
                           📅 {t.bookingModal.reserveDateBtn}
                         </button>
                         <a
                           href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(
-                            `Hello AddmeTour! I would like to book the "${tourTitle}" tour ($${tour.price} USD).`
+                            `Hello AddmeTour! I would like to book the "${tourTitle}" tour (${formatPrice(tour.price)} / $${tour.price} USD).`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-label={`Book ${tourTitle} tour on WhatsApp ($${tour.price} USD)`}
+                          aria-label={`Book ${tourTitle} tour on WhatsApp (${formatPrice(tour.price)})`}
                           className="w-full rounded-xl py-2.5 px-2 text-xs font-bold text-white transition-all duration-200 hover:opacity-95 active:scale-98 text-center cursor-pointer shadow-sm flex items-center justify-center gap-1"
                           style={{ backgroundColor: "#0f3460" }}
                         >
@@ -1454,21 +1551,15 @@ export default function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { slug: "baku", name: t.destinations.bakuName, subtitle: t.destinations.bakuDesc, tours: 12, image: "https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=1000&q=80" },
-              { slug: "absheron", name: t.destinations.absheronName, subtitle: t.destinations.absheronDesc, tours: 5, image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1000&q=80" },
               { slug: "sheki", name: t.destinations.shekiName, subtitle: t.destinations.shekiDesc, tours: 4, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1000&q=80" },
+              { slug: "gabala", name: language === "AZ" ? "Qəbələ & Şahdağ" : language === "RU" ? "Габала и Шахдаг" : language === "AR" ? "غابالا و شاهداغ" : "Gabala & Shahdag", subtitle: language === "AZ" ? "Dağ kurortları və göllər" : language === "RU" ? "Горные курорты и озера" : language === "AR" ? "منتجعات جبلية وبحيرات" : "Alpine resorts, cable cars & emerald lakes", tours: 5, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1000&q=80" },
               { slug: "gobustan", name: t.destinations.gobustanName, subtitle: t.destinations.gobustanDesc, tours: 3, image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=1000&q=80" },
             ].map((dest) => (
               <Link
                 key={dest.slug}
-                href="#tours"
-                aria-label={`Explore ${dest.name} tours in Azerbaijan`}
-                onClick={() => {
-                  setActiveFilter("All");
-                  setSearchQuery(dest.slug);
-                  const el = document.getElementById("tours");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="group relative h-80 overflow-hidden rounded-2xl block"
+                href={`/destinations/${dest.slug}`}
+                aria-label={`Explore ${dest.name} travel guide and tours`}
+                className="group relative h-80 overflow-hidden rounded-2xl block shadow-sm hover:shadow-xl transition-all duration-300"
               >
                 <Image
                   src={dest.image}
@@ -1480,6 +1571,9 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-5">
+                  <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm mb-2">
+                    {language === "AZ" ? "Bələdçi & Turlar" : language === "RU" ? "Гид и туры" : language === "AR" ? "دليل وجولات" : "Guide & Tours"}
+                  </span>
                   <h3 className="text-lg font-bold text-white font-display leading-tight">{dest.name}</h3>
                   <p className="text-xs text-white/70 mt-1 line-clamp-2">{dest.subtitle}</p>
                   <span
@@ -1495,31 +1589,163 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════════════════ CAUCASUS COMBO TOURS */}
+      <section className="py-20" style={{ backgroundColor: "#0f3460" }}>
+        <div className="container-section">
+          <div className="text-center mb-12">
+            <p className="section-label mb-3" style={{ color: "#f59e0b" }}>
+              {language === "AZ" ? "QAFQAZ MARŞRUTLARİ" : language === "RU" ? "КАВКАЗСКИЕ МАРШРУТЫ" : language === "AR" ? "رحلات القوقاز" : "CAUCASUS JOURNEYS"}
+            </p>
+            <h2 className="font-display text-4xl font-bold text-white mb-3">
+              {language === "AZ" ? "Çox Ölkəli Kombinasiya Paketləri" : language === "RU" ? "Многострановые комбо-маршруты" : language === "AR" ? "باقات جولات متعددة الدول" : "Multi-Country Combo Packages"}
+            </h2>
+            <p className="text-white/60 max-w-xl mx-auto text-sm">
+              {language === "AZ" ? "Azərbaycanı qonşu ölkələrlə birləşdirən unudulmaz səyahət paketləri" : language === "RU" ? "Незабываемые маршруты, объединяющие Азербайджан с соседними странами" : language === "AR" ? "باقات سياحية تجمع أذربيجان بدول الجوار" : "Unforgettable routes combining Azerbaijan with neighbouring countries"}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: language === "AZ" ? "1 Səfərdə 3 Ölkə" : language === "RU" ? "3 страны за 1 поездку" : language === "AR" ? "3 دول في رحلة واحدة" : "3 Countries in 1 Trip",
+                route: language === "AZ" ? "Bakı → Tbilisi → İstanbul" : language === "RU" ? "Баку → Тбилиси → Стамбул" : language === "AR" ? "باكو ← تبليسي ← إسطنبول" : "Baku → Tbilisi → Istanbul",
+                days: "7",
+                flags: "🇦🇿 🇬🇪 🇹🇷",
+                price: 590,
+                image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80",
+                badge: language === "AZ" ? "Ən Populyar" : language === "RU" ? "Популярный" : language === "AR" ? "الأكثر شعبية" : "Most Popular",
+              },
+              {
+                title: language === "AZ" ? "Qafqaz Dağ Marşrutu" : language === "RU" ? "Горный маршрут Кавказа" : language === "AR" ? "مسار جبال القوقاز" : "Caucasus Mountain Route",
+                route: language === "AZ" ? "Bakı → Şəki → Lahıc → Gəncə" : language === "RU" ? "Баку → Шеки → Lahıc → Гянджа" : language === "AR" ? "باكو ← شيكي ← لاهيج ← غنجة" : "Baku → Sheki → Lahij → Ganja",
+                days: "4",
+                flags: "🇦🇿",
+                price: 299,
+                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+                badge: language === "AZ" ? "Macəra" : language === "RU" ? "Приключение" : language === "AR" ? "مغامرة" : "Adventure",
+              },
+              {
+                title: language === "AZ" ? "Xəzər & İpək Yolu" : language === "RU" ? "Каспий и Шёлковый путь" : language === "AR" ? "بحر قزوين وطريق الحرير" : "Caspian & Silk Road",
+                route: language === "AZ" ? "Bakı → Qobustan → Abşeron → Şəki" : language === "RU" ? "Баку → Гобустан → Апшерон → Шеки" : language === "AR" ? "باكو ← غوبوستان ← أبشيرون ← شيكي" : "Baku → Gobustan → Absheron → Sheki",
+                days: "3",
+                flags: "🇦🇿",
+                price: 199,
+                image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80",
+                badge: language === "AZ" ? "Yeni" : language === "RU" ? "Новинка" : language === "AR" ? "جديد" : "New",
+              },
+            ].map((pkg, i) => (
+              <div
+                key={i}
+                className="group relative rounded-2xl overflow-hidden flex flex-col"
+                style={{ border: "1px solid rgba(255,255,255,0.12)", backgroundColor: "rgba(255,255,255,0.05)" }}
+              >
+                {/* Image */}
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src={pkg.image}
+                    alt={pkg.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    style={{ objectFit: "cover" }}
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <span className="rounded-full px-3 py-1 text-xs font-bold text-[#061225]" style={{ backgroundColor: "#f59e0b" }}>{pkg.badge}</span>
+                    <span className="rounded-full bg-white/15 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-white">{pkg.days} {language === "AZ" ? "Gün" : language === "RU" ? "дней" : language === "AR" ? "أيام" : "Days"}</span>
+                  </div>
+                  <div className="absolute bottom-3 left-3 text-xl">{pkg.flags}</div>
+                </div>
+
+                {/* Body */}
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="font-display text-lg font-bold text-white mb-1">{pkg.title}</h3>
+                  <p className="text-xs text-white/50 mb-4">{pkg.route}</p>
+                  <div className="mt-auto flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-white/40 block">{language === "AZ" ? "Qiymət" : language === "RU" ? "от" : language === "AR" ? "يبدأ من" : "from"}</span>
+                      <span className="text-xl font-black text-white">{formatPrice(pkg.price)}</span>
+                    </div>
+                    <a
+                      href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(`Hello AddmeTour! I'm interested in the "${pkg.title}" package (${pkg.route}, ${pkg.days} days).`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-bold text-[#061225] transition-all duration-200 hover:opacity-90 hover:scale-105"
+                      style={{ backgroundColor: "#f59e0b" }}
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      {language === "AZ" ? "Sorğu göndər" : language === "RU" ? "Запросить" : language === "AR" ? "استفسر" : "Request Quote"}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════════════════════════════════════════════════ TESTIMONIALS */}
       <section id="reviews" className="py-20" style={{ backgroundColor: "#f0f9ff" }}>
         <div className="container-section">
           {/* Header */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <p className="section-label mb-2">
               {t.reviews.badge}
             </p>
             <h2 className="font-display text-4xl md:text-5xl font-bold text-slate-900 mb-3">
               {t.reviews.title}
             </h2>
-            <div className="flex items-center justify-center gap-2 text-sm font-medium text-slate-600">
-              <div className="flex items-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star
-                    key={s}
-                    className="h-4 w-4"
-                    fill="#f59e0b"
-                    stroke="#f59e0b"
-                  />
+          </div>
+
+          {/* Rating Summary Box */}
+          <div className="mx-auto max-w-3xl mb-12 rounded-2xl bg-white shadow-lg border border-slate-100 p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              {/* Big score */}
+              <div className="text-center shrink-0">
+                <div className="text-7xl font-black text-slate-900 leading-none">4.9</div>
+                <div className="flex items-center justify-center gap-0.5 mt-2">
+                  {[1,2,3,4,5].map(s => <Star key={s} className="h-5 w-5 fill-[#f59e0b] text-[#f59e0b]" />)}
+                </div>
+                <div className="text-xs text-slate-500 mt-1">{language === "AZ" ? "600+ rəy əsasında" : language === "RU" ? "на основе 600+ отзывов" : language === "AR" ? "بناءً على +600 تقييم" : "Based on 600+ reviews"}</div>
+              </div>
+
+              {/* Breakdown bars */}
+              <div className="flex-1 w-full space-y-2">
+                {[
+                  { stars: 5, pct: 96 },
+                  { stars: 4, pct: 3 },
+                  { stars: 3, pct: 1 },
+                  { stars: 2, pct: 0 },
+                  { stars: 1, pct: 0 },
+                ].map(({ stars, pct }) => (
+                  <div key={stars} className="flex items-center gap-3">
+                    <span className="text-xs text-slate-600 w-4 shrink-0">{stars}</span>
+                    <Star className="h-3 w-3 fill-[#f59e0b] text-[#f59e0b] shrink-0" />
+                    <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: pct > 50 ? "#f59e0b" : "#cbd5e1" }} />
+                    </div>
+                    <span className="text-xs text-slate-500 w-8 text-right shrink-0">{pct}%</span>
+                  </div>
                 ))}
               </div>
-              <span className="font-semibold text-slate-800">{t.reviews.ratingText}</span>
-              <span className="text-slate-500">&middot;</span>
-              <span>TripAdvisor</span>
+
+              {/* Source badges */}
+              <div className="flex flex-col gap-3 shrink-0">
+                <div className="flex items-center gap-2 rounded-xl bg-[#00AF87]/10 border border-[#00AF87]/25 px-4 py-2.5">
+                  <span className="text-lg">🦉</span>
+                  <div>
+                    <div className="text-xs font-bold text-[#00AF87]">TripAdvisor</div>
+                    <div className="text-[10px] text-slate-500">Travelers' Choice</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 rounded-xl bg-blue-50 border border-blue-100 px-4 py-2.5">
+                  <span className="text-lg">🔵</span>
+                  <div>
+                    <div className="text-xs font-bold text-blue-600">Google Reviews</div>
+                    <div className="text-[10px] text-slate-500">4.8 / 5.0</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1529,6 +1755,7 @@ export default function HomePage() {
               const localizedReview = LOCALIZED_TESTIMONIALS[language]?.[idx] || item;
               const quote = localizedReview.quote || item.quote;
               const subtitle = localizedReview.subtitle || item.subtitle;
+              const countryFlags = ["🇬🇧", "🇮🇹", "🇯🇵"];
 
               return (
                 <div
@@ -1564,7 +1791,8 @@ export default function HomePage() {
                         {item.initials}
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                        <h3 className="text-sm font-bold text-slate-900 leading-tight flex items-center gap-1.5">
+                          <span>{countryFlags[idx]}</span>
                           {item.name}
                         </h3>
                         <p className="text-xs text-slate-600 mt-0.5 leading-tight">
@@ -1573,15 +1801,20 @@ export default function HomePage() {
                       </div>
                     </div>
 
-                  <div className="flex items-center gap-0.5 shrink-0 ml-2">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star
-                        key={s}
-                        className="h-3 w-3"
-                        fill="#f59e0b"
-                        stroke="#f59e0b"
-                      />
-                    ))}
+                  <div className="flex flex-col items-end gap-1 shrink-0 ml-2">
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star
+                          key={s}
+                          className="h-3 w-3"
+                          fill="#f59e0b"
+                          stroke="#f59e0b"
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[9px] text-[#00AF87] font-semibold flex items-center gap-0.5">
+                      <BadgeCheck className="h-3 w-3" /> {language === "AR" ? "مراجع" : "Verified"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -2114,10 +2347,43 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* PDF Brochure Download CTA */}
+          <div className="my-10 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ backgroundColor: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)" }}>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: "rgba(245,158,11,0.2)" }}>
+                <Download className="h-5 w-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">
+                  {language === "AZ" ? "Tur Kataloqlarını Yükləyin" : language === "RU" ? "Скачать каталог туров" : language === "AR" ? "تحميل كتالوج الجولات" : "Download Tour Catalogue"}
+                </p>
+                <p className="text-[11px] text-white/50 mt-0.5">
+                  {language === "AZ" ? "PDF formatında bütün marşrutlar, qiymətlər və paket detalları" : language === "RU" ? "Все маршруты, цены и детали туров в PDF формате" : language === "AR" ? "جميع المسارات والأسعار وتفاصيل الباقات بصيغة PDF" : "All itineraries, prices & package details in PDF format"}
+                </p>
+              </div>
+            </div>
+            <a
+              href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent("I'd like to receive the AddmeTour tour catalogue (PDF brochure).")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold text-[#061225] transition-all hover:opacity-90 hover:scale-105"
+              style={{ backgroundColor: "#f59e0b" }}
+            >
+              <Download className="h-3.5 w-3.5" />
+              {language === "AZ" ? "PDF Yüklə" : language === "RU" ? "Скачать PDF" : language === "AR" ? "تحميل PDF" : "Download PDF"}
+            </a>
+          </div>
+
           {/* Bottom Row */}
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
             <p>{t.footer.rights}</p>
             <div className="flex items-center gap-6">
+              <Link href="/medical" aria-label="Medical & Wellness Tourism" className="hover:text-white transition-colors">
+                {language === "AZ" ? "Tibbi Turizm" : language === "RU" ? "Медицинский туризм" : language === "AR" ? "السياحة الطبية" : "Medical Tourism"}
+              </Link>
+              <Link href="/mice" aria-label="MICE & Corporate Events" className="hover:text-white transition-colors">
+                {language === "AZ" ? "Korporativ Turlar" : language === "RU" ? "Корпоративные туры" : language === "AR" ? "سياحة الأعمال" : "Corporate & MICE"}
+              </Link>
               <Link href="/admin" aria-label="Admin Management Portal" className="hover:text-white transition-colors">
                 {t.nav.adminPortal}
               </Link>
@@ -2556,12 +2822,14 @@ export default function HomePage() {
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
                     <div className="flex justify-between font-medium">
                       <span>{t.bookingModal.ratePerGroup}</span>
-                      <span className="font-bold text-slate-900">${bookingModalTour.price} USD</span>
+                      <span className="font-bold text-slate-900">{formatPrice(bookingModalTour.price)}</span>
                     </div>
-                    <div className="flex justify-between text-[11px] text-slate-400">
-                      <span>{t.bookingModal.approxLocal}</span>
-                      <span>~{(bookingModalTour.price * 1.7).toFixed(0)} AZN</span>
-                    </div>
+                    {formatPriceWithSubtext(bookingModalTour.price).secondary && (
+                      <div className="flex justify-between text-[11px] text-slate-400">
+                        <span>{t.bookingModal.approxLocal}</span>
+                        <span>{formatPriceWithSubtext(bookingModalTour.price).secondary}</span>
+                      </div>
+                    )}
                   </div>
 
                   <button

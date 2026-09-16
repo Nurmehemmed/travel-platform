@@ -111,6 +111,10 @@ function escapeHtml(text: string): string {
     .replace(/>/g, "&gt;");
 }
 
+export async function notifyTelegram(message: string): Promise<boolean> {
+  return sendTelegramAlert(message);
+}
+
 // ─── Transfer Alert ──────────────────────────────────────────────────────────
 
 export interface TransferTelegramAlertPayload {

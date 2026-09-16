@@ -3,6 +3,7 @@ import "@travel/ui/styles";
 import FloatingTravelServices from "@/components/FloatingTravelServices";
 import { LanguageProvider } from "@/lib/i18n";
 import { SettingsProvider } from "@/lib/settings-context";
+import { CurrencyProvider } from "@/lib/currency-context";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 
 export const viewport: Viewport = {
@@ -292,8 +293,10 @@ export default function RootLayout({
         <SettingsProvider>
           <AnnouncementBanner />
           <LanguageProvider>
-            {children}
-            <FloatingTravelServices />
+            <CurrencyProvider>
+              {children}
+              <FloatingTravelServices />
+            </CurrencyProvider>
           </LanguageProvider>
         </SettingsProvider>
       </body>
