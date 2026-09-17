@@ -1298,7 +1298,7 @@ export default function HomePage() {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-2">
                         <button
                           type="button"
                           onClick={() => {
@@ -1410,7 +1410,7 @@ export default function HomePage() {
             </div>
 
             {/* Right: Photo collage */}
-            <div className="relative h-[480px]">
+            <div className="relative h-[380px] sm:h-[440px] md:h-[480px]">
               {/* Main large photo */}
               <div className="absolute right-0 top-0 h-[300px] w-[75%] overflow-hidden rounded-2xl shadow-2xl">
                 <Image
@@ -1489,7 +1489,7 @@ export default function HomePage() {
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
-                <div className="absolute bottom-0 left-0 p-5">
+                <div className="absolute bottom-0 left-0 p-3.5 sm:p-5">
                   <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm mb-2 pointer-events-none">
                     {language === "AZ" ? "Bələdçi & Turlar" : language === "RU" ? "Гид и туры" : language === "AR" ? "دليل وجولات" : "Guide & Tours"}
                   </span>
