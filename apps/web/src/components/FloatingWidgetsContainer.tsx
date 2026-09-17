@@ -21,15 +21,14 @@ const CookieConsent = dynamic(
 export function FloatingWidgetsContainer() {
   const { loading } = useSiteSettings();
 
-  // If initial settings are still being fetched and no local cache exists, wait to avoid flickering
-  if (loading && typeof window !== "undefined" && !localStorage.getItem("addmetour_site_settings_cache")) {
-    return <CookieConsent />;
-  }
-
   return (
     <>
-      <FloatingCustomItinerary />
-      <FloatingTravelServices />
+      {!loading && (
+        <>
+          <FloatingCustomItinerary />
+          <FloatingTravelServices />
+        </>
+      )}
       <CookieConsent />
     </>
   );

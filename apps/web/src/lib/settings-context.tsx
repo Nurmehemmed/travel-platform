@@ -101,6 +101,20 @@ export const DEFAULT_SETTINGS_MAP: Record<string, any> = {
 };
 
 const SETTINGS_CACHE_KEY = "addmetour_site_settings_cache";
+const SETTINGS_BROADCAST_CHANNEL = "addmetour_settings_channel";
+
+export function broadcastSettingsUpdate(newSettings: PublicSettings) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(newSettings));
+    window.dispatchEvent(new CustomEvent("addmetour:settings_updated", { detail: newSettings }));
+    if (typeof BroadcastChannel !== "undefined") {
+      const channel = new BroadcastChannel(SETTINGS_BROADCAST_CHANNEL);
+      channel.postMessage(newSettings);
+      channel.close();
+    }
+  } catch {}
+}
 
 interface SettingsContextType {
   settings: PublicSettings;
@@ -149,8 +163,47 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetchSettings();
-  }, []);
 
+    // Listen for cross-tab or in-app settings updates
+    const handleCustomUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<PublicSettings>;
+      if (customEvent.detail) {
+        setSettings(customEvent.detail);
+        setLoading(false);
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === SETTINGS_CACHE_KEY && e.newValue) {
+        try {
+          setSettings(JSON.parse(e.newValue));
+          setLoading(false);
+        } catch {}
+      }
+    };
+
+    let bc: BroadcastChannel | null = null;
+    if (typeof BroadcastChannel !== "undefined") {
+      bc = new BroadcastChannel(SETTINGS_BROADCAST_CHANNEL);
+      bc.onmessage = (event) => {
+        if (event.data) {
+          setSettings(event.data);
+          setLoading(false);
+        }
+      };
+    }
+
+    window.addEventListener("addmetour:settings_updated", handleCustomUpdate);
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("addmetour:settings_updated", handleCustomUpdate);
+      window.removeEventListener("storage", handleStorageChange);
+      if (bc) {
+        bc.close();
+      }
+    };
+  }, []);
 
   return (
     <SettingsContext.Provider value={{ settings, refreshSettings: fetchSettings, loading }}>

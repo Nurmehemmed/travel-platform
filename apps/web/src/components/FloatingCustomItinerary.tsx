@@ -72,7 +72,7 @@ export default function FloatingCustomItinerary() {
   return (
     <aside
       aria-label="Interactive Custom Itinerary Planner"
-      className="fixed bottom-4 sm:bottom-6 left-3 sm:left-6 z-40 print:hidden transition-all duration-300 pointer-events-auto"
+      className="fixed bottom-4 sm:bottom-6 left-3 sm:left-6 z-40 print:hidden transition-all duration-300 pointer-events-auto animate-fade-in"
     >
       <Link
         href="/custom-itinerary"

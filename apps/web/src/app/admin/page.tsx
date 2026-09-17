@@ -12,7 +12,7 @@ import { StatsCardsSkeleton, TableSkeleton } from "@/components/Skeletons";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 import { getAdminTranslations } from "@/lib/admin-i18n";
-import { DEFAULT_SETTINGS_MAP } from "@/lib/settings-context";
+import { DEFAULT_SETTINGS_MAP, broadcastSettingsUpdate } from "@/lib/settings-context";
 
 import {
   AuditLogItem,
@@ -309,6 +309,16 @@ export default function AdminPortalPage() {
           draftMap[s.key] = s.value;
         }
         setSettingsDraft(draftMap);
+
+        // Fetch fresh public settings structure and broadcast across all tabs & localStorage instantly
+        try {
+          const pubRes = await fetch("/api/settings", { cache: "no-store" });
+          if (pubRes.ok) {
+            const pubData = await pubRes.json();
+            broadcastSettingsUpdate(pubData);
+          }
+        } catch {}
+
         showNotification("Site settings saved and applied to live platform!");
       } else {
         alert(data?.error || "Failed to save settings");
