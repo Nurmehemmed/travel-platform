@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
 export const SUPPORTED_LOCALES = [
-  { code: "en-US", lang: "en", path: "" },
-  { code: "az-AZ", lang: "az", path: "" },
-  { code: "ru-RU", lang: "ru", path: "" },
-  { code: "fr-FR", lang: "fr", path: "" },
-  { code: "ar-SA", lang: "ar", path: "" },
-  { code: "de-DE", lang: "de", path: "" },
+  { code: "en", lang: "en", query: "" },
+  { code: "az", lang: "az", query: "lang=az" },
+  { code: "ru", lang: "ru", query: "lang=ru" },
+  { code: "fr", lang: "fr", query: "lang=fr" },
+  { code: "ar", lang: "ar", query: "lang=ar" },
+  { code: "de", lang: "de", query: "lang=de" },
 ] as const;
 
 export interface ConstructMetadataProps {
@@ -39,7 +39,11 @@ export function constructMetadata({
   };
 
   for (const locale of SUPPORTED_LOCALES) {
-    languageAlternates[locale.code] = canonicalUrl;
+    if (locale.query) {
+      languageAlternates[locale.code] = `${canonicalUrl}${canonicalUrl.includes("?") ? "&" : "?"}${locale.query}`;
+    } else {
+      languageAlternates[locale.code] = canonicalUrl;
+    }
   }
 
   return {

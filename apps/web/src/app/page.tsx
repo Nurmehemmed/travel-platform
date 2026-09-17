@@ -1332,9 +1332,9 @@ export default function HomePage() {
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 mb-4">
                   <Bookmark className="h-7 w-7 text-[#f59e0b]" />
                 </div>
-                <h3 className="font-display text-xl font-bold text-slate-900 mb-2">
+                <p className="font-display text-xl font-bold text-slate-900 mb-2">
                   {activeFilter === "Saved" ? t.nav.saved : t.search.noToursFound}
-                </h3>
+                </p>
                 <p className="text-sm text-slate-500 mb-6">
                   {activeFilter === "Saved"
                     ? "You haven't bookmarked any tours yet. Click the bookmark icon on any tour to save it."
@@ -1401,7 +1401,7 @@ export default function HomePage() {
                       >
                         <f.icon className="h-4 w-4" style={{ color: "#f59e0b" }} />
                       </div>
-                      <h3 className="text-sm font-semibold text-white">{f.title}</h3>
+                      <p className="text-sm font-semibold text-white">{f.title}</p>
                     </div>
                     <p className="text-xs text-white/60 leading-relaxed">{f.desc}</p>
                   </div>
@@ -1712,10 +1712,10 @@ export default function HomePage() {
                         {item.initials}
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900 leading-tight flex items-center gap-1.5">
+                        <p className="text-sm font-bold text-slate-900 leading-tight flex items-center gap-1.5">
                           <span>{countryFlags[idx]}</span>
                           {item.name}
-                        </h3>
+                        </p>
                         <p className="text-xs text-slate-600 mt-0.5 leading-tight">
                           {subtitle}
                         </p>
@@ -2014,7 +2014,7 @@ export default function HomePage() {
             style={{ backgroundColor: "#f0e7d8", border: "1px dashed #f59e0b" }}
           >
             <div className="text-left">
-              <h3 className="font-bold text-slate-900 text-base">{t.footer.contact}</h3>
+              <p className="font-bold text-slate-900 text-base">{t.footer.contact}</p>
               <p className="text-xs md:text-sm text-slate-600 mt-0.5">
                 {t.footer.supportAvailable}
               </p>
@@ -2040,7 +2040,19 @@ export default function HomePage() {
           <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full" style={{ backgroundColor: "#f59e0b", filter: "blur(80px)" }} />
         </div>
         <div className="container-section relative z-10 text-center">
-          <p className="section-label mb-4" style={{ color: "#f59e0b" }}>{t.hero.badge}</p>
+          <p className="section-label mb-4" style={{ color: "#f59e0b" }}>
+            {language === "AZ"
+              ? "Boutique Fərdi & Qrup Turları"
+              : language === "RU"
+              ? "Авторские и индивидуальные туры"
+              : language === "FR"
+              ? "Circuits d'Exception sur Mesure"
+              : language === "AR"
+              ? "رحلات سياحية خاصة وتجارب فريدة"
+              : language === "DE"
+              ? "Individuelle & Geführte Rundreisen"
+              : "Boutique Private & Small-Group Travel"}
+          </p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-white mb-6">
             {language === "AZ"
               ? "Azərbaycanı Bizimlə Kəşf Edin"
@@ -2054,25 +2066,47 @@ export default function HomePage() {
               ? "Entdecken Sie Aserbaidschan mit uns"
               : "Ready to Explore Azerbaijan?"}
           </h2>
-          <p className="text-white/60 max-w-xl mx-auto mb-10">
-            {t.hero.subtitle}
+          <p className="text-white/80 max-w-xl mx-auto mb-10 text-sm md:text-base leading-relaxed">
+            {language === "AZ"
+              ? "Bakı mütəxəssislərimizlə əlaqə saxlayın, unikal marşrutunuzu dərhal planlaşdırın və zəmanətli unudulmaz səyahət təcrübəsi yaşayın."
+              : language === "RU"
+              ? "Свяжитесь с нашими местными экспертами в Баку для составления индивидуальной программы, быстрого подтверждения и комфортного трансфера."
+              : language === "FR"
+              ? "Contactez nos spécialistes locaux à Bakou pour concevoir votre itinéraire personnalisé avec confirmation instantanée et assistance 24/7."
+              : language === "AR"
+              ? "تواصل مع خبرائنا المحليين في باكو لتنسيق برنامج سياحي مخصص، تأكيد فوري، وخدمة نقل مريحة على مدار الساعة."
+              : language === "DE"
+              ? "Kontaktieren Sie unsere lokalen Reiseexperten in Baku für eine individuelle Reiseroute, sofortige Bestätigung und perfekten Service."
+              : "Connect with our local Baku travel specialists for handcrafted itineraries, instant confirmations, and seamless 24/7 travel support."}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="#tours"
+              aria-label="View all handcrafted tour itineraries"
               className="rounded-full px-8 py-4 font-semibold text-sm transition-all duration-200 hover:opacity-90 hover:scale-105 hover:shadow-xl"
               style={{ backgroundColor: "#f59e0b", color: "#061225" }}
             >
-              {t.hero.ctaBrowse}
+              {language === "AZ"
+                ? "Bütün Turlara Baxın"
+                : language === "RU"
+                ? "Посмотреть все туры"
+                : language === "FR"
+                ? "Voir tous les circuits"
+                : language === "AR"
+                ? "استعرض جميع الجولات"
+                : language === "DE"
+                ? "Alle Touren ansehen"
+                : "View All Tour Itineraries"}
             </Link>
             <a
               href={siteConfig.contact.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Direct WhatsApp inquiry with travel expert"
               className="rounded-full border-2 border-white px-8 py-4 font-semibold text-sm text-white transition-all duration-200 hover:bg-white hover:text-brand-900 flex items-center gap-2"
             >
               <MessageCircle className="h-4 w-4" />
-              WhatsApp
+              WhatsApp Direct
             </a>
           </div>
         </div>
@@ -2107,18 +2141,18 @@ export default function HomePage() {
 
             {/* Col 2: Navigation Links */}
             <div>
-              <h3 className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
+              <p className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
                 {language === "AZ" ? "Sürətli Keçidlər" : language === "RU" ? "Навигация" : "Quick Links"}
-              </h3>
+              </p>
               <ul className="space-y-2.5 text-xs text-white/70">
                 <li>
                   <Link href="#tours" aria-label="Browse popular Azerbaijan tours" className="hover:text-amber-400 transition-colors">
-                    {t.nav.tours}
+                    {language === "AZ" ? "Bütün Ekskursiyalar" : language === "RU" ? "Все экскурсии" : "Browse All Tours"}
                   </Link>
                 </li>
                 <li>
                   <Link href="#destinations" aria-label="View Azerbaijan destinations" className="hover:text-amber-400 transition-colors">
-                    {t.nav.destinations}
+                    {language === "AZ" ? "Populyar Məkanlar" : language === "RU" ? "Популярные направления" : "Top Destinations"}
                   </Link>
                 </li>
                 <li>
@@ -2128,22 +2162,22 @@ export default function HomePage() {
                 </li>
                 <li>
                   <Link href="/transfer" aria-label="Book airport transfer in Baku" className="hover:text-amber-400 transition-colors">
-                    {t.nav.transfer}
+                    {language === "AZ" ? "Hava Limanı Transferi" : language === "RU" ? "Трансфер из аэропорта" : "Airport Transfer (GYD)"}
                   </Link>
                 </li>
                 <li>
                   <Link href="#about" aria-label="Why travel with AddmeTour" className="hover:text-amber-400 transition-colors">
-                    {t.nav.about}
+                    {language === "AZ" ? "Niyə AddmeTour?" : language === "RU" ? "Почему AddmeTour" : "Why Choose Us"}
                   </Link>
                 </li>
                 <li>
                   <Link href="#reviews" aria-label="Read authentic traveler reviews" className="hover:text-amber-400 transition-colors">
-                    {t.nav.reviews}
+                    {language === "AZ" ? "Səyahətçi Rəyləri" : language === "RU" ? "Отзывы туристов" : "Traveler Reviews"}
                   </Link>
                 </li>
                 <li>
                   <Link href="#faq" aria-label="Frequently asked travel questions" className="hover:text-amber-400 transition-colors">
-                    {t.nav.faq}
+                    {language === "AZ" ? "Suallar və Cavablar" : language === "RU" ? "Вопросы и ответы" : "Help & FAQ"}
                   </Link>
                 </li>
               </ul>
@@ -2151,9 +2185,9 @@ export default function HomePage() {
 
             {/* Col 3: Contact & Support */}
             <div>
-              <h3 className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
+              <p className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
                 {t.footer.contact}
-              </h3>
+              </p>
               <div className="space-y-3 text-xs text-white/70">
                 <p className="flex items-center gap-2">
                   <span className="text-amber-400">📍</span> Nizami St, Baku, Azerbaijan
@@ -2172,9 +2206,9 @@ export default function HomePage() {
 
             {/* Col 4: Social Channels & Share Bar */}
             <div>
-              <h3 className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
+              <p className="font-bold text-white text-sm mb-4 uppercase tracking-wider">
                 {language === "AZ" ? "Bizi İzləyin & Paylaşın" : language === "RU" ? "Соцсети и Поделиться" : "Follow & Share"}
-              </h3>
+              </p>
               
               {/* Social Channels */}
               <div className="flex items-center gap-2 mb-6">

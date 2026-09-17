@@ -286,8 +286,6 @@ export default function RootLayout({
         <link rel="icon" href="/icon.svg?v=5" type="image/svg+xml" />
         <link rel="alternate icon" href="/favicon.ico?v=5" />
         <link rel="apple-touch-icon" href="/icon.svg?v=5" />
-        <link rel="alternate" hrefLang="en" href={APP_URL} />
-        <link rel="alternate" hrefLang="x-default" href={APP_URL} />
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
         <script
           type="application/ld+json"
