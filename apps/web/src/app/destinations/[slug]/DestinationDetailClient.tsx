@@ -12,6 +12,7 @@ import { DestinationDetailData } from "@/lib/destinations-data";
 import { TourDetailData } from "@/lib/tours-data";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
+import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 
@@ -26,7 +27,9 @@ export default function DestinationDetailClient({
 }: DestinationDetailClientProps) {
   const { t, isRtl } = useLanguage();
   const { formatPrice, formatPriceWithSubtext } = useCurrency();
+  const { settings } = useSiteSettings();
   const [isScrolled, setIsScrolled] = useState(false);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,7 +76,7 @@ export default function DestinationDetailClient({
             <LanguageSelector variant="dark" />
             <CurrencySelector variant="dark" />
             <a
-              href={`https://wa.me/994551003146?text=${encodeURIComponent(
+              href={`https://wa.me/${settings?.contact?.whatsappClean || "994551003146"}?text=${encodeURIComponent(
                 `Hello AddmeTour! I'd like information on visiting ${destination.name}.`
               )}`}
               target="_blank"
@@ -83,6 +86,7 @@ export default function DestinationDetailClient({
               <MessageCircle className="h-3.5 w-3.5" />
               <span>Ask a Local</span>
             </a>
+
           </div>
         </div>
       </header>

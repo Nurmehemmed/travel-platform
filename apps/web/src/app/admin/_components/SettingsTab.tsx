@@ -581,7 +581,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
               <div>
                 <span className="text-xs font-bold text-slate-800 block">
@@ -602,7 +602,55 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                     operations_floating_whatsapp: e.target.checked,
                   }))
                 }
+                className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-slate-800 block">
+                  {language === "AZ" ? "Üzən Xidmət Düymələri (e-Viza / Transfer)" : "Floating Quick Services Dock"}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  {language === "AZ"
+                    ? "Aşağı sağ küncdə Viza və Transfer sürətli keçid kapsulunu göstər"
+                    : "Show bottom-right e-Visa & Airport Transfer pill dock"}
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settingsDraft["operations_floating_services"] !== false}
+                onChange={(e) =>
+                  setSettingsDraft((prev) => ({
+                    ...prev,
+                    operations_floating_services: e.target.checked,
+                  }))
+                }
                 className="h-4 w-4 rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
+              />
+            </div>
+
+            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-slate-800 block">
+                  {language === "AZ" ? "Üzən Fərdi Marşrut Vidceti" : "Floating Custom Itinerary Pill"}
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  {language === "AZ"
+                    ? "Aşağı sol küncdə 'Özəl Marşrut / VIP Tur' planlayıcı düyməsini göstər"
+                    : "Show bottom-left custom tour builder pill"}
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settingsDraft["operations_floating_itinerary"] !== false}
+                onChange={(e) =>
+                  setSettingsDraft((prev) => ({
+                    ...prev,
+                    operations_floating_itinerary: e.target.checked,
+                  }))
+                }
+                className="h-4 w-4 rounded text-amber-600 focus:ring-amber-500 cursor-pointer"
               />
             </div>
 

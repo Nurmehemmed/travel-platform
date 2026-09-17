@@ -10,13 +10,16 @@ import {
 import { COUNTRIES, getCountryEligibility, validatePassportValidity } from "@/lib/visa-countries";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { useSiteSettings } from "@/lib/settings-context";
 import { VISA_APPLY_TRANSLATIONS } from "@/lib/pages-i18n";
 import { DatePicker } from "@/components/DatePicker";
 import { CustomSelect } from "@/components/CustomSelect";
 
 export default function VisaApplyPage() {
   const { t, showToast, language } = useLanguage();
+  const { settings } = useSiteSettings();
   const va = (VISA_APPLY_TRANSLATIONS[language] || VISA_APPLY_TRANSLATIONS.EN)!;
+
   const router = useRouter();
 
   // Wizard Step: 1 = Nationality & Tier, 2 = Travel, 3 = Personal & Passport, 4 = Review & Pay, 5 = Success
@@ -84,10 +87,14 @@ export default function VisaApplyPage() {
   const isVisaFree = selectedCountryInfo?.category === "visa_free";
   const isEmbassyRequired = selectedCountryInfo?.category === "embassy_required";
 
-  // Calculate pricing
+  // Dynamic pricing calculation from site settings
+  const standardPrice = Number(settings?.pricing?.visaStandard) || 45;
+  const urgentPrice = Number(settings?.pricing?.visaUrgent) || 85;
+
   const govFee = visaType === "urgent" ? 61 : 26;
-  const serviceFee = visaType === "urgent" ? 49 : 33;
-  const totalAmount = govFee + serviceFee;
+  const totalAmount = visaType === "urgent" ? urgentPrice : standardPrice;
+  const serviceFee = Math.max(0, totalAmount - govFee);
+
 
   // Handle Photo / Document Upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -386,7 +393,7 @@ export default function VisaApplyPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mb-2">{va.standardDesc}</p>
-                    <p className="font-bold text-lg text-[#0f3460]">$59 <span className="text-xs font-normal text-slate-500">USD</span></p>
+                    <p className="font-bold text-lg text-[#0f3460]">${standardPrice} <span className="text-xs font-normal text-slate-500">USD</span></p>
                   </div>
 
                   <div
@@ -407,8 +414,9 @@ export default function VisaApplyPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mb-2">{va.urgentDesc}</p>
-                    <p className="font-bold text-lg text-[#0f3460]">$110 <span className="text-xs font-normal text-slate-500">USD</span></p>
+                    <p className="font-bold text-lg text-[#0f3460]">${urgentPrice} <span className="text-xs font-normal text-slate-500">USD</span></p>
                   </div>
+
                 </div>
               </div>
 

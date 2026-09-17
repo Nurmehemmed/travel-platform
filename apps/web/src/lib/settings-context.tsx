@@ -32,6 +32,8 @@ export interface PublicSettings {
   };
   operations: {
     floatingWhatsapp: boolean;
+    floatingServices: boolean;
+    floatingItinerary: boolean;
     visaServiceActive: boolean;
     transferServiceActive: boolean;
   };
@@ -66,10 +68,13 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
   },
   operations: {
     floatingWhatsapp: true,
+    floatingServices: true,
+    floatingItinerary: true,
     visaServiceActive: true,
     transferServiceActive: true,
   },
 };
+
 
 interface SettingsContextType {
   settings: PublicSettings;

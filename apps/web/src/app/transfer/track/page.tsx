@@ -27,10 +27,12 @@ import {
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { useSiteSettings } from "@/lib/settings-context";
 import { getVehicleConfig } from "@/lib/transfer-zones";
 import { TransferBookingSkeleton } from "@/components/Skeletons";
 import { TRANSFER_TRACK_TRANSLATIONS, LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
 import VoucherShareActions from "@/components/VoucherShareActions";
+
 
 interface BookingData {
   bookingNumber: string;
@@ -58,8 +60,10 @@ interface BookingData {
 
 function TransferTrackContent() {
   const { t, language, showToast } = useLanguage();
+  const { settings } = useSiteSettings();
   const searchParams = useSearchParams();
   const tt = (TRANSFER_TRACK_TRANSLATIONS[language] || TRANSFER_TRACK_TRANSLATIONS.EN)!;
+
   const initialRef = searchParams.get("ref") || "";
   const initialEmail = searchParams.get("email") || "";
   const isPaid = searchParams.get("paid") === "true";
@@ -464,7 +468,7 @@ function TransferTrackContent() {
             {/* Quick Actions Footer (Screen Only) */}
             <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 print:hidden">
               <a
-                href="https://wa.me/994551003146"
+                href={settings?.contact?.whatsappUrl || "https://wa.me/994551003146"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-semibold text-emerald-700 hover:underline flex items-center gap-1"
@@ -472,6 +476,7 @@ function TransferTrackContent() {
                 <MessageSquare className="h-3.5 w-3.5" />
                 <span>{tt.supportWhatsApp}</span>
               </a>
+
 
               <Link
                 href="/transfer/book"

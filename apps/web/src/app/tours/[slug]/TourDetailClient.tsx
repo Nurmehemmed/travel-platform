@@ -12,9 +12,11 @@ import {
 import { TourDetailData } from "@/lib/tours-data";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
+import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { DatePicker } from "@/components/DatePicker";
+
 
 interface TourDetailClientProps {
   tour: TourDetailData;
@@ -68,6 +70,7 @@ const TOUR_ADD_ONS: AddOnOption[] = [
 export default function TourDetailClient({ tour, relatedTours }: TourDetailClientProps) {
   const { t, isRtl, language, showToast } = useLanguage();
   const { formatPrice, formatPriceWithSubtext, currency, activeCurrency } = useCurrency();
+  const { settings } = useSiteSettings();
 
   const getTomorrowString = () => {
     const d = new Date();
@@ -150,7 +153,8 @@ ${addOnNames ? `✨ Add-ons: ${addOnNames}\n` : ""}💰 Estimated Total: ${forma
 
 Please confirm guide availability and pickup details.`;
 
-    return `https://wa.me/994551003146?text=${encodeURIComponent(text)}`;
+    const cleanNumber = settings?.contact?.whatsappClean || "994551003146";
+    return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
   };
 
   const handleReserveSubmit = async (e: React.FormEvent) => {
@@ -219,7 +223,7 @@ Please confirm guide availability and pickup details.`;
             <LanguageSelector variant="dark" />
             <CurrencySelector variant="dark" />
             <a
-              href="https://wa.me/994551003146"
+              href={settings?.contact?.whatsappUrl || "https://wa.me/994551003146"}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold bg-amber-500 text-[#061225] hover:opacity-90 transition-opacity"
@@ -228,6 +232,7 @@ Please confirm guide availability and pickup details.`;
               <span>WhatsApp</span>
             </a>
           </div>
+
         </div>
       </header>
 
@@ -713,9 +718,10 @@ Please confirm guide availability and pickup details.`;
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-[10px] text-slate-500 font-medium">
                 <span className="flex items-center gap-1">🔒 SSL Encrypted</span>
                 <span className="flex items-center gap-1">⏱️ 30-min WhatsApp Reply</span>
-                <span className="flex items-center gap-1">🏆 4.9★ TripAdvisor</span>
+                <span className="flex items-center gap-1">🏆 {settings?.marketing?.tripadvisorRating || "4.9"}★ TripAdvisor</span>
                 <span className="flex items-center gap-1">🇦🇿 Licensed Local Agency</span>
               </div>
+
             </div>
           </div>
         </div>

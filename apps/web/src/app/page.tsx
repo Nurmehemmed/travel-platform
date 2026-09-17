@@ -1185,7 +1185,7 @@ export default function HomePage() {
               { value: "15+",    label: language === "AZ" ? "Yerli Bələdçi" : language === "RU" ? "Местных гидов" : language === "AR" ? "مرشد خبير" : "Expert Guides" },
               { value: "99.2%", label: language === "AZ" ? "Viza Təsdiqi" : language === "RU" ? "Одобрение виз" : language === "AR" ? "معدل الموافقة" : "Visa Approval" },
               { value: "⚡ 3h", label: language === "AZ" ? "Sürətli e-Viza" : language === "RU" ? "Экспресс e-Виза" : language === "AR" ? "تأشيرة سريعة" : "Express e-Visa" },
-              { value: "4.9★",  label: language === "AZ" ? "TripAdvisor" : language === "RU" ? "TripAdvisor" : language === "AR" ? "تريب أدفايزر" : "TripAdvisor" },
+              { value: `${siteConfig.marketing.tripadvisorRating || "4.9"}★`,  label: language === "AZ" ? "TripAdvisor" : language === "RU" ? "TripAdvisor" : language === "AR" ? "تريب أدفايزر" : "TripAdvisor" },
             ].map((stat) => (
               <div key={stat.label} className="flex flex-col items-center py-5 px-3 text-center">
                 <span className="font-display text-xl font-bold" style={{ color: "#f59e0b" }}>
@@ -1205,7 +1205,7 @@ export default function HomePage() {
             {[
               { icon: "🏛️", text: language === "AZ" ? "Rəsmi ASAN e-Viza Tərəfdaşı" : language === "RU" ? "Официальный партнёр ASAN e-Visa" : language === "AR" ? "شريك رسمي لتأشيرة ASAN" : "Official ASAN e-Visa Partner" },
               { icon: "🔒", text: language === "AZ" ? "SSL Şifrəli & Təhlükəsiz Ödəniş" : language === "RU" ? "SSL защита и безопасная оплата" : language === "AR" ? "SSL آمن ومدفوعات مشفرة" : "SSL Secured & Safe Payments" },
-              { icon: "⭐", text: language === "AZ" ? "4.9 TripAdvisor · 600+ Rəy" : language === "RU" ? "4.9 TripAdvisor · 600+ отзывов" : language === "AR" ? "4.9 تريب أدفايزر · +600 تقييم" : "4.9 TripAdvisor · 600+ Reviews" },
+              { icon: "⭐", text: `${siteConfig.marketing.tripadvisorRating || "4.9"} TripAdvisor · ${siteConfig.marketing.tripadvisorReviews || "2,400+"} ${language === "AZ" ? "Rəy" : language === "RU" ? "отзывов" : language === "AR" ? "تقييم" : "Reviews"}` },
               { icon: "💬", text: language === "AZ" ? "24/7 VIP WhatsApp Dəstəyi" : language === "RU" ? "Поддержка 24/7 в WhatsApp" : language === "AR" ? "دعم واتساب VIP على مدار الساعة" : "24/7 VIP WhatsApp Support" },
               { icon: "📋", text: language === "AZ" ? "Lisenziyalı Azərbaycan Turizm Agentliyi" : language === "RU" ? "Лицензированное туристическое агентство" : language === "AR" ? "وكالة سياحية معتمدة" : "Licensed Azerbaijan Tourism Agency" },
             ].map((item, i) => (
@@ -1218,6 +1218,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
 
       {/* ═══════════════════════════════════════════════════════ SEARCH BAR */}
       <div style={{ backgroundColor: "#f0f9ff" }} className="py-10">
@@ -2294,7 +2295,7 @@ export default function HomePage() {
                     <Star key={s} className="h-3.5 w-3.5 fill-[#f59e0b] text-[#f59e0b]" />
                   ))}
                 </div>
-                <span className="text-xs font-bold text-white">4.9/5</span>
+                <span className="text-xs font-bold text-white">{siteConfig.marketing.tripadvisorRating || "4.9"}/5</span>
                 <span className="text-[11px] text-white/60">TripAdvisor</span>
               </div>
             </div>
@@ -2350,13 +2351,13 @@ export default function HomePage() {
               </p>
               <div className="space-y-3 text-xs text-white/70">
                 <p className="flex items-center gap-2">
-                  <span className="text-amber-400">📍</span> Nizami St, Baku, Azerbaijan
+                  <span className="text-amber-400">📍</span> {siteConfig.contact.officeAddress || "Nizami Street 48, Baku, Azerbaijan"}
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="text-amber-400">💬</span> WhatsApp: {siteConfig.contact.whatsappPhone}
                 </p>
                 <p className="flex items-center gap-2">
-                  <span className="text-amber-400">✉️</span> support@addmetour.com
+                  <span className="text-amber-400">✉️</span> {siteConfig.contact.supportEmail || "info@addmetour.com"}
                 </p>
                 <p className="text-[11px] text-white/50 pt-1">
                   {t.footer.supportAvailable}
@@ -2383,7 +2384,7 @@ export default function HomePage() {
                   <MessageCircle className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://t.me/addmetour"
+                  href={`https://t.me/${(siteConfig.contact.telegramHandle || "addmetour").replace(/^@/, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Follow AddmeTour on Telegram"
@@ -2392,6 +2393,7 @@ export default function HomePage() {
                 >
                   <Globe className="h-4 w-4" />
                 </a>
+
                 <a
                   href="https://instagram.com/addmetour"
                   target="_blank"

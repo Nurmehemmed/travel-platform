@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sparkles, ArrowRight, Compass } from "lucide-react";
 import { useLanguage, LanguageCode } from "@/lib/i18n";
+import { useSiteSettings } from "@/lib/settings-context";
 
 const LABELS: Record<
   LanguageCode,
@@ -44,6 +45,12 @@ const LABELS: Record<
 export default function FloatingCustomItinerary() {
   const pathname = usePathname();
   const { language } = useLanguage();
+  const { settings } = useSiteSettings();
+
+  // Hide if disabled in operational settings
+  if (settings?.operations?.floatingItinerary === false) {
+    return null;
+  }
 
   // Hide on custom-itinerary builder itself, admin dashboard, checkout, or voucher
   const isExcluded =
@@ -60,6 +67,7 @@ export default function FloatingCustomItinerary() {
   if (isExcluded) return null;
 
   const t = LABELS[language] || LABELS.EN;
+
 
   return (
     <aside

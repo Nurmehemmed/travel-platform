@@ -10,9 +10,11 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
+import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { DatePicker } from "@/components/DatePicker";
+
 
 interface DestinationTheme {
   id: string;
@@ -168,9 +170,11 @@ const VEHICLE_OPTIONS: VehicleOption[] = [
 export default function CustomItineraryClient() {
   const { t, isRtl, language, showToast } = useLanguage();
   const { formatPrice, formatPriceWithSubtext, activeCurrency } = useCurrency();
+  const { settings } = useSiteSettings();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isScrolled, setIsScrolled] = useState(false);
+
 
   // Form selections
   const [durationDays, setDurationDays] = useState(5);
@@ -251,8 +255,10 @@ export default function CustomItineraryClient() {
 
 Please send me the detailed day-by-day itinerary proposal and official quote.`;
 
-    return `https://wa.me/994551003146?text=${encodeURIComponent(text)}`;
+    const cleanNumber = settings?.contact?.whatsappClean || "994551003146";
+    return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
   };
+
 
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -317,7 +323,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
             <LanguageSelector variant="dark" />
             <CurrencySelector variant="dark" />
             <a
-              href="https://wa.me/994551003146"
+              href={settings?.contact?.whatsappUrl || "https://wa.me/994551003146"}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold bg-amber-500 text-[#061225] hover:opacity-90 transition-opacity"
@@ -326,6 +332,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
               <span>VIP Concierge</span>
             </a>
           </div>
+
         </div>
       </header>
 

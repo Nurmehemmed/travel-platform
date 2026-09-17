@@ -1,10 +1,140 @@
 import { NextResponse } from "next/server";
 import { db, siteSettings, recordAuditLog } from "@travel/db";
-import { eq, asc } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 import { requireAdmin } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 const log = logger.withContext({ route: "/api/admin/settings" });
+
+function getSettingMetadata(key: string): { category: string; label: string; description: string } {
+  const metadataMap: Record<string, { category: string; label: string; description: string }> = {
+    operations_floating_whatsapp: {
+      category: "operations",
+      label: "Show Floating WhatsApp Widget",
+      description: "Toggle floating green WhatsApp button on customer pages",
+    },
+    operations_floating_services: {
+      category: "operations",
+      label: "Show Floating Quick Services Dock",
+      description: "Toggle bottom-right e-Visa and Airport Transfer pill dock",
+    },
+    operations_floating_itinerary: {
+      category: "operations",
+      label: "Show Floating Custom Itinerary Widget",
+      description: "Toggle bottom-left Custom Itinerary planner pill",
+    },
+    operations_visa_service: {
+      category: "operations",
+      label: "e-Visa Processing Active",
+      description: "Kill-switch for electronic visa applications",
+    },
+    operations_transfer_service: {
+      category: "operations",
+      label: "Airport Transfer Booking Active",
+      description: "Kill-switch for airport transfer reservations",
+    },
+    contact_whatsapp: {
+      category: "contact",
+      label: "Primary WhatsApp Number",
+      description: "Main WhatsApp number used across the site for instant chat and booking",
+    },
+    contact_phone: {
+      category: "contact",
+      label: "Operations Emergency Phone",
+      description: "24/7 hotline displayed for urgent guest inquiries",
+    },
+    contact_email: {
+      category: "contact",
+      label: "Official Support Email",
+      description: "Customer service and inquiry inbox",
+    },
+    contact_telegram: {
+      category: "contact",
+      label: "Telegram Username/Channel",
+      description: "Telegram handle for guest support",
+    },
+    contact_address: {
+      category: "contact",
+      label: "Baku Office Address",
+      description: "Physical office address displayed in legal and footer sections",
+    },
+    announcement_active: {
+      category: "announcement",
+      label: "Announcement Bar Active",
+      description: "Toggle site-wide banner alert across the top of all pages",
+    },
+    announcement_text: {
+      category: "announcement",
+      label: "Announcement Text",
+      description: "Text displayed in the top banner",
+    },
+    announcement_badge: {
+      category: "announcement",
+      label: "Announcement Badge Text",
+      description: "Pill label text on the announcement bar",
+    },
+    announcement_link: {
+      category: "announcement",
+      label: "Announcement Action Link",
+      description: "Target URL when visitors click the announcement bar",
+    },
+    pricing_visa_standard: {
+      category: "pricing",
+      label: "Standard eVisa Price (USD)",
+      description: "Base price for 3-day standard e-visa processing",
+    },
+    pricing_visa_urgent: {
+      category: "pricing",
+      label: "Urgent eVisa Price (USD)",
+      description: "Base price for 3-hour fast-track urgent e-visa processing",
+    },
+    pricing_transfer_sedan: {
+      category: "pricing",
+      label: "Transfer Sedan Base (USD)",
+      description: "Standard sedan airport transfer rate to Central Baku",
+    },
+    pricing_transfer_minivan: {
+      category: "pricing",
+      label: "Transfer Minivan Base (USD)",
+      description: "Minivan (Mercedes Vito) airport transfer rate",
+    },
+    pricing_transfer_sprinter: {
+      category: "pricing",
+      label: "Transfer Sprinter Base (USD)",
+      description: "Sprinter VIP airport transfer rate",
+    },
+    marketing_tripadvisor_rating: {
+      category: "marketing",
+      label: "TripAdvisor Rating",
+      description: "Rating display on social proof widgets",
+    },
+    marketing_tripadvisor_reviews: {
+      category: "marketing",
+      label: "TripAdvisor Review Count",
+      description: "Verified review count on social proof widgets",
+    },
+  };
+
+  if (metadataMap[key]) return metadataMap[key];
+
+  const category = key.startsWith("contact_")
+    ? "contact"
+    : key.startsWith("pricing_")
+    ? "pricing"
+    : key.startsWith("announcement_")
+    ? "announcement"
+    : key.startsWith("operations_")
+    ? "operations"
+    : key.startsWith("marketing_")
+    ? "marketing"
+    : "general";
+
+  const label = key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return { category, label, description: `Dynamic ${label} configuration` };
+}
 
 export async function GET() {
   try {
@@ -45,14 +175,27 @@ export async function PATCH(req: Request) {
     const updatedKeys: string[] = [];
 
     for (const [key, value] of Object.entries(updates)) {
+      const meta = getSettingMetadata(key);
+
       await db
-        .update(siteSettings)
-        .set({
-          value: value,
+        .insert(siteSettings)
+        .values({
+          key,
+          value,
+          category: meta.category,
+          label: meta.label,
+          description: meta.description,
           updatedAt: new Date(),
           updatedBy: admin.email,
         })
-        .where(eq(siteSettings.key, key));
+        .onConflictDoUpdate({
+          target: siteSettings.key,
+          set: {
+            value,
+            updatedAt: new Date(),
+            updatedBy: admin.email,
+          },
+        });
 
       updatedKeys.push(key);
     }
@@ -89,3 +232,4 @@ export async function PATCH(req: Request) {
     );
   }
 }
+

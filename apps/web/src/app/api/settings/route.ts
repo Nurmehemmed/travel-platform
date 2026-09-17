@@ -49,6 +49,8 @@ export async function GET() {
       },
       operations: {
         floatingWhatsapp: settingsMap["operations_floating_whatsapp"] !== false && settingsMap["operations_floating_whatsapp"] !== "false",
+        floatingServices: settingsMap["operations_floating_services"] !== false && settingsMap["operations_floating_services"] !== "false",
+        floatingItinerary: settingsMap["operations_floating_itinerary"] !== false && settingsMap["operations_floating_itinerary"] !== "false",
         visaServiceActive: settingsMap["operations_visa_service"] !== false && settingsMap["operations_visa_service"] !== "false",
         transferServiceActive: settingsMap["operations_transfer_service"] !== false && settingsMap["operations_transfer_service"] !== "false",
       },
@@ -93,9 +95,12 @@ export async function GET() {
       },
       operations: {
         floatingWhatsapp: true,
+        floatingServices: true,
+        floatingItinerary: true,
         visaServiceActive: true,
         transferServiceActive: true,
       },
     });
   }
 }
+
