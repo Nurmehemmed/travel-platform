@@ -43,3 +43,11 @@ pnpm-debug.log*
 *.tsbuildinfo
 .neon
 .vercel
+
+# Test artifacts
+coverage/
+**/coverage/
+playwright-report/
+**/playwright-report/
+test-results/
+**/test-results/

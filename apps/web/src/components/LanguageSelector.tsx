@@ -60,6 +60,7 @@ export function LanguageSelector({
         }`}
         aria-expanded={isOpen}
         aria-haspopup="true"
+        aria-label={t.nav.selectLanguage || "Select language"}
         title={t.nav.language}
       >
         <span className="text-sm leading-none">{displayLangInfo.flag}</span>

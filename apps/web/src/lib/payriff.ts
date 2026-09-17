@@ -128,6 +128,10 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
  * Verify Payriff Order Status
  */
 export async function verifyPayriffOrder(orderId: string): Promise<{ isPaid: boolean; rawStatus?: string }> {
+  if (!orderId || !orderId.trim()) {
+    return { isPaid: false, rawStatus: "INVALID_ORDER_ID" };
+  }
+
   // In production, NEVER trust mock, simulated, or fallback order IDs. Live settlement is strictly required.
   if (process.env.NODE_ENV === "production") {
     if (!PAYRIFF_SECRET_KEY || orderId.startsWith("PR-SIM-") || orderId.startsWith("PR-FALLBACK-")) {

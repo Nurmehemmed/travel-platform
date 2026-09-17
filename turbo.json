@@ -6,7 +6,8 @@
     "AUTH_SECRET",
     "NEXT_PUBLIC_APP_URL",
     "PAYRIFF_SECRET_KEY",
-    "PAYRIFF_MERCHANT_ID"
+    "PAYRIFF_MERCHANT_ID",
+    "NODE_TLS_REJECT_UNAUTHORIZED"
   ],
   "tasks": {
     "build": {
@@ -23,6 +24,16 @@
     },
     "typecheck": {
       "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "cache": false
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "cache": false
     },
     "db:generate": {
       "cache": false
