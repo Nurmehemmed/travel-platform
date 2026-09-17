@@ -2817,10 +2817,6 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               </div>
             </div>
           )}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ═══════════════════════════════════════════════════════ TAB: SITE SETTINGS */}
           {activeTab === "settings" && (
@@ -3349,7 +3345,50 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        {language === "      {/* ═══════════════════════════════════════════════════════ MODAL: CREATE TOUR */}
+                        {language === "AZ" ? "TripAdvisor Reytinq Göstəricisi" : "TripAdvisor Rating Display"}
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["marketing_tripadvisor_rating"] ?? "4.9"}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            marketing_tripadvisor_rating: e.target.value,
+                          }))
+                        }
+                        placeholder="4.9"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        {language === "AZ" ? "Təsdiqlənmiş Rəy Sayı" : "Verified Reviews Count"}
+                      </label>
+                      <input
+                        type="text"
+                        value={settingsDraft["marketing_tripadvisor_reviews"] ?? "2,400+"}
+                        onChange={(e) =>
+                          setSettingsDraft((prev) => ({
+                            ...prev,
+                            marketing_tripadvisor_reviews: e.target.value,
+                          }))
+                        }
+                        placeholder="2,400+"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+            </>
+          )}
+        </div>
+      </main>
+
+      {/* ═══════════════════════════════════════════════════════ MODAL: CREATE TOUR */}
       {isNewTourOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
