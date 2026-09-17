@@ -88,6 +88,141 @@ const LABELS = {
   },
 };
 
+const SHARE_DICTIONARY = {
+  EN: {
+    header: "🎟️ *AddmeTour Booking Confirmation*",
+    ref: "Ref",
+    service: "Service",
+    passenger: "Passenger",
+    viewVoucher: "📄 View / Download Official Voucher PDF:",
+    Airport: "Airport",
+    Route: "Route",
+    Flight: "Flight",
+    Vehicle: "Vehicle",
+    Payment: "Payment",
+    Total: "Total",
+    "Total Amount": "Total Amount",
+    Date: "Date",
+    "Arrival Date": "Arrival Date",
+    Travelers: "Travelers",
+    Pickup: "Pickup Location",
+    Status: "Status",
+    Citizenship: "Citizenship",
+    Processing: "Processing Speed",
+    "Government ASAN ID": "Government ASAN ID",
+  },
+  AZ: {
+    header: "🎟️ *AddmeTour Rezervasiya Təsdiqi*",
+    ref: "Kod",
+    service: "Xidmət",
+    passenger: "Sərnişin",
+    viewVoucher: "📄 Rəsmi Vauçerə Bax / Yüklə (PDF):",
+    Airport: "Hava limanı",
+    Route: "Marşrut",
+    Flight: "Uçuş",
+    Vehicle: "Nəqliyyat",
+    Payment: "Ödəniş",
+    Total: "Məbləğ",
+    "Total Amount": "Ümumi Məbləğ",
+    Date: "Tarix",
+    "Arrival Date": "Gəliş Tarixi",
+    Travelers: "Səyahətçilər",
+    Pickup: "Qarşılama ünvanı",
+    Status: "Status",
+    Citizenship: "Vətəndaşlıq",
+    Processing: "İcra müddəti",
+    "Government ASAN ID": "Dövlət ASAN Kodu",
+  },
+  RU: {
+    header: "🎟️ *Подтверждение бронирования AddmeTour*",
+    ref: "Номер брони",
+    service: "Услуга",
+    passenger: "Пассажир",
+    viewVoucher: "📄 Просмотреть / Скачать официальный ваучер (PDF):",
+    Airport: "Аэропорт",
+    Route: "Маршрут",
+    Flight: "Рейс",
+    Vehicle: "Автомобиль",
+    Payment: "Оплата",
+    Total: "Итого",
+    "Total Amount": "Общая сумма",
+    Date: "Дата",
+    "Arrival Date": "Дата прибытия",
+    Travelers: "Путешественники",
+    Pickup: "Место встречи",
+    Status: "Статус",
+    Citizenship: "Гражданство",
+    Processing: "Срок оформления",
+    "Government ASAN ID": "Государственный ID ASAN",
+  },
+  AR: {
+    header: "🎟️ *تأكيد حجز AddmeTour*",
+    ref: "رقم الحجز",
+    service: "الخدمة",
+    passenger: "المسافر",
+    viewVoucher: "📄 عرض / تحميل قسيمة الحجز الرسمية (PDF):",
+    Airport: "المطار",
+    Route: "المسار",
+    Flight: "رقم الرحلة",
+    Vehicle: "نوع السيارة",
+    Payment: "طريقة الدفع",
+    Total: "المبلغ الإجمالي",
+    "Total Amount": "المبلغ الإجمالي",
+    Date: "التاريخ",
+    "Arrival Date": "تاريخ الوصول",
+    Travelers: "عدد المسافرين",
+    Pickup: "موقع الاستقبال",
+    Status: "الحالة",
+    Citizenship: "الجنسية",
+    Processing: "مدة المعالجة",
+    "Government ASAN ID": "رقم طلب أسان الحكومي",
+  },
+  FR: {
+    header: "🎟️ *Confirmation de réservation AddmeTour*",
+    ref: "Réf",
+    service: "Service",
+    passenger: "Passager",
+    viewVoucher: "📄 Voir / Télécharger le bon officiel (PDF) :",
+    Airport: "Aéroport",
+    Route: "Itinéraire",
+    Flight: "Vol",
+    Vehicle: "Véhicule",
+    Payment: "Paiement",
+    Total: "Total",
+    "Total Amount": "Montant total",
+    Date: "Date",
+    "Arrival Date": "Date d'arrivée",
+    Travelers: "Voyageurs",
+    Pickup: "Lieu de prise en charge",
+    Status: "Statut",
+    Citizenship: "Nationalité",
+    Processing: "Traitement",
+    "Government ASAN ID": "ID officiel ASAN",
+  },
+  DE: {
+    header: "🎟️ *AddmeTour Buchungsbestätigung*",
+    ref: "Ref-Nr.",
+    service: "Leistung",
+    passenger: "Passagier",
+    viewVoucher: "📄 Offiziellen Gutschein ansehen / PDF herunterladen:",
+    Airport: "Flughafen",
+    Route: "Route",
+    Flight: "Flug",
+    Vehicle: "Fahrzeug",
+    Payment: "Zahlungsart",
+    Total: "Gesamtbetrag",
+    "Total Amount": "Gesamtbetrag",
+    Date: "Datum",
+    "Arrival Date": "Ankunftsdatum",
+    Travelers: "Reisende",
+    Pickup: "Abholort",
+    Status: "Status",
+    Citizenship: "Staatsangehörigkeit",
+    Processing: "Bearbeitungszeit",
+    "Government ASAN ID": "Staatliche ASAN-ID",
+  },
+};
+
 export default function VoucherShareActions({
   bookingRef,
   serviceType,
@@ -104,7 +239,8 @@ export default function VoucherShareActions({
   const [copied, setCopied] = useState(false);
   const [hasNativeShare, setHasNativeShare] = useState(false);
 
-  const l = (LABELS[language as keyof typeof LABELS] || LABELS.EN);
+  const l = LABELS[language as keyof typeof LABELS] || LABELS.EN;
+  const dict = SHARE_DICTIONARY[language as keyof typeof SHARE_DICTIONARY] || SHARE_DICTIONARY.EN;
 
   useEffect(() => {
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
@@ -113,28 +249,39 @@ export default function VoucherShareActions({
   }, []);
 
   const getEffectiveUrl = () => {
-    if (directUrl) return directUrl;
-    if (typeof window !== "undefined") return window.location.href;
-    return `https://addmetour.vercel.app`;
+    const target = directUrl || (typeof window !== "undefined" ? window.location.href : "https://addmetour.vercel.app");
+    try {
+      const url = new URL(target);
+      if (language && language !== "EN") {
+        url.searchParams.set("lang", language.toLowerCase());
+      }
+      return url.toString();
+    } catch {
+      return target;
+    }
   };
 
   const getShareText = () => {
     const lines: string[] = [
-      `🎟️ *AddmeTour Booking Confirmation*`,
-      `Ref: *${bookingRef}*`,
-      `Service: *${serviceTitle}*`,
+      dict.header,
+      `${dict.ref}: *${bookingRef}*`,
+      `${dict.service}: *${serviceTitle}*`,
     ];
 
-    if (customerName) lines.push(`Passenger: *${customerName}*`);
+    if (customerName) lines.push(`${dict.passenger}: *${customerName}*`);
 
     if (summaryDetails) {
       Object.entries(summaryDetails).forEach(([key, val]) => {
-        if (val) lines.push(`${key}: *${val}*`);
+        if (val) {
+          const dictRecord = dict as Record<string, string>;
+          const localizedKey = dictRecord[key] || key;
+          lines.push(`${localizedKey}: *${val}*`);
+        }
       });
     }
 
     lines.push(``);
-    lines.push(`📄 View / Download Official Voucher PDF:`);
+    lines.push(dict.viewVoucher);
     lines.push(getEffectiveUrl());
 
     return lines.join("\n");

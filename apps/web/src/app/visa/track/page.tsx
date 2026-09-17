@@ -369,14 +369,14 @@ export default function VisaTrackPage() {
             <VoucherShareActions
               bookingRef={application.applicationNumber}
               serviceType="visa"
-              serviceTitle={`Azerbaijan ASAN e-Visa (${application.visaType.toUpperCase()})`}
+              serviceTitle={`${language === "AZ" ? "Azərbaycan ASAN e-Viza" : language === "RU" ? "Электронная виза ASAN Азербайджан" : language === "AR" ? "تأشيرة أذربيجان الإلكترونية ASAN" : "Azerbaijan ASAN e-Visa"} (${application.visaType === "urgent" ? vt.timeHours : vt.timeDays})`}
               customerName={`${application.surname} ${application.givenNames}`}
               customerEmail={application.email}
               summaryDetails={{
-                "Status": application.status.toUpperCase(),
+                "Status": application.status === "approved" ? vt.statusApproved : application.status === "submitted_to_govt" ? vt.statusAsanProcessing : vt.statusQualityReview,
                 "Citizenship": application.nationality,
                 "Arrival Date": application.arrivalDate,
-                "Processing": `${application.visaType.toUpperCase()} (${application.visaType === "urgent" ? "3 Hours" : "3-5 Days"})`,
+                "Processing": `${application.visaType.toUpperCase()} (${application.visaType === "urgent" ? vt.timeHours : vt.timeDays})`,
                 "Total Amount": `$${application.totalAmount} USD`,
               }}
               pdfFilename={`AddmeTour-Visa-Certificate-${application.applicationNumber}`}

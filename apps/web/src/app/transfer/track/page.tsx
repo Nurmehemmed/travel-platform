@@ -448,15 +448,15 @@ function TransferTrackContent() {
             <VoucherShareActions
               bookingRef={booking.bookingNumber}
               serviceType="transfer"
-              serviceTitle={`Airport Transfer ${booking.direction === "arrival" ? "Arrival" : booking.direction === "departure" ? "Departure" : "Round-Trip"} (${booking.vehicleClass.toUpperCase()})`}
+              serviceTitle={`${t.nav.transfer} — ${booking.direction === "arrival" ? t.transferPage.arrival : booking.direction === "departure" ? t.transferPage.departure : t.transferPage.roundTripLabel} (${booking.vehicleClass === "sedan" ? t.transferPage.sedan : booking.vehicleClass === "suv" ? t.transferPage.suv : t.transferPage.minivan})`}
               customerName={booking.passengerName}
               customerEmail={emailQuery}
               summaryDetails={{
-                "Airport": booking.airport,
-                "Route": `${booking.pickupZone} ➔ ${booking.dropoffAddress}`,
+                "Airport": LOCALIZED_AIRPORTS[language]?.[booking.airport] || booking.airport,
+                "Route": `${LOCALIZED_ZONES[language]?.[booking.pickupZone] || booking.pickupZone} ➔ ${booking.dropoffAddress}`,
                 "Flight": `${booking.flightNumber} (${booking.flightDate} ${booking.flightTime})`,
-                "Vehicle": booking.vehicleClass,
-                "Payment": `$${booking.totalAmount} (${booking.paymentMethod === "online" ? "Paid Online" : "Cash on Arrival"})`,
+                "Vehicle": booking.vehicleClass === "sedan" ? t.transferPage.sedan : booking.vehicleClass === "suv" ? t.transferPage.suv : t.transferPage.minivan,
+                "Payment": `$${booking.totalAmount} (${booking.paymentMethod === "online" ? tt.paidOnline : tt.payCash})`,
               }}
               pdfFilename={`AddmeTour-Transfer-Voucher-${booking.bookingNumber}`}
             />

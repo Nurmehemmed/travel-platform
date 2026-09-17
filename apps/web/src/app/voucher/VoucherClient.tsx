@@ -20,11 +20,13 @@ import {
   QrCode
 } from "lucide-react";
 import { useCurrency } from "@/lib/currency-context";
+import { useLanguage } from "@/lib/i18n";
 import VoucherShareActions from "@/components/VoucherShareActions";
 
 export default function VoucherClient() {
   const searchParams = useSearchParams();
   const { formatPrice } = useCurrency();
+  const { language } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [dbData, setDbData] = useState<any>(null);
   const [loadingDb, setLoadingDb] = useState(false);
@@ -109,7 +111,18 @@ export default function VoucherClient() {
         customerEmail={email}
         summaryDetails={{
           "Date": date,
-          "Travelers": `${guests} Person(s)`,
+          "Travelers":
+            language === "AZ"
+              ? `${guests} Nəfər`
+              : language === "RU"
+              ? `${guests} чел.`
+              : language === "AR"
+              ? `${guests} أشخاص`
+              : language === "FR"
+              ? `${guests} personne(s)`
+              : language === "DE"
+              ? `${guests} Person(en)`
+              : `${guests} Person(s)`,
           "Pickup": pickup,
           "Total": mounted ? formatPrice(totalAmount) : `$${totalAmount}`,
         }}

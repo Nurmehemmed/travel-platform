@@ -1361,19 +1361,33 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true);
     try {
-      const saved = localStorage.getItem("travel_language") as LanguageCode;
-      if (saved && TRANSLATIONS[saved]) {
-        setLanguageState(saved);
-        if (typeof document !== "undefined") {
-          document.documentElement.lang = saved.toLowerCase();
+      let initialLang: LanguageCode | null = null;
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get("lang")?.toUpperCase() as LanguageCode;
+        if (urlLang && TRANSLATIONS[urlLang]) {
+          initialLang = urlLang;
         }
-      } else {
-        const detected = detectBrowserLanguage();
-        if (detected && TRANSLATIONS[detected]) {
-          setLanguageState(detected);
-          if (typeof document !== "undefined") {
-            document.documentElement.lang = detected.toLowerCase();
+      }
+      if (!initialLang) {
+        const saved = localStorage.getItem("travel_language") as LanguageCode;
+        if (saved && TRANSLATIONS[saved]) {
+          initialLang = saved;
+        } else {
+          const detected = detectBrowserLanguage();
+          if (detected && TRANSLATIONS[detected]) {
+            initialLang = detected;
           }
+        }
+      }
+      if (initialLang && TRANSLATIONS[initialLang]) {
+        setLanguageState(initialLang);
+        try {
+          localStorage.setItem("travel_language", initialLang);
+        } catch {}
+        if (typeof document !== "undefined") {
+          document.documentElement.lang = initialLang.toLowerCase();
+          document.documentElement.dir = initialLang === "AR" ? "rtl" : "ltr";
         }
       }
     } catch {}
