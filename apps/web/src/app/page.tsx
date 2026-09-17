@@ -256,8 +256,24 @@ export default function HomePage() {
   const [savedTourIds, setSavedTourIds] = useState<string[]>([]);
   const [bookingModalTour, setBookingModalTour] = useState<{ id: string; title: string; price: number } | null>(null);
 
-  // Auth state
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  // Auth state with synchronous local cache hydration to eliminate header flicker
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem("addmetour_user_session");
+        if (cached) {
+          return JSON.parse(cached);
+        }
+      } catch {}
+    }
+    return null;
+  });
+  const [authChecking, setAuthChecking] = useState(() => {
+    if (typeof window !== "undefined" && localStorage.getItem("addmetour_user_session")) {
+      return false;
+    }
+    return true;
+  });
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -269,6 +285,37 @@ export default function HomePage() {
   const [shareCopied, setShareCopied] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { currency, setCurrency, activeCurrency, currencies, formatPrice, formatPriceWithSubtext } = useCurrency();
+
+  // Immediate Auth Validation Effect (runs right away, not delayed by requestIdleCallback)
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isMounted) return;
+        if (data?.user) {
+          setCurrentUser(data.user);
+          try {
+            localStorage.setItem("addmetour_user_session", JSON.stringify(data.user));
+          } catch {}
+        } else {
+          setCurrentUser(null);
+          try {
+            localStorage.removeItem("addmetour_user_session");
+          } catch {}
+        }
+      })
+      .catch(() => {
+        // Keep cached state on transient network glitch
+      })
+      .finally(() => {
+        if (isMounted) setAuthChecking(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Scroll listener for sticky header glassmorphism (RAF throttled to eliminate layout thrashing)
   useEffect(() => {
@@ -341,19 +388,6 @@ export default function HomePage() {
         }
       } catch {}
 
-      fetch("/api/auth/me", { cache: "no-store" })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.user) {
-            setCurrentUser(data.user);
-          } else {
-            setCurrentUser(null);
-          }
-        })
-        .catch(() => {
-          setCurrentUser(null);
-        });
-
       fetch("/api/tours", { cache: "no-store" })
         .then((res) => res.json())
         .then((data) => {
@@ -419,6 +453,9 @@ export default function HomePage() {
       });
       setCurrentUser(null);
       setUserDropdownOpen(false);
+      try {
+        localStorage.removeItem("addmetour_user_session");
+      } catch {}
       const logoutMsg =
         language === "AZ"
           ? "Uğurla çıxış edildi"
@@ -689,7 +726,7 @@ export default function HomePage() {
             </button>
 
             {currentUser ? (
-              <div id="user-dropdown-container" className="relative shrink-0">
+              <div id="user-dropdown-container" className="relative shrink-0 animate-fade-in">
                 <button
                   onClick={() => {
                     setUserDropdownOpen((prev) => !prev);
@@ -771,8 +808,10 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
+            ) : authChecking ? (
+              <div className="hidden sm:block h-8 w-24 rounded-full bg-white/5 animate-pulse shrink-0" />
             ) : (
-              <>
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0 animate-fade-in">
                 <button
                   onClick={() => {
                     setAuthMode("login");
@@ -802,7 +841,7 @@ export default function HomePage() {
                     ? "Registrieren"
                     : "Sign Up"}
                 </button>
-              </>
+              </div>
             )}
 
             {/* Mobile menu toggle */}
@@ -910,9 +949,40 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Auth actions in mobile menu for non-logged in users */}
-              {!currentUser && (
-                <div className="pt-3 border-t border-white/10 mt-2 flex gap-2">
+              {/* Auth actions in mobile menu */}
+              {currentUser ? (
+                <div className="pt-3 border-t border-white/10 mt-2 flex items-center justify-between animate-fade-in">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm shrink-0"
+                      style={{ backgroundColor: "#f59e0b" }}
+                    >
+                      {currentUser.name
+                        ? currentUser.name.charAt(0).toUpperCase()
+                        : currentUser.email.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex flex-col text-left leading-none max-w-[170px]">
+                      <span className="text-xs font-bold text-white truncate">
+                        {currentUser.name || "Traveler"}
+                      </span>
+                      <span className="text-[10px] text-white/60 truncate mt-0.5">
+                        {currentUser.email}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="px-2.5 py-1 rounded-lg text-xs font-semibold text-red-300 hover:text-white bg-red-500/20 hover:bg-red-500/30 transition-colors cursor-pointer"
+                  >
+                    {t.nav.logout}
+                  </button>
+                </div>
+              ) : !authChecking ? (
+                <div className="pt-3 border-t border-white/10 mt-2 flex gap-2 animate-fade-in">
                   <button
                     type="button"
                     onClick={() => {
@@ -947,7 +1017,7 @@ export default function HomePage() {
                       : "Sign Up"}
                   </button>
                 </div>
-              )}
+              ) : null}
 
               {/* Language selection in mobile menu */}
               <div className="pt-3 border-t border-white/10 mt-3">
@@ -2515,7 +2585,13 @@ export default function HomePage() {
           isOpen={isAuthOpen}
           initialMode={authMode}
           onClose={() => setIsAuthOpen(false)}
-          onSuccess={(user) => setCurrentUser(user)}
+          onSuccess={(user) => {
+            setCurrentUser(user);
+            try {
+              localStorage.setItem("addmetour_user_session", JSON.stringify(user));
+            } catch {}
+            setAuthChecking(false);
+          }}
         />
       )}
 
