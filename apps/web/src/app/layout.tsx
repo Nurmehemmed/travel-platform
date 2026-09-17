@@ -39,7 +39,7 @@ const APP_URL =
 
 export const metadata: Metadata = {
   title: {
-    default: "AddmeTour — Handcrafted Azerbaijan Tours & Travel Experiences",
+    default: "AddmeTour — Azerbaijan Tours & Travel Experiences",
     template: "%s | AddmeTour",
   },
   description:
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
     languages: {
-      en: "/",
+      en: "/?lang=en",
       az: "/?lang=az",
       ru: "/?lang=ru",
       fr: "/?lang=fr",
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: APP_URL,
     siteName: "AddmeTour",
-    title: "AddmeTour — Handcrafted Azerbaijan Tours & Travel Experiences",
+    title: "AddmeTour — Azerbaijan Tours & Travel Experiences",
     description:
       "Explore Baku, the Great Caucasus, and Silk Road heritage with authentic local guides. 4.9★ on TripAdvisor.",
     images: [
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AddmeTour — Handcrafted Azerbaijan Tours & Travel Experiences",
+    title: "AddmeTour — Azerbaijan Tours & Travel Experiences",
     description:
       "Boutique private & small-group tours across Azerbaijan. 4.9★ TripAdvisor rating.",
     images: [

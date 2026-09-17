@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const SUPPORTED_LOCALES = [
-  { code: "en", lang: "en", query: "" },
+  { code: "en", lang: "en", query: "lang=en" },
   { code: "az", lang: "az", query: "lang=az" },
   { code: "ru", lang: "ru", query: "lang=ru" },
   { code: "fr", lang: "fr", query: "lang=fr" },
@@ -39,11 +39,8 @@ export function constructMetadata({
   };
 
   for (const locale of SUPPORTED_LOCALES) {
-    if (locale.query) {
-      languageAlternates[locale.code] = `${canonicalUrl}${canonicalUrl.includes("?") ? "&" : "?"}${locale.query}`;
-    } else {
-      languageAlternates[locale.code] = canonicalUrl;
-    }
+    const queryParam = (locale as { query?: string; code: string }).query || `lang=${locale.code}`;
+    languageAlternates[locale.code] = `${canonicalUrl}${canonicalUrl.includes("?") ? "&" : "?"}${queryParam}`;
   }
 
   return {

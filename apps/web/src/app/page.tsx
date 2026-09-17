@@ -1476,10 +1476,8 @@ export default function HomePage() {
               { slug: "gabala", name: language === "AZ" ? "Qəbələ & Şahdağ" : language === "RU" ? "Габала и Шахдаг" : language === "AR" ? "غابالا و شاهداغ" : "Gabala & Shahdag", subtitle: language === "AZ" ? "Dağ kurortları və göllər" : language === "RU" ? "Горные курорты и озера" : language === "AR" ? "منتجعات جبلية وبحيرات" : "Alpine resorts, cable cars & emerald lakes", tours: 5, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1000&q=80" },
               { slug: "gobustan", name: t.destinations.gobustanName, subtitle: t.destinations.gobustanDesc, tours: 3, image: "https://images.unsplash.com/photo-1519181245277-cffeb31da2e3?w=1000&q=80" },
             ].map((dest) => (
-              <Link
+              <div
                 key={dest.slug}
-                href={`/destinations/${dest.slug}`}
-                aria-label={`Explore ${dest.name} travel guide and tours`}
                 className="group relative h-80 overflow-hidden rounded-2xl block shadow-sm hover:shadow-xl transition-all duration-300"
               >
                 <Image
@@ -1490,21 +1488,29 @@ export default function HomePage() {
                   style={{ objectFit: "cover" }}
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
                 <div className="absolute bottom-0 left-0 p-5">
-                  <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm mb-2">
+                  <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white backdrop-blur-sm mb-2 pointer-events-none">
                     {language === "AZ" ? "Bələdçi & Turlar" : language === "RU" ? "Гид и туры" : language === "AR" ? "دليل وجولات" : "Guide & Tours"}
                   </span>
-                  <h3 className="text-lg font-bold text-white font-display leading-tight">{dest.name}</h3>
-                  <p className="text-xs text-white/70 mt-1 line-clamp-2">{dest.subtitle}</p>
+                  <p className="text-lg font-bold text-white font-display leading-tight">
+                    <Link
+                      href={`/destinations/${dest.slug}`}
+                      aria-label={`Explore ${dest.name} travel guide`}
+                      className="hover:underline focus:outline-none after:absolute after:inset-0"
+                    >
+                      {dest.name}
+                    </Link>
+                  </p>
+                  <p className="text-xs text-white/70 mt-1 line-clamp-2 pointer-events-none">{dest.subtitle}</p>
                   <span
-                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold transition-all group-hover:gap-2"
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold transition-all group-hover:gap-2 pointer-events-none"
                     style={{ color: "#f59e0b" }}
                   >
                     {dest.tours} {t.nav.tours} <ArrowRight className="h-3 w-3" />
                   </span>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -1580,7 +1586,7 @@ export default function HomePage() {
 
                 {/* Body */}
                 <div className="p-5 flex flex-col flex-1">
-                  <h3 className="font-display text-lg font-bold text-white mb-1">{pkg.title}</h3>
+                  <p className="font-display text-lg font-bold text-white mb-1">{pkg.title}</p>
                   <p className="text-xs text-white/50 mb-4">{pkg.route}</p>
                   <div className="mt-auto flex items-center justify-between">
                     <div>
@@ -1860,7 +1866,7 @@ export default function HomePage() {
               >
                 <div>
                   <div className="text-3xl mb-4">{p.icon}</div>
-                  <h3 className="font-display text-lg font-bold text-slate-900 mb-2">{p.title}</h3>
+                  <p className="font-display text-lg font-bold text-slate-900 mb-2">{p.title}</p>
                   <p className="text-xs text-slate-600 leading-relaxed">{p.desc}</p>
                 </div>
               </div>

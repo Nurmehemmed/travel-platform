@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/transfer",
     languages: {
-      en: "/transfer",
+      en: "/transfer?lang=en",
       az: "/transfer?lang=az",
       ru: "/transfer?lang=ru",
       fr: "/transfer?lang=fr",

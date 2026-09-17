@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/visa",
     languages: {
-      en: "/visa",
+      en: "/visa?lang=en",
       az: "/visa?lang=az",
       ru: "/visa?lang=ru",
       fr: "/visa?lang=fr",
