@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { db, transferBookings } from "@travel/db";
-import { and, eq } from "drizzle-orm";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { transferService } from "@/services/transfer.service";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -39,12 +38,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const booking = await db.query.transferBookings.findFirst({
-      where: and(
-        eq(transferBookings.bookingNumber, ref.toUpperCase()),
-        eq(transferBookings.email, email.toLowerCase())
-      ),
-    });
+    const booking = await transferService.getByReferenceAndEmail(ref, email);
 
     if (!booking) {
       return NextResponse.json(
@@ -53,31 +47,7 @@ export async function GET(req: Request) {
       );
     }
 
-    // Return safe public subset (no sensitive DB IDs or admin notes)
-    return NextResponse.json({
-      bookingNumber:      booking.bookingNumber,
-      status:             booking.status,
-      direction:          booking.direction,
-      airport:            booking.airport,
-      pickupZone:         booking.pickupZone,
-      dropoffAddress:     booking.dropoffAddress,
-      vehicleClass:       booking.vehicleClass,
-      flightNumber:       booking.flightNumber,
-      flightDate:         booking.flightDate,
-      flightTime:         booking.flightTime,
-      returnFlightNumber: booking.returnFlightNumber,
-      returnDate:         booking.returnDate,
-      returnTime:         booking.returnTime,
-      passengerName:      booking.passengerName,
-      passengerCount:     booking.passengerCount,
-      totalAmount:        booking.totalAmount,
-      paymentMethod:      booking.paymentMethod,
-      paymentStatus:      booking.paymentStatus,
-      driverName:         booking.driverName,
-      driverPhone:        booking.driverPhone,
-      createdAt:          booking.createdAt,
-    });
-
+    return NextResponse.json(booking);
   } catch (error) {
     console.error("[Transfer Track API error]:", error);
     return NextResponse.json(
@@ -86,4 +56,3 @@ export async function GET(req: Request) {
     );
   }
 }
-

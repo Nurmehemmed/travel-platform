@@ -39,24 +39,28 @@ const APP_URL =
 
 export const metadata: Metadata = {
   title: {
-    default: "AddmeTour — Azerbaijan Tours & Travel Experiences",
-    template: "%s | AddmeTour",
+    default: "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
+    template: "%s | AddmeTour Azerbaijan",
   },
   description:
-    "Discover Azerbaijan with AddmeTour. Boutique private & small-group tours across Baku, the Caucasus, Sheki & Gobustan. 4.9★ rated. Instant WhatsApp booking.",
+    "Official Azerbaijan Inbound DMC & Tour Operator. Fast 3-hour ASAN Electronic Visa (e-Visa), 24/7 Baku Airport VIP transfers, and curated Caucasus private & group tour packages. 4.9★ Rated.",
   keywords: [
+    "AddmeTour",
+    "AddmeTravel",
     "Azerbaijan tours",
     "Baku tours",
+    "Azerbaijan visa online",
+    "ASAN visa application",
+    "Baku airport transfer",
     "Baku Old City walking tour",
     "Great Caucasus tours",
     "Gobustan mud volcanoes",
     "Sheki tour Azerbaijan",
     "Absheron peninsula tour",
-    "Azerbaijan boutique travel agency",
-    "AddmeTour",
+    "Azerbaijan travel agency",
     "Azerbaijan private tours",
     "Baku day trips",
-    "Caucasus adventure travel",
+    "Caucasus luxury travel",
   ],
   authors: [{ name: "AddmeTour", url: APP_URL }],
   creator: "AddmeTour",
@@ -78,10 +82,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: APP_URL,
-    siteName: "AddmeTour",
-    title: "AddmeTour — Azerbaijan Tours & Travel Experiences",
+    siteName: "AddmeTour Azerbaijan DMC",
+    title: "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
     description:
-      "Explore Baku, the Great Caucasus, and Silk Road heritage with authentic local guides. 4.9★ on TripAdvisor.",
+      "Explore Baku, the Great Caucasus, and Silk Road heritage with authentic local guides. Fast ASAN e-Visa processing and 24/7 Airport VIP transfers.",
     images: [
       {
         url: "/images/og-main-cover.jpg",
@@ -93,9 +97,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AddmeTour — Azerbaijan Tours & Travel Experiences",
+    title: "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
     description:
-      "Boutique private & small-group tours across Azerbaijan. 4.9★ TripAdvisor rating.",
+      "Boutique private & small-group tours, 3-hour urgent ASAN e-Visas, and Baku airport transfers. 4.9★ TripAdvisor rating.",
     images: ["/images/og-main-cover.jpg"],
   },
   robots: {
@@ -124,10 +128,6 @@ export const metadata: Metadata = {
     apple: "/icon.svg?v=5",
   },
   manifest: "/manifest.json",
-  verification: {
-    // Add your Google Search Console verification code here
-    // google: "your-verification-code",
-  },
   category: "travel",
 };
 
@@ -140,23 +140,73 @@ const jsonLd = {
       "@type": "TravelAgency",
       "@id": `${APP_URL}/#organization`,
       name: "AddmeTour",
+      legalName: "AddmeTour LLC",
       url: APP_URL,
       logo: `${APP_URL}/icon.svg`,
       image:
         "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=630&q=85",
       description:
-        "Boutique travel agency in Baku offering authentic small-group and private tours across Azerbaijan.",
+        "Premier Destination Management Company (DMC) in Baku offering official ASAN e-Visas, 24/7 airport chauffeur transfers, small-group cultural journeys, and luxury Caucasus itineraries.",
       telephone: "+994 55 100 31 46",
+      email: "bookings@addmetour.com",
       priceRange: "$$",
+      currenciesAccepted: "USD, EUR, AZN, GBP, AED, SAR",
+      paymentAccepted: "Credit Card, Debit Card, Visa, MasterCard, Cash on Arrival",
       address: {
         "@type": "PostalAddress",
+        streetAddress: "Nizami Street 142, Sabail District",
         addressLocality: "Baku",
+        postalCode: "AZ1000",
         addressCountry: "AZ",
       },
       geo: {
         "@type": "GeoCoordinates",
         latitude: 40.4093,
         longitude: 49.8671,
+      },
+      openingHoursSpecification: [
+        {
+          "@type": "OpeningHoursSpecification",
+          dayOfWeek: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ],
+          opens: "00:00",
+          closes: "23:59",
+        },
+      ],
+      sameAs: [
+        "https://instagram.com/addmetour",
+        "https://x.com/addmetour",
+        "https://linkedin.com/company/addmetour",
+        "https://facebook.com/addmetour",
+      ],
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Azerbaijan Inbound Travel Services",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Official Azerbaijan ASAN e-Visa Fast Processing",
+              description: "Standard (3 working days) and Urgent (3 hours) electronic visas for citizens of 95+ eligible countries.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Baku Heydar Aliyev Airport (GYD) VIP Transfer",
+              description: "Door-to-door flight-tracked transfers with Sedan, SUV, and VIP Mercedes Minivans.",
+            },
+          },
+        ],
       },
       aggregateRating: {
         "@type": "AggregateRating",
@@ -172,6 +222,11 @@ const jsonLd = {
       name: "AddmeTour",
       publisher: {
         "@id": `${APP_URL}/#organization`,
+      },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${APP_URL}/packages?search={search_term_string}`,
+        "query-input": "required name=search_term_string",
       },
     },
     {

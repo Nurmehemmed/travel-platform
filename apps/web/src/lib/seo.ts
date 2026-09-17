@@ -23,8 +23,8 @@ export interface ConstructMetadataProps {
  * Ensures search engine crawlers (Google, Yandex, Bing) understand multi-regional localization without duplicate penalties.
  */
 export function constructMetadata({
-  title = "AddmeTour | Premier Azerbaijan Inbound DMC & ASAN Visa Portal",
-  description = "Official Azerbaijan Inbound Tour Operator, ASAN Electronic Visa (e-Visa) agency, Baku Airport VIP transfer services, and tailor-made luxury Caucasus travel itineraries.",
+  title = "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
+  description = "Official Azerbaijan Inbound DMC & Tour Operator. Fast 3-hour ASAN Electronic Visa (e-Visa), 24/7 Baku Airport VIP transfers, and curated Caucasus private & group tour packages. 4.9★ Rated.",
   path = "",
   image = "/images/og-main-cover.jpg",
   noIndex = false,

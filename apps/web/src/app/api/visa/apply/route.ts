@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { db, visaApplications, recordAuditLog } from "@travel/db";
-import { sendTelegramVisaAlert } from "@/lib/telegram";
-import { sendVisaConfirmationEmail } from "@/lib/email";
 import { validateBotProtection } from "@/lib/anti-bot";
-import { validatePassportValidity } from "@/lib/visa-countries";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
+import { visaService } from "@/services/visa.service";
 
 export async function POST(req: Request) {
   try {
@@ -35,199 +32,38 @@ export async function POST(req: Request) {
       );
     }
 
-    const {
-      nationality,
-      passportType = "Ordinary passport",
-      visaType = "standard",
-      arrivalDate,
-      purposeOfVisit = "Tourism",
-      stayAddress,
-      surname,
-      givenNames,
-      gender,
-      birthDate,
-      birthCountry,
-      birthPlace,
-      occupation,
-      phoneNumber,
-      email,
-      residentialAddress,
-      passportNumber,
-      passportIssueDate,
-      passportExpiryDate,
-      passportScanUrl,
-      photoUrl,
-    } = body;
-
-    // 2. Payload size guard (max 7MB for passport scan)
-    if (passportScanUrl && typeof passportScanUrl === "string" && passportScanUrl.length > 7 * 1024 * 1024) {
+    // 3. Payload size guard (max 7MB for passport scan)
+    if (body.passportScanUrl && typeof body.passportScanUrl === "string" && body.passportScanUrl.length > 7 * 1024 * 1024) {
       return NextResponse.json(
         { error: "Passport image file is too large. Maximum size is 5MB." },
         { status: 413 }
       );
     }
 
-    // 3. Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(String(email).trim())) {
-      return NextResponse.json(
-        { error: "Please enter a valid email address for visa delivery." },
-        { status: 400 }
-      );
-    }
-
-    // Required fields validation
-    if (
-      !nationality ||
-      !arrivalDate ||
-      !stayAddress ||
-      !surname ||
-      !givenNames ||
-      !gender ||
-      !birthDate ||
-      !birthCountry ||
-      !birthPlace ||
-      !occupation ||
-      !phoneNumber ||
-      !email ||
-      !residentialAddress ||
-      !passportNumber ||
-      !passportIssueDate ||
-      !passportExpiryDate
-    ) {
-      return NextResponse.json(
-        { error: "Please fill in all required fields accurately as shown on your passport." },
-        { status: 400 }
-      );
-    }
-
-    // Passport validity check (minimum 3 months beyond arrival)
-    const validityCheck = validatePassportValidity(arrivalDate, passportExpiryDate);
-    if (!validityCheck.valid) {
-      return NextResponse.json({ error: validityCheck.message }, { status: 400 });
-    }
-
-    // Nationality & ASAN Visa eligibility check
-    const { getCountryEligibility } = await import("@/lib/visa-countries");
-    const countryInfo = getCountryEligibility(nationality);
-    if (countryInfo.category === "visa_free") {
-      return NextResponse.json(
-        { error: `Citizens of ${countryInfo.name} enter Azerbaijan visa-free. You do not need to apply for an e-Visa.` },
-        { status: 400 }
-      );
-    }
-    if (countryInfo.category === "embassy_required") {
-      return NextResponse.json(
-        { error: `Citizens of ${countryInfo.name} are not eligible for an ASAN e-Visa under Azerbaijani immigration law. An application must be submitted directly to an Embassy or Consulate of the Republic of Azerbaijan.` },
-        { status: 400 }
-      );
-    }
-
-    // Pricing calculation
-    const isUrgent = visaType === "urgent";
-    const govFee = isUrgent ? "61.00" : "26.00";
-    const serviceFee = isUrgent ? "49.00" : "33.00";
-    const totalAmount = isUrgent ? "110.00" : "59.00";
-
-    // Generate unique application number (e.g., AZV-784219)
-    const randomCode = Math.floor(100000 + Math.random() * 900000);
-    const applicationNumber = `AZV-${randomCode}`;
-
-    // Generate Payriff payment session
-    const { createPayriffOrder } = await import("@/lib/payriff");
-    const payriffOrder = await createPayriffOrder({
-      applicationNumber,
-      amount: Number(totalAmount),
-      currency: "USD",
-      description: `Azerbaijan e-Visa ${isUrgent ? "Urgent" : "Standard"} (${applicationNumber})`,
-      email,
+    // 4. Delegate core domain validation & creation to VisaService
+    const result = await visaService.createApplication({
+      ...body,
+      clientIp: ip,
     });
-
-    const inserted = await db.transaction(async (tx) => {
-      const [row] = await tx
-        .insert(visaApplications)
-        .values({
-          applicationNumber,
-          visaType: isUrgent ? "urgent" : "standard",
-          status: "received",
-          nationality,
-          passportType,
-          arrivalDate,
-          purposeOfVisit,
-          stayAddress,
-          surname: surname.trim().toUpperCase(),
-          givenNames: givenNames.trim().toUpperCase(),
-          gender,
-          birthDate,
-          birthCountry,
-          birthPlace,
-          occupation,
-          phoneNumber,
-          email: email.trim().toLowerCase(),
-          residentialAddress,
-          passportNumber: passportNumber.trim().toUpperCase(),
-          passportIssueDate,
-          passportExpiryDate,
-          passportScanUrl: passportScanUrl || null,
-          photoUrl: photoUrl || null,
-          govFee,
-          serviceFee,
-          totalAmount,
-          paymentStatus: "pending_payment",
-          adminNotes: `Payriff Order ID: ${payriffOrder.orderId}`,
-        })
-        .returning();
-
-      if (row) {
-        await recordAuditLog({
-          entityType: "visa",
-          entityId: applicationNumber,
-          action: "submitted",
-          actorEmail: email,
-          actorRole: "customer",
-          metadata: {
-            visaType: isUrgent ? "urgent" : "standard",
-            totalAmount,
-            nationality,
-            arrivalDate,
-            payriffOrderId: payriffOrder.orderId,
-          },
-        });
-      }
-
-      return row;
-    });
-
-    logger.info(`Visa application submitted: ${applicationNumber}`, {
-      applicationNumber,
-      visaType: isUrgent ? "urgent" : "standard",
-      totalAmount,
-      nationality,
-    });
-
-    // Asynchronously send customer confirmation email
-    sendVisaConfirmationEmail({
-      to: email.trim().toLowerCase(),
-      applicantName: `${givenNames.trim()} ${surname.trim()}`,
-      referenceNumber: applicationNumber,
-      visaType: isUrgent ? "urgent" : "standard",
-      arrivalDate,
-      totalAmount: Number(totalAmount),
-    }).catch((err) => console.warn("[Non-fatal visa confirmation email error]:", err));
 
     return NextResponse.json({
       success: true,
-      applicationNumber,
-      applicationId: inserted?.id,
-      paymentUrl: payriffOrder.paymentUrl,
-      isMockPayment: payriffOrder.isMock,
+      applicationNumber: result.applicationNumber,
+      applicationId: result.applicationId,
+      paymentUrl: result.paymentUrl,
+      isMockPayment: result.isMockPayment,
       message: "Application initiated. Redirecting to payment...",
     });
   } catch (error: any) {
     logger.error("Visa apply submission error", error);
+    const isClientError = error?.message?.includes("valid") ||
+      error?.message?.includes("required") ||
+      error?.message?.includes("eligible") ||
+      error?.message?.includes("visa-free");
+
     return NextResponse.json(
       { error: error?.message || "Failed to submit visa application. Please try again." },
-      { status: 500 }
+      { status: isClientError ? 400 : 500 }
     );
   }
 }

@@ -1,22 +1,10 @@
 import { NextResponse } from "next/server";
-import { db, customItineraries, recordAuditLog } from "@travel/db";
-import { desc, eq } from "drizzle-orm";
-import { notifyTelegram } from "@/lib/telegram";
 import { requireAdmin } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { itineraryService } from "@/services/itinerary.service";
 
 const log = logger.withContext({ route: "/api/itinerary/create" });
-
-function generateItineraryReference(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let random = "";
-  for (let i = 0; i < 6; i++) {
-    random += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  const year = new Date().getFullYear();
-  return `ITN-${year}-${random}`;
-}
 
 export async function POST(req: Request) {
   try {
@@ -34,130 +22,24 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const {
-      durationDays,
-      arrivalDate,
-      adults,
-      children,
-      destinations,
-      hotelTier,
-      vehicleClass,
-      estimatedPriceUSD,
-      currency,
-      customer,
-    } = body;
 
-    const travelerName = customer?.fullName?.trim();
-    const email = customer?.email?.trim();
-    const phoneNumber = customer?.phone?.trim();
-
-    if (!travelerName || !email || !phoneNumber) {
-      return NextResponse.json(
-        { error: "Traveler full name, email, and phone number are required." },
-        { status: 400 }
-      );
-    }
-
-    const duration = Math.max(1, Math.min(30, Number(durationDays) || 5));
-    const adultCount = Math.max(1, Math.min(50, Number(adults) || 2));
-    const childCount = Math.max(0, Math.min(20, Number(children) || 0));
-    const priceUsd = Math.max(0, parseFloat(String(estimatedPriceUSD)) || 0);
-
-    const arrivalDateStr: string =
-      (typeof arrivalDate === "string" && arrivalDate.length >= 10
-        ? arrivalDate.split("T")[0]
-        : new Date().toISOString().split("T")[0]) || new Date().toISOString().slice(0, 10);
-
-    const referenceCode = generateItineraryReference();
-
-    const selectedDests: string[] = Array.isArray(destinations) && destinations.length > 0
-      ? destinations
-      : ["Baku Old City & Modern Marvels"];
-
-    // 2. Insert into Neon PostgreSQL database & Audit Log atomically
-    const created = await db.transaction(async (tx) => {
-      const [inserted] = await tx
-        .insert(customItineraries)
-        .values({
-          referenceCode,
-          travelerName,
-          email,
-          phoneNumber,
-          durationDays: duration,
-          arrivalDate: arrivalDateStr,
-          adults: adultCount,
-          children: childCount,
-          hotelTier: hotelTier || "4-Star Comfort",
-          vehicleClass: vehicleClass || "Mercedes VIP Van",
-          destinations: selectedDests,
-          estimatedPriceUsd: String(priceUsd.toFixed(2)),
-          currency: currency || "USD",
-          specialRequests: customer?.notes || null,
-          status: "pending",
-        })
-        .returning();
-
-      if (inserted) {
-        await recordAuditLog({
-          entityType: "tour",
-          entityId: inserted.referenceCode,
-          action: "custom_itinerary_created",
-          actorRole: "customer",
-          metadata: {
-            referenceCode: inserted.referenceCode,
-            travelerName,
-            email,
-            durationDays: duration,
-            arrivalDate: arrivalDateStr,
-            estimatedPriceUSD: priceUsd,
-            clientIp,
-          },
-        });
-      }
-
-      return inserted;
-    });
-
-    if (created) {
-      log.info(`New custom itinerary inquiry saved: ${created.referenceCode}`, {
-        referenceCode: created.referenceCode,
-        travelerName,
-        priceUsd,
-      });
-    }
-
-    // 4. Dispatch Telegram Notification asynchronously
-    const summaryText = `🗺️ *NEW BESPOKE ITINERARY INQUIRY*
-━━━━━━━━━━━━━━━━━━━━━━━━━
-🔖 *Ref Code:* \`${created?.referenceCode || referenceCode}\`
-👤 *Traveler:* ${travelerName}
-📱 *Phone/WA:* \`${phoneNumber}\`
-✉️ *Email:* ${email}
-🏨 *Hotel Tier:* ${hotelTier || "4-Star Comfort"}
-🚗 *Vehicle:* ${vehicleClass || "Mercedes VIP Van"}
-📅 *Duration:* ${duration} Days (${arrivalDateStr})
-👥 *Party:* ${adultCount} Adults${childCount > 0 ? `, ${childCount} Children` : ""}
-📍 *Destinations Selected:*
-${selectedDests.map((d: string) => `  • ${d}`).join("\n")}
-💰 *Estimated Budget:* ~$${priceUsd} USD (${currency || "USD"})
-📝 *Special Requests:* ${customer?.notes || "None"}
-━━━━━━━━━━━━━━━━━━━━━━━━━`;
-
-    notifyTelegram(summaryText).catch((err) => {
-      log.warn("Telegram notification failed", { err: err?.message });
+    const result = await itineraryService.createCustomItinerary({
+      ...body,
+      clientIp,
     });
 
     return NextResponse.json({
       success: true,
-      referenceCode: created?.referenceCode || referenceCode,
-      itinerary: created,
+      referenceCode: result.referenceCode,
+      itinerary: result.itinerary,
       message: "Custom itinerary request saved and received successfully",
     });
   } catch (error: any) {
     log.error("Error creating custom itinerary", error);
+    const isClientError = error?.message?.includes("required") || error?.message?.includes("valid");
     return NextResponse.json(
       { success: false, error: error?.message || "Failed to process custom itinerary" },
-      { status: 500 }
+      { status: isClientError ? 400 : 500 }
     );
   }
 }
@@ -169,11 +51,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized: Admin privileges required" }, { status: 401 });
     }
 
-    const list = await db
-      .select()
-      .from(customItineraries)
-      .orderBy(desc(customItineraries.createdAt));
-
+    const list = await itineraryService.listItineraries();
     return NextResponse.json({ itineraries: list });
   } catch (error: any) {
     log.error("Failed to fetch custom itineraries", error);
@@ -198,37 +76,12 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Itinerary ID is required" }, { status: 400 });
     }
 
-    const updateData: Record<string, any> = {
-      updatedAt: new Date(),
-    };
-
-    if (status !== undefined) updateData.status = status;
-    if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
-
-    const [updated] = await db
-      .update(customItineraries)
-      .set(updateData)
-      .where(eq(customItineraries.id, id))
-      .returning();
-
-    if (updated) {
-      await recordAuditLog({
-        entityType: "tour",
-        entityId: updated.referenceCode,
-        action: status ? `custom_itinerary.status_${status}` : "custom_itinerary.updated",
-        actorEmail: admin.email,
-        actorRole: "admin",
-        metadata: {
-          status,
-          adminNotes,
-        },
-      });
-
-      log.info(`Custom itinerary updated: ${updated.referenceCode}`, {
-        referenceCode: updated.referenceCode,
-        status: updated.status,
-      });
-    }
+    const updated = await itineraryService.updateItinerary({
+      id,
+      status,
+      adminNotes,
+      adminEmail: admin.email,
+    });
 
     return NextResponse.json({ success: true, itinerary: updated });
   } catch (error: any) {

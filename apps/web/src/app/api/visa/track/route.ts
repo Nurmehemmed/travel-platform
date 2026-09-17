@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { db, visaApplications } from "@travel/db";
-import { eq, and } from "drizzle-orm";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { visaService } from "@/services/visa.service";
 
 export async function GET(req: Request) {
   try {
@@ -27,31 +26,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const whereClause = and(
-      eq(visaApplications.applicationNumber, ref.toUpperCase()),
-      eq(visaApplications.email, email)
-    );
-
-    const [found] = await db
-      .select({
-        id: visaApplications.id,
-        applicationNumber: visaApplications.applicationNumber,
-        visaType: visaApplications.visaType,
-        status: visaApplications.status,
-        nationality: visaApplications.nationality,
-        arrivalDate: visaApplications.arrivalDate,
-        surname: visaApplications.surname,
-        givenNames: visaApplications.givenNames,
-        email: visaApplications.email,
-        totalAmount: visaApplications.totalAmount,
-        paymentStatus: visaApplications.paymentStatus,
-        asanApplicationId: visaApplications.asanApplicationId,
-        evisaPdfUrl: visaApplications.evisaPdfUrl,
-        createdAt: visaApplications.createdAt,
-        updatedAt: visaApplications.updatedAt,
-      })
-      .from(visaApplications)
-      .where(whereClause);
+    const found = await visaService.getByReferenceAndEmail(ref, email);
 
     if (!found) {
       return NextResponse.json(
