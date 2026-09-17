@@ -30,6 +30,20 @@ export const metadata: Metadata = {
     title: "Track Your Azerbaijan e-Visa — Live Status | AddmeTour",
     description:
       "Real-time visa tracking. Enter your reference number to see live progress and download your approved e-Visa.",
+    images: [
+      {
+        url: "/images/og-visa-cover.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Track Azerbaijan e-Visa Status — AddmeTour",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Track Your Azerbaijan e-Visa — AddmeTour",
+    description: "Check live status of your Azerbaijan e-Visa application.",
+    images: ["/images/og-visa-cover.jpg"],
   },
   robots: {
     index: true,

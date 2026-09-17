@@ -45,7 +45,7 @@ export const metadata: Metadata = {
       "Book a private airport transfer across Azerbaijan. Fixed prices, meet & greet, flight monitoring. Available at GYD, GJA, and NAJ airports.",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&h=630&q=85",
+        url: "/images/og-transfer-cover.jpg",
         width: 1200,
         height: 630,
         alt: "Airport transfer service — professional driver",

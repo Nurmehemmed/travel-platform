@@ -54,7 +54,7 @@ export const metadata: Metadata = {
       "Official ASAN e-Visa processing service. Apply online, receive your approved electronic visa by email. 95+ eligible countries. Urgent 3-hour processing available.",
     images: [
       {
-        url: "/images/baku-maiden-tower-wide.jpg",
+        url: "/images/og-visa-cover.jpg",
         width: 1200,
         height: 630,
         alt: "Baku Old City Maiden Tower — Azerbaijan e-Visa Service by AddmeTour",
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     description:
       "Get your Azerbaijan e-Visa in 3 hours. 95+ eligible countries. Trusted by 2,400+ travelers.",
     images: [
-      "/images/baku-maiden-tower-wide.jpg",
+      "/images/og-visa-cover.jpg",
     ],
   },
 };

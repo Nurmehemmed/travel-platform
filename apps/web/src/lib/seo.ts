@@ -26,7 +26,7 @@ export function constructMetadata({
   title = "AddmeTour | Premier Azerbaijan Inbound DMC & ASAN Visa Portal",
   description = "Official Azerbaijan Inbound Tour Operator, ASAN Electronic Visa (e-Visa) agency, Baku Airport VIP transfer services, and tailor-made luxury Caucasus travel itineraries.",
   path = "",
-  image = "/images/og-baku-cover.jpg",
+  image = "/images/og-main-cover.jpg",
   noIndex = false,
   type = "website",
 }: ConstructMetadataProps = {}): Metadata {

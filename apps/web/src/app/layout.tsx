@@ -84,7 +84,7 @@ export const metadata: Metadata = {
       "Explore Baku, the Great Caucasus, and Silk Road heritage with authentic local guides. 4.9★ on TripAdvisor.",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=630&q=85",
+        url: "/images/og-main-cover.jpg",
         width: 1200,
         height: 630,
         alt: "Great Caucasus Mountains in Azerbaijan — AddmeTour",
@@ -96,9 +96,7 @@ export const metadata: Metadata = {
     title: "AddmeTour — Azerbaijan Tours & Travel Experiences",
     description:
       "Boutique private & small-group tours across Azerbaijan. 4.9★ TripAdvisor rating.",
-    images: [
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=630&q=85",
-    ],
+    images: ["/images/og-main-cover.jpg"],
   },
   robots: {
     index: true,
