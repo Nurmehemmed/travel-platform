@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useSiteSettings } from "@/lib/settings-context";
 
 const FloatingTravelServices = dynamic(
   () => import("@/components/FloatingTravelServices"),
@@ -18,6 +19,13 @@ const CookieConsent = dynamic(
 );
 
 export function FloatingWidgetsContainer() {
+  const { loading } = useSiteSettings();
+
+  // If initial settings are still being fetched and no local cache exists, wait to avoid flickering
+  if (loading && typeof window !== "undefined" && !localStorage.getItem("addmetour_site_settings_cache")) {
+    return <CookieConsent />;
+  }
+
   return (
     <>
       <FloatingCustomItinerary />
@@ -28,3 +36,4 @@ export function FloatingWidgetsContainer() {
 }
 
 export default FloatingWidgetsContainer;
+

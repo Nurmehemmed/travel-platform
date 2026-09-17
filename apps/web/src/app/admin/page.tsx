@@ -12,6 +12,7 @@ import { StatsCardsSkeleton, TableSkeleton } from "@/components/Skeletons";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 import { getAdminTranslations } from "@/lib/admin-i18n";
+import { DEFAULT_SETTINGS_MAP } from "@/lib/settings-context";
 
 import {
   AuditLogItem,
@@ -167,7 +168,7 @@ export default function AdminPortalPage() {
       if (tourRes?.reservations) setTourReservationsList(tourRes.reservations);
       if (settingsRes?.settings) {
         setSettingsList(settingsRes.settings);
-        const draftMap: Record<string, any> = {};
+        const draftMap: Record<string, any> = { ...DEFAULT_SETTINGS_MAP };
         for (const s of settingsRes.settings) {
           draftMap[s.key] = s.value;
         }
@@ -303,7 +304,7 @@ export default function AdminPortalPage() {
       const data = await res.json();
       if (res.ok && data?.settings) {
         setSettingsList(data.settings);
-        const draftMap: Record<string, any> = {};
+        const draftMap: Record<string, any> = { ...DEFAULT_SETTINGS_MAP };
         for (const s of data.settings) {
           draftMap[s.key] = s.value;
         }
@@ -321,7 +322,7 @@ export default function AdminPortalPage() {
   };
 
   const handleResetSettings = () => {
-    const draftMap: Record<string, any> = {};
+    const draftMap: Record<string, any> = { ...DEFAULT_SETTINGS_MAP };
     for (const s of settingsList) {
       draftMap[s.key] = s.value;
     }

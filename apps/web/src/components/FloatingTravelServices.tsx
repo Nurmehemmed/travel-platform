@@ -26,28 +26,22 @@ export default function FloatingTravelServices() {
   const isVisaPage = pathname.startsWith("/visa");
   const isTransferPage = pathname.startsWith("/transfer");
 
-  const showServices = settings?.operations?.floatingServices !== false;
-  const showVisa = showServices && settings?.operations?.visaServiceActive !== false;
-  const showTransfer = showServices && settings?.operations?.transferServiceActive !== false;
-  const showWhatsapp = settings?.operations?.floatingWhatsapp !== false && Boolean(settings?.contact?.whatsappUrl);
+  const showServices = settings?.operations?.floatingServices === true;
+  const showWhatsapp = settings?.operations?.floatingWhatsapp === true && Boolean(settings?.contact?.whatsappUrl);
 
   // If all floating widgets on the right dock are disabled, hide the entire aside
-  if (!showVisa && !showTransfer && !showWhatsapp) {
+  if (!showServices && !showWhatsapp) {
     return null;
   }
-
-  // Determine what capsule / pills to render
-  const renderSingleTransfer = (isVisaPage && showTransfer) || (!showVisa && showTransfer);
-  const renderSingleVisa = (isTransferPage && showVisa) || (!showTransfer && showVisa);
-  const renderDualCapsule = !isVisaPage && !isTransferPage && showVisa && showTransfer;
 
   return (
     <aside
       aria-label="Quick travel services and WhatsApp support dock"
-      className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40 print:hidden transition-all duration-300 flex items-center gap-2 sm:gap-2.5 max-w-[calc(100vw-1.5rem)] pointer-events-auto"
+      className="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 z-40 print:hidden transition-all duration-300 flex items-center gap-2 sm:gap-2.5 max-w-[calc(100vw-1.5rem)] pointer-events-auto animate-fade-in"
     >
-      {/* CASE 1: Single Airport Transfer Pill */}
-      {renderSingleTransfer && (
+      {/* Quick Services Dock (e-Visa / Airport Transfer) */}
+      {showServices && isVisaPage && !isTransferPage && (
+        /* CASE 1: On Visa page -> Slim Airport Transfer Pill */
         <Link
           href="/transfer"
           aria-label="Book Baku Airport Transfer (GYD)"
@@ -74,8 +68,8 @@ export default function FloatingTravelServices() {
         </Link>
       )}
 
-      {/* CASE 2: Single e-Visa Pill */}
-      {renderSingleVisa && (
+      {showServices && isTransferPage && !isVisaPage && (
+        /* CASE 2: On Transfer page -> Slim e-Visa Pill */
         <Link
           href="/visa"
           aria-label="Official Azerbaijan ASAN e-Visa Online Application"
@@ -102,8 +96,8 @@ export default function FloatingTravelServices() {
         </Link>
       )}
 
-      {/* CASE 3: Dual Segmented Capsule (e-Visa + Transfer) */}
-      {renderDualCapsule && (
+      {showServices && !isVisaPage && !isTransferPage && (
+        /* CASE 3: Everywhere else -> Unified 2-in-1 Segmented Capsule */
         <div
           className="flex items-center rounded-full p-1 shadow-2xl backdrop-blur-xl border border-white/20 transition-all duration-300 hover:border-white/30 shrink-0"
           style={{

@@ -76,6 +76,32 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
 };
 
 
+export const DEFAULT_SETTINGS_MAP: Record<string, any> = {
+  contact_whatsapp: COMPANY_CONTACT.whatsappPhone,
+  contact_phone: COMPANY_CONTACT.whatsappPhone,
+  contact_email: "info@addmetour.com",
+  contact_telegram: "addmetour",
+  contact_address: "Nizami Street 48, Baku, Azerbaijan",
+  announcement_active: false,
+  announcement_text: "",
+  announcement_badge: "Limited Offer",
+  announcement_link: "/#tours",
+  pricing_visa_standard: 45,
+  pricing_visa_urgent: 85,
+  pricing_transfer_sedan: 25,
+  pricing_transfer_minivan: 40,
+  pricing_transfer_sprinter: 65,
+  marketing_tripadvisor_rating: "4.9",
+  marketing_tripadvisor_reviews: "2,400+",
+  operations_floating_whatsapp: true,
+  operations_floating_services: true,
+  operations_floating_itinerary: true,
+  operations_visa_service: true,
+  operations_transfer_service: true,
+};
+
+const SETTINGS_CACHE_KEY = "addmetour_site_settings_cache";
+
 interface SettingsContextType {
   settings: PublicSettings;
   refreshSettings: () => Promise<void>;
@@ -89,7 +115,17 @@ const SettingsContext = createContext<SettingsContextType>({
 });
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<PublicSettings>(DEFAULT_PUBLIC_SETTINGS);
+  const [settings, setSettings] = useState<PublicSettings>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
+        if (cached) {
+          return JSON.parse(cached);
+        }
+      } catch {}
+    }
+    return DEFAULT_PUBLIC_SETTINGS;
+  });
   const [loading, setLoading] = useState(true);
 
   const fetchSettings = async () => {
@@ -98,6 +134,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setSettings(data);
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(data));
+          } catch {}
+        }
       }
     } catch (err) {
       console.warn("Could not load dynamic settings, using fallback", err);
@@ -109,6 +150,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     fetchSettings();
   }, []);
+
 
   return (
     <SettingsContext.Provider value={{ settings, refreshSettings: fetchSettings, loading }}>
