@@ -8,6 +8,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   MapPin, Search, Clock, Users, Star, ChevronDown, ChevronLeft, ChevronRight,
   Zap, Shield, MessageCircle, Award, ArrowRight, Globe,
@@ -21,8 +22,20 @@ import { useCurrency, CURRENCIES, CurrencyCode } from "@/lib/currency-context";
 import { LOCALIZED_SLIDES, LOCALIZED_TOURS, LOCALIZED_TESTIMONIALS, getLocalizedTour } from "@/lib/tours-i18n";
 import { useSiteSettings } from "@/lib/settings-context";
 import { TourCardsSkeleton } from "@/components/Skeletons";
-import { DatePicker } from "@/components/DatePicker";
 import { CustomSelect } from "@/components/CustomSelect";
+import type { AuthUser } from "@/components/AuthModal";
+
+// ─── Dynamic Modal Imports (Zero Main Thread Blocking until Opened) ────────────
+const AuthModal = dynamic(() => import("@/components/AuthModal"), {
+  ssr: false,
+});
+
+const TourReservationModal = dynamic(
+  () => import("@/components/TourReservationModal"),
+  {
+    ssr: false,
+  }
+);
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -232,13 +245,6 @@ const DURATIONS = ["Any duration", "Half day (1–4h)", "Full day (5–8h)", "Mu
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-interface AuthUser {
-  id: string;
-  name?: string | null;
-  email: string;
-  role?: string | null;
-}
-
 export default function HomePage() {
   const { settings: siteConfig } = useSiteSettings();
   const [activeFilter, setActiveFilter] = useState<string>("All");
@@ -246,28 +252,14 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [toursList, setToursList] = useState(TOURS);
-  const [toursLoading, setToursLoading] = useState(true);
+  const [toursLoading, setToursLoading] = useState(false);
   const [savedTourIds, setSavedTourIds] = useState<string[]>([]);
   const [bookingModalTour, setBookingModalTour] = useState<{ id: string; title: string; price: number } | null>(null);
-  const [bookingDate, setBookingDate] = useState("");
-  const [bookingGuests, setBookingGuests] = useState(2);
-  const [bookingName, setBookingName] = useState("");
-  const [bookingPhone, setBookingPhone] = useState("");
-  const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [confirmedResNumber, setConfirmedResNumber] = useState<string | null>(null);
-  const [bookingSubmitting, setBookingSubmitting] = useState(false);
 
   // Auth state
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [authLoading, setAuthLoading] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [socialNotice, setSocialNotice] = useState<string | null>(null);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { language, setLanguage, t, currentLangInfo, isRtl, languages, showToast } = useLanguage();
@@ -319,62 +311,68 @@ export default function HomePage() {
     };
   }, [userDropdownOpen]);
 
-  // Auto-advance hero background slider every 6 seconds
+  // Auto-advance hero background slider & non-blocking background initialization
   useEffect(() => {
     setMounted(true);
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
     }, 6000);
-    return () => clearInterval(timer);
-  }, []);
 
-  // Check existing session on mount & load saved tours
-  useEffect(() => {
+    // Defer non-critical background data fetching to keep main thread completely idle during initial hydration
+    const runDeferredTasks = () => {
+      try {
+        const saved = localStorage.getItem("travel_saved_tour_ids");
+        if (saved) {
+          setSavedTourIds(JSON.parse(saved));
+        }
+      } catch {}
 
-    // Load saved tours from localStorage
-    try {
-      const saved = localStorage.getItem("travel_saved_tour_ids");
-      if (saved) {
-        setSavedTourIds(JSON.parse(saved));
-      }
-    } catch {}
-
-    fetch("/api/auth/me", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.user) {
-          setCurrentUser(data.user);
-        } else {
+      fetch("/api/auth/me", { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.user) {
+            setCurrentUser(data.user);
+          } else {
+            setCurrentUser(null);
+          }
+        })
+        .catch(() => {
           setCurrentUser(null);
-        }
-      })
-      .catch(() => {
-        setCurrentUser(null);
-      });
+        });
 
-    // Fetch live active tours from Neon DB (always fresh, no client cache)
-    fetch("/api/tours", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.tours && data.tours.length > 0) {
-          setToursList(data.tours);
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        setToursLoading(false);
-      });
+      fetch("/api/tours", { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.tours && data.tours.length > 0) {
+            setToursList(data.tours);
+          }
+        })
+        .catch(() => {});
 
-    // Clean URL if redirected back from social auth or handle auth modal trigger
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("auth") === "login") {
-        setAuthMode("login");
-        setIsAuthOpen(true);
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("auth") === "login") {
+          setAuthMode("login");
+          setIsAuthOpen(true);
+        }
+        if (urlParams.get("auth_provider")) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       }
-      if (urlParams.get("auth_provider")) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const idleId = (window as any).requestIdleCallback(runDeferredTasks, { timeout: 1500 });
+      return () => {
+        clearInterval(timer);
+        if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(idleId);
+      };
+    } else {
+      const timeoutId = setTimeout(runDeferredTasks, 100);
+      return () => {
+        clearInterval(timer);
+        clearTimeout(timeoutId);
+      };
     }
   }, []);
 
@@ -421,74 +419,6 @@ export default function HomePage() {
           : "Logged out successfully";
       showToast(logoutMsg);
     } catch {}
-  };
-
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-    setSocialNotice(null);
-    setAuthLoading(true);
-
-    try {
-      const endpoint = authMode === "login" ? "/api/auth/login" : "/api/auth/register";
-      const payload =
-        authMode === "login"
-          ? { email, password }
-          : { name: fullName, email, password };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setAuthError(data?.error || "Authentication failed. Please try again.");
-        setAuthLoading(false);
-        return;
-      }
-
-      if (data?.user) {
-        setCurrentUser(data.user);
-        setIsAuthOpen(false);
-        setEmail("");
-        setPassword("");
-        setFullName("");
-        setAuthError(null);
-        const name = data.user.name || data.user.email?.split("@")[0] || "";
-        const loginMsg =
-          authMode === "login"
-            ? (language === "AZ"
-                ? `Xoş gəldiniz, ${name}!`
-                : language === "RU"
-                ? `Добро пожаловать, ${name}!`
-                : language === "FR"
-                ? `Bienvenue, ${name} !`
-                : language === "AR"
-                ? `مرحباً بك، ${name}!`
-                : language === "DE"
-                ? `Willkommen, ${name}!`
-                : `Welcome back, ${name}!`)
-            : (language === "AZ"
-                ? "Qeydiyyat uğurla tamamlandı!"
-                : language === "RU"
-                ? "Регистрация прошла успешно!"
-                : language === "FR"
-                ? "Inscription réussie !"
-                : language === "AR"
-                ? "تم إنشاء الحساب بنجاح!"
-                : language === "DE"
-                ? "Registrierung erfolgreich!"
-                : "Account created successfully!");
-        showToast(loginMsg);
-      }
-    } catch (err: any) {
-      setAuthError(err?.message || "Network error. Please try again.");
-    } finally {
-      setAuthLoading(false);
-    }
   };
 
   const filteredTours = toursList.filter((t) => {
@@ -720,8 +650,6 @@ export default function HomePage() {
                 <button
                   onClick={() => {
                     setAuthMode("login");
-                    setAuthError(null);
-                    setSocialNotice(null);
                     setIsAuthOpen(true);
                   }}
                   className="hidden md:inline-block text-xs sm:text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
@@ -731,8 +659,6 @@ export default function HomePage() {
                 <button
                   onClick={() => {
                     setAuthMode("signup");
-                    setAuthError(null);
-                    setSocialNotice(null);
                     setIsAuthOpen(true);
                   }}
                   className="hidden sm:inline-block rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold transition-all duration-200 hover:opacity-90 hover:shadow-lg cursor-pointer whitespace-nowrap shrink-0"
@@ -839,8 +765,6 @@ export default function HomePage() {
                     type="button"
                     onClick={() => {
                       setAuthMode("login");
-                      setAuthError(null);
-                      setSocialNotice(null);
                       setIsAuthOpen(true);
                       setMobileMenuOpen(false);
                     }}
@@ -852,8 +776,6 @@ export default function HomePage() {
                     type="button"
                     onClick={() => {
                       setAuthMode("signup");
-                      setAuthError(null);
-                      setSocialNotice(null);
                       setIsAuthOpen(true);
                       setMobileMenuOpen(false);
                     }}
@@ -1381,7 +1303,6 @@ export default function HomePage() {
                           type="button"
                           onClick={() => {
                             setBookingModalTour({ id: tour.id, title: tourTitle, price: tour.price });
-                            setBookingSuccess(false);
                           }}
                           aria-label={`Reserve date for ${tourTitle} (${formatPrice(tour.price)})`}
                           className="w-full rounded-xl py-2.5 px-2 text-xs font-bold transition-all duration-200 border border-slate-300 text-slate-800 hover:bg-slate-100 active:scale-98 text-center cursor-pointer shadow-sm"
@@ -2394,457 +2315,20 @@ export default function HomePage() {
 
       {/* ═══════════════════════════════════════════════════════ AUTH MODAL */}
       {isAuthOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsAuthOpen(false);
-          }}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="relative w-full max-w-[440px] rounded-3xl p-8 shadow-2xl animate-scale-up"
-            style={{
-              backgroundColor: "#f0f9ff",
-              border: "1px solid #e0f2fe",
-              boxShadow: "0 25px 50px -12px rgba(15, 23, 42, 0.25)",
-            }}
-          >
-            {/* Close Button */}
-            <button
-              onClick={() => setIsAuthOpen(false)}
-              className="absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-black/5 transition-colors cursor-pointer"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
-            {/* Logo */}
-            <div className="flex items-center gap-2 mb-6">
-              <div
-                className="flex h-7 w-7 items-center justify-center rounded-full"
-                style={{ backgroundColor: "#f59e0b" }}
-              >
-                <MapPin className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
-              </div>
-              <span className="font-bold text-base tracking-tight" style={{ color: "#f59e0b" }}>
-                addmetour
-              </span>
-            </div>
-
-            {/* Tab Pill Switcher */}
-            <div className="flex rounded-full border border-[#e5dcd0] p-1 bg-white mb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("login");
-                  setAuthError(null);
-                  setSocialNotice(null);
-                }}
-                className={`flex-1 rounded-full py-2 text-xs font-semibold transition-all cursor-pointer ${
-                  authMode === "login"
-                    ? "text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-                style={authMode === "login" ? { backgroundColor: "#0f3460" } : {}}
-              >
-                {t.auth.loginTab}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode("signup");
-                  setAuthError(null);
-                  setSocialNotice(null);
-                }}
-                className={`flex-1 rounded-full py-2 text-xs font-semibold transition-all cursor-pointer ${
-                  authMode === "signup"
-                    ? "text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-                style={authMode === "signup" ? { backgroundColor: "#0f3460" } : {}}
-              >
-                {t.auth.signupTab}
-              </button>
-            </div>
-
-            {/* Title & Subtitle */}
-            <div className="mb-6">
-              <h3 className="font-display text-2xl font-bold text-slate-900 mb-1">
-                {authMode === "login" ? t.auth.welcomeBack : t.auth.createAccount}
-              </h3>
-              <p className="text-xs text-slate-500">
-                {authMode === "login"
-                  ? t.auth.loginSubtitle
-                  : t.auth.signupSubtitle}
-              </p>
-            </div>
-
-            {/* Social Notice / API Guidance */}
-            {socialNotice && (
-              <div className="mb-4 rounded-xl p-3 text-xs leading-relaxed bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                <div>{socialNotice}</div>
-              </div>
-            )}
-
-            {/* Auth Error Banner */}
-            {authError && (
-              <div className="mb-4 rounded-xl p-3 text-xs leading-relaxed bg-red-50 border border-red-200 text-red-800 flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
-                <div>{authError}</div>
-              </div>
-            )}
-
-            {/* Social Buttons */}
-            <div className="space-y-2.5 mb-5">
-              <button
-                type="button"
-                onClick={() => {
-                  window.location.href = "/api/auth/oauth/google";
-                }}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#e2d8cc] bg-white py-2.5 px-4 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm cursor-pointer"
-              >
-                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.36 24 12 24z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                  />
-                </svg>
-                {t.auth.continueGoogle}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  window.location.href = "/api/auth/oauth/apple";
-                }}
-                className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#111111] py-2.5 px-4 text-xs font-semibold text-white hover:bg-black transition-colors shadow-sm cursor-pointer"
-              >
-                <svg className="h-4 w-4 shrink-0 fill-current" viewBox="0 0 24 24">
-                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 1.04-2.85 0-.14-.01-.29-.04-.42-.99.04-2.19.66-2.9 1.48-.56.65-1.05 1.7-1.05 2.76 0 .15.02.31.04.42 1.07.08 2.29-.54 2.91-1.39z" />
-                </svg>
-                {t.auth.continueApple}
-              </button>
-            </div>
-
-            {/* Divider */}
-            <div className="relative my-5 flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#e2d8cc]" />
-              </div>
-              <span className="relative bg-[#f0f9ff] px-3 text-[11px] text-slate-400">
-                {t.auth.orEmail}
-              </span>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleAuthSubmit} className="space-y-3">
-              {authMode === "signup" && (
-                <div>
-                  <input
-                    type="text"
-                    required
-                    placeholder={t.auth.fullNamePlaceholder}
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460] transition-colors"
-                  />
-                </div>
-              )}
-
-              <div>
-                <input
-                  type="email"
-                  required
-                  placeholder={t.auth.emailPlaceholder}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460] transition-colors"
-                />
-              </div>
-
-              <div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    placeholder={t.auth.passwordPlaceholder}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#e2d8cc] bg-white px-4 py-2.5 pr-10 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460] transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                    aria-label="Toggle password visibility"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {authMode === "login" && (
-                  <div className="flex justify-end mt-1.5">
-                    <button
-                      type="button"
-                      className="text-[11px] font-semibold hover:underline cursor-pointer"
-                      style={{ color: "#f59e0b" }}
-                    >
-                      {t.auth.forgotPassword}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full flex items-center justify-center gap-2 rounded-xl py-3 px-4 text-xs font-semibold text-white transition-all duration-200 hover:opacity-95 shadow-md cursor-pointer mt-3 disabled:opacity-70"
-                style={{ backgroundColor: "#0f3460" }}
-              >
-                {authLoading && <Loader2 className="h-4 w-4 animate-spin text-white" />}
-                {authMode === "login"
-                  ? authLoading
-                    ? t.auth.loggingIn
-                    : t.auth.loginBtn
-                  : authLoading
-                  ? t.auth.creatingAccount
-                  : t.auth.createAccountBtn}
-              </button>
-            </form>
-
-            {/* Bottom Toggle */}
-            <p className="mt-5 text-center text-xs text-slate-500">
-              {authMode === "login" ? (
-                <>
-                  {t.auth.noAccount}{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode("signup");
-                      setAuthError(null);
-                      setSocialNotice(null);
-                    }}
-                    className="font-semibold hover:underline cursor-pointer"
-                    style={{ color: "#f59e0b" }}
-                  >
-                    {t.auth.signUpFree}
-                  </button>
-                </>
-              ) : (
-                <>
-                  {t.auth.haveAccount}{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode("login");
-                      setAuthError(null);
-                      setSocialNotice(null);
-                    }}
-                    className="font-semibold hover:underline cursor-pointer"
-                    style={{ color: "#f59e0b" }}
-                  >
-                    {t.auth.logInLink}
-                  </button>
-                </>
-              )}
-            </p>
-          </div>
-        </div>
+        <AuthModal
+          isOpen={isAuthOpen}
+          initialMode={authMode}
+          onClose={() => setIsAuthOpen(false)}
+          onSuccess={(user) => setCurrentUser(user)}
+        />
       )}
 
       {/* ═══════════════════════════════════════════════════════ TOUR RESERVATION MODAL */}
       {bookingModalTour && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setBookingModalTour(null);
-          }}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="relative w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl bg-white border border-slate-200 animate-scale-up">
-            <button
-              onClick={() => setBookingModalTour(null)}
-              className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
-            {bookingSuccess ? (
-              <div className="text-center py-6">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4">
-                  <Check className="h-8 w-8" />
-                </div>
-                <h3 className="font-display text-xl font-bold text-slate-900 mb-2">{t.bookingModal.confirmedTitle}</h3>
-                {confirmedResNumber && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-mono font-bold mb-3">
-                    <span>{t.bookingModal.referenceLabel}</span>
-                    <span>{confirmedResNumber}</span>
-                  </div>
-                )}
-                <p className="text-xs text-slate-600 mb-6 leading-relaxed">
-                  {t.bookingModal.thankYouPart1} <strong>{bookingName}</strong>. {t.bookingModal.thankYouPart2} <strong>{bookingModalTour.title}</strong> ({bookingDate}). {t.bookingModal.thankYouPart3}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setBookingModalTour(null);
-                    setBookingSuccess(false);
-                    setConfirmedResNumber(null);
-                  }}
-                  className="rounded-xl px-6 py-2.5 text-xs font-bold text-white shadow-md cursor-pointer"
-                  style={{ backgroundColor: "#0f3460" }}
-                >
-                  {t.bookingModal.doneBtn}
-                </button>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
-                    {t.bookingModal.badge}
-                  </span>
-                </div>
-                <h3 className="font-display text-xl font-bold text-slate-900 mb-1">
-                  {getLocalizedTour(bookingModalTour, language).title}
-                </h3>
-                <p className="text-xs text-slate-500 mb-5">
-                  {t.bookingModal.subtitle}
-                </p>
-
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (!bookingDate || !bookingName.trim() || !bookingPhone.trim()) {
-                      showToast(t.bookingModal.fillAllFields, "warning");
-                      return;
-                    }
-                    setBookingSubmitting(true);
-                    try {
-                      const res = await fetch("/api/tours/reserve", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          tourId: bookingModalTour.id,
-                          tourTitle: bookingModalTour.title,
-                          tourDate: bookingDate,
-                          guests: bookingGuests,
-                          travelerName: bookingName,
-                          phoneNumber: bookingPhone,
-                          price: bookingModalTour.price,
-                        }),
-                      });
-                      const data = await res.json();
-                      if (data.success) {
-                        setConfirmedResNumber(data.reservationNumber);
-                        setBookingSuccess(true);
-                        showToast(t.bookingModal.reservationSuccess, "success");
-                      } else {
-                        showToast(data.error || "Failed to submit reservation", "error");
-                      }
-                    } catch (err) {
-                      showToast(t.bookingModal.networkError, "error");
-                    } finally {
-                      setBookingSubmitting(false);
-                    }
-                  }}
-                  className="space-y-3.5"
-                >
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      {t.bookingModal.dateLabel}
-                    </label>
-                    <DatePicker
-                      required
-                      minDate={new Date().toISOString().split("T")[0]}
-                      value={bookingDate}
-                      placeholder={t.bookingModal.dateLabel}
-                      onChange={(val) => setBookingDate(val)}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      {t.bookingModal.guestsLabel}
-                    </label>
-                    <CustomSelect
-                      value={bookingGuests}
-                      onChange={(val) => setBookingGuests(Number(val))}
-                      options={[1, 2, 3, 4, 5, 6, 7, 8, t.bookingModal.customGroup].map((n) => ({
-                        value: typeof n === "number" ? n : 9,
-                        label: typeof n === "number" ? `${n} ${n === 1 ? t.bookingModal.guest : t.bookingModal.guests}` : String(n),
-                      }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      {t.bookingModal.nameLabel}
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder={t.bookingModal.namePlaceholder}
-                      value={bookingName}
-                      onChange={(e) => setBookingName(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      {t.bookingModal.phoneLabel}
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder={t.bookingModal.phonePlaceholder}
-                      value={bookingPhone}
-                      onChange={(e) => setBookingPhone(e.target.value)}
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
-                    />
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
-                    <div className="flex justify-between font-medium">
-                      <span>{t.bookingModal.ratePerGroup}</span>
-                      <span className="font-bold text-slate-900">{formatPrice(bookingModalTour.price)}</span>
-                    </div>
-                    {formatPriceWithSubtext(bookingModalTour.price).secondary && (
-                      <div className="flex justify-between text-[11px] text-slate-400">
-                        <span>{t.bookingModal.approxLocal}</span>
-                        <span>{formatPriceWithSubtext(bookingModalTour.price).secondary}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={bookingSubmitting}
-                    className="w-full rounded-xl py-3 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:opacity-95 cursor-pointer mt-2 disabled:opacity-50"
-                    style={{ backgroundColor: "#0f3460" }}
-                  >
-                    {bookingSubmitting ? t.bookingModal.submittingBtn : t.bookingModal.submitBtn}
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-        </div>
+        <TourReservationModal
+          tour={bookingModalTour}
+          onClose={() => setBookingModalTour(null)}
+        />
       )}
 
     </div>

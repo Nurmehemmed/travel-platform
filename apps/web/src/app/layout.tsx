@@ -1,12 +1,26 @@
 import type { Metadata, Viewport } from "next";
+import { Outfit, Fraunces } from "next/font/google";
 import "@travel/ui/styles";
-import FloatingTravelServices from "@/components/FloatingTravelServices";
-import FloatingCustomItinerary from "@/components/FloatingCustomItinerary";
-import { CookieConsent } from "@/components/CookieConsent";
 import { LanguageProvider } from "@/lib/i18n";
 import { SettingsProvider } from "@/lib/settings-context";
 import { CurrencyProvider } from "@/lib/currency-context";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import FloatingWidgetsContainer from "@/components/FloatingWidgetsContainer";
+
+// ─── Font Optimization via Next.js Font Engine (Zero render-blocking requests) ───
+const outfit = Outfit({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  variable: "--font-body",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700", "800"],
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -263,23 +277,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="font-body"
+      className={`${outfit.variable} ${fraunces.variable} font-body`}
       suppressHydrationWarning
     >
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="preload"
-          as="style"
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,400..800&display=swap"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,400..800&display=swap"
-        />
         <link rel="icon" href="/icon.svg?v=5" type="image/svg+xml" />
         <link rel="alternate icon" href="/favicon.ico?v=5" />
         <link rel="apple-touch-icon" href="/icon.svg?v=5" />
@@ -297,9 +300,7 @@ export default function RootLayout({
           <LanguageProvider>
             <CurrencyProvider>
               {children}
-              <FloatingCustomItinerary />
-              <FloatingTravelServices />
-              <CookieConsent />
+              <FloatingWidgetsContainer />
             </CurrencyProvider>
           </LanguageProvider>
         </SettingsProvider>
