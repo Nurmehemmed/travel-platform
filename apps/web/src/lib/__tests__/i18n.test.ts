@@ -5,6 +5,7 @@ import {
   VISA_PAGE_TRANSLATIONS,
   NAV_EXTRA_TRANSLATIONS,
 } from "../pages-i18n";
+import { ADMIN_TRANSLATIONS, getAdminTranslations } from "../admin-i18n";
 
 describe("Internationalization (i18n) Engine", () => {
   const supportedCodes: LanguageCode[] = ["EN", "AZ", "RU", "FR", "AR", "DE"];
@@ -54,5 +55,22 @@ describe("Internationalization (i18n) Engine", () => {
       expect(dict.trackTransfer).toBeTruthy();
       expect(dict.applyVisa).toBeTruthy();
     }
+  });
+
+  it("provides complete Admin translations for English and Azerbaijani", () => {
+    const en = getAdminTranslations("EN");
+    const az = getAdminTranslations("AZ");
+
+    expect(en.sidebar.overview).toBe("Overview");
+    expect(az.sidebar.overview).toBe("Ümumi Baxış");
+
+    expect(en.headers.visas).toContain("e-Visa");
+    expect(az.headers.visas).toContain("e-Viza");
+
+    expect(en.stats.totalRevenue).toBe("Total Revenue");
+    expect(az.stats.totalRevenue).toBe("Ümumi Gəlir");
+
+    expect(ADMIN_TRANSLATIONS.EN).toBeDefined();
+    expect(ADMIN_TRANSLATIONS.AZ).toBeDefined();
   });
 });

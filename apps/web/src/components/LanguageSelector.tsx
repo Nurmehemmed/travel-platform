@@ -7,15 +7,26 @@ import { useLanguage, LanguageCode } from "@/lib/i18n";
 interface LanguageSelectorProps {
   variant?: "dark" | "light";
   className?: string;
+  allowedLanguages?: LanguageCode[];
 }
 
 export function LanguageSelector({
   variant = "dark",
   className = "",
+  allowedLanguages,
 }: LanguageSelectorProps) {
   const { language, setLanguage, currentLangInfo, languages, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const availableLanguages = allowedLanguages
+    ? languages.filter((l) => allowedLanguages.includes(l.code))
+    : languages;
+
+  const displayLangInfo =
+    allowedLanguages && !allowedLanguages.includes(language)
+      ? availableLanguages[0] || currentLangInfo
+      : currentLangInfo;
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -51,8 +62,8 @@ export function LanguageSelector({
         aria-haspopup="true"
         title={t.nav.language}
       >
-        <span className="text-sm leading-none">{currentLangInfo.flag}</span>
-        <span className="tracking-wider">{currentLangInfo.code}</span>
+        <span className="text-sm leading-none">{displayLangInfo.flag}</span>
+        <span className="tracking-wider">{displayLangInfo.code}</span>
         <ChevronDown
           className={`h-3 w-3 transition-transform duration-200 opacity-70 ${
             isOpen ? "rotate-180" : ""
@@ -72,8 +83,8 @@ export function LanguageSelector({
           <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
             {t.nav.selectLanguage}
           </div>
-          {languages.map((lang) => {
-            const isSelected = language === lang.code;
+          {availableLanguages.map((lang) => {
+            const isSelected = (allowedLanguages && !allowedLanguages.includes(language) ? displayLangInfo.code : language) === lang.code;
             return (
               <button
                 key={lang.code}

@@ -44,6 +44,9 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { StatsCardsSkeleton, TableSkeleton } from "@/components/Skeletons";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useLanguage } from "@/lib/i18n";
+import { getAdminTranslations } from "@/lib/admin-i18n";
 
 interface AuditLogItem {
   id: string;
@@ -213,6 +216,8 @@ interface SiteSettingItem {
 type TabType = "overview" | "tours" | "bookings" | "users" | "destinations" | "visas" | "transfers" | "audit" | "settings";
 
 export default function AdminPortalPage() {
+  const { language } = useLanguage();
+  const adminT = getAdminTranslations(language);
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -920,60 +925,61 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
       >
         <div>
           {/* Brand Header */}
-          <div className="p-6 border-b border-white/10">
-            <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="p-6 border-b border-white/10 flex items-center justify-between gap-2">
+            <Link href="/" className="flex items-center gap-2.5 group min-w-0">
               <div
-                className="flex h-9 w-9 items-center justify-center rounded-full shadow-md"
+                className="flex h-9 w-9 items-center justify-center rounded-full shadow-md shrink-0"
                 style={{ backgroundColor: "#f59e0b" }}
               >
                 <MapPin className="h-5 w-5 text-white" strokeWidth={2.5} />
               </div>
-              <div>
+              <div className="truncate">
                 <span className="font-bold text-lg tracking-tight block text-[#f59e0b] leading-tight">
                   addmetour
                 </span>
                 <span className="text-[10px] uppercase tracking-widest text-white/60 font-semibold">
-                  Admin Portal
+                  {adminT.sidebar.brandSubtitle}
                 </span>
               </div>
             </Link>
+            <LanguageSelector variant="dark" allowedLanguages={["EN", "AZ"]} />
           </div>
 
           {/* Navigation Links */}
           <nav className="p-4 space-y-1.5">
             {[
-              { id: "overview", label: "Overview", icon: LayoutDashboard },
-              { id: "tours", label: "Tours & Packages", icon: Compass, count: tours.length },
+              { id: "overview", label: adminT.sidebar.overview, icon: LayoutDashboard },
+              { id: "tours", label: adminT.sidebar.tours, icon: Compass, count: tours.length },
               {
                 id: "bookings",
-                label: "Bookings",
+                label: adminT.sidebar.bookings,
                 icon: CalendarCheck,
-                badge: stats.pendingBookings > 0 ? `${stats.pendingBookings} New` : undefined,
+                badge: stats.pendingBookings > 0 ? `${stats.pendingBookings} ${adminT.sidebar.newBadge}` : undefined,
               },
               {
                 id: "visas",
-                label: "e-Visa Processing",
+                label: adminT.sidebar.visas,
                 icon: FileText,
                 badge:
                   visasList.filter((v) => v.status === "received").length > 0
-                    ? `${visasList.filter((v) => v.status === "received").length} New`
+                    ? `${visasList.filter((v) => v.status === "received").length} ${adminT.sidebar.newBadge}`
                     : undefined,
                 count: visasList.length,
               },
               {
                 id: "transfers",
-                label: "Airport Transfers",
+                label: adminT.sidebar.transfers,
                 icon: Car,
                 badge:
                   transfersList.filter((t) => t.status === "pending").length > 0
-                    ? `${transfersList.filter((t) => t.status === "pending").length} New`
+                    ? `${transfersList.filter((t) => t.status === "pending").length} ${adminT.sidebar.newBadge}`
                     : undefined,
                 count: transfersList.length,
               },
-              { id: "users", label: "Users & Staff", icon: Users, count: usersList.length },
-              { id: "destinations", label: "Destinations", icon: MapPin, count: destinationsList.length },
-              { id: "audit", label: "Audit Trail", icon: ScrollText, count: auditLogs.length > 0 ? auditLogs.length : undefined },
-              { id: "settings", label: "Site Settings", icon: Sliders },
+              { id: "users", label: adminT.sidebar.users, icon: Users, count: usersList.length },
+              { id: "destinations", label: adminT.sidebar.destinations, icon: MapPin, count: destinationsList.length },
+              { id: "audit", label: adminT.sidebar.audit, icon: ScrollText, count: auditLogs.length > 0 ? auditLogs.length : undefined },
+              { id: "settings", label: adminT.sidebar.settings, icon: Sliders },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -1022,10 +1028,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               ADM
             </div>
             <div className="truncate">
-              <p className="text-xs font-semibold text-white truncate">Admin Team</p>
+              <p className="text-xs font-semibold text-white truncate">{adminT.sidebar.adminTeam}</p>
               <p className="text-[10px] text-emerald-400 flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
-                Live on Neon DB
+                {adminT.sidebar.liveDb}
               </p>
             </div>
           </div>
@@ -1035,7 +1041,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-medium text-white/80 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Live Site
+            {adminT.sidebar.backToSite}
           </Link>
 
           <button
@@ -1050,7 +1056,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium text-rose-300 hover:text-rose-100 bg-rose-500/10 hover:bg-rose-500/20 transition-colors cursor-pointer"
           >
             <LogOut className="h-3.5 w-3.5" />
-            Sign Out
+            {adminT.sidebar.signOut}
           </button>
         </div>
       </aside>
@@ -1064,19 +1070,21 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
         >
           <div className="flex items-center gap-3">
             <h1 className="text-lg font-bold text-slate-900 capitalize font-display">
-              {activeTab === "overview" && "Dashboard Overview"}
-              {activeTab === "tours" && "Tours & Experiences Management"}
-              {activeTab === "bookings" && "Customer Bookings & Reservations"}
-              {activeTab === "visas" && "e-Visa Operations & Fulfillment Queue"}
-              {activeTab === "transfers" && "Airport Transfer Dispatch & Chauffeur Management"}
-              {activeTab === "users" && "User & Staff Directory"}
-              {activeTab === "destinations" && "Destinations & Regions"}
-              {activeTab === "audit" && "System Audit Trail & Security Logs"}
-              {activeTab === "settings" && "Platform Settings & Operations Control"}
+              {activeTab === "overview" && adminT.headers.overview}
+              {activeTab === "tours" && adminT.headers.tours}
+              {activeTab === "bookings" && adminT.headers.bookings}
+              {activeTab === "visas" && adminT.headers.visas}
+              {activeTab === "transfers" && adminT.headers.transfers}
+              {activeTab === "users" && adminT.headers.users}
+              {activeTab === "destinations" && adminT.headers.destinations}
+              {activeTab === "audit" && adminT.headers.audit}
+              {activeTab === "settings" && adminT.headers.settings}
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageSelector variant="light" allowedLanguages={["EN", "AZ"]} />
+
             {activeTab === "settings" && (
               <button
                 onClick={handleSaveSettings}
@@ -1085,7 +1093,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 style={{ backgroundColor: "#0f3460" }}
               >
                 <Save className={`h-3.5 w-3.5 text-[#f59e0b] ${settingsSaving ? "animate-spin" : ""}`} />
-                {settingsSaving ? "Saving Settings..." : "Save All Settings"}
+                {settingsSaving ? adminT.actions.savingSettings : adminT.actions.saveSettings}
               </button>
             )}
 
@@ -1095,7 +1103,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm cursor-pointer disabled:opacity-70"
             >
               <RefreshCw className={`h-3.5 w-3.5 text-[#f59e0b] ${refreshing ? "animate-spin" : ""}`} />
-              <span>{refreshing ? "Refreshing..." : "Refresh Data"}</span>
+              <span>{refreshing ? adminT.actions.refreshing : adminT.actions.refreshData}</span>
             </button>
 
             {activeTab === "visas" && (
@@ -1107,7 +1115,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 style={{ backgroundColor: "#0f3460" }}
               >
                 <ExternalLink className="h-3.5 w-3.5 text-[#f59e0b]" />
-                Open Official evisa.gov.az
+                {adminT.actions.openEvisaGov}
               </a>
             )}
 
@@ -1118,7 +1126,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 style={{ backgroundColor: "#0f3460" }}
               >
                 <Plus className="h-4 w-4 text-[#f59e0b]" />
-                Add Destination
+                {adminT.actions.addDestination}
               </button>
             )}
 
@@ -1129,7 +1137,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 style={{ backgroundColor: "#0f3460" }}
               >
                 <Plus className="h-4 w-4 text-[#f59e0b]" />
-                Add New Tour
+                {adminT.actions.addNewTour}
               </button>
             )}
           </div>
@@ -1163,7 +1171,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      Total Revenue
+                      {adminT.stats.totalRevenue}
                     </span>
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
                       <DollarSign className="h-4 w-4" />
@@ -1174,7 +1182,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       ${stats.totalRevenue.toFixed(2)}
                     </h3>
                     <p className="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3" /> From confirmed bookings
+                      <TrendingUp className="h-3 w-3" /> {adminT.stats.allTimeGross}
                     </p>
                   </div>
                 </div>
@@ -1185,7 +1193,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      Total Bookings
+                      {adminT.stats.totalBookings}
                     </span>
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600">
                       <CalendarCheck className="h-4 w-4" />
@@ -1195,7 +1203,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     <h3 className="text-2xl font-bold text-slate-900 font-display">
                       {stats.totalBookings}
                     </h3>
-                    <p className="text-[11px] text-slate-500 mt-1">Across all travel seasons</p>
+                    <p className="text-[11px] text-slate-500 mt-1">{adminT.stats.confirmedPending}</p>
                   </div>
                 </div>
 
@@ -1205,7 +1213,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      Pending Action
+                      {adminT.stats.pendingBookings}
                     </span>
                     <div
                       className="flex h-8 w-8 items-center justify-center rounded-full"
@@ -1227,7 +1235,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                         stats.pendingBookings > 0 ? "text-amber-600" : "text-slate-500"
                       }`}
                     >
-                      {stats.pendingBookings > 0 ? "Needs employer confirmation" : "All up to date"}
+                      {stats.pendingBookings > 0 ? adminT.stats.needsReview : adminT.status.completed}
                     </p>
                   </div>
                 </div>
@@ -1238,7 +1246,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      Active Tours
+                      {adminT.stats.activeTours}
                     </span>
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-50 text-purple-600">
                       <Compass className="h-4 w-4" />
@@ -1249,7 +1257,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       {stats.activeTours} / {tours.length}
                     </h3>
                     <p className="text-[11px] text-purple-600 font-semibold mt-1">
-                      Published on site
+                      {adminT.stats.liveInCatalog}
                     </p>
                   </div>
                 </div>
@@ -1841,9 +1849,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Destinations</span>
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{adminT.stats.totalDestinations}</span>
                     <p className="text-2xl font-bold font-display text-slate-900 mt-1">{destinationsList.length}</p>
-                    <span className="text-[11px] text-slate-400 mt-0.5 block">Cataloged regions</span>
+                    <span className="text-[11px] text-slate-400 mt-0.5 block">{adminT.stats.catalogedRegions}</span>
                   </div>
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-50 text-sky-600 border border-sky-100">
                     <MapPin className="h-5 w-5" />
@@ -1852,7 +1860,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider">Azerbaijan Regions</span>
+                    <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider">{adminT.stats.azerbaijanRegions}</span>
                     <p className="text-2xl font-bold font-display text-amber-600 mt-1">
                       {destinationsList.filter((d) => d.country?.toLowerCase().includes("azerbaijan")).length}
                     </p>
@@ -1865,11 +1873,11 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">Linked Tours</span>
+                    <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider">{adminT.stats.linkedTours}</span>
                     <p className="text-2xl font-bold font-display text-emerald-600 mt-1">
                       {destinationsList.reduce((acc, d) => acc + (d.tourCount || 0), 0)}
                     </p>
-                    <span className="text-[11px] text-emerald-600/70 mt-0.5 block">Active tour packages</span>
+                    <span className="text-[11px] text-emerald-600/70 mt-0.5 block">{adminT.stats.activeTourPackages}</span>
                   </div>
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
                     <Compass className="h-5 w-5" />
@@ -1878,7 +1886,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider">Top Destination</span>
+                    <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider">{adminT.stats.topDestination}</span>
                     <p className="text-lg font-bold font-display text-indigo-900 mt-1 truncate max-w-[150px]">
                       {destinationsList.length > 0
                         ? [...destinationsList].sort((a, b) => (b.tourCount || 0) - (a.tourCount || 0))[0]?.name || "Baku"
