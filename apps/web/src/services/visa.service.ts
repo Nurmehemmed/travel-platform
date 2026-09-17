@@ -159,7 +159,7 @@ export class VisaService {
             payriffOrderId: payriffOrder.orderId,
             clientIp: input.clientIp,
           },
-        });
+        }, tx);
       }
 
       return row;

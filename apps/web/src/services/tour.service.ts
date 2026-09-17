@@ -177,7 +177,7 @@ export class TourService {
             verifiedPrice: validation.trustedUnitPrice,
             clientIp: input.clientIp,
           },
-        });
+        }, tx);
       }
 
       return inserted;

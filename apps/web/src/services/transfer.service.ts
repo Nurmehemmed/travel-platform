@@ -234,7 +234,7 @@ export class TransferService {
           hasPayriffOrder: !!payriffResult?.orderId,
           clientIp: input.clientIp,
         },
-      });
+      }, tx);
     });
 
     logger.info("transfer_booked", {

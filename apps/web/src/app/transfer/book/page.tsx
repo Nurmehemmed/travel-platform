@@ -261,6 +261,7 @@ function TransferBookForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(15000),
       });
 
       const data = await res.json();
@@ -276,8 +277,11 @@ function TransferBookForm() {
       }
 
       // If on-arrival or custom quote, redirect to tracking confirmation page
-      router.push(`/transfer/track?ref=${encodeURIComponent(data.bookingNumber)}&confirmed=true`);
-
+      const trackTarget =
+        data.trackUrl ||
+        `/transfer/track?ref=${encodeURIComponent(data.bookingNumber)}&email=${encodeURIComponent(payload.email)}&confirmed=true`;
+      window.location.href = trackTarget;
+      return;
     } catch (err: any) {
       console.error("Booking error:", err);
       const msg = err?.message || "An unexpected error occurred. Please try again.";

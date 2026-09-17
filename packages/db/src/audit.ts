@@ -16,15 +16,16 @@ export interface CreateAuditLogParams {
  * Record an audit log event into Neon Postgres.
  * Designed to fail gracefully without disrupting the primary business transaction.
  */
-export async function recordAuditLog(params: CreateAuditLogParams) {
+export async function recordAuditLog(params: CreateAuditLogParams, tx?: any) {
   try {
+    const client = tx || db;
     const role = params.actorRole || params.actorType || "system";
     const combinedMetadata = {
       ...(params.metadata || {}),
       ...(params.ipAddress ? { ipAddress: params.ipAddress } : {}),
     };
 
-    const [entry] = await db
+    const [entry] = await client
       .insert(auditLogs)
       .values({
         entityType: params.entityType,

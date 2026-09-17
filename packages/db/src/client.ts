@@ -19,18 +19,18 @@ const globalForDb = globalThis as unknown as {
   conn?: postgres.Sql;
 };
 
-// `max: 1` is safe for serverless Lambdas.
+// `max: 5` provides headroom for concurrent queries and transactions in serverless environments.
+const maxConnections = process.env.DB_MAX_CONNECTIONS ? Number(process.env.DB_MAX_CONNECTIONS) : 5;
+
 const queryClient =
   globalForDb.conn ??
   postgres(connectionString, {
-    max: 1,
+    max: maxConnections,
     idle_timeout: 20,
-    connect_timeout: 10,
+    connect_timeout: 8,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.conn = queryClient;
-}
+globalForDb.conn = queryClient;
 
 export const db = drizzle(queryClient, { schema });
 export type Database = typeof db;

@@ -137,7 +137,7 @@ export class ItineraryService {
             estimatedPriceUSD: priceUsd,
             clientIp: input.clientIp,
           },
-        });
+        }, tx);
       }
 
       return inserted;
