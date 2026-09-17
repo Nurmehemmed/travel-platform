@@ -256,24 +256,9 @@ export default function HomePage() {
   const [savedTourIds, setSavedTourIds] = useState<string[]>([]);
   const [bookingModalTour, setBookingModalTour] = useState<{ id: string; title: string; price: number } | null>(null);
 
-  // Auth state with synchronous local cache hydration to eliminate header flicker
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem("addmetour_user_session");
-        if (cached) {
-          return JSON.parse(cached);
-        }
-      } catch {}
-    }
-    return null;
-  });
-  const [authChecking, setAuthChecking] = useState(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("addmetour_user_session")) {
-      return false;
-    }
-    return true;
-  });
+  // Auth state - initialized safely for SSR hydration without mismatch error #418
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [authChecking, setAuthChecking] = useState(true);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -286,13 +271,25 @@ export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { currency, setCurrency, activeCurrency, currencies, formatPrice, formatPriceWithSubtext } = useCurrency();
 
-  // Immediate Auth Validation Effect (runs right away, not delayed by requestIdleCallback)
+  // Hydrate local cache on mount and validate session immediately
   useEffect(() => {
-    let isMounted = true;
+    setMounted(true);
+
+    // 1. Immediately hydrate cached user session synchronously on client mount
+    try {
+      const cached = localStorage.getItem("addmetour_user_session");
+      if (cached) {
+        setCurrentUser(JSON.parse(cached));
+        setAuthChecking(false);
+      }
+    } catch {}
+
+    // 2. Validate session against server in parallel
+    let isSubscribed = true;
     fetch("/api/auth/me", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (!isMounted) return;
+        if (!isSubscribed) return;
         if (data?.user) {
           setCurrentUser(data.user);
           try {
@@ -309,11 +306,11 @@ export default function HomePage() {
         // Keep cached state on transient network glitch
       })
       .finally(() => {
-        if (isMounted) setAuthChecking(false);
+        if (isSubscribed) setAuthChecking(false);
       });
 
     return () => {
-      isMounted = false;
+      isSubscribed = false;
     };
   }, []);
 
@@ -692,7 +689,7 @@ export default function HomePage() {
           </nav>
 
           {/* Right side — always shrink-0 so controls stay visible */}
-          <div className="flex items-center gap-1.5 sm:gap-2 relative shrink-0">
+          <div suppressHydrationWarning className="flex items-center gap-1.5 sm:gap-2 relative shrink-0">
             {/* Interactive Language & Currency Selectors (Desktop Navbar only; on mobile, cleanly accessible in drawer) */}
             <div className="hidden xl:flex items-center gap-1.5 sm:gap-2">
               <LanguageSelector variant="dark" />
@@ -725,7 +722,9 @@ export default function HomePage() {
               )}
             </button>
 
-            {currentUser ? (
+            {!mounted ? (
+              <div className="hidden sm:block h-8 w-24 rounded-full bg-white/5 shrink-0" />
+            ) : currentUser ? (
               <div id="user-dropdown-container" className="relative shrink-0 animate-fade-in">
                 <button
                   onClick={() => {
@@ -858,7 +857,7 @@ export default function HomePage() {
 
         {/* Mobile slide-down navigation drawer */}
         {mobileMenuOpen && (
-          <div dir={isRtl ? "rtl" : "ltr"} className="xl:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
+          <div suppressHydrationWarning dir={isRtl ? "rtl" : "ltr"} className="xl:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
             <div className="flex flex-col space-y-1">
               {[
                 { label: t.nav.tours, href: "#tours" },
