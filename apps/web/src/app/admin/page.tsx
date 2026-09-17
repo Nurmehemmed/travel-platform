@@ -925,8 +925,8 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
       >
         <div>
           {/* Brand Header */}
-          <div className="p-6 border-b border-white/10 flex items-center justify-between gap-2">
-            <Link href="/" className="flex items-center gap-2.5 group min-w-0">
+          <div className="p-6 border-b border-white/10">
+            <Link href="/" className="flex items-center gap-2.5 group">
               <div
                 className="flex h-9 w-9 items-center justify-center rounded-full shadow-md shrink-0"
                 style={{ backgroundColor: "#f59e0b" }}
@@ -942,7 +942,6 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </span>
               </div>
             </Link>
-            <LanguageSelector variant="dark" allowedLanguages={["EN", "AZ"]} />
           </div>
 
           {/* Navigation Links */}
@@ -1271,17 +1270,17 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between">
                   <div>
                     <h2 className="font-bold text-base text-slate-900 font-display">
-                      Recent Customer Bookings
+                      {adminT.overviewTab.title}
                     </h2>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Live reservation requests from travelers
+                      {adminT.overviewTab.subtitle}
                     </p>
                   </div>
                   <button
                     onClick={() => setActiveTab("bookings")}
                     className="text-xs font-semibold text-[#f59e0b] hover:underline cursor-pointer"
                   >
-                    View all bookings →
+                    {adminT.overviewTab.viewAll}
                   </button>
                 </div>
 
@@ -1289,33 +1288,33 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
                       <tr>
-                        <th className="px-6 py-3.5">Customer</th>
-                        <th className="px-6 py-3.5">Tour Experience</th>
-                        <th className="px-6 py-3.5">Guests</th>
-                        <th className="px-6 py-3.5">Total</th>
-                        <th className="px-6 py-3.5">Status</th>
-                        <th className="px-6 py-3.5 text-right">Action</th>
+                        <th className="px-6 py-3.5">{adminT.overviewTab.colCustomer}</th>
+                        <th className="px-6 py-3.5">{adminT.overviewTab.colTour}</th>
+                        <th className="px-6 py-3.5">{adminT.overviewTab.colGuests}</th>
+                        <th className="px-6 py-3.5">{adminT.overviewTab.colTotal}</th>
+                        <th className="px-6 py-3.5">{adminT.overviewTab.colStatus}</th>
+                        <th className="px-6 py-3.5 text-right">{adminT.overviewTab.colAction}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {recentBookings.length === 0 ? (
                         <tr>
                           <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
-                            No recent bookings found.
+                            {adminT.overviewTab.noBookings}
                           </td>
                         </tr>
                       ) : (
                         recentBookings.map((b) => (
                           <tr key={b.id} className="hover:bg-slate-50/60 transition-colors">
                             <td className="px-6 py-4">
-                              <p className="font-bold text-slate-900">{b.userName || "Guest"}</p>
+                              <p className="font-bold text-slate-900">{b.userName || adminT.overviewTab.guest}</p>
                               <p className="text-[11px] text-slate-500">{b.userEmail}</p>
                             </td>
                             <td className="px-6 py-4 font-medium text-slate-800 max-w-[220px] truncate">
-                              {b.tourTitle || "Custom Tour"}
+                              {b.tourTitle || adminT.overviewTab.customTour}
                             </td>
                             <td className="px-6 py-4 text-slate-600">
-                              {b.travelerCount} {b.travelerCount > 1 ? "Travelers" : "Traveler"}
+                              {b.travelerCount} {b.travelerCount > 1 ? adminT.overviewTab.travelerPlural : adminT.overviewTab.travelerSingular}
                             </td>
                             <td className="px-6 py-4 font-bold text-slate-900">
                               ${parseFloat(b.totalPrice).toFixed(2)}
@@ -1330,7 +1329,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                     : "bg-red-100 text-red-800"
                                 }`}
                               >
-                                {b.status}
+                                {adminT.status[b.status as keyof typeof adminT.status] || b.status}
                               </span>
                             </td>
                             <td className="px-6 py-4 text-right">
@@ -1339,7 +1338,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   onClick={() => handleUpdateBookingStatus(b.id, "confirmed")}
                                   className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors cursor-pointer"
                                 >
-                                  Confirm
+                                  {adminT.overviewTab.confirm}
                                 </button>
                               ) : (
                                 <span className="text-slate-400 text-[11px]">—</span>
@@ -1364,10 +1363,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-bold text-base text-slate-900 font-display">
-                    All Tours & Experiences ({tours.length})
+                    {adminT.toursTab.title} ({tours.length})
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Manage tour catalog, pricing, durations, and public visibility
+                    {adminT.toursTab.subtitle}
                   </p>
                 </div>
 
@@ -1376,7 +1375,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search tours..."
+                      placeholder={adminT.toursTab.searchPlaceholder}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-8 pr-4 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-[#0f3460]"
@@ -1389,13 +1388,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-3.5">Tour Details</th>
-                      <th className="px-6 py-3.5">Destination</th>
-                      <th className="px-6 py-3.5">Duration</th>
-                      <th className="px-6 py-3.5">Pricing</th>
-                      <th className="px-6 py-3.5">Rating</th>
-                      <th className="px-6 py-3.5">Site Visibility</th>
-                      <th className="px-6 py-3.5 text-right">Actions</th>
+                      <th className="px-6 py-3.5">{adminT.toursTab.colDetails}</th>
+                      <th className="px-6 py-3.5">{adminT.toursTab.colDestination}</th>
+                      <th className="px-6 py-3.5">{adminT.toursTab.colDuration}</th>
+                      <th className="px-6 py-3.5">{adminT.toursTab.colPricing}</th>
+                      <th className="px-6 py-3.5">{adminT.toursTab.colRating}</th>
+                      <th className="px-6 py-3.5">{adminT.toursTab.colVisibility}</th>
+                      <th className="px-6 py-3.5 text-right">{adminT.toursTab.colActions}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1445,7 +1444,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             </span>
                           </td>
                           <td className="px-6 py-4 font-medium text-slate-600">
-                            {t.durationDays} {t.durationDays > 1 ? "Days" : "Day"}
+                            {t.durationDays} {t.durationDays > 1 ? adminT.toursTab.days : adminT.toursTab.daySingular}
                           </td>
                           <td className="px-6 py-4">
                             <p className="font-bold text-slate-900">
@@ -1477,14 +1476,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   t.isActive ? "bg-emerald-600" : "bg-slate-400"
                                 }`}
                               />
-                              {t.isActive ? "Active (Live)" : "Hidden"}
+                              {t.isActive ? adminT.toursTab.active : adminT.toursTab.inactive}
                             </button>
                           </td>
                           <td className="px-6 py-4 text-right">
                             <button
                               onClick={() => handleDeleteTour(t.id)}
                               className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                              title="Delete Tour"
+                              title={adminT.toursTab.delete}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -1509,14 +1508,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div>
                     <div className="flex items-center gap-2">
                       <h2 className="font-bold text-base text-slate-900 font-display">
-                        Direct Tour Date Reservations ({tourReservationsList.length})
+                        {language === "AZ" ? `Birbaşa Tur Rezervasiyaları (${tourReservationsList.length})` : `Direct Tour Date Reservations (${tourReservationsList.length})`}
                       </h2>
                       <span className="rounded-full px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-900 uppercase tracking-wider">
-                        Homepage Inquiries
+                        {language === "AZ" ? "Əsas Səhifə Sorğuları" : "Homepage Inquiries"}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Direct inquiries submitted from landing page — assign licensed guides and chauffeurs
+                      {language === "AZ" ? "Əsas səhifədən daxil olan birbaşa rezervasiya sorğuları — lisenziyalı bələdçi və sürücü təyin edin" : "Direct inquiries submitted from landing page — assign licensed guides and chauffeurs"}
                     </p>
                   </div>
 
@@ -1531,7 +1530,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                         }`}
                       >
-                        {st}
+                        {st === "all" ? adminT.actions.filterAll : adminT.status[st as keyof typeof adminT.status] || st}
                       </button>
                     ))}
                   </div>
@@ -1541,13 +1540,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
                       <tr>
-                        <th className="px-5 py-3.5">Ref & Date</th>
-                        <th className="px-5 py-3.5">Experience</th>
-                        <th className="px-5 py-3.5">Lead Traveler</th>
-                        <th className="px-5 py-3.5">Price (~AZN)</th>
-                        <th className="px-5 py-3.5">Assigned Guide</th>
-                        <th className="px-5 py-3.5">Status</th>
-                        <th className="px-5 py-3.5 text-right">Actions</th>
+                        <th className="px-5 py-3.5">{language === "AZ" ? "Kod və Tarix" : "Ref & Date"}</th>
+                        <th className="px-5 py-3.5">{adminT.overviewTab.colTour}</th>
+                        <th className="px-5 py-3.5">{language === "AZ" ? "Əsas Səyahətçi" : "Lead Traveler"}</th>
+                        <th className="px-5 py-3.5">{language === "AZ" ? "Qiymət (~AZN)" : "Price (~AZN)"}</th>
+                        <th className="px-5 py-3.5">{language === "AZ" ? "Təyin Edilmiş Bələdçi" : "Assigned Guide"}</th>
+                        <th className="px-5 py-3.5">{adminT.overviewTab.colStatus}</th>
+                        <th className="px-5 py-3.5 text-right">{adminT.overviewTab.colAction}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -1570,7 +1569,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             <td className="px-5 py-4 font-semibold text-slate-800 max-w-[200px] truncate">
                               {r.tourTitle}
                               <span className="text-[11px] text-slate-400 block font-normal">
-                                {r.guests} {r.guests === 1 ? "Guest" : "Guests"}
+                                {r.guests} {r.guests === 1 ? adminT.overviewTab.travelerSingular : adminT.overviewTab.travelerPlural}
                               </span>
                             </td>
                             <td className="px-5 py-4">
@@ -1607,7 +1606,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 </div>
                               ) : (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                                  No Guide Assigned
+                                  {language === "AZ" ? "Bələdçi Təyin Edilməyib" : "No Guide Assigned"}
                                 </span>
                               )}
                             </td>
@@ -1623,7 +1622,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                     : "bg-red-100 text-red-800"
                                 }`}
                               >
-                                {r.status}
+                                {adminT.status[r.status as keyof typeof adminT.status] || r.status}
                               </span>
                             </td>
                             <td className="px-5 py-4 text-right">
@@ -1632,7 +1631,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
                                 style={{ backgroundColor: "#0f3460" }}
                               >
-                                Assign Guide / Manage
+                                {language === "AZ" ? "Bələdçi Təyin Et" : "Assign Guide / Manage"}
                               </button>
                             </td>
                           </tr>
@@ -1641,7 +1640,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   </table>
                   {tourReservationsList.length === 0 && (
                     <div className="py-10 text-center text-xs text-slate-500">
-                      No direct tour reservations received yet.
+                      {language === "AZ" ? "Hələ birbaşa rezervasiya daxil olmayıb." : "No direct tour reservations received yet."}
                     </div>
                   )}
                 </div>
@@ -1655,10 +1654,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h2 className="font-bold text-base text-slate-900 font-display">
-                      Registered Account Bookings ({bookingsList.length})
+                      {language === "AZ" ? `Qeydiyyatlı İstifadəçi Sifarişləri (${bookingsList.length})` : `Registered Account Bookings (${bookingsList.length})`}
                     </h2>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Bookings created by registered users through checkout slots
+                      {language === "AZ" ? "Qeydiyyatlı istifadəçilər tərəfindən yaradılan sifarişlər" : "Bookings created by registered users through checkout slots"}
                     </p>
                   </div>
 
@@ -1673,7 +1672,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                         }`}
                       >
-                        {st}
+                        {st === "all" ? adminT.actions.filterAll : adminT.status[st as keyof typeof adminT.status] || st}
                       </button>
                     ))}
                   </div>
@@ -1683,13 +1682,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
                       <tr>
-                        <th className="px-6 py-3.5">Booking ID</th>
-                        <th className="px-6 py-3.5">Customer</th>
-                        <th className="px-6 py-3.5">Tour Experience</th>
-                        <th className="px-6 py-3.5">Travelers</th>
-                        <th className="px-6 py-3.5">Amount</th>
-                        <th className="px-6 py-3.5">Status</th>
-                        <th className="px-6 py-3.5 text-right">Change Status</th>
+                        <th className="px-6 py-3.5">{language === "AZ" ? "Sifariş ID" : "Booking ID"}</th>
+                        <th className="px-6 py-3.5">{adminT.bookingsTab.colCustomer}</th>
+                        <th className="px-6 py-3.5">{adminT.bookingsTab.colTour}</th>
+                        <th className="px-6 py-3.5">{adminT.bookingsTab.colTravelers}</th>
+                        <th className="px-6 py-3.5">{adminT.bookingsTab.colTotal}</th>
+                        <th className="px-6 py-3.5">{adminT.bookingsTab.colStatus}</th>
+                        <th className="px-6 py-3.5 text-right">{language === "AZ" ? "Statusu Dəyiş" : "Change Status"}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -1705,14 +1704,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               #{b.id.slice(0, 8)}
                             </td>
                             <td className="px-6 py-4">
-                              <p className="font-bold text-slate-900">{b.userName || "Traveler"}</p>
+                              <p className="font-bold text-slate-900">{b.userName || adminT.overviewTab.guest}</p>
                               <p className="text-[11px] text-slate-500">{b.userEmail}</p>
                             </td>
                             <td className="px-6 py-4 font-medium text-slate-800 max-w-[200px] truncate">
-                              {b.tourTitle || "Custom Guided Tour"}
+                              {b.tourTitle || adminT.overviewTab.customTour}
                             </td>
                             <td className="px-6 py-4 text-slate-600">
-                              {b.travelerCount} Guests
+                              {b.travelerCount} {b.travelerCount > 1 ? adminT.overviewTab.travelerPlural : adminT.overviewTab.travelerSingular}
                             </td>
                             <td className="px-6 py-4 font-bold text-slate-900">
                               ${parseFloat(b.totalPrice).toFixed(2)}
@@ -1727,7 +1726,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                     : "bg-red-100 text-red-800"
                                 }`}
                               >
-                                {b.status}
+                                {adminT.status[b.status as keyof typeof adminT.status] || b.status}
                               </span>
                             </td>
                             <td className="px-6 py-4 text-right">
@@ -1736,10 +1735,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 onChange={(e) => handleUpdateBookingStatus(b.id, e.target.value)}
                                 className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#0f3460] cursor-pointer"
                               >
-                                <option value="pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
-                                <option value="cancelled">Cancelled</option>
-                                <option value="refunded">Refunded</option>
+                                <option value="pending">{adminT.status.pending}</option>
+                                <option value="confirmed">{adminT.status.confirmed}</option>
+                                <option value="cancelled">{adminT.status.cancelled}</option>
+                                <option value="refunded">{adminT.status.refunded}</option>
                               </select>
                             </td>
                           </tr>
@@ -1748,7 +1747,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   </table>
                   {bookingsList.length === 0 && (
                     <div className="py-10 text-center text-xs text-slate-500">
-                      No portal bookings recorded yet.
+                      {adminT.bookingsTab.noBookings}
                     </div>
                   )}
                 </div>
@@ -1765,10 +1764,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-bold text-base text-slate-900 font-display">
-                    User & Staff Directory ({usersList.length})
+                    {adminT.usersTab.title} ({usersList.length})
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    View registered users, employee roles, and booking engagement
+                    {adminT.usersTab.subtitle}
                   </p>
                 </div>
               </div>
@@ -1777,12 +1776,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-3.5">User</th>
-                      <th className="px-6 py-3.5">Email</th>
-                      <th className="px-6 py-3.5">Role</th>
-                      <th className="px-6 py-3.5">Bookings Placed</th>
-                      <th className="px-6 py-3.5">Joined Date</th>
-                      <th className="px-6 py-3.5 text-right">Assign Role</th>
+                      <th className="px-6 py-3.5">{adminT.usersTab.colUser}</th>
+                      <th className="px-6 py-3.5">{adminT.common.email}</th>
+                      <th className="px-6 py-3.5">{adminT.usersTab.colRole}</th>
+                      <th className="px-6 py-3.5">{language === "AZ" ? "Sifariş Sayı" : "Bookings Placed"}</th>
+                      <th className="px-6 py-3.5">{adminT.usersTab.colCreated}</th>
+                      <th className="px-6 py-3.5 text-right">{language === "AZ" ? "Rol Təyin Et" : "Assign Role"}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -1798,7 +1797,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             >
                               {u.name ? u.name.charAt(0).toUpperCase() : u.email.charAt(0).toUpperCase()}
                             </div>
-                            <span className="font-bold text-slate-900">{u.name || "Traveler"}</span>
+                            <span className="font-bold text-slate-900">{u.name || adminT.usersTab.userRole}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-slate-600 font-mono text-[11px]">
@@ -1814,7 +1813,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 : "bg-slate-100 text-slate-700"
                             }`}
                           >
-                            {u.role}
+                            {u.role === "admin" ? adminT.usersTab.adminRole : u.role === "agent" ? adminT.usersTab.staffRole : adminT.usersTab.userRole}
                           </span>
                         </td>
                         <td className="px-6 py-4 font-semibold text-slate-800">
@@ -1829,9 +1828,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             onChange={(e) => handleUpdateUserRole(u.id, e.target.value)}
                             className="px-2.5 py-1 rounded-lg border border-slate-200 text-xs bg-white text-slate-800 outline-none focus:border-[#0f3460] cursor-pointer"
                           >
-                            <option value="customer">Customer</option>
-                            <option value="agent">Agent</option>
-                            <option value="admin">Admin</option>
+                            <option value="customer">{adminT.usersTab.userRole}</option>
+                            <option value="agent">{adminT.usersTab.staffRole}</option>
+                            <option value="admin">{adminT.usersTab.adminRole}</option>
                           </select>
                         </td>
                       </tr>
@@ -1912,7 +1911,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     type="text"
                     value={destSearchQuery}
                     onChange={(e) => setDestSearchQuery(e.target.value)}
-                    placeholder="Search destinations by name, region or slug..."
+                    placeholder={adminT.destinationsTab.searchPlaceholder}
                     className="w-full pl-10 pr-9 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0f3460] bg-slate-50 focus:bg-white transition-all"
                   />
                   {destSearchQuery && (
@@ -1927,7 +1926,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
                   <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
-                    Showing {filteredDestinations.length} of {destinationsList.length} destinations
+                    {language === "AZ"
+                      ? `${destinationsList.length} istiqamətdən ${filteredDestinations.length}-i göstərilir`
+                      : `Showing ${filteredDestinations.length} of ${destinationsList.length} destinations`}
                   </span>
                   <button
                     type="button"
@@ -1936,7 +1937,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     style={{ backgroundColor: "#0f3460" }}
                   >
                     <Plus className="h-4 w-4 text-[#f59e0b]" />
-                    <span>Add New Destination</span>
+                    <span>{adminT.destinationsTab.addBtn}</span>
                   </button>
                 </div>
               </div>
@@ -1947,25 +1948,27 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-full bg-slate-100 text-slate-400">
                     <MapPin className="h-6 w-6" />
                   </div>
-                  <h3 className="font-bold text-base text-slate-800">No Destinations Found</h3>
+                  <h3 className="font-bold text-base text-slate-800">
+                    {language === "AZ" ? "İstiqamət Tapılmadı" : "No Destinations Found"}
+                  </h3>
                   <p className="text-xs text-slate-500 max-w-sm mx-auto">
                     {destSearchQuery
-                      ? `No destinations matched "${destSearchQuery}". Try a different keyword.`
-                      : "No destinations have been created yet. Click below to add your first destination."}
+                      ? (language === "AZ" ? `"${destSearchQuery}" sorğusuna uyğun istiqamət tapılmadı.` : `No destinations matched "${destSearchQuery}". Try a different keyword.`)
+                      : (language === "AZ" ? "Hələ heç bir istiqamət yaradılmayıb." : "No destinations have been created yet. Click below to add your first destination.")}
                   </p>
                   {destSearchQuery ? (
                     <button
                       onClick={() => setDestSearchQuery("")}
                       className="px-4 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-colors"
                     >
-                      Clear Search
+                      {language === "AZ" ? "Axtarışı Təmizlə" : "Clear Search"}
                     </button>
                   ) : (
                     <button
                       onClick={handleOpenCreateDestination}
                       className="px-4 py-2 rounded-xl bg-[#0f3460] text-white text-xs font-bold shadow-sm"
                     >
-                      Add Destination
+                      {adminT.destinationsTab.addBtn}
                     </button>
                   )}
                 </div>
@@ -2014,7 +2017,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                         <div className="flex items-center justify-between pt-1">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 text-xs font-bold border border-sky-200/80">
                             <Compass className="h-3.5 w-3.5 text-sky-600" />
-                            {d.tourCount} {d.tourCount === 1 ? "Active Tour" : "Active Tours"}
+                            {d.tourCount} {language === "AZ" ? "Aktiv Tur" : (d.tourCount === 1 ? "Active Tour" : "Active Tours")}
                           </span>
 
                           <div className="flex items-center gap-1.5">
@@ -2022,7 +2025,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               type="button"
                               onClick={() => handleOpenEditDestination(d)}
                               className="p-1.5 rounded-lg border border-slate-200 hover:border-sky-400 text-slate-600 hover:text-sky-600 hover:bg-sky-50 transition-colors shadow-xs cursor-pointer"
-                              title={`Edit ${d.name}`}
+                              title={`${adminT.destinationsTab.editBtn} ${d.name}`}
                             >
                               <Pencil className="h-3.5 w-3.5" />
                             </button>
@@ -2030,7 +2033,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               type="button"
                               onClick={() => handleDeleteDestination(d.id, d.name)}
                               className="p-1.5 rounded-lg border border-slate-200 hover:border-red-400 text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors shadow-xs cursor-pointer"
-                              title={`Delete ${d.name}`}
+                              title={`${adminT.destinationsTab.deleteBtn} ${d.name}`}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </button>
@@ -2038,7 +2041,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               href={`/#destinations`}
                               target="_blank"
                               className="p-1.5 rounded-lg border border-slate-200 hover:border-amber-400 text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors shadow-xs"
-                              title="View destination on live website"
+                              title={language === "AZ" ? "Saytda bax" : "View destination on live website"}
                             >
                               <ExternalLink className="h-3.5 w-3.5" />
                             </Link>
@@ -2058,23 +2061,31 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Stat cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase">Total Visa Orders</span>
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase">
+                    {language === "AZ" ? "Ümumi Viza Müraciətləri" : "Total Visa Orders"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-slate-900 mt-1">{visasList.length}</p>
                 </div>
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-amber-600 uppercase">New / Need Review</span>
+                  <span className="text-[11px] font-semibold text-amber-600 uppercase">
+                    {language === "AZ" ? "Yeni / Baxış Tələb Edən" : "New / Need Review"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-amber-600 mt-1">
                     {visasList.filter((v) => v.status === "received").length}
                   </p>
                 </div>
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-red-600 uppercase">⚡ Urgent 3-Hour Visas</span>
+                  <span className="text-[11px] font-semibold text-red-600 uppercase">
+                    {language === "AZ" ? "⚡ Təcili 3 Saatlıq Vizalar" : "⚡ Urgent 3-Hour Visas"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-red-600 mt-1">
                     {visasList.filter((v) => v.visaType === "urgent").length}
                   </p>
                 </div>
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-emerald-600 uppercase">Approved & Delivered</span>
+                  <span className="text-[11px] font-semibold text-emerald-600 uppercase">
+                    {language === "AZ" ? "Təsdiqlənmiş və Çatdırılmış" : "Approved & Delivered"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-emerald-600 mt-1">
                     {visasList.filter((v) => v.status === "approved").length}
                   </p>
@@ -2087,7 +2098,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <Search className="h-4 w-4 text-slate-400 shrink-0" />
                   <input
                     type="text"
-                    placeholder="Search applicant, ref, passport..."
+                    placeholder={adminT.visasTab.searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-transparent text-xs text-slate-800 outline-none"
@@ -2106,10 +2117,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       }`}
                     >
                       {st === "all"
-                        ? "All Visas"
+                        ? adminT.actions.filterAll
                         : st === "submitted_to_govt"
-                        ? "In Gov Review"
-                        : st}
+                        ? (language === "AZ" ? "Dövlət İcrasında" : "In Gov Review")
+                        : (adminT.status[st as keyof typeof adminT.status] || st)}
                     </button>
                   ))}
                 </div>
@@ -2121,13 +2132,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <table className="w-full text-left text-xs text-slate-700">
                     <thead className="bg-slate-50 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                       <tr>
-                        <th className="py-3.5 px-4">Ref & Speed</th>
-                        <th className="py-3.5 px-4">Applicant Details</th>
-                        <th className="py-3.5 px-4">Passport No</th>
-                        <th className="py-3.5 px-4">Arrival Date</th>
-                        <th className="py-3.5 px-4">Total Fee</th>
-                        <th className="py-3.5 px-4">Status</th>
-                        <th className="py-3.5 px-4 text-right">Actions</th>
+                        <th className="py-3.5 px-4">{adminT.visasTab.colRefCode}</th>
+                        <th className="py-3.5 px-4">{adminT.visasTab.colApplicant}</th>
+                        <th className="py-3.5 px-4">{adminT.visasTab.colPassport}</th>
+                        <th className="py-3.5 px-4">{language === "AZ" ? "Gəliş Tarixi" : "Arrival Date"}</th>
+                        <th className="py-3.5 px-4">{adminT.overviewTab.colTotal}</th>
+                        <th className="py-3.5 px-4">{adminT.visasTab.colStatus}</th>
+                        <th className="py-3.5 px-4 text-right">{adminT.visasTab.colActions}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -2193,11 +2204,11 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               <span className="font-bold text-slate-900 block">${visa.totalAmount}</span>
                               {visa.paymentStatus === "paid" ? (
                                 <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-0.5">
-                                  ✓ Paid
+                                  {language === "AZ" ? "✓ Ödənilib" : "✓ Paid"}
                                 </span>
                               ) : (
                                 <span className="inline-block text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-0.5">
-                                  Pending
+                                  {adminT.status.pending}
                                 </span>
                               )}
                             </td>
@@ -2205,22 +2216,22 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             <td className="py-3.5 px-4">
                               {visa.status === "received" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-[11px] font-bold text-amber-800">
-                                  <Clock className="h-3 w-3" /> New
+                                  <Clock className="h-3 w-3" /> {adminT.sidebar.newBadge}
                                 </span>
                               )}
                               {visa.status === "submitted_to_govt" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-1 text-[11px] font-bold text-blue-800">
-                                  <Clock className="h-3 w-3" /> In Gov Review
+                                  <Clock className="h-3 w-3" /> {language === "AZ" ? "Dövlət İcrasında" : "In Gov Review"}
                                 </span>
                               )}
                               {visa.status === "approved" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
-                                  <CheckCircle2 className="h-3 w-3" /> Approved
+                                  <CheckCircle2 className="h-3 w-3" /> {adminT.status.confirmed}
                                 </span>
                               )}
                               {visa.status === "rejected" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2.5 py-1 text-[11px] font-bold text-red-800">
-                                  <AlertCircle className="h-3 w-3" /> Rejected
+                                  <AlertCircle className="h-3 w-3" /> {adminT.status.rejected}
                                 </span>
                               )}
                             </td>
@@ -2236,7 +2247,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                         title: `Passport: ${visa.surname} ${visa.givenNames} (${visa.passportNumber})`,
                                       })
                                     }
-                                    title="Preview Passport Document"
+                                    title={language === "AZ" ? "Pasporta Bax" : "Preview Passport Document"}
                                     className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-sky-700 transition-colors cursor-pointer"
                                   >
                                     <Eye className="h-3.5 w-3.5" />
@@ -2248,14 +2259,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   )}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="Contact Applicant on WhatsApp"
+                                  title={language === "AZ" ? "WhatsApp ilə Əlaqə" : "Contact Applicant on WhatsApp"}
                                   className="p-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 transition-colors cursor-pointer"
                                 >
                                   <MessageCircle className="h-3.5 w-3.5" />
                                 </a>
                                 <button
                                   onClick={() => handleCopyAsanFormat(visa)}
-                                  title="Copy Formatted Data for evisa.gov.az"
+                                  title={language === "AZ" ? "evisa.gov.az üçün Kopyala" : "Copy Formatted Data for evisa.gov.az"}
                                   className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
                                 >
                                   <Copy className="h-3.5 w-3.5" />
@@ -2265,7 +2276,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
                                   style={{ backgroundColor: "#0f3460" }}
                                 >
-                                  Process
+                                  {adminT.visasTab.markProcessing}
                                 </button>
                               </div>
                             </td>
@@ -2275,7 +2286,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   </table>
                   {visasList.length === 0 && (
                     <div className="py-12 text-center text-xs text-slate-500">
-                      No visa applications received yet.
+                      {adminT.visasTab.noVisas}
                     </div>
                   )}
                 </div>
@@ -2289,23 +2300,31 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Stat cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase">Total Transfers</span>
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase">
+                    {language === "AZ" ? "Cəmi Transferlər" : "Total Transfers"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-slate-900 mt-1">{transfersList.length}</p>
                 </div>
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-amber-600 uppercase">Awaiting Driver / New</span>
+                  <span className="text-[11px] font-semibold text-amber-600 uppercase">
+                    {language === "AZ" ? "Sürücü Gözləyən / Yeni" : "Awaiting Driver / New"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-amber-600 mt-1">
                     {transfersList.filter((t) => t.status === "pending").length}
                   </p>
                 </div>
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-sky-600 uppercase">Confirmed / En Route</span>
+                  <span className="text-[11px] font-semibold text-sky-600 uppercase">
+                    {language === "AZ" ? "Təsdiqlənmiş / Yolda" : "Confirmed / En Route"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-sky-600 mt-1">
                     {transfersList.filter((t) => t.status === "confirmed" || t.status === "in_progress").length}
                   </p>
                 </div>
                 <div className="p-5 rounded-2xl bg-white border border-[#e0f2fe] shadow-sm">
-                  <span className="text-[11px] font-semibold text-emerald-600 uppercase">Completed</span>
+                  <span className="text-[11px] font-semibold text-emerald-600 uppercase">
+                    {language === "AZ" ? "Tamamlanmış" : "Completed"}
+                  </span>
                   <p className="text-2xl font-bold font-display text-emerald-600 mt-1">
                     {transfersList.filter((t) => t.status === "completed").length}
                   </p>
@@ -2318,7 +2337,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <Search className="h-4 w-4 text-slate-400 shrink-0" />
                   <input
                     type="text"
-                    placeholder="Search passenger, ref, flight, phone..."
+                    placeholder={adminT.transfersTab.searchPlaceholder}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-transparent text-xs text-slate-800 outline-none"
@@ -2336,7 +2355,11 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                       }`}
                     >
-                      {st === "all" ? "All Transfers" : st.replace("_", " ")}
+                      {st === "all"
+                        ? adminT.actions.filterAll
+                        : st === "in_progress"
+                        ? (language === "AZ" ? "Yolda" : "En Route")
+                        : (adminT.status[st as keyof typeof adminT.status] || st)}
                     </button>
                   ))}
                 </div>
@@ -2348,13 +2371,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/75 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-3 px-4">Ref & Route</th>
-                        <th className="py-3 px-4">Flight & Schedule</th>
-                        <th className="py-3 px-4">Passenger</th>
-                        <th className="py-3 px-4">Vehicle & Amount</th>
-                        <th className="py-3 px-4">Chauffeur</th>
-                        <th className="py-3 px-4">Status</th>
-                        <th className="py-3 px-4 text-right">Actions</th>
+                        <th className="py-3 px-4">{adminT.transfersTab.colRoute}</th>
+                        <th className="py-3 px-4">{adminT.transfersTab.colFlight}</th>
+                        <th className="py-3 px-4">{adminT.transfersTab.colPassenger}</th>
+                        <th className="py-3 px-4">{adminT.transfersTab.colVehicle}</th>
+                        <th className="py-3 px-4">{language === "AZ" ? "Sürücü" : "Chauffeur"}</th>
+                        <th className="py-3 px-4">{adminT.transfersTab.colStatus}</th>
+                        <th className="py-3 px-4 text-right">{adminT.transfersTab.colActions}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -2380,10 +2403,10 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               <span className="text-[11px] text-slate-500 block mt-0.5">
                                 {item.airport} &middot;{" "}
                                 {item.direction === "arrival"
-                                  ? "🛬 Arrival"
+                                  ? (language === "AZ" ? "🛬 Qarşılama" : "🛬 Arrival")
                                   : item.direction === "departure"
-                                  ? "🛫 Departure"
-                                  : "🔄 Round Trip"}
+                                  ? (language === "AZ" ? "🛫 Yola salma" : "🛫 Departure")
+                                  : (language === "AZ" ? "🔄 İkitərəfli" : "🔄 Round Trip")}
                               </span>
                               <span className="text-[10px] text-slate-400 block line-clamp-1">
                                 {item.pickupZone}: {item.dropoffAddress}
@@ -2399,7 +2422,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   href={`https://www.flightradar24.com/data/flights/${item.flightNumber.replace(/\s+/g, "")}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="Track Live Flight on FlightRadar24"
+                                  title={language === "AZ" ? "FlightRadar24-də Canlı İzlə" : "Track Live Flight on FlightRadar24"}
                                   className="inline-flex items-center gap-0.5 text-[9px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1.5 py-0.5 rounded hover:bg-sky-100"
                                 >
                                   Live ↗
@@ -2420,7 +2443,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 {item.passengerName}
                               </span>
                               <span className="text-[11px] text-slate-500 block">
-                                {item.passengerCount} pax &middot; {item.phoneNumber}
+                                {item.passengerCount} {language === "AZ" ? "nəfər" : "pax"} &middot; {item.phoneNumber}
                               </span>
                               <span className="text-[10px] text-slate-400 block">
                                 {item.email}
@@ -2436,15 +2459,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                               </span>
                               {item.paymentStatus === "paid" ? (
                                 <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-0.5">
-                                  ✓ Paid Online
+                                  {language === "AZ" ? "✓ Onlayn Ödənilib" : "✓ Paid Online"}
                                 </span>
                               ) : item.paymentStatus === "cash_collected" ? (
                                 <span className="inline-block text-[10px] font-bold text-teal-700 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded mt-0.5">
-                                  💵 Cash Remitted
+                                  {language === "AZ" ? "💵 Nağd Təhvil Alınıb" : "💵 Cash Remitted"}
                                 </span>
                               ) : (
                                 <span className="inline-block text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded mt-0.5">
-                                  ⚠️ Collect ${item.totalAmount}
+                                  {language === "AZ" ? `⚠️ ${item.totalAmount}$ Tələb olunur` : `⚠️ Collect $${item.totalAmount}`}
                                 </span>
                               )}
                             </td>
@@ -2463,7 +2486,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                 </div>
                               ) : (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-700">
-                                  Unassigned
+                                  {language === "AZ" ? "Təyin Edilməyib" : "Unassigned"}
                                 </span>
                               )}
                             </td>
@@ -2471,27 +2494,27 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             <td className="py-3.5 px-4">
                               {item.status === "pending" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-[11px] font-bold text-amber-800">
-                                  <Clock className="h-3 w-3" /> Pending
+                                  <Clock className="h-3 w-3" /> {adminT.status.pending}
                                 </span>
                               )}
                               {item.status === "confirmed" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
-                                  <CheckCircle2 className="h-3 w-3" /> Confirmed
+                                  <CheckCircle2 className="h-3 w-3" /> {adminT.status.confirmed}
                                 </span>
                               )}
                               {item.status === "in_progress" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 border border-sky-200 px-2.5 py-1 text-[11px] font-bold text-sky-800">
-                                  <Car className="h-3 w-3" /> En Route
+                                  <Car className="h-3 w-3" /> {language === "AZ" ? "Yolda" : "En Route"}
                                 </span>
                               )}
                               {item.status === "completed" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-2.5 py-1 text-[11px] font-bold text-slate-800">
-                                  <CheckCircle2 className="h-3 w-3" /> Completed
+                                  <CheckCircle2 className="h-3 w-3" /> {adminT.status.completed}
                                 </span>
                               )}
                               {item.status === "cancelled" && (
                                 <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2.5 py-1 text-[11px] font-bold text-red-800">
-                                  <AlertCircle className="h-3 w-3" /> Cancelled
+                                  <AlertCircle className="h-3 w-3" /> {adminT.status.cancelled}
                                 </span>
                               )}
                             </td>
@@ -2504,7 +2527,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   )}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  title="Message Passenger on WhatsApp"
+                                  title={language === "AZ" ? "Sərnişinə WhatsApp ilə Yaz" : "Message Passenger on WhatsApp"}
                                   className="p-1.5 rounded-lg border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 transition-colors cursor-pointer"
                                 >
                                   <MessageCircle className="h-3.5 w-3.5" />
@@ -2514,7 +2537,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                   className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
                                   style={{ backgroundColor: "#0f3460" }}
                                 >
-                                  {item.driverName ? "Manage" : "Assign Driver"}
+                                  {item.driverName ? (language === "AZ" ? "İdarə Et" : "Manage") : (language === "AZ" ? "Sürücü Təyin Et" : "Assign Driver")}
                                 </button>
                               </div>
                             </td>
@@ -2524,7 +2547,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   </table>
                   {transfersList.length === 0 && (
                     <div className="py-12 text-center text-xs text-slate-500">
-                      No airport transfer bookings received yet.
+                      {adminT.transfersTab.noTransfers}
                     </div>
                   )}
                 </div>
@@ -2543,13 +2566,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 <div className="space-y-1 max-w-2xl">
                   <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#f59e0b]">
                     <Shield className="h-4 w-4" />
-                    Security & Compliance Audit Trail
+                    {language === "AZ" ? "Təhlükəsizlik və Uyğunluq Audit Jurnalı" : "Security & Compliance Audit Trail"}
                   </div>
                   <h2 className="text-xl font-bold font-display text-white">
-                    Immutable System Activity & Event Logs
+                    {language === "AZ" ? "Dəyişdirilməz Sistem Fəaliyyəti və Hadisə Girişləri" : "Immutable System Activity & Event Logs"}
                   </h2>
                   <p className="text-xs text-white/80 leading-relaxed">
-                    Permanent record of critical operations: visa submissions, government sync updates, payment confirmations, and admin logins. All customer PII is automatically redacted.
+                    {language === "AZ"
+                      ? "Kritik əməliyyatların daimi qeydi: viza müraciətləri, dövlət sinxronizasiyası yeniləmələri, ödəniş təsdiqləri və admin girişləri. Bütün fərdi məlumatlar avtomatik gizlədilir."
+                      : "Permanent record of critical operations: visa submissions, government sync updates, payment confirmations, and admin logins. All customer PII is automatically redacted."}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 self-stretch md:self-auto shrink-0">
@@ -2559,7 +2584,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border border-white/15"
                   >
                     <RefreshCw className={`h-3.5 w-3.5 text-[#f59e0b] ${refreshing ? "animate-spin" : ""}`} />
-                    Refresh Logs
+                    {language === "AZ" ? "Jurnalları Yenilə" : "Refresh Logs"}
                   </button>
                 </div>
               </div>
@@ -2568,42 +2593,50 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="rounded-2xl p-4 bg-white border border-[#e5ded4] shadow-sm">
                   <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
-                    Total Logged Events
+                    {language === "AZ" ? "Cəmi Qeydə Alınmış Hadisələr" : "Total Logged Events"}
                   </div>
                   <div className="mt-1 text-2xl font-bold text-slate-900 font-display">
                     {auditLogs.length}
                   </div>
-                  <div className="mt-1 text-[11px] text-slate-400">Stored in Neon DB</div>
+                  <div className="mt-1 text-[11px] text-slate-400">
+                    {language === "AZ" ? "Neon DB-də Saxlanılır" : "Stored in Neon DB"}
+                  </div>
                 </div>
 
                 <div className="rounded-2xl p-4 bg-white border border-[#e5ded4] shadow-sm">
                   <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
-                    e-Visa Actions
+                    {language === "AZ" ? "e-Viza Əməliyyatları" : "e-Visa Actions"}
                   </div>
                   <div className="mt-1 text-2xl font-bold text-slate-900 font-display">
                     {auditLogs.filter((l) => l.entityType === "visa").length}
                   </div>
-                  <div className="mt-1 text-[11px] text-emerald-600 font-medium">Submissions & Status Changes</div>
+                  <div className="mt-1 text-[11px] text-emerald-600 font-medium">
+                    {language === "AZ" ? "Müraciətlər və Status Dəyişiklikləri" : "Submissions & Status Changes"}
+                  </div>
                 </div>
 
                 <div className="rounded-2xl p-4 bg-white border border-[#e5ded4] shadow-sm">
                   <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
-                    Payments
+                    {language === "AZ" ? "Ödənişlər" : "Payments"}
                   </div>
                   <div className="mt-1 text-2xl font-bold text-slate-900 font-display">
                     {auditLogs.filter((l) => l.entityType === "payment").length}
                   </div>
-                  <div className="mt-1 text-[11px] text-blue-600 font-medium">Gateway Confirmations</div>
+                  <div className="mt-1 text-[11px] text-blue-600 font-medium">
+                    {language === "AZ" ? "Ödəniş Sistemi Təsdiqləri" : "Gateway Confirmations"}
+                  </div>
                 </div>
 
                 <div className="rounded-2xl p-4 bg-white border border-[#e5ded4] shadow-sm">
                   <div className="text-[11px] font-medium text-slate-500 uppercase tracking-wide">
-                    Auth & Security
+                    {language === "AZ" ? "Giriş və Təhlükəsizlik" : "Auth & Security"}
                   </div>
                   <div className="mt-1 text-2xl font-bold text-slate-900 font-display">
                     {auditLogs.filter((l) => l.entityType === "user" || l.action.startsWith("auth")).length}
                   </div>
-                  <div className="mt-1 text-[11px] text-amber-600 font-medium">Admin & User Logins</div>
+                  <div className="mt-1 text-[11px] text-amber-600 font-medium">
+                    {language === "AZ" ? "Admin və İstifadəçi Girişləri" : "Admin & User Logins"}
+                  </div>
                 </div>
               </div>
 
@@ -2613,11 +2646,11 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   {/* Entity Filter Pills */}
                   <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
                     {[
-                      { id: "all", label: "All Events" },
+                      { id: "all", label: language === "AZ" ? "Bütün Hadisələr" : "All Events" },
                       { id: "visa", label: "e-Visa" },
-                      { id: "payment", label: "Payments" },
-                      { id: "user", label: "Auth & Users" },
-                      { id: "tour", label: "Tours" },
+                      { id: "payment", label: language === "AZ" ? "Ödənişlər" : "Payments" },
+                      { id: "user", label: language === "AZ" ? "Giriş və İstifadəçilər" : "Auth & Users" },
+                      { id: "tour", label: language === "AZ" ? "Turlar" : "Tours" },
                     ].map((btn) => {
                       const isSel = auditEntityFilter === btn.id;
                       return (
@@ -2641,7 +2674,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
                     <input
                       type="text"
-                      placeholder="Search action, entity ID, email, IP..."
+                      placeholder={adminT.auditTab.searchPlaceholder}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-9 pr-3.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0f3460]"
@@ -2662,12 +2695,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <table className="w-full text-left text-xs text-slate-600">
                     <thead className="bg-slate-50 border-b border-slate-200 font-semibold text-slate-700">
                       <tr>
-                        <th className="py-3 px-4">Timestamp (UTC)</th>
-                        <th className="py-3 px-4">Action</th>
-                        <th className="py-3 px-4">Entity</th>
-                        <th className="py-3 px-4">Actor</th>
-                        <th className="py-3 px-4">IP Address</th>
-                        <th className="py-3 px-4 text-right">Details</th>
+                        <th className="py-3 px-4">{language === "AZ" ? "Tarix və Saat (UTC)" : "Timestamp (UTC)"}</th>
+                        <th className="py-3 px-4">{adminT.auditTab.colAction}</th>
+                        <th className="py-3 px-4">{adminT.auditTab.colEntity}</th>
+                        <th className="py-3 px-4">{adminT.auditTab.colActor}</th>
+                        <th className="py-3 px-4">{adminT.auditTab.colIp}</th>
+                        <th className="py-3 px-4 text-right">{language === "AZ" ? "Detallar" : "Details"}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 font-normal">
@@ -2703,7 +2736,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                             <tbody key={log.id} className="group">
                               <tr className="hover:bg-slate-50/75 transition-colors">
                                 <td className="py-3 px-4 whitespace-nowrap text-slate-500 font-mono text-[11px]">
-                                  {new Date(log.createdAt).toLocaleString("en-GB", {
+                                  {new Date(log.createdAt).toLocaleString(language === "AZ" ? "az-AZ" : "en-GB", {
                                     year: "numeric",
                                     month: "2-digit",
                                     day: "2-digit",
@@ -2734,7 +2767,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                     {log.actorRole || log.actorType || "system"}
                                   </span>
                                   <span className="text-slate-700 text-xs">
-                                    {log.actorEmail || "Anonymous / System"}
+                                    {log.actorEmail || (language === "AZ" ? "Anonim / Sistem" : "Anonymous / System")}
                                   </span>
                                 </td>
                                 <td className="py-3 px-4 font-mono text-[11px] text-slate-500 whitespace-nowrap">
@@ -2746,7 +2779,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                     className="px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 text-[11px] font-medium inline-flex items-center gap-1 transition-colors cursor-pointer"
                                   >
                                     <Eye className="h-3 w-3 text-slate-400" />
-                                    {isExpanded ? "Hide" : "Inspect"}
+                                    {isExpanded ? (language === "AZ" ? "Gizlə" : "Hide") : (language === "AZ" ? "Bax" : "Inspect")}
                                   </button>
                                 </td>
                               </tr>
@@ -2756,7 +2789,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                                     <div className="space-y-2">
                                       <div className="flex items-center justify-between text-[11px] text-slate-400 border-b border-slate-800 pb-2">
                                         <span className="font-mono">Log ID: {log.id}</span>
-                                        <span className="text-amber-400 font-medium">PII-Redacted Payload</span>
+                                        <span className="text-amber-400 font-medium">
+                                          {language === "AZ" ? "Gizlədilmiş Fərdi Məlumatlar" : "PII-Redacted Payload"}
+                                        </span>
                                       </div>
                                       <pre className="text-[11px] font-mono bg-slate-950 p-3 rounded-lg overflow-x-auto text-emerald-300">
                                         {JSON.stringify(log.metadata || {}, null, 2)}
@@ -2773,9 +2808,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                   {auditLogs.length === 0 && (
                     <div className="py-12 text-center text-xs text-slate-500">
-                      No audit events recorded yet. Perform actions like submitting or processing visas to see audit trails here.
+                      {language === "AZ"
+                        ? "Hələ heç bir audit hadisəsi qeydə alınmayıb. Viza və ya digər əməliyyatları icra etdikdə audit qeydləri burada görünəcək."
+                        : "No audit events recorded yet. Perform actions like submitting or processing visas to see audit trails here."}
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          )}
                 </div>
               </div>
             </div>
@@ -2789,10 +2830,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 <div>
                   <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                     <Sliders className="h-5 w-5 text-[#f59e0b]" />
-                    <span>Dynamic Platform Configuration</span>
+                    <span>{language === "AZ" ? "Dinamik Platform Konfiqurasiyası" : "Dynamic Platform Configuration"}</span>
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Modify business contact channels, pricing margins, announcement banners, and service availability without redeploying code.
+                    {language === "AZ"
+                      ? "Biznes əlaqə kanallarını, qiymət marjalarını, elan başlıqlarını və xidmət əlçatanlığını kodu yenidən yerləşdirmədən idarə edin."
+                      : "Modify business contact channels, pricing margins, announcement banners, and service availability without redeploying code."}
                   </p>
                 </div>
 
@@ -2803,7 +2846,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     disabled={settingsSaving}
                     className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
                   >
-                    Reset Draft
+                    {language === "AZ" ? "Qaralamanı Sıfırla" : "Reset Draft"}
                   </button>
                   <button
                     type="button"
@@ -2813,7 +2856,11 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     style={{ backgroundColor: "#0f3460" }}
                   >
                     <Save className={`h-4 w-4 text-[#f59e0b] ${settingsSaving ? "animate-spin" : ""}`} />
-                    <span>{settingsSaving ? "Saving..." : "Save All Settings"}</span>
+                    <span>
+                      {settingsSaving
+                        ? (language === "AZ" ? "Yadda saxlanılır..." : "Saving...")
+                        : (language === "AZ" ? "Bütün Tənzimləmələri Yadda Saxla" : "Save All Settings")}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -2821,12 +2868,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Category Filter Tabs */}
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 {[
-                  { id: "all", label: "All Settings", icon: Sliders },
-                  { id: "contact", label: "Contact & Concierge", icon: Phone },
-                  { id: "announcement", label: "Announcement Bar", icon: Megaphone },
-                  { id: "pricing", label: "Pricing & Margins", icon: DollarSign },
-                  { id: "operations", label: "Service Toggles", icon: Shield },
-                  { id: "marketing", label: "Social Proof", icon: Sparkles },
+                  { id: "all", label: language === "AZ" ? "Bütün Tənzimləmələr" : "All Settings", icon: Sliders },
+                  { id: "contact", label: language === "AZ" ? "Əlaqə və Konsyerj" : "Contact & Concierge", icon: Phone },
+                  { id: "announcement", label: language === "AZ" ? "Elan Zolağı" : "Announcement Bar", icon: Megaphone },
+                  { id: "pricing", label: language === "AZ" ? "Qiymətlər və Marjalar" : "Pricing & Margins", icon: DollarSign },
+                  { id: "operations", label: language === "AZ" ? "Xidmət Keçidləri" : "Service Toggles", icon: Shield },
+                  { id: "marketing", label: language === "AZ" ? "Sosial Sübutlar" : "Social Proof", icon: Sparkles },
                 ].map((cat) => {
                   const Icon = cat.icon;
                   const isSelected = settingsCategoryFilter === cat.id;
@@ -2854,10 +2901,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     <div>
                       <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                         <Phone className="h-4 w-4 text-emerald-600" />
-                        <span>Contact & Concierge Channels</span>
+                        <span>{language === "AZ" ? "Əlaqə və Konsyerj Kanalları" : "Contact & Concierge Channels"}</span>
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Controls numbers and handles used for WhatsApp booking, emergency assistance, and guest inquiries.
+                        {language === "AZ"
+                          ? "WhatsApp sifarişləri, təcili yardım və qonaq sorğuları üçün nömrə və ünvanları idarə edir."
+                          : "Controls numbers and handles used for WhatsApp booking, emergency assistance, and guest inquiries."}
                       </p>
                     </div>
                     {settingsDraft["contact_whatsapp"] && (
@@ -2868,7 +2917,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                         className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 hover:bg-emerald-100 transition-colors"
                       >
                         <MessageCircle className="h-3.5 w-3.5" />
-                        <span>Test WhatsApp Link</span>
+                        <span>{language === "AZ" ? "WhatsApp Linkini Yoxla" : "Test WhatsApp Link"}</span>
                       </a>
                     )}
                   </div>
@@ -2876,7 +2925,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Primary WhatsApp Number *
+                        {language === "AZ" ? "Əsas WhatsApp Nömrəsi *" : "Primary WhatsApp Number *"}
                       </label>
                       <input
                         type="text"
@@ -2888,13 +2937,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                         className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-mono focus:border-sky-500 focus:bg-white focus:outline-none"
                       />
                       <p className="text-[11px] text-slate-500 mt-1">
-                        Linked dynamically to all "Book via WhatsApp", tour card buttons, and concierge triggers.
+                        {language === "AZ"
+                          ? "Bütün \"WhatsApp ilə sifariş\", tur kartı düymələri və konsyerj keçidlərinə dinamik bağlanır."
+                          : "Linked dynamically to all \"Book via WhatsApp\", tour card buttons, and concierge triggers."}
                       </p>
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Operations & Emergency Hotline
+                        {language === "AZ" ? "Əməliyyat və Təcili Əlaqə Qaynar Xətti" : "Operations & Emergency Hotline"}
                       </label>
                       <input
                         type="text"
@@ -2906,13 +2957,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                         className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-mono focus:border-sky-500 focus:bg-white focus:outline-none"
                       />
                       <p className="text-[11px] text-slate-500 mt-1">
-                        Displayed in footer and support documents for voice inquiries.
+                        {language === "AZ"
+                          ? "Zəng sorğuları üçün saytın aşağı hissəsində və dəstək sənədlərində göstərilir."
+                          : "Displayed in footer and support documents for voice inquiries."}
                       </p>
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Support Email Address
+                        {language === "AZ" ? "Dəstək E-poçt Ünvanı" : "Support Email Address"}
                       </label>
                       <input
                         type="email"
@@ -2927,7 +2980,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Telegram Username / Support Channel
+                        {language === "AZ" ? "Telegram İstifadəçi Adı / Dəstək Kanalı" : "Telegram Username / Support Channel"}
                       </label>
                       <input
                         type="text"
@@ -2942,7 +2995,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Baku Office / Operational Base Address
+                        {language === "AZ" ? "Bakı Ofisi / Əməliyyat Mərkəzi Ünvanı" : "Baku Office / Operational Base Address"}
                       </label>
                       <input
                         type="text"
@@ -2965,10 +3018,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     <div>
                       <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                         <Megaphone className="h-4 w-4 text-[#f59e0b]" />
-                        <span>Live Site Announcement Banner</span>
+                        <span>{language === "AZ" ? "Sayt Üzrə Canlı Elan Zolağı" : "Live Site Announcement Banner"}</span>
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Renders an interactive ribbon at the top of every page for promotions, border updates, or seasonal specials.
+                        {language === "AZ"
+                          ? "Aksiyalar, sərhəd yeniləmələri və ya mövsümi təkliflər üçün hər səhifənin yuxarısında interaktiv zolaq göstərir."
+                          : "Renders an interactive ribbon at the top of every page for promotions, border updates, or seasonal specials."}
                       </p>
                     </div>
 
@@ -2986,7 +3041,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       />
                       <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                       <span className="ml-2 text-xs font-bold text-slate-700">
-                        {settingsDraft["announcement_active"] ? "Active (Visible)" : "Disabled"}
+                        {settingsDraft["announcement_active"]
+                          ? (language === "AZ" ? "Aktiv (Görünən)" : "Active (Visible)")
+                          : (language === "AZ" ? "Deaktiv" : "Disabled")}
                       </span>
                     </label>
                   </div>
@@ -2996,12 +3053,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 text-slate-950 flex items-center justify-between text-xs font-semibold shadow-sm">
                       <div className="flex items-center gap-2">
                         <span className="px-2 py-0.5 rounded-full bg-slate-950 text-amber-300 text-[10px] uppercase font-bold">
-                          {settingsDraft["announcement_badge"] || "Offer"}
+                          {settingsDraft["announcement_badge"] || (language === "AZ" ? "Təklif" : "Offer")}
                         </span>
-                        <span>{settingsDraft["announcement_text"] || "Preview announcement text goes here..."}</span>
+                        <span>{settingsDraft["announcement_text"] || (language === "AZ" ? "Elan mətni burada göstəriləcək..." : "Preview announcement text goes here...")}</span>
                       </div>
                       <span className="text-[11px] underline font-bold cursor-pointer">
-                        {settingsDraft["announcement_link"] || "Learn More"} ↗
+                        {settingsDraft["announcement_link"] || (language === "AZ" ? "Ətraflı" : "Learn More")} ↗
                       </span>
                     </div>
                   )}
@@ -3009,7 +3066,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Badge Pill Text
+                        {language === "AZ" ? "Nişan Mətni" : "Badge Pill Text"}
                       </label>
                       <input
                         type="text"
@@ -3017,14 +3074,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                         onChange={(e) =>
                           setSettingsDraft((prev) => ({ ...prev, announcement_badge: e.target.value }))
                         }
-                        placeholder="Limited Offer"
+                        placeholder={language === "AZ" ? "Məhdud Təklif" : "Limited Offer"}
                         className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
                       />
                     </div>
 
                     <div className="md:col-span-2">
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Announcement Message Text
+                        {language === "AZ" ? "Elan Mesaj Mətni" : "Announcement Message Text"}
                       </label>
                       <input
                         type="text"
@@ -3039,7 +3096,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Call-to-Action Link URL
+                        {language === "AZ" ? "Keçid Linki URL" : "Call-to-Action Link URL"}
                       </label>
                       <input
                         type="text"
@@ -3061,17 +3118,19 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div className="border-b border-slate-100 pb-3">
                     <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-emerald-600" />
-                      <span>e-Visa & Airport Transfer Pricing (USD)</span>
+                      <span>{language === "AZ" ? "e-Viza və Aeroport Transfer Qiymətləri (USD)" : "e-Visa & Airport Transfer Pricing (USD)"}</span>
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Adjust service fees charged to travelers. Changes reflect immediately on checkout and booking cards.
+                      {language === "AZ"
+                        ? "Səyahətçilərdən tutulan xidmət haqlarını tənzimləyin. Dəyişikliklər dərhal ödəniş və sifariş kartlarında əks olunur."
+                        : "Adjust service fees charged to travelers. Changes reflect immediately on checkout and booking cards."}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                        Standard eVisa (3d)
+                        {language === "AZ" ? "Standart e-Viza (3 gün)" : "Standard eVisa (3d)"}
                       </span>
                       <div className="flex items-center gap-1">
                         <span className="text-slate-400 font-bold">$</span>
@@ -3087,12 +3146,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400 mt-1 block">Includes govt fee ($26)</span>
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        {language === "AZ" ? "Dövlət rüsumu daxildir ($26)" : "Includes govt fee ($26)"}
+                      </span>
                     </div>
 
                     <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/40">
                       <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider block mb-1">
-                        Urgent eVisa (3h)
+                        {language === "AZ" ? "Təcili e-Viza (3 saat)" : "Urgent eVisa (3h)"}
                       </span>
                       <div className="flex items-center gap-1">
                         <span className="text-amber-700 font-bold">$</span>
@@ -3108,12 +3169,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           className="w-full rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
                         />
                       </div>
-                      <span className="text-[10px] text-amber-700 mt-1 block">Includes urgent fee ($61)</span>
+                      <span className="text-[10px] text-amber-700 mt-1 block">
+                        {language === "AZ" ? "Təcili rüsum daxildir ($61)" : "Includes urgent fee ($61)"}
+                      </span>
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                        Transfer Sedan Base
+                        {language === "AZ" ? "Transfer Sedan Baza" : "Transfer Sedan Base"}
                       </span>
                       <div className="flex items-center gap-1">
                         <span className="text-slate-400 font-bold">$</span>
@@ -3129,12 +3192,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400 mt-1 block">Baku City Center</span>
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        {language === "AZ" ? "Bakı Şəhər Mərkəzi" : "Baku City Center"}
+                      </span>
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                        Transfer Minivan (Vito)
+                        {language === "AZ" ? "Transfer Minivan (Vito)" : "Transfer Minivan (Vito)"}
                       </span>
                       <div className="flex items-center gap-1">
                         <span className="text-slate-400 font-bold">$</span>
@@ -3150,12 +3215,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400 mt-1 block">Up to 6 Passengers</span>
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        {language === "AZ" ? "6 Sərnişinə qədər" : "Up to 6 Passengers"}
+                      </span>
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                        Transfer Sprinter VIP
+                        {language === "AZ" ? "Transfer Sprinter VIP" : "Transfer Sprinter VIP"}
                       </span>
                       <div className="flex items-center gap-1">
                         <span className="text-slate-400 font-bold">$</span>
@@ -3171,7 +3238,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                           className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-bold text-slate-900 outline-none"
                         />
                       </div>
-                      <span className="text-[10px] text-slate-400 mt-1 block">Up to 16 Passengers</span>
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        {language === "AZ" ? "16 Sərnişinə qədər" : "Up to 16 Passengers"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -3183,18 +3252,24 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div className="border-b border-slate-100 pb-3">
                     <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                       <Shield className="h-4 w-4 text-indigo-600" />
-                      <span>Operational Kill-Switches & Feature Toggles</span>
+                      <span>{language === "AZ" ? "Əməliyyat Keçidləri və Funksiya Açarları" : "Operational Kill-Switches & Feature Toggles"}</span>
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Enable or suspend customer-facing modules during peak season capacity or scheduled maintenance.
+                      {language === "AZ"
+                        ? "Pik mövsüm tutumu və ya planlaşdırılan texniki qulluq zamanı müştəri modullarını aktiv edin və ya dayandırın."
+                        : "Enable or suspend customer-facing modules during peak season capacity or scheduled maintenance."}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
                       <div>
-                        <span className="text-xs font-bold text-slate-800 block">Floating WhatsApp Widget</span>
-                        <span className="text-[11px] text-slate-500">Show bottom-right WhatsApp chat bubble</span>
+                        <span className="text-xs font-bold text-slate-800 block">
+                          {language === "AZ" ? "Üzən WhatsApp Vidceti" : "Floating WhatsApp Widget"}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          {language === "AZ" ? "Aşağı sağ küncdə WhatsApp söhbət düyməsini göstər" : "Show bottom-right WhatsApp chat bubble"}
+                        </span>
                       </div>
                       <input
                         type="checkbox"
@@ -3211,8 +3286,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
                       <div>
-                        <span className="text-xs font-bold text-slate-800 block">e-Visa Application Service</span>
-                        <span className="text-[11px] text-slate-500">Accept new online visa submissions</span>
+                        <span className="text-xs font-bold text-slate-800 block">
+                          {language === "AZ" ? "e-Viza Müraciət Xidməti" : "e-Visa Application Service"}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          {language === "AZ" ? "Yeni onlayn viza müraciətlərini qəbul et" : "Accept new online visa submissions"}
+                        </span>
                       </div>
                       <input
                         type="checkbox"
@@ -3229,8 +3308,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                     <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-between">
                       <div>
-                        <span className="text-xs font-bold text-slate-800 block">Airport Transfer Bookings</span>
-                        <span className="text-[11px] text-slate-500">Accept direct ride reservations</span>
+                        <span className="text-xs font-bold text-slate-800 block">
+                          {language === "AZ" ? "Aeroport Transfer Sifarişləri" : "Airport Transfer Bookings"}
+                        </span>
+                        <span className="text-[11px] text-slate-500">
+                          {language === "AZ" ? "Birbaşa gediş rezervasiyalarını qəbul et" : "Accept direct ride reservations"}
+                        </span>
                       </div>
                       <input
                         type="checkbox"
@@ -3254,60 +3337,19 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   <div className="border-b border-slate-100 pb-3">
                     <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-amber-500" />
-                      <span>Social Proof & Trust Badges</span>
+                      <span>{language === "AZ" ? "Sosial Sübutlar və Etibar Nişanları" : "Social Proof & Trust Badges"}</span>
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Ratings and review counters displayed in badges across the homepage.
+                      {language === "AZ"
+                        ? "Əsas səhifədə nişanlar kimi göstərilən reytinq və rəy sayğacları."
+                        : "Ratings and review counters displayed in badges across the homepage."}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        TripAdvisor Rating Display
-                      </label>
-                      <input
-                        type="text"
-                        value={settingsDraft["marketing_tripadvisor_rating"] ?? "4.9"}
-                        onChange={(e) =>
-                          setSettingsDraft((prev) => ({
-                            ...prev,
-                            marketing_tripadvisor_rating: e.target.value,
-                          }))
-                        }
-                        placeholder="4.9"
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                        Verified Reviews Count
-                      </label>
-                      <input
-                        type="text"
-                        value={settingsDraft["marketing_tripadvisor_reviews"] ?? "2,400+"}
-                        onChange={(e) =>
-                          setSettingsDraft((prev) => ({
-                            ...prev,
-                            marketing_tripadvisor_reviews: e.target.value,
-                          }))
-                        }
-                        placeholder="2,400+"
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-            </>
-          )}
-        </div>
-      </main>
-
-      {/* ═══════════════════════════════════════════════════════ MODAL: CREATE TOUR */}
+                        {language === "      {/* ═══════════════════════════════════════════════════════ MODAL: CREATE TOUR */}
       {isNewTourOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
@@ -3328,15 +3370,19 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             </button>
 
             <h3 className="font-display text-2xl font-bold text-slate-900 mb-1">
-              Add New Tour Package
+              {language === "AZ" ? "Yeni Tur Paketi Əlavə Et" : "Add New Tour Package"}
             </h3>
             <p className="text-xs text-slate-500 mb-6">
-              Publish a new travel experience directly to the live website catalog
+              {language === "AZ"
+                ? "Yeni səyahət təcrübəsini birbaşa canlı sayt kataloqunda dərc edin"
+                : "Publish a new travel experience directly to the live website catalog"}
             </p>
 
             <form onSubmit={handleCreateTour} className="space-y-3.5 text-xs">
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Tour Title</label>
+                <label className="font-semibold text-slate-700 block mb-1">
+                  {language === "AZ" ? "Turun Adı" : "Tour Title"}
+                </label>
                 <input
                   type="text"
                   required
@@ -3349,7 +3395,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Destination</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "İstiqamət" : "Destination"}
+                  </label>
                   <select
                     value={newTourDestId}
                     onChange={(e) => setNewTourDestId(e.target.value)}
@@ -3364,7 +3412,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Duration (Days)</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Müddət (Gün)" : "Duration (Days)"}
+                  </label>
                   <input
                     type="number"
                     min="1"
@@ -3378,7 +3428,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Base Price ($)</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Baza Qiyməti ($)" : "Base Price ($)"}
+                  </label>
                   <input
                     type="number"
                     step="0.01"
@@ -3391,7 +3443,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Promo Price ($, optional)</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Endirimli Qiymət ($, könüllü)" : "Promo Price ($, optional)"}
+                  </label>
                   <input
                     type="number"
                     step="0.01"
@@ -3404,7 +3458,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Cover Image URL (optional)</label>
+                <label className="font-semibold text-slate-700 block mb-1">
+                  {language === "AZ" ? "Örtük Şəkli URL (könüllü)" : "Cover Image URL (optional)"}
+                </label>
                 <input
                   type="url"
                   placeholder="https://images.unsplash.com/..."
@@ -3415,11 +3471,13 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Overview Description</label>
+                <label className="font-semibold text-slate-700 block mb-1">
+                  {language === "AZ" ? "Ümumi Təsvir" : "Overview Description"}
+                </label>
                 <textarea
                   required
                   rows={3}
-                  placeholder="Describe the highlights and itinerary..."
+                  placeholder={language === "AZ" ? "Əsas məqamları və marşrutu təsvir edin..." : "Describe the highlights and itinerary..."}
                   value={newTourOverview}
                   onChange={(e) => setNewTourOverview(e.target.value)}
                   className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3.5 py-2 text-slate-800 outline-none focus:border-[#0f3460]"
@@ -3432,7 +3490,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity mt-2 cursor-pointer disabled:opacity-50"
                 style={{ backgroundColor: "#0f3460" }}
               >
-                {createLoading ? "Creating Tour..." : "Publish Tour Experience"}
+                {createLoading
+                  ? (language === "AZ" ? "Tur Yaradılır..." : "Creating Tour...")
+                  : (language === "AZ" ? "Tur Təcrübəsini Dərc Et" : "Publish Tour Experience")}
               </button>
             </form>
           </div>
@@ -3468,7 +3528,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   selectedVisa.visaType === "urgent" ? "bg-red-100 text-red-800" : "bg-slate-100 text-slate-700"
                 }`}
               >
-                {selectedVisa.visaType === "urgent" ? "⚡ Urgent (3h)" : "Standard (3d)"}
+                {selectedVisa.visaType === "urgent"
+                  ? (language === "AZ" ? "⚡ Təcili (3 saat)" : "⚡ Urgent (3h)")
+                  : (language === "AZ" ? "Standart (3 gün)" : "Standard (3d)")}
               </span>
             </div>
 
@@ -3493,10 +3555,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             </div>
 
             <h3 className="font-display text-2xl font-bold text-slate-900 mb-1">
-              Process e-Visa Application
+              {language === "AZ" ? "e-Viza Müraciətini İcra Et" : "Process e-Visa Application"}
             </h3>
             <p className="text-xs text-slate-500 mb-6">
-              Review applicant passport data, copy information for submission to evisa.gov.az, and attach approved e-Visa PDF.
+              {language === "AZ"
+                ? "Müraciətçinin pasport məlumatlarını yoxlayın, evisa.gov.az portalına daxil etmək üçün kopyalayın və təsdiqlənmiş e-Viza PDF-ni əlavə edin."
+                : "Review applicant passport data, copy information for submission to evisa.gov.az, and attach approved e-Visa PDF."}
             </p>
 
             {/* Side-by-Side Content */}
@@ -3504,68 +3568,90 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Left Column: Applicant Bio Data */}
               <div className="p-4 rounded-2xl bg-white border border-[#e2d8cc] text-xs space-y-2.5">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="font-bold text-slate-900">Applicant Bio Data</span>
+                  <span className="font-bold text-slate-900">
+                    {language === "AZ" ? "Müraciətçinin Bioqrafik Məlumatları" : "Applicant Bio Data"}
+                  </span>
                   <button
                     onClick={() => handleCopyAsanFormat(selectedVisa)}
                     className="flex items-center gap-1 text-[11px] font-bold text-[#0f3460] hover:underline cursor-pointer"
                   >
                     <Copy className="h-3 w-3" />
-                    Copy for ASAN
+                    {language === "AZ" ? "ASAN üçün kopyala" : "Copy for ASAN"}
                   </button>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Full Name</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Tam Adı" : "Full Name"}
+                  </span>
                   <span className="font-bold text-slate-800">{selectedVisa.surname} {selectedVisa.givenNames}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Nationality</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Vətəndaşlıq" : "Nationality"}
+                    </span>
                     <span className="font-semibold text-slate-800">{selectedVisa.nationality}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Gender</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Cins" : "Gender"}
+                    </span>
                     <span className="font-semibold text-slate-800">{selectedVisa.gender}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Birth Date</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Doğum Tarixi" : "Birth Date"}
+                    </span>
                     <span className="font-semibold text-slate-800">{selectedVisa.birthDate}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Birth Place</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Doğum Yeri" : "Birth Place"}
+                    </span>
                     <span className="font-semibold text-slate-800">{selectedVisa.birthPlace}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Passport No</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Pasport Nömrəsi" : "Passport No"}
+                    </span>
                     <span className="font-mono font-bold text-slate-900">{selectedVisa.passportNumber}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Expiry Date</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Bitmə Tarixi" : "Expiry Date"}
+                    </span>
                     <span className="font-mono text-slate-800">{selectedVisa.passportExpiryDate}</span>
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Contact</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Əlaqə" : "Contact"}
+                  </span>
                   <span className="text-slate-800 block">{selectedVisa.email}</span>
                   <span className="text-slate-800 block">{selectedVisa.phoneNumber}</span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Stay Address in Azerbaijan</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Azərbaycanda Qalma Ünvanı" : "Stay Address in Azerbaijan"}
+                  </span>
                   <span className="text-slate-800 block">{selectedVisa.stayAddress}</span>
                 </div>
 
                 {selectedVisa.passportScanUrl && (
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Passport Document</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Pasport Sənədi" : "Passport Document"}
+                    </span>
                     <button
                       type="button"
                       onClick={() =>
@@ -3577,7 +3663,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       className="inline-flex items-center gap-1 text-xs font-bold text-sky-700 hover:text-sky-900 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-lg cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5" />
-                      Inspect Full Scan ↗
+                      {language === "AZ" ? "Tam Skan Baxışı ↗" : "Inspect Full Scan ↗"}
                     </button>
                   </div>
                 )}
@@ -3593,7 +3679,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
                   >
                     <MessageCircle className="h-3.5 w-3.5" />
-                    Message Applicant on WhatsApp
+                    {language === "AZ" ? "Müraciətçiyə WhatsApp-da Yaz" : "Message Applicant on WhatsApp"}
                   </a>
                 </div>
               </div>
@@ -3601,22 +3687,32 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Right Column: Update Status Form */}
               <form onSubmit={handleUpdateVisa} className="space-y-4 text-xs">
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Application Status</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Müraciət Statusu" : "Application Status"}
+                  </label>
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as any)}
                     className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
                   >
-                    <option value="received">Received / New Verification</option>
-                    <option value="submitted_to_govt">Submitted to evisa.gov.az (In Review)</option>
-                    <option value="approved">Approved & Visa Issued</option>
-                    <option value="rejected">Rejected / Action Needed</option>
+                    <option value="received">
+                      {language === "AZ" ? "Qəbul edildi / Yeni Yoxlama" : "Received / New Verification"}
+                    </option>
+                    <option value="submitted_to_govt">
+                      {language === "AZ" ? "evisa.gov.az portalına göndərildi (Baxışda)" : "Submitted to evisa.gov.az (In Review)"}
+                    </option>
+                    <option value="approved">
+                      {language === "AZ" ? "Təsdiqləndi & Viza Verildi" : "Approved & Visa Issued"}
+                    </option>
+                    <option value="rejected">
+                      {language === "AZ" ? "İmtina edildi / Düzəliş lazımdır" : "Rejected / Action Needed"}
+                    </option>
                   </select>
                 </div>
 
                 <div>
                   <label className="font-semibold text-slate-700 block mb-1">
-                    ASAN Government Reference ID (optional)
+                    {language === "AZ" ? "ASAN Dövlət Referans Kodu (könüllü)" : "ASAN Government Reference ID (optional)"}
                   </label>
                   <input
                     type="text"
@@ -3625,12 +3721,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     onChange={(e) => setEditAsanId(e.target.value)}
                     className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3 py-2 text-slate-800 outline-none font-mono"
                   />
-                  <p className="text-[10px] text-slate-400 mt-0.5">Reference number generated on evisa.gov.az</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    {language === "AZ" ? "evisa.gov.az portalında yaradılan qeydiyyat nömrəsi" : "Reference number generated on evisa.gov.az"}
+                  </p>
                 </div>
 
                 <div>
                   <label className="font-semibold text-slate-700 block mb-1">
-                    Approved e-Visa PDF Download URL
+                    {language === "AZ" ? "Təsdiqlənmiş e-Viza PDF Yükləmə URL" : "Approved e-Visa PDF Download URL"}
                   </label>
                   <input
                     type="url"
@@ -3639,11 +3737,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     onChange={(e) => setEditPdfUrl(e.target.value)}
                     className="w-full rounded-xl border border-[#e2d8cc] bg-white px-3 py-2 text-slate-800 outline-none font-mono"
                   />
-                  <p className="text-[10px] text-slate-400 mt-0.5">URL will be provided to traveler on tracking page</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    {language === "AZ" ? "URL izləmə səhifəsində səyahətçiyə təqdim ediləcək" : "URL will be provided to traveler on tracking page"}
+                  </p>
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Officer Notes (Visible to Traveler)</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Mütəxəssis Qeydləri (Səyahətçiyə Görünür)" : "Officer Notes (Visible to Traveler)"}
+                  </label>
                   <textarea
                     rows={3}
                     placeholder="e.g. Application submitted to ASAN Visa portal at 14:30."
@@ -3660,7 +3762,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity cursor-pointer disabled:opacity-50"
                     style={{ backgroundColor: "#0f3460" }}
                   >
-                    {visaUpdateLoading ? "Updating Application..." : "Save & Update Status"}
+                    {visaUpdateLoading
+                      ? (language === "AZ" ? "Yenilənir..." : "Updating Application...")
+                      : (language === "AZ" ? "Yadda Saxla və Statusu Yenilə" : "Save & Update Status")}
                   </button>
                 </div>
               </form>
@@ -3668,6 +3772,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
           </div>
         </div>
       )}
+
       {/* ═══════════════════════════════════════════════════════ TRANSFER DISPATCH MODAL */}
       {isTransferModalOpen && selectedTransfer && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
@@ -3676,7 +3781,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  Transfer Dispatch & Chauffeur Management
+                  {language === "AZ" ? "Transfer Təyinatı və Sürücü İdarəetməsi" : "Transfer Dispatch & Chauffeur Management"}
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 font-mono">
                   {selectedTransfer.bookingNumber}
@@ -3695,29 +3800,35 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Left Column: Booking Details */}
               <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
                 <div className="font-bold text-slate-700 text-xs uppercase tracking-wider mb-1">
-                  Trip Information
+                  {language === "AZ" ? "Səfər Məlumatları" : "Trip Information"}
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Route</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Marşrut" : "Route"}
+                  </span>
                   <span className="font-semibold text-slate-800">
                     {selectedTransfer.airport} &middot;{" "}
                     {selectedTransfer.direction === "arrival"
-                      ? "🛬 Arrival (Airport → Hotel)"
+                      ? (language === "AZ" ? "🛬 Qarşılama (Aeroport → Hotel)" : "🛬 Arrival (Airport → Hotel)")
                       : selectedTransfer.direction === "departure"
-                      ? "🛫 Departure (Hotel → Airport)"
-                      : "🔄 Round Trip"}
+                      ? (language === "AZ" ? "🛫 Yola salma (Hotel → Aeroport)" : "🛫 Departure (Hotel → Airport)")
+                      : (language === "AZ" ? "🔄 İkitərəfli" : "🔄 Round Trip")}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Zone & Specific Address</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Zona və Dəqiq Ünvan" : "Zone & Specific Address"}
+                  </span>
                   <span className="font-semibold text-slate-800 block">{selectedTransfer.pickupZone}</span>
                   <span className="text-slate-600 block text-[11px]">{selectedTransfer.dropoffAddress}</span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Flight Details</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Uçuş Məlumatları" : "Flight Details"}
+                  </span>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="font-mono font-semibold text-slate-800">
                       ✈️ {selectedTransfer.flightNumber} &middot; {selectedTransfer.flightDate} at {selectedTransfer.flightTime}
@@ -3728,20 +3839,22 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-0.5 text-[10px] font-bold text-sky-600 hover:underline"
                     >
-                      Track ↗
+                      {language === "AZ" ? "İzlə ↗" : "Track ↗"}
                     </a>
                   </div>
                   {selectedTransfer.returnFlightNumber && (
                     <span className="font-mono text-slate-600 block text-[11px] mt-0.5">
-                      ↩️ Return: {selectedTransfer.returnFlightNumber} on {selectedTransfer.returnDate} at {selectedTransfer.returnTime}
+                      {language === "AZ" ? "↩️ Qayıdış:" : "↩️ Return:"} {selectedTransfer.returnFlightNumber} on {selectedTransfer.returnDate} at {selectedTransfer.returnTime}
                     </span>
                   )}
                 </div>
 
                 <div className="border-t border-slate-200/60 pt-2">
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Passenger</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Sərnişin" : "Passenger"}
+                  </span>
                   <span className="font-semibold text-slate-800 block">
-                    {selectedTransfer.passengerName} ({selectedTransfer.passengerCount} pax)
+                    {selectedTransfer.passengerName} ({selectedTransfer.passengerCount} {language === "AZ" ? "nəfər" : "pax"})
                   </span>
                   <span className="text-slate-600 block">{selectedTransfer.phoneNumber}</span>
                   <span className="text-slate-600 block">{selectedTransfer.email}</span>
@@ -3749,20 +3862,26 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
 
                 {selectedTransfer.luggageNotes && (
                   <div className="border-t border-slate-200/60 pt-2">
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Luggage & Special Notes</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Baqaj və Xüsusi Qeydlər" : "Luggage & Special Notes"}
+                    </span>
                     <span className="text-slate-700 italic block">{selectedTransfer.luggageNotes}</span>
                   </div>
                 )}
 
                 <div className="border-t border-slate-200/60 pt-2 flex items-center justify-between">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Vehicle Class</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Nəqliyyat Növü" : "Vehicle Class"}
+                    </span>
                     <span className="font-semibold text-slate-800">
                       {selectedTransfer.vehicleClass === "sedan" ? "🚗 Sedan" : selectedTransfer.vehicleClass === "suv" ? "🚙 SUV" : selectedTransfer.vehicleClass === "minivan" ? "🚐 Minivan" : selectedTransfer.vehicleClass}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Total Rate</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Ümumi Məbləğ" : "Total Rate"}
+                    </span>
                     <span className="text-base font-extrabold text-sky-700">${selectedTransfer.totalAmount}</span>
                   </div>
                 </div>
@@ -3778,7 +3897,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-xl bg-emerald-600 text-white font-bold text-[11px] hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
                   >
                     <MessageCircle className="h-3.5 w-3.5" />
-                    Dispatch Chauffeur via WhatsApp
+                    {language === "AZ" ? "Sürücüyə WhatsApp ilə Göndər" : "Dispatch Chauffeur via WhatsApp"}
                   </a>
 
                   <a
@@ -3790,7 +3909,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-xl bg-sky-600 text-white font-bold text-[11px] hover:bg-sky-700 transition-colors shadow-sm cursor-pointer"
                   >
                     <MessageCircle className="h-3.5 w-3.5" />
-                    Notify Passenger via WhatsApp
+                    {language === "AZ" ? "Sərnişinə WhatsApp ilə Xəbər Ver" : "Notify Passenger via WhatsApp"}
                   </a>
                 </div>
               </div>
@@ -3798,38 +3917,62 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Right Column: Dispatch Form */}
               <form onSubmit={handleUpdateTransfer} className="space-y-4 text-xs">
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Transfer Status</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Transfer Statusu" : "Transfer Status"}
+                  </label>
                   <select
                     value={editTransferStatus}
                     onChange={(e) => setEditTransferStatus(e.target.value as any)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
                   >
-                    <option value="pending">Pending (Awaiting Driver)</option>
-                    <option value="confirmed">Confirmed (Driver Assigned)</option>
-                    <option value="in_progress">In Progress (Driver En Route)</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Payment & Cash Settlement</label>
-                  <select
-                    value={editTransferPaymentStatus}
-                    onChange={(e) => setEditTransferPaymentStatus(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid Online</option>
-                    <option value="cash_collected">💵 Cash Collected by Chauffeur & Remitted</option>
-                    <option value="on_arrival">Pay on Arrival (Cash Pending)</option>
-                    <option value="refunded">Refunded</option>
+                    <option value="pending">
+                      {language === "AZ" ? "Gözləmədə (Sürücü təyin edilməyib)" : "Pending (Awaiting Driver)"}
+                    </option>
+                    <option value="confirmed">
+                      {language === "AZ" ? "Təsdiqləndi (Sürücü təyin edildi)" : "Confirmed (Driver Assigned)"}
+                    </option>
+                    <option value="in_progress">
+                      {language === "AZ" ? "İcrada (Sürücü yoldadır)" : "In Progress (Driver En Route)"}
+                    </option>
+                    <option value="completed">
+                      {language === "AZ" ? "Tamamlandı" : "Completed"}
+                    </option>
+                    <option value="cancelled">
+                      {language === "AZ" ? "Ləğv edildi" : "Cancelled"}
+                    </option>
                   </select>
                 </div>
 
                 <div>
                   <label className="font-semibold text-slate-700 block mb-1">
-                    Assigned Driver Name
+                    {language === "AZ" ? "Ödəniş və Nağd Hesablaşma" : "Payment & Cash Settlement"}
+                  </label>
+                  <select
+                    value={editTransferPaymentStatus}
+                    onChange={(e) => setEditTransferPaymentStatus(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
+                  >
+                    <option value="pending">
+                      {language === "AZ" ? "Gözləmədə" : "Pending"}
+                    </option>
+                    <option value="paid">
+                      {language === "AZ" ? "Onlayn Ödənilib" : "Paid Online"}
+                    </option>
+                    <option value="cash_collected">
+                      {language === "AZ" ? "💵 Nağd Pul Sürücü Tərəfindən Alındı" : "💵 Cash Collected by Chauffeur & Remitted"}
+                    </option>
+                    <option value="on_arrival">
+                      {language === "AZ" ? "Çatanda Ödəniş (Nağd Gözlənilir)" : "Pay on Arrival (Cash Pending)"}
+                    </option>
+                    <option value="refunded">
+                      {language === "AZ" ? "Geri qaytarıldı" : "Refunded"}
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Təyin Olunmuş Sürücünün Adı" : "Assigned Driver Name"}
                   </label>
                   <input
                     type="text"
@@ -3838,12 +3981,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     onChange={(e) => setEditDriverName(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-medium"
                   />
-                  <p className="text-[10px] text-slate-400 mt-0.5">Visible to passenger on tracking page</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    {language === "AZ" ? "İzləmə səhifəsində sərnişinə görünür" : "Visible to passenger on tracking page"}
+                  </p>
                 </div>
 
                 <div>
                   <label className="font-semibold text-slate-700 block mb-1">
-                    Driver Phone / WhatsApp Number
+                    {language === "AZ" ? "Sürücünün Telefonu / WhatsApp Nömrəsi" : "Driver Phone / WhatsApp Number"}
                   </label>
                   <input
                     type="text"
@@ -3852,11 +3997,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     onChange={(e) => setEditDriverPhone(e.target.value)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-mono"
                   />
-                  <p className="text-[10px] text-slate-400 mt-0.5">Used for chauffeur WhatsApp dispatch</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    {language === "AZ" ? "Sürücüyə WhatsApp bildirişi üçün istifadə olunur" : "Used for chauffeur WhatsApp dispatch"}
+                  </p>
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Dispatch & Ops Notes</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Dispetçer və Əməliyyat Qeydləri" : "Dispatch & Ops Notes"}
+                  </label>
                   <textarea
                     rows={3}
                     placeholder="e.g. Flight monitored, Terminal 1 greeting sign ready."
@@ -3873,7 +4022,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity cursor-pointer disabled:opacity-50"
                     style={{ backgroundColor: "#0f3460" }}
                   >
-                    {transferUpdateLoading ? "Updating Dispatch..." : "Save & Update Dispatch"}
+                    {transferUpdateLoading
+                      ? (language === "AZ" ? "Yenilənir..." : "Updating Dispatch...")
+                      : (language === "AZ" ? "Yadda Saxla və Yenilə" : "Save & Update Dispatch")}
                   </button>
                 </div>
               </form>
@@ -3889,7 +4040,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                  Tour Guide & Date Assignment
+                  {language === "AZ" ? "Tur Bələdçisi və Tarix Təyinatı" : "Tour Guide & Date Assignment"}
                 </span>
                 <h3 className="text-xl font-bold text-slate-900 font-mono mt-1">
                   {selectedTourRes.reservationNumber}
@@ -3907,38 +4058,50 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Left: Reservation Summary */}
               <div className="space-y-3 bg-amber-50/40 p-4 rounded-2xl border border-amber-200/60 text-xs">
                 <div className="font-bold text-slate-700 text-xs uppercase tracking-wider mb-1">
-                  Tour Request Details
+                  {language === "AZ" ? "Tur Rezervasiya Təfərrüatları" : "Tour Request Details"}
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Tour Experience</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Tur Təcrübəsi" : "Tour Experience"}
+                  </span>
                   <span className="font-bold text-slate-900 text-sm">{selectedTourRes.tourTitle}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Preferred Date</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Seçilmiş Tarix" : "Preferred Date"}
+                    </span>
                     <span className="font-semibold text-slate-800">📅 {selectedTourRes.tourDate}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Party Size</span>
-                    <span className="font-semibold text-slate-800">{selectedTourRes.guests} Guests</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Qrup Ölçüsü" : "Party Size"}
+                    </span>
+                    <span className="font-semibold text-slate-800">{selectedTourRes.guests} {language === "AZ" ? "Qonaq" : "Guests"}</span>
                   </div>
                 </div>
 
                 <div className="border-t border-amber-200/60 pt-2">
-                  <span className="text-slate-400 block text-[10px] uppercase font-medium">Lead Traveler</span>
+                  <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                    {language === "AZ" ? "Əsas Səyahətçi" : "Lead Traveler"}
+                  </span>
                   <span className="font-semibold text-slate-900 block">{selectedTourRes.travelerName}</span>
                   <span className="text-slate-600 font-mono block">{selectedTourRes.phoneNumber}</span>
                 </div>
 
                 <div className="border-t border-amber-200/60 pt-2 flex items-center justify-between">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Group Rate</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Qrup Qiyməti" : "Group Rate"}
+                    </span>
                     <span className="text-base font-extrabold text-slate-900">${selectedTourRes.price} USD</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-slate-400 block text-[10px] uppercase font-medium">Approx. AZN</span>
+                    <span className="text-slate-400 block text-[10px] uppercase font-medium">
+                      {language === "AZ" ? "Təxmini AZN" : "Approx. AZN"}
+                    </span>
                     <span className="text-xs font-bold text-slate-600">~{(Number(selectedTourRes.price) * 1.7).toFixed(0)} AZN</span>
                   </div>
                 </div>
@@ -3953,7 +4116,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="flex items-center justify-center gap-1.5 w-full py-2.5 px-3 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
                   >
                     <MessageCircle className="h-3.5 w-3.5" />
-                    Chat with Traveler on WhatsApp
+                    {language === "AZ" ? "Səyahətçi ilə WhatsApp-da Əlaqə Saxla" : "Chat with Traveler on WhatsApp"}
                   </a>
                 </div>
               </div>
@@ -3961,21 +4124,33 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               {/* Right: Guide Assignment Form */}
               <form onSubmit={handleUpdateTourRes} className="space-y-4 text-xs">
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Reservation Status</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Rezervasiya Statusu" : "Reservation Status"}
+                  </label>
                   <select
                     value={editTourResStatus}
                     onChange={(e) => setEditTourResStatus(e.target.value as any)}
                     className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 outline-none font-semibold cursor-pointer"
                   >
-                    <option value="pending">Pending Review</option>
-                    <option value="confirmed">Confirmed (Guide Assigned)</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">
+                      {language === "AZ" ? "Baxış Gözlənilir" : "Pending Review"}
+                    </option>
+                    <option value="confirmed">
+                      {language === "AZ" ? "Təsdiqləndi (Bələdçi Təyin Edildi)" : "Confirmed (Guide Assigned)"}
+                    </option>
+                    <option value="completed">
+                      {language === "AZ" ? "Tamamlandı" : "Completed"}
+                    </option>
+                    <option value="cancelled">
+                      {language === "AZ" ? "Ləğv edildi" : "Cancelled"}
+                    </option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Assigned Guide Name</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Təyin Edilən Bələdçinin Adı" : "Assigned Guide Name"}
+                  </label>
                   <input
                     type="text"
                     placeholder="e.g. Leyla Aliyeva (English Guide)"
@@ -3986,7 +4161,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Guide Contact / WhatsApp</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Bələdçi Əlaqə / WhatsApp" : "Guide Contact / WhatsApp"}
+                  </label>
                   <input
                     type="text"
                     placeholder="e.g. +994 55 987 6543"
@@ -3997,7 +4174,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
 
                 <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Operational Notes / Hotel Pickup</label>
+                  <label className="font-semibold text-slate-700 block mb-1">
+                    {language === "AZ" ? "Əməliyyat Qeydləri / Hoteldən Götürmə" : "Operational Notes / Hotel Pickup"}
+                  </label>
                   <textarea
                     rows={3}
                     placeholder="e.g. Pickup from Four Seasons at 09:30 AM. Mercedes Sprinter arranged."
@@ -4014,7 +4193,9 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-white shadow-md hover:opacity-95 transition-opacity cursor-pointer disabled:opacity-50"
                     style={{ backgroundColor: "#0f3460" }}
                   >
-                    {tourResUpdateLoading ? "Saving..." : "Save Reservation & Guide"}
+                    {tourResUpdateLoading
+                      ? (language === "AZ" ? "Yadda saxlanılır..." : "Saving...")
+                      : (language === "AZ" ? "Rezervasiya və Bələdçini Saxla" : "Save Reservation & Guide")}
                   </button>
                 </div>
               </form>
@@ -4035,10 +4216,14 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 </div>
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">
-                    {destinationModalMode === "create" ? "New Region" : "Update Region"}
+                    {destinationModalMode === "create"
+                      ? (language === "AZ" ? "Yeni Region" : "New Region")
+                      : (language === "AZ" ? "Regionu Yenilə" : "Update Region")}
                   </span>
                   <h3 className="text-xl font-bold font-display text-slate-900 mt-0.5">
-                    {destinationModalMode === "create" ? "Add New Destination" : `Edit Destination: ${destFormName}`}
+                    {destinationModalMode === "create"
+                      ? (language === "AZ" ? "Yeni İstiqamət Əlavə Et" : "Add New Destination")
+                      : (language === "AZ" ? `İstiqamətə Düzəliş Et: ${destFormName}` : `Edit Destination: ${destFormName}`)}
                   </h3>
                 </div>
               </div>
@@ -4056,9 +4241,11 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 flex items-center gap-1.5">
                   <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-                  Quick Azerbaijan Presets (1-Click Fill)
+                  {language === "AZ" ? "Azərbaycan Şablonları (1 Kliklə Doldur)" : "Quick Azerbaijan Presets (1-Click Fill)"}
                 </span>
-                <span className="text-[10px] text-sky-600 font-medium">Click to auto-fill</span>
+                <span className="text-[10px] text-sky-600 font-medium">
+                  {language === "AZ" ? "Avtomatik doldurmaq üçün klikləyin" : "Click to auto-fill"}
+                </span>
               </div>
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {AZERBAIJAN_DESTINATION_PRESETS.map((p) => {
@@ -4088,7 +4275,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 {/* Destination Name */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Destination / City Name *
+                    {language === "AZ" ? "İstiqamət / Şəhər Adı *" : "Destination / City Name *"}
                   </label>
                   <input
                     type="text"
@@ -4109,7 +4296,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 {/* Country */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Country
+                    {language === "AZ" ? "Ölkə" : "Country"}
                   </label>
                   <input
                     type="text"
@@ -4125,7 +4312,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                 {/* Slug */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    URL Slug
+                    {language === "AZ" ? "URL Slug (Qısa yol)" : "URL Slug"}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-mono text-slate-400">
@@ -4139,13 +4326,15 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                       className="w-full pl-7 pr-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-base sm:text-xs text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460]"
                     />
                   </div>
-                  <span className="text-[10px] text-slate-400 mt-1 block">Used for routing and tour filtering tags.</span>
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    {language === "AZ" ? "Marşrut və tur filtr etiketləri üçün istifadə olunur." : "Used for routing and tour filtering tags."}
+                  </span>
                 </div>
 
                 {/* Hero Image URL */}
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Featured Hero Image URL
+                    {language === "AZ" ? "Əsas Qapaq Şəkli URL" : "Featured Hero Image URL"}
                   </label>
                   <input
                     type="url"
@@ -4154,14 +4343,18 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                     placeholder="https://images.unsplash.com/..."
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-base sm:text-xs text-slate-900 bg-white placeholder-slate-400 focus:outline-none focus:border-[#0f3460] focus:ring-1 focus:ring-[#0f3460]"
                   />
-                  <span className="text-[10px] text-slate-400 mt-1 block">High quality landscape orientation photo (16:9 or 4:3).</span>
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    {language === "AZ" ? "Yüksək keyfiyyətli üfüqi foto (16:9 və ya 4:3)." : "High quality landscape orientation photo (16:9 or 4:3)."}
+                  </span>
                 </div>
               </div>
 
               {/* Live Preview Card */}
               {destFormHeroImage && (
                 <div className="space-y-1.5">
-                  <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">Live Image Preview</span>
+                  <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
+                    {language === "AZ" ? "Şəkil Ön Baxışı" : "Live Image Preview"}
+                  </span>
                   <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 shadow-inner">
                     <img
                       src={destFormHeroImage}
@@ -4177,12 +4370,12 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                         /{destFormSlug || "slug"}
                       </span>
                       <span className="rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-400/30 px-2 py-0.5 text-[10px] font-bold text-amber-200">
-                        🇦🇿 {destFormCountry || "Azerbaijan"}
+                        🇦🇿 {destFormCountry || (language === "AZ" ? "Azərbaycan" : "Azerbaijan")}
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-4 text-white">
                       <p className="font-bold text-lg font-display drop-shadow-md">
-                        {destFormName || "Destination Preview"}
+                        {destFormName || (language === "AZ" ? "İstiqamət Ön Baxışı" : "Destination Preview")}
                       </p>
                     </div>
                   </div>
@@ -4196,7 +4389,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   onClick={() => setIsDestinationModalOpen(false)}
                   className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  Cancel
+                  {adminT.actions.cancel}
                 </button>
                 <button
                   type="submit"
@@ -4207,12 +4400,16 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   {destSaving ? (
                     <>
                       <RefreshCw className="h-4 w-4 animate-spin text-amber-400" />
-                      <span>Saving Destination...</span>
+                      <span>{language === "AZ" ? "İstiqamət Saxlanılır..." : "Saving Destination..."}</span>
                     </>
                   ) : (
                     <>
                       <Check className="h-4 w-4 text-amber-400" />
-                      <span>{destinationModalMode === "create" ? "Create Destination" : "Save Changes"}</span>
+                      <span>
+                        {destinationModalMode === "create"
+                          ? (language === "AZ" ? "İstiqamət Yarat" : "Create Destination")
+                          : (language === "AZ" ? "Dəyişiklikləri Saxla" : "Save Changes")}
+                      </span>
                     </>
                   )}
                 </button>
@@ -4244,7 +4441,7 @@ Purpose of Visit: ${visa.purposeOfVisit}`;
                   download
                   className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
                 >
-                  <Download className="h-3.5 w-3.5" /> Full Resolution ↗
+                  <Download className="h-3.5 w-3.5" /> {language === "AZ" ? "Tam Ölçüdə ↗" : "Full Resolution ↗"}
                 </a>
                 <button
                   onClick={() => setLightboxImage(null)}

@@ -68,6 +68,148 @@ export interface AdminTranslations {
     activeTourPackages: string;
     topDestination: string;
   };
+  overviewTab: {
+    title: string;
+    subtitle: string;
+    viewAll: string;
+    colCustomer: string;
+    colTour: string;
+    colGuests: string;
+    colTotal: string;
+    colStatus: string;
+    colAction: string;
+    noBookings: string;
+    guest: string;
+    customTour: string;
+    travelerSingular: string;
+    travelerPlural: string;
+    confirm: string;
+  };
+  toursTab: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    colDetails: string;
+    colDestination: string;
+    colDuration: string;
+    colPricing: string;
+    colRating: string;
+    colVisibility: string;
+    colActions: string;
+    days: string;
+    nights: string;
+    daySingular: string;
+    nightSingular: string;
+    active: string;
+    inactive: string;
+    reviews: string;
+    edit: string;
+    delete: string;
+    noTours: string;
+    createNewTour: string;
+  };
+  bookingsTab: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    filterAll: string;
+    colCustomer: string;
+    colTour: string;
+    colTravelers: string;
+    colTotal: string;
+    colStatus: string;
+    colDate: string;
+    colActions: string;
+    noBookings: string;
+    confirmBtn: string;
+    cancelBtn: string;
+  };
+  destinationsTab: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    colPhoto: string;
+    colName: string;
+    colCountry: string;
+    colSlug: string;
+    colTours: string;
+    colActions: string;
+    noDestinations: string;
+    addBtn: string;
+    editBtn: string;
+    deleteBtn: string;
+  };
+  visasTab: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    colApplicant: string;
+    colPassport: string;
+    colRefCode: string;
+    colType: string;
+    colStatus: string;
+    colDate: string;
+    colActions: string;
+    noVisas: string;
+    markProcessing: string;
+    markIssued: string;
+    reject: string;
+    viewDetails: string;
+    standard: string;
+    express: string;
+  };
+  transfersTab: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    colPassenger: string;
+    colFlight: string;
+    colRoute: string;
+    colVehicle: string;
+    colDate: string;
+    colFare: string;
+    colStatus: string;
+    colActions: string;
+    noTransfers: string;
+    confirm: string;
+    cancel: string;
+    complete: string;
+  };
+  usersTab: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    colUser: string;
+    colRole: string;
+    colCreated: string;
+    colActions: string;
+    noUsers: string;
+    adminRole: string;
+    staffRole: string;
+    userRole: string;
+  };
+  auditTab: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    colAction: string;
+    colEntity: string;
+    colActor: string;
+    colIp: string;
+    colTime: string;
+    noLogs: string;
+  };
+  settingsTab: {
+    title: string;
+    subtitle: string;
+    saveBtn: string;
+    savingBtn: string;
+    catAll: string;
+    catGeneral: string;
+    catPricing: string;
+    catContact: string;
+    catFeatures: string;
+  };
   status: {
     pending: string;
     confirmed: string;
@@ -156,13 +298,13 @@ export const ADMIN_TRANSLATIONS: Record<"EN" | "AZ", AdminTranslations> = {
     stats: {
       totalRevenue: "Total Revenue",
       totalBookings: "Total Bookings",
-      pendingBookings: "Pending Bookings",
+      pendingBookings: "Pending Action",
       activeTours: "Active Tours",
       totalUsers: "Total Users",
-      allTimeGross: "All time gross",
-      confirmedPending: "Confirmed & pending",
-      needsReview: "Needs review",
-      liveInCatalog: "Live in catalog",
+      allTimeGross: "From confirmed bookings",
+      confirmedPending: "Across all travel seasons",
+      needsReview: "Needs employer confirmation",
+      liveInCatalog: "Published on site",
       registeredTravelers: "Registered travelers",
       totalDestinations: "Total Destinations",
       catalogedRegions: "Cataloged regions",
@@ -170,6 +312,148 @@ export const ADMIN_TRANSLATIONS: Record<"EN" | "AZ", AdminTranslations> = {
       linkedTours: "Linked Tours",
       activeTourPackages: "Active tour packages",
       topDestination: "Top Destination",
+    },
+    overviewTab: {
+      title: "Recent Customer Bookings",
+      subtitle: "Live reservation requests from travelers",
+      viewAll: "View all bookings →",
+      colCustomer: "Customer",
+      colTour: "Tour Experience",
+      colGuests: "Guests",
+      colTotal: "Total",
+      colStatus: "Status",
+      colAction: "Action",
+      noBookings: "No recent bookings found.",
+      guest: "Guest",
+      customTour: "Custom Tour",
+      travelerSingular: "Traveler",
+      travelerPlural: "Travelers",
+      confirm: "Confirm",
+    },
+    toursTab: {
+      title: "All Tours & Experiences",
+      subtitle: "Manage tour catalog, pricing, durations, and public visibility",
+      searchPlaceholder: "Search tours...",
+      colDetails: "Tour Details",
+      colDestination: "Destination",
+      colDuration: "Duration",
+      colPricing: "Pricing",
+      colRating: "Rating",
+      colVisibility: "Site Visibility",
+      colActions: "Actions",
+      days: "days",
+      nights: "nights",
+      daySingular: "day",
+      nightSingular: "night",
+      active: "Active",
+      inactive: "Hidden",
+      reviews: "reviews",
+      edit: "Edit",
+      delete: "Delete",
+      noTours: "No tours match your search.",
+      createNewTour: "Create New Tour",
+    },
+    bookingsTab: {
+      title: "All Bookings & Reservations",
+      subtitle: "Manage customer bookings, deposits, confirmations and cancellations",
+      searchPlaceholder: "Search by customer, email or tour...",
+      filterAll: "All Statuses",
+      colCustomer: "Customer",
+      colTour: "Booked Tour",
+      colTravelers: "Travelers",
+      colTotal: "Total Price",
+      colStatus: "Status",
+      colDate: "Booked Date",
+      colActions: "Actions",
+      noBookings: "No bookings found matching filters.",
+      confirmBtn: "Confirm",
+      cancelBtn: "Cancel",
+    },
+    destinationsTab: {
+      title: "Destinations & Regions",
+      subtitle: "Manage featured locations, cities, and regional guides",
+      searchPlaceholder: "Search destinations by name, region or slug...",
+      colPhoto: "Photo",
+      colName: "Destination",
+      colCountry: "Country / Region",
+      colSlug: "Slug",
+      colTours: "Linked Tours",
+      colActions: "Actions",
+      noDestinations: "No destinations found matching your search.",
+      addBtn: "Add Destination",
+      editBtn: "Edit",
+      deleteBtn: "Delete",
+    },
+    visasTab: {
+      title: "e-Visa Processing Queue",
+      subtitle: "Review, process, issue or reject incoming tourist and business visas",
+      searchPlaceholder: "Search applicant, ref, passport...",
+      colApplicant: "Applicant",
+      colPassport: "Passport",
+      colRefCode: "Ref Code",
+      colType: "Visa Type",
+      colStatus: "Status",
+      colDate: "Created",
+      colActions: "Actions",
+      noVisas: "No e-Visa applications match your search.",
+      markProcessing: "Process",
+      markIssued: "Issue Visa",
+      reject: "Reject",
+      viewDetails: "View Details",
+      standard: "Standard",
+      express: "Express",
+    },
+    transfersTab: {
+      title: "Airport Transfers & Chauffeur Queue",
+      subtitle: "Manage airport arrivals, hotel drop-offs and chauffeur assignments",
+      searchPlaceholder: "Search passenger, ref, flight, phone...",
+      colPassenger: "Passenger",
+      colFlight: "Flight & Airport",
+      colRoute: "Pickup & Dropoff",
+      colVehicle: "Vehicle",
+      colDate: "Date & Time",
+      colFare: "Fare",
+      colStatus: "Status",
+      colActions: "Actions",
+      noTransfers: "No transfer bookings match your search.",
+      confirm: "Confirm",
+      cancel: "Cancel",
+      complete: "Complete",
+    },
+    usersTab: {
+      title: "Users & Staff Directory",
+      subtitle: "Platform administrators, managers, and registered travelers",
+      searchPlaceholder: "Search users by name or email...",
+      colUser: "User",
+      colRole: "Role",
+      colCreated: "Joined",
+      colActions: "Actions",
+      noUsers: "No users match your search query.",
+      adminRole: "Administrator",
+      staffRole: "Staff Member",
+      userRole: "Customer",
+    },
+    auditTab: {
+      title: "System Audit Trail & Security Logs",
+      subtitle: "Comprehensive activity log of all admin operations and data changes",
+      searchPlaceholder: "Search action, entity ID, email, IP...",
+      colAction: "Action",
+      colEntity: "Entity",
+      colActor: "Actor",
+      colIp: "IP Address",
+      colTime: "Timestamp",
+      noLogs: "No audit records found matching your filters.",
+    },
+    settingsTab: {
+      title: "Platform Settings & Operations Control",
+      subtitle: "Configure live pricing, currency rates, support contact and site metadata",
+      saveBtn: "Save All Settings",
+      savingBtn: "Saving Settings...",
+      catAll: "All Settings",
+      catGeneral: "General",
+      catPricing: "Pricing & Currency",
+      catContact: "Support & Contact",
+      catFeatures: "Features & Flags",
     },
     status: {
       pending: "Pending",
@@ -260,10 +544,10 @@ export const ADMIN_TRANSLATIONS: Record<"EN" | "AZ", AdminTranslations> = {
       pendingBookings: "Gözləyən Sifarişlər",
       activeTours: "Aktiv Turlar",
       totalUsers: "Cəmi İstifadəçilər",
-      allTimeGross: "Bütün dövrlər üzrə",
-      confirmedPending: "Təsdiqlənmiş və gözləyən",
-      needsReview: "Baxış tələb edir",
-      liveInCatalog: "Kataloqda aktiv",
+      allTimeGross: "Təsdiqlənmiş sifarişlərdən",
+      confirmedPending: "Bütün səyahət mövsümləri üzrə",
+      needsReview: "Təsdiq tələb olunur",
+      liveInCatalog: "Saytda dərc edilib",
       registeredTravelers: "Qeydiyyatlı səyahətçilər",
       totalDestinations: "Cəmi İstiqamətlər",
       catalogedRegions: "Kataloqdakı regionlar",
@@ -271,6 +555,148 @@ export const ADMIN_TRANSLATIONS: Record<"EN" | "AZ", AdminTranslations> = {
       linkedTours: "Bağlı Turlar",
       activeTourPackages: "Aktiv tur paketləri",
       topDestination: "Ən Populyar İstiqamət",
+    },
+    overviewTab: {
+      title: "Son Müştəri Sifarişləri",
+      subtitle: "Səyahətçilərdən daxil olan canlı rezervasiya sorğuları",
+      viewAll: "Bütün sifarişlərə bax →",
+      colCustomer: "Müştəri",
+      colTour: "Tur Təcrübəsi",
+      colGuests: "Qonaqlar",
+      colTotal: "Məbləğ",
+      colStatus: "Status",
+      colAction: "Əməliyyat",
+      noBookings: "Son sifariş tapılmadı.",
+      guest: "Qonaq",
+      customTour: "Fərdi Tur",
+      travelerSingular: "Səyahətçi",
+      travelerPlural: "Səyahətçi",
+      confirm: "Təsdiqlə",
+    },
+    toursTab: {
+      title: "Bütün Turlar və Təcrübələr",
+      subtitle: "Tur kataloqu, qiymətlər, müddət və sayt görünüşünü idarə edin",
+      searchPlaceholder: "Turları axtar...",
+      colDetails: "Tur Məlumatları",
+      colDestination: "İstiqamət",
+      colDuration: "Müddət",
+      colPricing: "Qiymət",
+      colRating: "Reytinq",
+      colVisibility: "Saytda Görünüş",
+      colActions: "Əməliyyatlar",
+      days: "gün",
+      nights: "gecə",
+      daySingular: "gün",
+      nightSingular: "gecə",
+      active: "Aktiv",
+      inactive: "Gizli",
+      reviews: "rəy",
+      edit: "Düzəliş et",
+      delete: "Sil",
+      noTours: "Axtarışa uyğun tur tapılmadı.",
+      createNewTour: "Yeni Tur Yarat",
+    },
+    bookingsTab: {
+      title: "Bütün Sifarişlər və Rezervasiyalar",
+      subtitle: "Müştəri sifarişləri, depozitlər, təsdiqlər və ləğvləri idarə edin",
+      searchPlaceholder: "Müştəri, e-poçt və ya tur üzrə axtar...",
+      filterAll: "Bütün Statuslar",
+      colCustomer: "Müştəri",
+      colTour: "Sifariş Edilən Tur",
+      colTravelers: "Səyahətçilər",
+      colTotal: "Ümumi Məbləğ",
+      colStatus: "Status",
+      colDate: "Sifariş Tarixi",
+      colActions: "Əməliyyatlar",
+      noBookings: "Filtrə uyğun sifariş tapılmadı.",
+      confirmBtn: "Təsdiqlə",
+      cancelBtn: "Ləğv et",
+    },
+    destinationsTab: {
+      title: "İstiqamətlər və Regionlar",
+      subtitle: "Seçilmiş məkanlar, şəhərlər və regional bələdçiləri idarə edin",
+      searchPlaceholder: "Ad, region və ya slug üzrə axtar...",
+      colPhoto: "Şəkil",
+      colName: "İstiqamət",
+      colCountry: "Ölkə / Region",
+      colSlug: "Slug",
+      colTours: "Bağlı Turlar",
+      colActions: "Əməliyyatlar",
+      noDestinations: "Axtarışa uyğun istiqamət tapılmadı.",
+      addBtn: "Yeni İstiqamət",
+      editBtn: "Düzəliş et",
+      deleteBtn: "Sil",
+    },
+    visasTab: {
+      title: "e-Viza Müraciətləri Növbəsi",
+      subtitle: "Daxil olan turist və biznes vizalarını yoxlayın, icra edin, təsdiqləyin və ya imtina edin",
+      searchPlaceholder: "Müraciətçi, kod, pasport axtar...",
+      colApplicant: "Müraciətçi",
+      colPassport: "Pasport",
+      colRefCode: "Müraciət Kodu",
+      colType: "Viza Növü",
+      colStatus: "Status",
+      colDate: "Tarix",
+      colActions: "Əməliyyatlar",
+      noVisas: "Axtarışa uyğun e-Viza müraciəti tapılmadı.",
+      markProcessing: "İcraya götür",
+      markIssued: "Viza Ver",
+      reject: "İmtina et",
+      viewDetails: "Ətraflı bax",
+      standard: "Standart",
+      express: "Ekspres",
+    },
+    transfersTab: {
+      title: "Aeroport Transferləri və Sürücü Növbəsi",
+      subtitle: "Hava limanı qarşılamaları, hotel çatdırılmaları və sürücü təyinatını idarə edin",
+      searchPlaceholder: "Sərnişin, kod, reys, telefon axtar...",
+      colPassenger: "Sərnişin",
+      colFlight: "Reys və Aeroport",
+      colRoute: "Marşrut",
+      colVehicle: "Nəqliyyat",
+      colDate: "Tarix və Saat",
+      colFare: "Məbləğ",
+      colStatus: "Status",
+      colActions: "Əməliyyatlar",
+      noTransfers: "Axtarışa uyğun transfer sifarişi tapılmadı.",
+      confirm: "Təsdiqlə",
+      cancel: "Ləğv et",
+      complete: "Tamamla",
+    },
+    usersTab: {
+      title: "İstifadəçilər və Heyət Siyahısı",
+      subtitle: "Platform inzibatçıları, menecerlər və qeydiyyatlı səyahətçilər",
+      searchPlaceholder: "Ad və ya e-poçt üzrə axtar...",
+      colUser: "İstifadəçi",
+      colRole: "Rol",
+      colCreated: "Qeydiyyat",
+      colActions: "Əməliyyatlar",
+      noUsers: "Axtarışa uyğun istifadəçi tapılmadı.",
+      adminRole: "İnzibatçı",
+      staffRole: "Heyət Üzvü",
+      userRole: "Müştəri",
+    },
+    auditTab: {
+      title: "Sistem Audit və Təhlükəsizlik Girişləri",
+      subtitle: "Bütün admin əməliyyatları və məlumat dəyişikliklərinin fəaliyyət jurnalı",
+      searchPlaceholder: "Əməliyyat, ID, e-poçt, IP axtar...",
+      colAction: "Əməliyyat",
+      colEntity: "Obyekt",
+      colActor: "İstifadəçi",
+      colIp: "IP Ünvanı",
+      colTime: "Zaman",
+      noLogs: "Axtarışa uyğun audit qeydi tapılmadı.",
+    },
+    settingsTab: {
+      title: "Platform Tənzimləmələri və Əməliyyat Nəzarəti",
+      subtitle: "Canlı qiymətlər, məzənnələr, əlaqə və sayt tənzimləmələrini idarə edin",
+      saveBtn: "Bütün Tənzimləmələri Yadda Saxla",
+      savingBtn: "Yadda saxlanılır...",
+      catAll: "Bütün Tənzimləmələr",
+      catGeneral: "Ümumi",
+      catPricing: "Qiymət və Valyuta",
+      catContact: "Dəstək və Əlaqə",
+      catFeatures: "Funksiyalar",
     },
     status: {
       pending: "Gözləmədə",
