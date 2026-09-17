@@ -261,6 +261,7 @@ export default function HomePage() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { language, setLanguage, t, currentLangInfo, isRtl, languages, showToast } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -269,14 +270,24 @@ export default function HomePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { currency, setCurrency, activeCurrency, currencies, formatPrice, formatPriceWithSubtext } = useCurrency();
 
-  // Scroll listener for sticky header glassmorphism
+  // Scroll listener for sticky header glassmorphism (RAF throttled to eliminate layout thrashing)
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    handleScroll();
+    const rafId = window.requestAnimationFrame(handleScroll);
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const handleCopyLink = () => {
@@ -302,14 +313,17 @@ export default function HomePage() {
       if (!target.closest("#user-dropdown-container")) {
         setUserDropdownOpen(false);
       }
+      if (!target.closest("#services-dropdown-container")) {
+        setServicesDropdownOpen(false);
+      }
     };
-    if (userDropdownOpen) {
+    if (userDropdownOpen || servicesDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [userDropdownOpen]);
+  }, [userDropdownOpen, servicesDropdownOpen]);
 
   // Auto-advance hero background slider & non-blocking background initialization
   useEffect(() => {
@@ -494,38 +508,150 @@ export default function HomePage() {
               </Link>
             ))}
 
-            {/* ── e-Visa CTA — icon+text at 2xl+, icon-only at xl ── */}
-            <Link
-              href="/visa"
-              className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-white/10 hover:text-white whitespace-nowrap shrink-0"
-              title={t.nav.evisa}
+            {/* ── Services Dropdown (Zero mystery icons, zero overflow in any language) ── */}
+            <div
+              id="services-dropdown-container"
+              className="relative"
+              onMouseEnter={() => setServicesDropdownOpen(true)}
+              onMouseLeave={() => setServicesDropdownOpen(false)}
             >
-              <FileText className="h-3.5 w-3.5 shrink-0 text-slate-300" />
-              <span className="hidden 2xl:inline">{t.nav.evisa}</span>
-              <span className="hidden 2xl:inline ms-0.5 rounded bg-white/15 px-1.5 py-0.5 text-[9px] font-medium tracking-wide text-slate-300 shrink-0">
-                {t.nav.fastBadge}
-              </span>
-            </Link>
+              <button
+                type="button"
+                onClick={() => setServicesDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-1 text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer py-1.5 whitespace-nowrap"
+                aria-expanded={servicesDropdownOpen}
+              >
+                <span>
+                  {language === "AZ"
+                    ? "Xidmətlər"
+                    : language === "RU"
+                    ? "Услуги"
+                    : language === "FR"
+                    ? "Services"
+                    : language === "AR"
+                    ? "الخدمات"
+                    : language === "DE"
+                    ? "Services"
+                    : "Services"}
+                </span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                    servicesDropdownOpen ? "rotate-180 text-[#f59e0b]" : "text-white/70"
+                  }`}
+                />
+              </button>
 
-            {/* ── Airport Transfer CTA — icon+text at 2xl+, icon-only at xl ── */}
-            <Link
-              href="/transfer"
-              className="flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-sky-500/15 px-3 py-1 text-xs font-semibold text-sky-200 backdrop-blur-sm transition-all duration-200 hover:border-sky-300 hover:bg-sky-500/25 hover:text-white whitespace-nowrap shrink-0"
-              title={t.nav.transfer}
-            >
-              <Car className="h-3.5 w-3.5 text-sky-300 shrink-0" />
-              <span className="hidden 2xl:inline">{t.nav.transfer}</span>
-            </Link>
+              {servicesDropdownOpen && (
+                <div className="absolute start-0 top-full pt-2 w-72 z-50 animate-scale-up">
+                  <div
+                    className="rounded-2xl p-2 shadow-2xl backdrop-blur-xl border border-white/10"
+                    style={{ backgroundColor: "#061225" }}
+                  >
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-white/10 mb-1">
+                      {language === "AZ"
+                        ? "Səyahət Xidmətləri"
+                        : language === "RU"
+                        ? "Туристические Услуги"
+                        : "Travel Services"}
+                    </div>
 
-            {/* ── Custom Itinerary CTA — icon+text at 2xl+, icon-only at xl ── */}
-            <Link
-              href="/custom-itinerary"
-              className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-200 backdrop-blur-sm transition-all duration-200 hover:border-amber-300 hover:bg-amber-500/25 hover:text-white whitespace-nowrap shrink-0"
-              title="Custom Tour Builder"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-              <span className="hidden 2xl:inline">Custom Planner</span>
-            </Link>
+                    <Link
+                      href="/visa"
+                      onClick={() => setServicesDropdownOpen(false)}
+                      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="p-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                            {t.nav.evisa}
+                          </span>
+                          <span className="rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 text-[9px] font-semibold">
+                            {t.nav.fastBadge || "3h"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                          {language === "AZ"
+                            ? "Rəsmi ASAN Elektron Viza"
+                            : language === "RU"
+                            ? "Официальная виза ASAN за 3 часа"
+                            : "Official ASAN 3-hour electronic visa"}
+                        </p>
+                      </div>
+                    </Link>
+
+                    <Link
+                      href="/transfer"
+                      onClick={() => setServicesDropdownOpen(false)}
+                      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="p-2 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
+                        <Car className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                          {t.nav.transfer}
+                        </span>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                          {language === "AZ"
+                            ? "Heydər Əliyev Hava Limanı (GYD) transferi"
+                            : language === "RU"
+                            ? "Встреча в аэропорту Баку 24/7"
+                            : "Baku GYD Airport 24/7 VIP pickup"}
+                        </p>
+                      </div>
+                    </Link>
+
+                    <Link
+                      href="/custom-itinerary"
+                      onClick={() => setServicesDropdownOpen(false)}
+                      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="p-2 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                          {language === "AZ"
+                            ? "Xüsusi Tur Planlayıcı"
+                            : language === "RU"
+                            ? "Индивидуальный Тур"
+                            : "Custom Tour Planner"}
+                        </span>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                          {language === "AZ"
+                            ? "Fərdi səyahət marşrutu qurun"
+                            : language === "RU"
+                            ? "Индивидуальный маршрут под ключ"
+                            : "Tailor-made Caucasus bespoke journeys"}
+                        </p>
+                      </div>
+                    </Link>
+
+                    <div className="border-t border-white/10 my-1 pt-1">
+                      <Link
+                        href="/medical"
+                        onClick={() => setServicesDropdownOpen(false)}
+                        className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <span>{language === "AZ" ? "🩺 Tibbi Turizm" : language === "RU" ? "🩺 Медицинский Туризм" : "🩺 Medical Tourism"}</span>
+                        <ArrowRight className="h-3 w-3 text-slate-500" />
+                      </Link>
+                      <Link
+                        href="/mice"
+                        onClick={() => setServicesDropdownOpen(false)}
+                        className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <span>{language === "AZ" ? "🏢 MICE & Korporativ" : language === "RU" ? "🏢 MICE и Корпоративы" : "🏢 MICE & Corporate"}</span>
+                        <ArrowRight className="h-3 w-3 text-slate-500" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right side — always shrink-0 so controls stay visible */}
@@ -751,12 +877,38 @@ export default function HomePage() {
               >
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-[#061225]" />
-                  <span>Custom Tour Planner</span>
+                  <span>
+                    {language === "AZ"
+                      ? "Xüsusi Tur Planlayıcı"
+                      : language === "RU"
+                      ? "Индивидуальный Тур"
+                      : "Custom Tour Planner"}
+                  </span>
                 </div>
                 <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-[#061225] text-amber-400">
                   Interactive
                 </span>
               </Link>
+
+              {/* Medical & MICE links in mobile menu */}
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <Link
+                  href="/medical"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-white/10 text-slate-200 hover:bg-white/15 hover:text-white transition-colors text-center"
+                >
+                  <span>🩺</span>
+                  <span>{language === "AZ" ? "Tibbi Turizm" : language === "RU" ? "Медтуризм" : "Medical"}</span>
+                </Link>
+                <Link
+                  href="/mice"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-white/10 text-slate-200 hover:bg-white/15 hover:text-white transition-colors text-center"
+                >
+                  <span>🏢</span>
+                  <span>{language === "AZ" ? "MICE Korporativ" : language === "RU" ? "MICE Бизнес" : "MICE"}</span>
+                </Link>
+              </div>
 
               {/* Auth actions in mobile menu for non-logged in users */}
               {!currentUser && (
@@ -890,6 +1042,8 @@ export default function HomePage() {
                     index === currentSlide ? "animate-ken-burns" : "scale-100"
                   }`}
                   priority={index === 0}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  {...(index === 0 ? { fetchPriority: "high" as const } : {})}
                 />
               </div>
             );

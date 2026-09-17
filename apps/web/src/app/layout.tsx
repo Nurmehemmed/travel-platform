@@ -334,8 +334,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="icon" href="/icon.svg?v=5" type="image/svg+xml" />
         <link rel="alternate icon" href="/favicon.ico?v=5" />
         <link rel="apple-touch-icon" href="/icon.svg?v=5" />
