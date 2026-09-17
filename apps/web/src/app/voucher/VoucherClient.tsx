@@ -20,6 +20,7 @@ import {
   QrCode
 } from "lucide-react";
 import { useCurrency } from "@/lib/currency-context";
+import VoucherShareActions from "@/components/VoucherShareActions";
 
 export default function VoucherClient() {
   const searchParams = useSearchParams();
@@ -84,44 +85,42 @@ export default function VoucherClient() {
     }
   }, [bookingRef]);
 
-  const handlePrint = () => {
-    if (typeof window !== "undefined") {
-      window.print();
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-slate-900/5 py-10 px-4 sm:px-6 lg:px-8 font-sans print:p-0 print:bg-white">
+    <div className="min-h-screen bg-slate-900/5 py-8 px-4 sm:px-6 lg:px-8 font-sans print:p-0 print:bg-white">
       {/* Screen-only top action bar */}
-      <div className="max-w-4xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 print:hidden">
+      <div className="max-w-4xl mx-auto mb-4 flex items-center justify-between print:hidden">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-amber-600 transition-colors bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-sky-600 transition-colors bg-white px-3.5 py-2 rounded-xl shadow-sm border border-slate-200"
         >
-          <ArrowLeft className="w-4 h-4" /> Return to AddmeTour
+          <ArrowLeft className="w-3.5 h-3.5" /> Return to AddmeTour
         </Link>
-        <div className="flex items-center gap-3">
-          <a
-            href={`https://wa.me/994501234567?text=${encodeURIComponent(`Hello AddmeTour Operations! I am holding booking voucher ${bookingRef} for ${title}.`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all px-4 py-2 rounded-xl shadow-sm"
-          >
-            <MessageCircle className="w-4 h-4" /> 24/7 Concierge WhatsApp
-          </a>
-          <button
-            onClick={handlePrint}
-            className="inline-flex items-center gap-2 text-sm font-bold text-white bg-[#0f3460] hover:bg-[#1a4a84] transition-all px-5 py-2 rounded-xl shadow-md"
-          >
-            <Printer className="w-4 h-4" /> Print / Save Voucher PDF
-          </button>
+        <div className="text-xs text-slate-500 font-medium">
+          Official Digital Confirmation
         </div>
       </div>
 
+      {/* Multi-Channel Customer Sharing Hub */}
+      <VoucherShareActions
+        bookingRef={bookingRef}
+        serviceType="tour"
+        serviceTitle={title}
+        customerName={guestName}
+        customerEmail={email}
+        summaryDetails={{
+          "Date": date,
+          "Travelers": `${guests} Person(s)`,
+          "Pickup": pickup,
+          "Total": mounted ? formatPrice(totalAmount) : `$${totalAmount}`,
+        }}
+        pdfFilename={`AddmeTour-Voucher-${bookingRef}`}
+        className="max-w-4xl mx-auto mb-6"
+      />
+
       {/* Main Luxury Voucher Card */}
-      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200/80 print:shadow-none print:border-none print:rounded-none">
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200/80 print:shadow-none print:border-none print:rounded-none print:max-w-full print-avoid-break">
         {/* Voucher Header Banner */}
-        <div className="bg-[#0f3460] text-white p-8 sm:p-10 relative overflow-hidden border-b-4 border-amber-500">
+        <div className="bg-[#0f3460] text-white p-8 sm:p-10 relative overflow-hidden border-b-4 border-amber-500 print:p-5 print:border-b-2">
           <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -143,7 +142,7 @@ export default function VoucherClient() {
             </div>
 
             {/* Reference Badge & QR Code */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-right flex items-center sm:flex-col sm:items-end justify-between sm:justify-center gap-2">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-right flex items-center sm:flex-col sm:items-end justify-between sm:justify-center gap-2 print:border-white/30">
               <div>
                 <span className="text-[11px] uppercase tracking-wider text-amber-300 font-semibold block">Booking Reference</span>
                 <span className="font-mono text-xl sm:text-2xl font-black text-white tracking-wider">{bookingRef}</span>
@@ -156,7 +155,7 @@ export default function VoucherClient() {
         </div>
 
         {/* Voucher Body Content */}
-        <div className="p-8 sm:p-10 space-y-8">
+        <div className="p-8 sm:p-10 space-y-8 print:p-5 print:space-y-4">
           
           {/* Section: Service Summary */}
           <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">

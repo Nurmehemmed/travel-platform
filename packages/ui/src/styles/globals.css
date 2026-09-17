@@ -195,4 +195,74 @@
   will-change: transform;
 }
 
+/* ─── Modern CSS Paged Media & Print Design System (A4 Travel Vouchers) ──── */
+@page {
+  size: A4 portrait;
+  margin: 10mm 12mm;
+}
+
+@media print {
+  /* Force exact background colors, borders, and brand gradients */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    text-shadow: none !important;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Universal Screen-Only UI suppression */
+  header,
+  nav,
+  footer,
+  aside,
+  .print-hidden,
+  [data-screen-only="true"],
+  .floating-widget,
+  .announcement-banner,
+  #announcement-banner {
+    display: none !important;
+  }
+
+  /* Do not print raw URLs after hyperlinks */
+  a[href]::after {
+    content: "" !important;
+  }
+
+  /* Page break controls */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-page-break {
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Suppress drop shadows to avoid toner haloing */
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl {
+    box-shadow: none !important;
+  }
+}
+
 

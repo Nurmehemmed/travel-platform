@@ -10,6 +10,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 import { VISA_TRACK_TRANSLATIONS } from "@/lib/pages-i18n";
 import { VisaTrackingSkeleton } from "@/components/Skeletons";
+import VoucherShareActions from "@/components/VoucherShareActions";
 
 interface TrackedApplication {
   id: string;
@@ -107,7 +108,7 @@ export default function VisaTrackPage() {
     <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
       {/* ═══════════════════════════════════════════════════════ HEADER */}
       <header
-        className={`sticky top-0 z-50 py-4 transition-all duration-300 ${
+        className={`sticky top-0 z-50 py-4 transition-all duration-300 print:hidden ${
           isScrolled
             ? "bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10"
             : "bg-[#0f3460] border-b border-transparent shadow-none"
@@ -132,9 +133,9 @@ export default function VisaTrackPage() {
         </div>
       </header>
 
-      <main className="container-section py-12 max-w-2xl mx-auto">
+      <main className="container-section py-12 max-w-2xl mx-auto print:py-0 print:max-w-full print:p-0">
         {/* Lookup Box */}
-        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 mb-8">
+        <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 mb-8 print:hidden">
           <h1 className="font-display text-2xl font-bold text-slate-900 mb-1">
             {vt.lookupTitle}
           </h1>
@@ -190,7 +191,7 @@ export default function VisaTrackPage() {
 
         {/* Just Paid Confirmation Alert */}
         {justPaid && (
-          <div className="rounded-3xl bg-emerald-50 border border-emerald-200 p-6 text-emerald-950 shadow-sm animate-fade-in flex items-start gap-4">
+          <div className="rounded-3xl bg-emerald-50 border border-emerald-200 p-6 text-emerald-950 shadow-sm animate-fade-in flex items-start gap-4 print:hidden">
             <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 text-emerald-700">
               <CheckCircle2 className="h-6 w-6" />
             </div>
@@ -208,8 +209,20 @@ export default function VisaTrackPage() {
 
         {/* Application Status Card */}
         {!loading && application && (
-          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 animate-fade-in space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-card border border-slate-200 animate-fade-in space-y-6 print:p-0 print:border-none print:shadow-none print:space-y-4 print-avoid-break">
+            {/* Official Print Header for e-Visa */}
+            <div className="hidden print:flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-3">
+              <div>
+                <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">AddmeTour Azerbaijan DMC</h1>
+                <p className="text-[10px] text-slate-500 font-medium">Official ASAN Electronic Visa (e-Visa) Status & Application Certificate</p>
+              </div>
+              <div className="text-right text-[10px] text-slate-600 space-y-0.5">
+                <p className="font-bold text-slate-900">ASAN Visa Facilitator #AZ-DMC-889</p>
+                <p>Date: {new Date().toLocaleDateString("en-GB")}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 print:pb-2">
               <div>
                 <p className="text-[11px] text-slate-400 font-semibold uppercase">{vt.refHeader}</p>
                 <div className="flex items-center gap-2 mt-0.5">
@@ -351,6 +364,24 @@ export default function VisaTrackPage() {
                 <span className="font-bold text-slate-800">{application.arrivalDate}</span>
               </div>
             </div>
+
+            {/* Multi-Channel Customer Sharing Hub */}
+            <VoucherShareActions
+              bookingRef={application.applicationNumber}
+              serviceType="visa"
+              serviceTitle={`Azerbaijan ASAN e-Visa (${application.visaType.toUpperCase()})`}
+              customerName={`${application.surname} ${application.givenNames}`}
+              customerEmail={application.email}
+              summaryDetails={{
+                "Status": application.status.toUpperCase(),
+                "Citizenship": application.nationality,
+                "Arrival Date": application.arrivalDate,
+                "Processing": `${application.visaType.toUpperCase()} (${application.visaType === "urgent" ? "3 Hours" : "3-5 Days"})`,
+                "Total Amount": `$${application.totalAmount} USD`,
+              }}
+              pdfFilename={`AddmeTour-Visa-Certificate-${application.applicationNumber}`}
+              className="mt-6"
+            />
           </div>
         )}
       </main>

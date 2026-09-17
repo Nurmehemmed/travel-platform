@@ -30,6 +30,7 @@ import { useLanguage } from "@/lib/i18n";
 import { getVehicleConfig } from "@/lib/transfer-zones";
 import { TransferBookingSkeleton } from "@/components/Skeletons";
 import { TRANSFER_TRACK_TRANSLATIONS, LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
+import VoucherShareActions from "@/components/VoucherShareActions";
 
 interface BookingData {
   bookingNumber: string;
@@ -166,10 +167,10 @@ function TransferTrackContent() {
   };
 
   return (
-    <div className="min-h-screen pb-20" style={{ backgroundColor: "#f0f9ff" }}>
+    <div className="min-h-screen pb-20 print:pb-0 print:bg-white" style={{ backgroundColor: "#f0f9ff" }}>
       {/* Header */}
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
+        className={`sticky top-0 z-50 transition-all duration-300 print:hidden ${
           isScrolled
             ? "bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10"
             : "bg-[#0f3460] border-b border-transparent shadow-none"
@@ -201,10 +202,10 @@ function TransferTrackContent() {
         </div>
       </header>
 
-      <div className="container-section max-w-3xl mx-auto pt-8">
+      <div className="container-section max-w-3xl mx-auto pt-8 print:pt-0 print:max-w-full print:p-0">
         {/* Success Banner if newly booked/paid */}
         {(isPaid || isConfirmed) && (
-          <div className="mb-6 rounded-2xl bg-emerald-500 text-white p-5 shadow-lg flex items-center gap-4">
+          <div className="mb-6 rounded-2xl bg-emerald-500 text-white p-5 shadow-lg flex items-center gap-4 print:hidden">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 flex-shrink-0">
               <Sparkles className="h-6 w-6 text-white" />
             </div>
@@ -220,7 +221,7 @@ function TransferTrackContent() {
         )}
 
         {/* Search Bar */}
-        <div className="rounded-2xl bg-white p-6 shadow-sm border border-sky-100 mb-6">
+        <div className="rounded-2xl bg-white p-6 shadow-sm border border-sky-100 mb-6 print:hidden">
           <h1 className="text-lg font-bold text-slate-900 mb-1">{tt.trackTitle}</h1>
           <p className="text-xs text-slate-500 mb-4">
             {tt.trackSubtitle}
@@ -269,9 +270,27 @@ function TransferTrackContent() {
 
         {/* Booking Details Display */}
         {!loading && booking && (
-          <div className="rounded-2xl bg-white shadow-md border border-sky-100 overflow-hidden space-y-6 p-6 sm:p-8">
+          <div className="rounded-2xl bg-white shadow-md border border-sky-100 overflow-hidden space-y-6 p-6 sm:p-8 print:p-0 print:border-none print:shadow-none print:space-y-3 print-avoid-break">
+            {/* Official Print Header (Shown only on PDF / Physical Print) */}
+            <div className="hidden print:flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-2">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-full bg-[#0f3460] flex items-center justify-center text-white font-black text-lg">
+                  A
+                </div>
+                <div>
+                  <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">AddmeTour Azerbaijan DMC</h1>
+                  <p className="text-[10px] text-slate-500 font-medium">Official Airport VIP Transfer & Chauffeur Boarding Voucher</p>
+                </div>
+              </div>
+              <div className="text-right text-[10px] text-slate-600 space-y-0.5">
+                <p className="font-bold text-slate-900">State Tourism Agency License #AZ-DMC-889</p>
+                <p>24/7 Operations Hub: +994 55 100 3146</p>
+                <p>Date Issued: {new Date().toLocaleDateString("en-GB")}</p>
+              </div>
+            </div>
+
             {/* Top Bar: Ref & Status */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5 print:pb-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   {tt.refLabel}
@@ -296,7 +315,7 @@ function TransferTrackContent() {
 
             {/* Driver Assignment Card */}
             {booking.driverName ? (
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 print:p-3">
                 <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <ShieldCheck className="h-4 w-4 text-emerald-600" />
                   <span>{tt.chauffeurTitle}</span>
@@ -310,7 +329,7 @@ function TransferTrackContent() {
                     </div>
                   </div>
                   {booking.driverPhone && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 print:hidden">
                       <a
                         href={`tel:${booking.driverPhone}`}
                         className="rounded-lg bg-white border border-emerald-300 text-emerald-700 px-3 py-1.5 text-xs font-bold hover:bg-emerald-100 flex items-center gap-1.5 shadow-sm"
@@ -332,7 +351,7 @@ function TransferTrackContent() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-4 flex items-center gap-3">
+              <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-4 print:p-3 flex items-center gap-3">
                 <Clock className="h-5 w-5 text-sky-600 flex-shrink-0" />
                 <div className="text-xs text-slate-600">
                   <span className="font-bold text-slate-800">{tt.driverPendingTitle}</span> {tt.driverPendingDesc}
@@ -341,8 +360,8 @@ function TransferTrackContent() {
             )}
 
             {/* Route & Flight Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs print:gap-3">
+              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 print:p-3 space-y-2">
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5 text-sky-600" /> {tt.routeTitle}
                 </div>
@@ -373,7 +392,7 @@ function TransferTrackContent() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-2">
+              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 print:p-3 space-y-2">
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                   <Plane className="h-3.5 w-3.5 text-sky-600" /> {tt.flightTitle}
                 </div>
@@ -408,36 +427,59 @@ function TransferTrackContent() {
               </div>
             </div>
 
-            {/* Quick Actions Footer */}
-            <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all flex items-center gap-1.5"
-              >
-                <Printer className="h-3.5 w-3.5 text-slate-500" />
-                <span>{tt.printVoucher}</span>
-              </button>
-
-              <div className="flex items-center gap-3">
-                <a
-                  href="https://wa.me/994551003146"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-semibold text-emerald-700 hover:underline flex items-center gap-1"
-                >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  <span>{tt.supportWhatsApp}</span>
-                </a>
-
-                <Link
-                  href="/transfer/book"
-                  className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
-                >
-                  <span>{tt.bookAnother}</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+            {/* Official Chauffeur Arrival Protocol & Verification (Print-Only) */}
+            <div className="hidden print:grid grid-cols-3 gap-3 border border-slate-200 rounded-xl p-3 bg-slate-50 text-[10px]">
+              <div className="space-y-0.5">
+                <span className="font-bold text-slate-900 block">🛬 Arrivals Hall Greeting</span>
+                <p className="text-slate-600">Chauffeur will meet you holding an AddmeTour nameboard at terminal exit.</p>
               </div>
+              <div className="space-y-0.5">
+                <span className="font-bold text-slate-900 block">⏱️ 60-Min Free Wait Time</span>
+                <p className="text-slate-600">Complimentary waiting period starts upon flight touchdown. Delays tracked.</p>
+              </div>
+              <div className="space-y-0.5 text-right">
+                <span className="font-bold text-slate-900 block">Digital Dispatch Code</span>
+                <p className="font-mono font-bold text-sky-800 text-xs">{booking.bookingNumber}-VLD</p>
+                <p className="text-slate-500 text-[9px]">Official AddmeTour Voucher Guarantee</p>
+              </div>
+            </div>
+
+            {/* Multi-Channel Customer Sharing Hub */}
+            <VoucherShareActions
+              bookingRef={booking.bookingNumber}
+              serviceType="transfer"
+              serviceTitle={`Airport Transfer ${booking.direction === "arrival" ? "Arrival" : booking.direction === "departure" ? "Departure" : "Round-Trip"} (${booking.vehicleClass.toUpperCase()})`}
+              customerName={booking.passengerName}
+              customerEmail={emailQuery}
+              summaryDetails={{
+                "Airport": booking.airport,
+                "Route": `${booking.pickupZone} ➔ ${booking.dropoffAddress}`,
+                "Flight": `${booking.flightNumber} (${booking.flightDate} ${booking.flightTime})`,
+                "Vehicle": booking.vehicleClass,
+                "Payment": `$${booking.totalAmount} (${booking.paymentMethod === "online" ? "Paid Online" : "Cash on Arrival"})`,
+              }}
+              pdfFilename={`AddmeTour-Transfer-Voucher-${booking.bookingNumber}`}
+            />
+
+            {/* Quick Actions Footer (Screen Only) */}
+            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 print:hidden">
+              <a
+                href="https://wa.me/994551003146"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-semibold text-emerald-700 hover:underline flex items-center gap-1"
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+                <span>{tt.supportWhatsApp}</span>
+              </a>
+
+              <Link
+                href="/transfer/book"
+                className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+              >
+                <span>{tt.bookAnother}</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           </div>
         )}
