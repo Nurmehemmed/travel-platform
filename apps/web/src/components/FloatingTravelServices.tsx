@@ -26,8 +26,8 @@ export default function FloatingTravelServices() {
   const isVisaPage = pathname.startsWith("/visa");
   const isTransferPage = pathname.startsWith("/transfer");
 
-  const showServices = settings?.operations?.floatingServices === true;
-  const showWhatsapp = settings?.operations?.floatingWhatsapp === true && Boolean(settings?.contact?.whatsappUrl);
+  const showServices = settings?.operations?.floatingServices !== false;
+  const showWhatsapp = settings?.operations?.floatingWhatsapp !== false && Boolean(settings?.contact?.whatsappUrl);
 
   // If all floating widgets on the right dock are disabled, hide the entire aside
   if (!showServices && !showWhatsapp) {

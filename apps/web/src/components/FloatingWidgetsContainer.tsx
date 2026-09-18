@@ -1,34 +1,14 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useSiteSettings } from "@/lib/settings-context";
-
-const FloatingTravelServices = dynamic(
-  () => import("@/components/FloatingTravelServices"),
-  { ssr: false }
-);
-
-const FloatingCustomItinerary = dynamic(
-  () => import("@/components/FloatingCustomItinerary"),
-  { ssr: false }
-);
-
-const CookieConsent = dynamic(
-  () => import("@/components/CookieConsent").then((mod) => mod.CookieConsent),
-  { ssr: false }
-);
+import FloatingTravelServices from "@/components/FloatingTravelServices";
+import FloatingCustomItinerary from "@/components/FloatingCustomItinerary";
+import { CookieConsent } from "@/components/CookieConsent";
 
 export function FloatingWidgetsContainer() {
-  const { loading } = useSiteSettings();
-
   return (
     <>
-      {!loading && (
-        <>
-          <FloatingCustomItinerary />
-          <FloatingTravelServices />
-        </>
-      )}
+      <FloatingCustomItinerary />
+      <FloatingTravelServices />
       <CookieConsent />
     </>
   );
