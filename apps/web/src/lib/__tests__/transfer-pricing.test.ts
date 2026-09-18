@@ -9,6 +9,8 @@ import {
   getLocationById,
   searchDestinations,
   resolveLocationOrZone,
+  calculateHaversineDistanceKm,
+  resolveLocationByCoords,
 } from "../transfer-zones";
 
 describe("Transfer Pricing Engine", () => {
@@ -96,10 +98,32 @@ describe("Transfer Pricing Engine", () => {
     expect(resolvedZone.zone.id).toBe("GYD-baku-center");
   });
 
+  it("computes Haversine distance and resolves coordinates to transfer zones", () => {
+    // GYD to Baku Center (~20-25 km direct)
+    const directDist = calculateHaversineDistanceKm(40.4675, 50.0469, 40.3756, 49.8450);
+    expect(directDist).toBeGreaterThan(15);
+    expect(directDist).toBeLessThan(30);
+
+    // Resolve coordinates in Shahdag (North > 41 deg lat)
+    const shahdagCoords = resolveLocationByCoords(41.3214, 48.1464, "GYD");
+    expect(shahdagCoords.zone.id).toBe("GYD-shahdag");
+    expect(shahdagCoords.distanceKm).toBe(210);
+
+    // Resolve coordinates in Baku Boulevard
+    const bulvarCoords = resolveLocationByCoords(40.3760, 49.8600, "GYD");
+    expect(bulvarCoords.zone.id).toBe("GYD-baku-bulvar");
+
+    // Resolve coordinates in Ganja
+    const goygolCoords = resolveLocationByCoords(40.5500, 46.3000, "GJA");
+    expect(goygolCoords.zone.id).toBe("GJA-goygol");
+  });
+
   it("retrieves valid airport by IATA code", () => {
     const gyd = getAirportByCode("GYD");
     expect(gyd).toBeDefined();
     expect(gyd?.code).toBe("GYD");
     expect(gyd?.city).toBe("Baku");
+    expect(gyd?.lat).toBeCloseTo(40.4675, 2);
+    expect(gyd?.lng).toBeCloseTo(50.0469, 2);
   });
 });

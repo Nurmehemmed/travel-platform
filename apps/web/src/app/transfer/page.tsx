@@ -28,6 +28,7 @@ import CurrencySelector from "@/components/CurrencySelector";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { CustomSelect } from "@/components/CustomSelect";
+import { MapLocationPickerModal, MapLocationPickerResult } from "@/components/MapLocationPickerModal";
 import {
   AIRPORTS,
   VEHICLE_CLASSES,
@@ -44,6 +45,7 @@ import {
   LOCALIZED_AIRPORTS,
   LOCALIZED_ZONES,
   LOCALIZED_DESTINATION_CATEGORIES,
+  LOCALIZED_MAP_PICKER,
   LOCALIZED_AIRPORT_DESCRIPTIONS,
   LOCALIZED_TRANSFER_FAQS,
   LOCALIZED_VEHICLE_FEATURES,
@@ -59,6 +61,7 @@ export default function TransferLandingPage() {
   const [selectedAirport, setSelectedAirport] = useState<AirportCode>("GYD");
   const [direction, setDirection] = useState<"arrival" | "departure" | "round_trip">("arrival");
   const [selectedLocationId, setSelectedLocationId] = useState<string>("loc-jw-marriott");
+  const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -127,6 +130,14 @@ export default function TransferLandingPage() {
       aliases: dest.aliases,
     };
   });
+
+  const handleMapSelect = (result: MapLocationPickerResult) => {
+    if (result.locationId) {
+      setSelectedLocationId(result.locationId);
+    } else {
+      setSelectedLocationId(`custom:${result.address}`);
+    }
+  };
 
   const handleBookNow = (vehicleClass?: VehicleClass) => {
     const params = new URLSearchParams({
@@ -299,9 +310,19 @@ export default function TransferLandingPage() {
 
               {/* Destination Zone Selector */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                  {t.transferPage.destinationZone}
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                    {t.transferPage.destinationZone}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsMapModalOpen(true)}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 px-2.5 py-0.5 rounded-lg border border-sky-200 transition-colors shadow-2xs cursor-pointer"
+                  >
+                    <span>🗺️</span>
+                    <span>{destinationCategoryI18n.pickOnMap}</span>
+                  </button>
+                </div>
                 <CustomSelect
                   value={selectedLocationId}
                   onChange={(val) => setSelectedLocationId(String(val))}
@@ -310,6 +331,8 @@ export default function TransferLandingPage() {
                   searchPlaceholder={destinationCategoryI18n.searchPlaceholder}
                   allowCustomValue={true}
                   customValueLabelPrefix={destinationCategoryI18n.useCustomPrefix}
+                  onOpenMapPicker={() => setIsMapModalOpen(true)}
+                  mapPickerLabel={destinationCategoryI18n.pickOnMap}
                 />
               </div>
             </div>
@@ -674,6 +697,15 @@ export default function TransferLandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Map Location Picker Modal */}
+      <MapLocationPickerModal
+        isOpen={isMapModalOpen}
+        onClose={() => setIsMapModalOpen(false)}
+        onSelectLocation={handleMapSelect}
+        airportCode={selectedAirport}
+        initialLocationId={selectedLocationId}
+      />
     </div>
   );
 }

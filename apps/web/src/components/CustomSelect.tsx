@@ -33,6 +33,8 @@ export interface CustomSelectProps {
   ariaLabel?: string | undefined;
   allowCustomValue?: boolean | undefined;
   customValueLabelPrefix?: string | undefined;
+  onOpenMapPicker?: (() => void) | undefined;
+  mapPickerLabel?: string | undefined;
 }
 
 export function CustomSelect({
@@ -55,6 +57,8 @@ export function CustomSelect({
   ariaLabel,
   allowCustomValue = false,
   customValueLabelPrefix = "Use custom destination",
+  onOpenMapPicker,
+  mapPickerLabel,
 }: CustomSelectProps) {
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -247,16 +251,53 @@ export function CustomSelect({
             </div>
           )}
 
+          {/* Pick on Map quick action */}
+          {onOpenMapPicker && (
+            <div className="px-1 pb-1.5 mb-1 border-b border-slate-100">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(false);
+                  onOpenMapPicker();
+                }}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100/80 border border-sky-200/70 transition-all cursor-pointer group/map"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-base group-hover/map:scale-110 transition-transform">🗺️</span>
+                  <span>{mapPickerLabel || "Select location on interactive map"}</span>
+                </div>
+                <span className="text-[10px] uppercase font-extrabold text-sky-600 bg-sky-200/60 px-1.5 py-0.5 rounded-md">
+                  Map Pin
+                </span>
+              </button>
+            </div>
+          )}
+
           {/* Options List */}
           <div ref={listRef} className="max-h-72 overflow-y-auto space-y-0.5 scrollbar-thin p-0.5">
             {filteredOptions.length === 0 ? (
-              <div className="py-4 px-3 text-center">
+              <div className="py-4 px-3 text-center space-y-2">
                 <p className="text-xs text-slate-500 font-medium">No direct matches found</p>
+                {onOpenMapPicker && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsOpen(false);
+                      onOpenMapPicker();
+                    }}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 transition-colors shadow-2xs cursor-pointer"
+                  >
+                    <span>🗺️</span>
+                    <span>{mapPickerLabel || "Pick exact location on map"}</span>
+                  </button>
+                )}
                 {allowCustomValue && searchTerm.trim() && (
                   <button
                     type="button"
                     onClick={() => handleSelect(`custom:${searchTerm.trim()}`)}
-                    className="mt-2.5 w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm cursor-pointer"
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 transition-colors shadow-sm cursor-pointer"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>{customValueLabelPrefix}: &ldquo;{searchTerm.trim()}&rdquo;</span>

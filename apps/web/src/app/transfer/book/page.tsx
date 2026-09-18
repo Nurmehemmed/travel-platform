@@ -45,11 +45,13 @@ import {
   LOCALIZED_AIRPORTS,
   LOCALIZED_ZONES,
   LOCALIZED_DESTINATION_CATEGORIES,
+  LOCALIZED_MAP_PICKER,
   TRANSFER_BOOK_TRANSLATIONS,
 } from "@/lib/pages-i18n";
 import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
 import { CustomSelect } from "@/components/CustomSelect";
+import { MapLocationPickerModal, MapLocationPickerResult } from "@/components/MapLocationPickerModal";
 
 function TransferBookForm() {
   const router = useRouter();
@@ -113,6 +115,7 @@ function TransferBookForm() {
   const [selectedDestinationId, setSelectedDestinationId] = useState<string>(initialLocationId);
   const [dropoffAddress, setDropoffAddress] = useState<string>(initialAddress);
   const [vehicleClass, setVehicleClass] = useState<VehicleClass>(paramVehicle);
+  const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
 
   // Step 2: Flight Details
   const [flightNumber, setFlightNumber] = useState<string>("");
@@ -175,6 +178,15 @@ function TransferBookForm() {
       if (loc) {
         setDropoffAddress(loc.address || loc.name);
       }
+    }
+  };
+
+  const handleMapSelect = (result: MapLocationPickerResult) => {
+    setDropoffAddress(result.address);
+    if (result.locationId) {
+      setSelectedDestinationId(result.locationId);
+    } else {
+      setSelectedDestinationId(`custom:${result.address}`);
     }
   };
 
@@ -488,9 +500,19 @@ function TransferBookForm() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    {t.transferPage.destinationZone}
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                      {t.transferPage.destinationZone}
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsMapModalOpen(true)}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-lg border border-sky-200 transition-colors shadow-2xs cursor-pointer"
+                    >
+                      <span>🗺️</span>
+                      <span>{destinationCategoryI18n.pickOnMap}</span>
+                    </button>
+                  </div>
                   <CustomSelect
                     value={selectedDestinationId}
                     onChange={(val) => handleDestinationChange(String(val))}
@@ -499,15 +521,27 @@ function TransferBookForm() {
                     searchPlaceholder={destinationCategoryI18n.searchPlaceholder}
                     allowCustomValue={true}
                     customValueLabelPrefix={destinationCategoryI18n.useCustomPrefix}
+                    onOpenMapPicker={() => setIsMapModalOpen(true)}
+                    mapPickerLabel={destinationCategoryI18n.pickOnMap}
                   />
                 </div>
               </div>
 
               {/* Exact hotel / dropoff address */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  {direction === "departure" ? tb.pickupAddressLabel : tb.dropoffAddressLabel} *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                    {direction === "departure" ? tb.pickupAddressLabel : tb.dropoffAddressLabel} *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsMapModalOpen(true)}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-600 hover:text-sky-700 transition-colors cursor-pointer"
+                  >
+                    <span>📍</span>
+                    <span>{destinationCategoryI18n.pickOnMap}</span>
+                  </button>
+                </div>
                 <div className="relative">
                   <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                   <input
@@ -519,7 +553,6 @@ function TransferBookForm() {
                     onChange={(e) => {
                       setDropoffAddress(e.target.value);
                       if (invalidField === "dropoffAddress") setInvalidField(null);
-
                     }}
                     className={`w-full rounded-xl border pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       invalidField === "dropoffAddress"
@@ -1170,6 +1203,16 @@ function TransferBookForm() {
           )}
         </div>
       </div>
+
+      {/* Interactive Map Location Picker Modal */}
+      <MapLocationPickerModal
+        isOpen={isMapModalOpen}
+        onClose={() => setIsMapModalOpen(false)}
+        onSelectLocation={handleMapSelect}
+        airportCode={airport}
+        initialLocationId={selectedDestinationId}
+        initialAddress={dropoffAddress}
+      />
     </div>
   );
 }

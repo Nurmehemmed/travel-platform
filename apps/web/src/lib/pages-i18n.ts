@@ -861,6 +861,7 @@ export const LOCALIZED_DESTINATION_CATEGORIES: Record<
     custom: string;
     searchPlaceholder: string;
     useCustomPrefix: string;
+    pickOnMap: string;
   }
 > = {
   EN: {
@@ -870,6 +871,7 @@ export const LOCALIZED_DESTINATION_CATEGORIES: Record<
     custom: "Custom Location",
     searchPlaceholder: "Search hotel, landmark, or region...",
     useCustomPrefix: "Use custom destination",
+    pickOnMap: "Pick on Map",
   },
   AZ: {
     hotel: "Otellər və Kurortlar",
@@ -878,6 +880,7 @@ export const LOCALIZED_DESTINATION_CATEGORIES: Record<
     custom: "Fərdi Ünvan",
     searchPlaceholder: "Otel, məkan və ya region axtarın...",
     useCustomPrefix: "Fərdi təyinat kimi seç",
+    pickOnMap: "Xəritədə Seç",
   },
   RU: {
     hotel: "Отели и курорты",
@@ -886,6 +889,7 @@ export const LOCALIZED_DESTINATION_CATEGORIES: Record<
     custom: "Индивидуальный адрес",
     searchPlaceholder: "Поиск отеля, места или региона...",
     useCustomPrefix: "Использовать свой адрес",
+    pickOnMap: "Выбрать на карте",
   },
   AR: {
     hotel: "الفنادق والمنتجعات",
@@ -894,6 +898,7 @@ export const LOCALIZED_DESTINATION_CATEGORIES: Record<
     custom: "موقع مخصص",
     searchPlaceholder: "ابحث عن فندق، معلم أو منطقة...",
     useCustomPrefix: "استخدام وجهة مخصصة",
+    pickOnMap: "تحديد على الخريطة",
   },
   FR: {
     hotel: "Hôtels et complexes hôteliers",
@@ -902,6 +907,7 @@ export const LOCALIZED_DESTINATION_CATEGORIES: Record<
     custom: "Emplacement personnalisé",
     searchPlaceholder: "Rechercher un hôtel, un lieu ou une région...",
     useCustomPrefix: "Utiliser une destination personnalisée",
+    pickOnMap: "Choisir sur la carte",
   },
   DE: {
     hotel: "Hotels & Resorts",
@@ -910,6 +916,110 @@ export const LOCALIZED_DESTINATION_CATEGORIES: Record<
     custom: "Individuelle Adresse",
     searchPlaceholder: "Hotel, Ort oder Region suchen...",
     useCustomPrefix: "Individuelles Ziel verwenden",
+    pickOnMap: "Auf Karte wählen",
+  },
+};
+
+export const LOCALIZED_MAP_PICKER: Record<
+  LanguageCode,
+  {
+    pickOnMap: string;
+    modalTitle: string;
+    modalSubtitle: string;
+    searchPlaceholder: string;
+    dragHint: string;
+    confirmButton: string;
+    cancelButton: string;
+    distanceBadge: string;
+    zoneBadge: string;
+    findingAddress: string;
+    quickShortcuts: string;
+    customPinAddress: string;
+  }
+> = {
+  EN: {
+    pickOnMap: "Pick on Map",
+    modalTitle: "Select Destination on Map",
+    modalSubtitle: "Drag the pin or search to select your drop-off hotel or address in Azerbaijan.",
+    searchPlaceholder: "Search hotel, street, or landmark in Azerbaijan...",
+    dragHint: "Drag map or click anywhere to reposition the pin",
+    confirmButton: "Use This Location",
+    cancelButton: "Cancel",
+    distanceBadge: "Est. Distance:",
+    zoneBadge: "Transfer Zone:",
+    findingAddress: "Locating address...",
+    quickShortcuts: "Quick Places:",
+    customPinAddress: "Pinned Map Location",
+  },
+  AZ: {
+    pickOnMap: "Xəritədə Seç",
+    modalTitle: "Təyinatı Xəritədə Seçin",
+    modalSubtitle: "Pini sürüşdürün və ya axtarış edərək hotel/ünvanınızı seçin.",
+    searchPlaceholder: "Otel, küçə və ya məkan axtarın...",
+    dragHint: "Pini hərəkət etdirmək üçün xəritəni sürüşdürün və ya klikləyin",
+    confirmButton: "Bu Ünvanı Seç",
+    cancelButton: "Ləğv et",
+    distanceBadge: "Təxmini Məsafə:",
+    zoneBadge: "Transfer Zonası:",
+    findingAddress: "Ünvan müəyyən edilir...",
+    quickShortcuts: "Məşhur Məkanlar:",
+    customPinAddress: "Xəritədə qeyd olunan ünvan",
+  },
+  RU: {
+    pickOnMap: "Выбрать на карте",
+    modalTitle: "Выбор пункта назначения на карте",
+    modalSubtitle: "Переместите булавку или введите адрес отеля в Азербайджане.",
+    searchPlaceholder: "Поиск отеля, улицы или достопримечательности...",
+    dragHint: "Перемещайте карту или кликните в нужное место",
+    confirmButton: "Выбрать этот адрес",
+    cancelButton: "Отмена",
+    distanceBadge: "Расстояние:",
+    zoneBadge: "Зона трансфера:",
+    findingAddress: "Определение адреса...",
+    quickShortcuts: "Популярные места:",
+    customPinAddress: "Точка на карте",
+  },
+  AR: {
+    pickOnMap: "تحديد على الخريطة",
+    modalTitle: "حدد الوجهة على الخريطة",
+    modalSubtitle: "اسحب الدبوس أو ابحث لتحديد فندقك أو عنوانك في أذربيجان.",
+    searchPlaceholder: "ابحث عن فندق أو شارع أو معلم في أذربيجان...",
+    dragHint: "اسحب الخريطة أو انقر في أي مكان لتحريك الدبوس",
+    confirmButton: "استخدام هذا الموقع",
+    cancelButton: "إلغاء",
+    distanceBadge: "المسافة التقريبية:",
+    zoneBadge: "منطقة التوصيل:",
+    findingAddress: "جاري تحديد العنوان...",
+    quickShortcuts: "أماكن سريعة:",
+    customPinAddress: "الموقع المحدد على الخريطة",
+  },
+  FR: {
+    pickOnMap: "Choisir sur la carte",
+    modalTitle: "Sélectionner la destination sur la carte",
+    modalSubtitle: "Faites glisser le repère ou recherchez votre hôtel en Azerbaïdjan.",
+    searchPlaceholder: "Rechercher un hôtel, une rue ou un monument...",
+    dragHint: "Faites glisser la carte ou cliquez pour déplacer le repère",
+    confirmButton: "Utiliser cet emplacement",
+    cancelButton: "Annuler",
+    distanceBadge: "Distance est. :",
+    zoneBadge: "Zone de transfert :",
+    findingAddress: "Recherche de l'adresse...",
+    quickShortcuts: "Lieux rapides :",
+    customPinAddress: "Emplacement épinglé",
+  },
+  DE: {
+    pickOnMap: "Auf Karte wählen",
+    modalTitle: "Ziel auf der Karte auswählen",
+    modalSubtitle: "Verschieben Sie die Stecknadel oder suchen Sie nach Ihrem Hotel in Aserbaidschan.",
+    searchPlaceholder: "Hotel, Straße oder Sehenswürdigkeit suchen...",
+    dragHint: "Karte verschieben oder klicken, um Stecknadel zu setzen",
+    confirmButton: "Diesen Ort wählen",
+    cancelButton: "Abbrechen",
+    distanceBadge: "Geschätzte Entfernung:",
+    zoneBadge: "Transferzone:",
+    findingAddress: "Adresse wird ermittelt...",
+    quickShortcuts: "Beliebte Orte:",
+    customPinAddress: "Ausgewählter Ort",
   },
 };
 

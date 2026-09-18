@@ -75,6 +75,8 @@ export interface AirportInfo {
   name: string;
   city: string;
   fullName: string;
+  lat: number;
+  lng: number;
 }
 
 export const AIRPORTS: AirportInfo[] = [
@@ -83,18 +85,24 @@ export const AIRPORTS: AirportInfo[] = [
     name: "Heydar Aliyev International",
     city: "Baku",
     fullName: "Heydar Aliyev International Airport (GYD)",
+    lat: 40.4675,
+    lng: 50.0469,
   },
   {
     code: "GJA",
     name: "Ganja Airport",
     city: "Ganja",
     fullName: "Ganja Airport (GJA)",
+    lat: 40.7419,
+    lng: 46.3175,
   },
   {
     code: "NAJ",
     name: "Nakhchivan Airport",
     city: "Nakhchivan",
     fullName: "Nakhchivan Airport (NAJ)",
+    lat: 39.1892,
+    lng: 45.4594,
   },
 ];
 
@@ -285,9 +293,11 @@ export interface DestinationLocation {
   zoneId: string;
   airport: AirportCode;
   distanceKm: number;
-  address?: string;
-  aliases?: string[];
-  badge?: string;
+  address?: string | undefined;
+  aliases?: string[] | undefined;
+  badge?: string | undefined;
+  lat?: number | undefined;
+  lng?: number | undefined;
 }
 
 export const POPULAR_DESTINATIONS: DestinationLocation[] = [
@@ -1100,4 +1110,165 @@ export function generateTransferRef(): string {
     ref += chars[Math.floor(Math.random() * chars.length)];
   }
   return `ATR-${ref}`;
+}
+
+/**
+ * Haversine formula to compute distance between two geographical points in kilometers.
+ */
+export function calculateHaversineDistanceKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+}
+
+/**
+ * Resolves map coordinates (lat/lng) to the best matching DestinationLocation and TransferZone.
+ */
+export function resolveLocationByCoords(
+  lat: number,
+  lng: number,
+  airport: AirportCode = "GYD"
+): {
+  location?: DestinationLocation;
+  zone: TransferZone;
+  distanceKm: number;
+} {
+  const airportObj = getAirportByCode(airport) || AIRPORTS[0]!;
+  const directDistance = calculateHaversineDistanceKm(airportObj.lat, airportObj.lng, lat, lng);
+  const estDrivingDistance = Math.round(directDistance * 1.25);
+
+  // Check if near any known landmark (< 1.5 km)
+  const airportDests = getDestinationsByAirport(airport);
+  let closestDest: DestinationLocation | undefined;
+  let minDestDist = Infinity;
+
+  for (const dest of airportDests) {
+    if (dest.lat !== undefined && dest.lng !== undefined) {
+      const d = calculateHaversineDistanceKm(lat, lng, dest.lat, dest.lng);
+      if (d < minDestDist) {
+        minDestDist = d;
+        closestDest = dest;
+      }
+    }
+  }
+
+  if (closestDest && minDestDist <= 1.5) {
+    const zone = getZoneById(closestDest.zoneId) || getZonesByAirport(airport)[0]!;
+    return {
+      location: closestDest,
+      zone,
+      distanceKm: zone.distanceKm || estDrivingDistance,
+    };
+  }
+
+  // Clustering and regional heuristics for Azerbaijan
+  if (airport === "GYD") {
+    // Shahdag / Gusar / Quba (North corridor)
+    if (lat >= 41.15) {
+      if (lng <= 48.3) {
+        const zone = getZoneById("GYD-shahdag") || getZonesByAirport("GYD")[0]!;
+        return { zone, distanceKm: 210 };
+      }
+      const zone = getZoneById("GYD-quba") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 170 };
+    }
+    // Qabala / Sheki (North-West corridor)
+    if (lat >= 40.7 && lng <= 48.0) {
+      if (lng <= 47.4) {
+        const zone = getZoneById("GYD-sheki") || getZonesByAirport("GYD")[0]!;
+        return { zone, distanceKm: 300 };
+      }
+      const zone = getZoneById("GYD-qabala") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 225 };
+    }
+    // Shamakhi
+    if (lng <= 48.8 && lat >= 40.4) {
+      const zone = getZoneById("GYD-shamakhi") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 125 };
+    }
+    // Lankaran / South Coast
+    if (lat <= 39.5) {
+      const zone = getZoneById("GYD-lankaran") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 260 };
+    }
+    // Naftalan
+    if (lng <= 47.0) {
+      const zone = getZoneById("GYD-naftalan") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 330 };
+    }
+    // Sumqayit
+    if (lat >= 40.55 && lng <= 49.75) {
+      const zone = getZoneById("GYD-sumqayit") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 48 };
+    }
+    // Khirdalan
+    if (lat >= 40.42 && lat <= 40.52 && lng <= 49.78) {
+      const zone = getZoneById("GYD-khirdalan") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 38 };
+    }
+    // Absheron Peninsula (Mardakan, Bilgah, Novkhani, Pirallahi)
+    if (lat >= 40.48 || lng >= 50.15) {
+      const zone = getZoneById("GYD-absheron") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 32 };
+    }
+    // Sabail / Flame Towers
+    if (lng <= 49.835 && lat <= 40.365) {
+      const zone = getZoneById("GYD-sabail") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 33 };
+    }
+    // Baku Boulevard / Port Baku
+    if (lng >= 49.85 && lat <= 40.38) {
+      const zone = getZoneById("GYD-baku-bulvar") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 28 };
+    }
+    // Default Baku Center
+    const zone = getZoneById("GYD-baku-center") || getZonesByAirport("GYD")[0]!;
+    return { zone, distanceKm: 30 };
+  }
+
+  if (airport === "GJA") {
+    if (lat <= 40.6) {
+      const zone = getZoneById("GJA-goygol") || getZonesByAirport("GJA")[0]!;
+      return { zone, distanceKm: 35 };
+    }
+    if (lng >= 46.7) {
+      const zone = getZoneById("GJA-naftalan") || getZonesByAirport("GJA")[0]!;
+      return { zone, distanceKm: 65 };
+    }
+    if (lat >= 41.1) {
+      const zone = getZoneById("GJA-sheki") || getZonesByAirport("GJA")[0]!;
+      return { zone, distanceKm: 145 };
+    }
+    const zone = getZoneById("GJA-ganja-center") || getZonesByAirport("GJA")[0]!;
+    return { zone, distanceKm: 8 };
+  }
+
+  if (airport === "NAJ") {
+    if (lat >= 39.25) {
+      const zone = getZoneById("NAJ-duzdag") || getZonesByAirport("NAJ")[0]!;
+      return { zone, distanceKm: 18 };
+    }
+    if (lng >= 45.8) {
+      const zone = getZoneById("NAJ-ordubad") || getZonesByAirport("NAJ")[0]!;
+      return { zone, distanceKm: 75 };
+    }
+    const zone = getZoneById("NAJ-nakhchivan-center") || getZonesByAirport("NAJ")[0]!;
+    return { zone, distanceKm: 7 };
+  }
+
+  const fallback = getZonesByAirport(airport)[0]!;
+  return { zone: fallback, distanceKm: fallback.distanceKm || estDrivingDistance };
 }
