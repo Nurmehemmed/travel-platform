@@ -104,6 +104,7 @@ export const transferVehicleEnum = pgEnum("transfer_vehicle", [
   "sedan",      // Sedan up to 3 pax
   "suv",        // SUV up to 4 pax
   "minivan",    // Minivan up to 7 pax
+  "sprinter",   // Minibus up to 16 pax
   "economy",    // Backward compatibility
   "business",
   "executive",

@@ -52,6 +52,7 @@ describe("Database Schema Integrity Suite", () => {
       expect(transferVehicleEnum.enumValues).toContain("sedan");
       expect(transferVehicleEnum.enumValues).toContain("suv");
       expect(transferVehicleEnum.enumValues).toContain("minivan");
+      expect(transferVehicleEnum.enumValues).toContain("sprinter");
       expect(transferPaymentMethodEnum.enumValues).toEqual(["online", "on_arrival"]);
       expect(transferStatusEnum.enumValues).toEqual([
         "pending",

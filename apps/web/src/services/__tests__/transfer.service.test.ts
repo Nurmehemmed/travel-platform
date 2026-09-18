@@ -28,6 +28,13 @@ describe("TransferService Domain Logic", () => {
       expect(pricing?.totalAmount).toBe(39); // 25 + 0.45 * 30 = 38.5 -> ceil(38.5) = 39
     });
 
+    it("calculates one-way transfer pricing correctly for minibus sprinter", () => {
+      const pricing = transferService.calculatePricing("GYD-baku-center", "sprinter", "airport_to_hotel");
+      expect(pricing).not.toBeNull();
+      expect(pricing?.isCustom).toBe(false);
+      expect(pricing?.totalAmount).toBe(123); // 90 + 1.10 * 30 = 123
+    });
+
     it("calculates round-trip transfer pricing with discount", () => {
       const oneWay = transferService.calculatePricing("GYD-baku-center", "sedan", "airport_to_hotel");
       const roundTrip = transferService.calculatePricing("GYD-baku-center", "sedan", "round_trip");
