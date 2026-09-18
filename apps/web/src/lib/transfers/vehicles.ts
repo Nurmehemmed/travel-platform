@@ -63,14 +63,25 @@ export const ALL_VEHICLE_CLASSES: VehicleConfig[] = [
 /** Baseline alias for backward compatibility */
 export const VEHICLE_CLASSES = ALL_VEHICLE_CLASSES;
 
+function parseBool(val: any, defaultVal: boolean): boolean {
+  if (val === undefined || val === null) return defaultVal;
+  if (typeof val === "boolean") return val;
+  if (typeof val === "string") {
+    const s = val.trim().toLowerCase();
+    if (s === "false" || s === "0" || s === "off" || s === "disabled") return false;
+    if (s === "true" || s === "1" || s === "on" || s === "enabled") return true;
+  }
+  return Boolean(val);
+}
+
 /** Helper to check if a specific vehicle class is active according to site operations */
 export function isVehicleClassActive(
   vehicleId: string,
   operations?: {
-    vehicleSedanActive?: boolean;
-    vehicleSuvActive?: boolean;
-    vehicleMinivanActive?: boolean;
-    vehicleSprinterActive?: boolean;
+    vehicleSedanActive?: boolean | string | any;
+    vehicleSuvActive?: boolean | string | any;
+    vehicleMinivanActive?: boolean | string | any;
+    vehicleSprinterActive?: boolean | string | any;
   }
 ): boolean {
   if (!operations) {
@@ -79,10 +90,10 @@ export function isVehicleClassActive(
   }
 
   const vId = vehicleId.toLowerCase();
-  if (vId === "sedan") return operations.vehicleSedanActive !== false;
-  if (vId === "suv") return operations.vehicleSuvActive !== false;
-  if (vId === "minivan") return operations.vehicleMinivanActive !== false;
-  if (vId === "sprinter") return Boolean(operations.vehicleSprinterActive);
+  if (vId === "sedan") return parseBool(operations.vehicleSedanActive, true);
+  if (vId === "suv") return parseBool(operations.vehicleSuvActive, true);
+  if (vId === "minivan") return parseBool(operations.vehicleMinivanActive, true);
+  if (vId === "sprinter") return parseBool(operations.vehicleSprinterActive, false);
 
   return true;
 }
@@ -90,10 +101,10 @@ export function isVehicleClassActive(
 /** Get list of active vehicle classes dynamically */
 export function getActiveVehicleClasses(
   operations?: {
-    vehicleSedanActive?: boolean;
-    vehicleSuvActive?: boolean;
-    vehicleMinivanActive?: boolean;
-    vehicleSprinterActive?: boolean;
+    vehicleSedanActive?: boolean | string | any;
+    vehicleSuvActive?: boolean | string | any;
+    vehicleMinivanActive?: boolean | string | any;
+    vehicleSprinterActive?: boolean | string | any;
   }
 ): VehicleConfig[] {
   return ALL_VEHICLE_CLASSES.filter((vc) => isVehicleClassActive(vc.id, operations));

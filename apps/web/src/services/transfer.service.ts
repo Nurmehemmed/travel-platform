@@ -15,6 +15,8 @@ import {
   VehicleClass,
   AirportCode,
 } from "@/lib/transfer-zones";
+import { isVehicleClassActive } from "@/lib/transfers/vehicles";
+import { siteSettings } from "@travel/db";
 
 export interface CreateTransferBookingInput {
   direction: "airport_to_hotel" | "hotel_to_airport" | "round_trip" | "arrival" | "departure";
@@ -158,6 +160,22 @@ export class TransferService {
     const validation = this.validateBooking(input);
     if (!validation.valid) {
       throw new Error(validation.error);
+    }
+
+    // Check if vehicle class is active in site settings
+    const settingsRows = await db.select().from(siteSettings);
+    const settingsMap: Record<string, any> = {};
+    for (const r of settingsRows) {
+      settingsMap[r.key] = r.value;
+    }
+    const isVehicleActive = isVehicleClassActive(input.vehicleClass as VehicleClass, {
+      vehicleSedanActive: settingsMap["operations_vehicle_sedan_active"],
+      vehicleSuvActive: settingsMap["operations_vehicle_suv_active"],
+      vehicleMinivanActive: settingsMap["operations_vehicle_minivan_active"],
+      vehicleSprinterActive: settingsMap["operations_vehicle_sprinter_active"],
+    });
+    if (!isVehicleActive) {
+      throw new Error(`The selected vehicle (${input.vehicleClass}) is currently unavailable.`);
     }
 
     const pricing = this.calculatePricing(input.zoneId, input.vehicleClass, input.direction);

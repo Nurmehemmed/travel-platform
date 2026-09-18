@@ -42,21 +42,23 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   handleResetSettings,
   handleSaveSettings,
 }) => {
+  const isAZ = language === "AZ";
+
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-6 animate-fade-in pb-20">
       {/* Top Banner & Control Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
         <div>
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Sliders className="h-5 w-5 text-[#f59e0b]" />
             <span>
-              {language === "AZ"
+              {isAZ
                 ? "Dinamik Platform Konfiqurasiyası"
                 : "Dynamic Platform Configuration"}
             </span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            {language === "AZ"
+            {isAZ
               ? "Biznes əlaqə kanallarını, qiymət marjalarını, elan başlıqlarını və xidmət əlçatanlığını kodu yenidən yerləşdirmədən idarə edin."
               : "Modify business contact channels, pricing margins, announcement banners, and service availability without redeploying code."}
           </p>
@@ -69,7 +71,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             disabled={settingsSaving}
             className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            {language === "AZ" ? "Qaralamanı Sıfırla" : "Reset Draft"}
+            {isAZ ? "Qaralamanı Sıfırla" : "Reset Draft"}
           </button>
           <button
             type="button"
@@ -85,10 +87,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             />
             <span>
               {settingsSaving
-                ? language === "AZ"
+                ? isAZ
                   ? "Yadda saxlanılır..."
                   : "Saving..."
-                : language === "AZ"
+                : isAZ
                 ? "Bütün Tənzimləmələri Yadda Saxla"
                 : "Save All Settings"}
             </span>
@@ -101,32 +103,32 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         {[
           {
             id: "all",
-            label: language === "AZ" ? "Bütün Tənzimləmələr" : "All Settings",
+            label: isAZ ? "Bütün Bölmələr" : "All Sections",
             icon: Sliders,
           },
           {
             id: "contact",
-            label: language === "AZ" ? "Əlaqə və Konsyerj" : "Contact & Concierge",
+            label: isAZ ? "Əlaqə & Qaynar Xətt" : "Contact & Helpline",
             icon: Phone,
           },
           {
             id: "announcement",
-            label: language === "AZ" ? "Elan Zolağı" : "Announcement Bar",
+            label: isAZ ? "Elan Başlığı" : "Announcement Banner",
             icon: Megaphone,
           },
           {
             id: "pricing",
-            label: language === "AZ" ? "Qiymətlər və Marjalar" : "Pricing & Margins",
+            label: isAZ ? "Viza & Transfer Qiymətləri" : "Visa & Transfer Pricing",
             icon: DollarSign,
           },
           {
             id: "operations",
-            label: language === "AZ" ? "Xidmət Keçidləri" : "Service Toggles",
+            label: isAZ ? "Xidmət Keçidləri" : "Service Toggles",
             icon: Shield,
           },
           {
             id: "marketing",
-            label: language === "AZ" ? "Sosial Sübutlar" : "Social Proof",
+            label: isAZ ? "Sosial Sübutlar" : "Social Proof",
             icon: Sparkles,
           },
         ].map((cat) => {
@@ -177,6 +179,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           language={language}
           settingsDraft={settingsDraft}
           setSettingsDraft={setSettingsDraft}
+          handleSaveSettings={handleSaveSettings}
+          settingsSaving={settingsSaving}
         />
       )}
 
@@ -197,6 +201,35 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           setSettingsDraft={setSettingsDraft}
         />
       )}
+
+      {/* Sticky Bottom Save Bar */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-4 transition-all">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs font-semibold text-slate-200">
+            {isAZ ? "Platform Tənzimləmələri İdarəsi" : "Platform Configuration Center"}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleResetSettings}
+            disabled={settingsSaving}
+            className="px-3 py-1.5 rounded-lg border border-slate-700 text-xs font-medium text-slate-300 hover:bg-slate-800 transition-colors"
+          >
+            {isAZ ? "Sıfırla" : "Reset"}
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveSettings}
+            disabled={settingsSaving}
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white shadow-sm transition-all"
+          >
+            <Save className={`h-3.5 w-3.5 ${settingsSaving ? "animate-spin" : ""}`} />
+            <span>{settingsSaving ? (isAZ ? "Yadda saxlanılır..." : "Saving...") : (isAZ ? "Yadda Saxla" : "Save All Changes")}</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

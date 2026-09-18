@@ -21,7 +21,8 @@ import {
   Calendar,
   Compass,
   DollarSign,
-  FileText
+  FileText,
+  AlertTriangle
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import CurrencySelector from "@/components/CurrencySelector";
@@ -181,6 +182,13 @@ export default function TransferLandingPage() {
   };
 
   const handleBookNow = (vehicleClass?: VehicleClass) => {
+    if (activeVehicles.length === 0) {
+      if (typeof window !== "undefined") {
+        window.open(settings.contact.whatsappUrl, "_blank");
+      }
+      return;
+    }
+
     const params = new URLSearchParams({
       airport: selectedAirport,
       direction,
@@ -381,69 +389,107 @@ export default function TransferLandingPage() {
             </div>
 
             {/* Vehicle Options Grid with Live Pricing */}
-            <div className={`grid gap-4 pt-2 ${
-              activeVehicles.length === 4
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-                : activeVehicles.length === 2
-                ? "grid-cols-1 sm:grid-cols-2"
-                : activeVehicles.length === 1
-                ? "grid-cols-1"
-                : "grid-cols-1 sm:grid-cols-3"
-            }`}>
-              {activeVehicles.map((vc) => {
-                let priceObj = currentZone
-                  ? direction === "round_trip"
-                    ? calculateRoundTripPrice(currentZone, vc.id, dynamicPricingConfig)
-                    : calculateTransferPrice(currentZone, vc.id, dynamicPricingConfig)
-                  : null;
-
-                const isCustom = currentZone?.isCustom;
-
-                return (
-                  <div
-                    key={vc.id}
-                    className="flex flex-col justify-between rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/50 p-4 transition-all hover:border-sky-400 hover:shadow-md group"
+            {activeVehicles.length === 0 ? (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-6 text-center space-y-3 pt-4">
+                <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                  <AlertTriangle className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    {language === "AZ"
+                      ? "Bütün Nəqliyyat Vasitələri Hazırda Məşğuldur"
+                      : "All Vehicles Are Currently Fully Booked"}
+                  </h3>
+                  <p className="text-xs text-slate-600 max-w-md mx-auto mt-1">
+                    {language === "AZ"
+                      ? "Hal-hazırda onlayn rezervasiya üçün boş nəqliyyat vasitəsi yoxdur. Təcili və ya fərdi sifarişlər üçün 24/7 dispetçer komandamızla birbaşa əlaqə saxlayın."
+                      : "No vehicles are currently available for instant online reservation. Please contact our 24/7 operations team directly for custom urgent arrangements."}
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                  <a
+                    href={settings.contact.whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl">{vc.icon}</span>
-                        <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
-                          <Users className="h-3 w-3" /> {getVehicleCapacity(vc.id)}
-                        </span>
-                      </div>
-                      <h3 className="font-bold text-slate-800 text-sm">{getVehicleLabel(vc.id)}</h3>
-                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
-                        {getVehicleDesc(vc.id)}
-                      </p>
-                    </div>
+                    <span>💬</span>
+                    <span>{language === "AZ" ? "WhatsApp ilə Əlaqə" : "Contact on WhatsApp"}</span>
+                  </a>
+                  <a
+                    href={`tel:${settings.transferPolicy.dispatchPhone}`}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all"
+                  >
+                    <PhoneCall className="h-3.5 w-3.5" />
+                    <span>{settings.transferPolicy.dispatchPhone}</span>
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className={`grid gap-4 pt-2 ${
+                activeVehicles.length === 4
+                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                  : activeVehicles.length === 2
+                  ? "grid-cols-1 sm:grid-cols-2"
+                  : activeVehicles.length === 1
+                  ? "grid-cols-1"
+                  : "grid-cols-1 sm:grid-cols-3"
+              }`}>
+                {activeVehicles.map((vc) => {
+                  let priceObj = currentZone
+                    ? direction === "round_trip"
+                      ? calculateRoundTripPrice(currentZone, vc.id, dynamicPricingConfig)
+                      : calculateTransferPrice(currentZone, vc.id, dynamicPricingConfig)
+                    : null;
 
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                  const isCustom = currentZone?.isCustom;
+
+                  return (
+                    <div
+                      key={vc.id}
+                      className="flex flex-col justify-between rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50/50 p-4 transition-all hover:border-sky-400 hover:shadow-md group"
+                    >
                       <div>
-                        <div className="text-[10px] uppercase font-bold text-slate-400">
-                          {direction === "round_trip" ? t.transferPage.roundTripLabel : t.transferPage.oneWay}
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-2xl">{vc.icon}</span>
+                          <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                            <Users className="h-3 w-3" /> {getVehicleCapacity(vc.id)}
+                          </span>
                         </div>
-                        <div className="text-lg font-extrabold text-sky-700">
-                          {isCustom ? (
-                            <span className="text-xs font-semibold text-slate-600">{t.transferPage.quoteOnRequest}</span>
-                          ) : priceObj ? (
-                            formatPrice(priceObj.totalAmount)
-                          ) : (
-                            "—"
-                          )}
-                        </div>
+                        <h3 className="font-bold text-slate-800 text-sm">{getVehicleLabel(vc.id)}</h3>
+                        <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
+                          {getVehicleDesc(vc.id)}
+                        </p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleBookNow(vc.id)}
-                        className="rounded-lg bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 text-xs font-bold transition-all shadow-sm group-hover:scale-105"
-                      >
-                        {t.transferPage.selectVehicle}
-                      </button>
+
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <div>
+                          <div className="text-[10px] uppercase font-bold text-slate-400">
+                            {direction === "round_trip" ? t.transferPage.roundTripLabel : t.transferPage.oneWay}
+                          </div>
+                          <div className="text-lg font-extrabold text-sky-700">
+                            {isCustom ? (
+                              <span className="text-xs font-semibold text-slate-600">{t.transferPage.quoteOnRequest}</span>
+                            ) : priceObj ? (
+                              formatPrice(priceObj.totalAmount)
+                            ) : (
+                              "—"
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleBookNow(vc.id)}
+                          className="rounded-lg bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 text-xs font-bold transition-all shadow-sm group-hover:scale-105"
+                        >
+                          {t.transferPage.selectVehicle}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Quick CTA banner inside widget */}
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl bg-sky-50 p-4 border border-sky-100">
@@ -455,14 +501,24 @@ export default function TransferLandingPage() {
                   <span className="font-bold text-slate-800">{t.transferPage.allInclusiveTitle}</span> {t.transferPage.allInclusiveDesc}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => handleBookNow()}
-                className="w-full sm:w-auto rounded-xl bg-[#0f3460] hover:bg-[#1a4478] text-white px-5 py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap"
-              >
-                <span>{t.transferPage.proceedBooking}</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
+              {activeVehicles.length === 0 ? (
+                <button
+                  type="button"
+                  disabled={true}
+                  className="w-full sm:w-auto rounded-xl bg-slate-300 text-slate-500 px-5 py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 shadow-none cursor-not-allowed whitespace-nowrap"
+                >
+                  <span>{language === "AZ" ? "Hal-hazırda Tam Məşğuldur" : "Temporarily Fully Booked"}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleBookNow()}
+                  className="w-full sm:w-auto rounded-xl bg-[#0f3460] hover:bg-[#1a4478] text-white px-5 py-2.5 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap cursor-pointer"
+                >
+                  <span>{t.transferPage.proceedBooking}</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -746,14 +802,26 @@ export default function TransferLandingPage() {
             {t.transferPage.bottomDesc}
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/transfer/book"
-              className="w-full sm:w-auto rounded-full px-8 py-3 text-sm font-bold text-white transition-all hover:scale-105 shadow-lg flex items-center justify-center gap-2"
-              style={{ backgroundColor: "#0284c7" }}
-            >
-              <span>{t.transferPage.bottomBookBtn}</span>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            {activeVehicles.length === 0 ? (
+              <a
+                href={settings.contact.whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto rounded-full px-8 py-3 text-sm font-bold text-white transition-all hover:scale-105 shadow-lg flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700"
+              >
+                <span>{language === "AZ" ? "WhatsApp ilə Əlaqə" : "Contact on WhatsApp"}</span>
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            ) : (
+              <Link
+                href="/transfer/book"
+                className="w-full sm:w-auto rounded-full px-8 py-3 text-sm font-bold text-white transition-all hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                style={{ backgroundColor: "#0284c7" }}
+              >
+                <span>{t.transferPage.bottomBookBtn}</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
             <Link
               href="/transfer/track"
               className="w-full sm:w-auto rounded-full border border-sky-300/40 px-6 py-3 text-sm font-semibold text-sky-200 hover:bg-white/10 transition-all text-center"

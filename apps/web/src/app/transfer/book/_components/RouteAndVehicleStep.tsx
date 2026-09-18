@@ -202,74 +202,104 @@ export const RouteAndVehicleStep: React.FC<RouteAndVehicleStepProps> = ({
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                   {t.transferPage.selectVehicle}
                 </label>
-                <div className={`grid gap-3 ${
-                  (activeVehicles || VEHICLE_CLASSES).length === 4
-                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-                    : (activeVehicles || VEHICLE_CLASSES).length === 2
-                    ? "grid-cols-1 sm:grid-cols-2"
-                    : (activeVehicles || VEHICLE_CLASSES).length === 1
-                    ? "grid-cols-1"
-                    : "grid-cols-1 sm:grid-cols-3"
-                }`}>
-                  {(activeVehicles || VEHICLE_CLASSES).map((vc) => {
-                    const price = currentZone
-                      ? direction === "round_trip"
-                        ? calculateRoundTripPrice(currentZone, vc.id, dynamicPricingConfig)
-                        : calculateTransferPrice(currentZone, vc.id, dynamicPricingConfig)
-                      : null;
+                {(!activeVehicles || activeVehicles.length === 0) ? (
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-6 text-center space-y-3">
+                    <div className="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                      <AlertCircle className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">
+                        {language === "AZ"
+                          ? "Bütün Nəqliyyat Vasitələri Hazırda Məşğuldur"
+                          : "All Vehicles Are Currently Fully Booked"}
+                      </h3>
+                      <p className="text-xs text-slate-600 max-w-md mx-auto mt-1">
+                        {language === "AZ"
+                          ? "Hal-hazırda onlayn rezervasiya üçün heç bir nəqliyyat vasitəsi əlçatan deyil. Təcili sifarişlər üçün 24/7 dispetçerimizlə WhatsApp vasitəsilə əlaqə saxlayın."
+                          : "No vehicles are currently available for online booking. Please contact our 24/7 operations team directly on WhatsApp for urgent arrangements."}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`grid gap-3 ${
+                    activeVehicles.length === 4
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                      : activeVehicles.length === 2
+                      ? "grid-cols-1 sm:grid-cols-2"
+                      : activeVehicles.length === 1
+                      ? "grid-cols-1"
+                      : "grid-cols-1 sm:grid-cols-3"
+                  }`}>
+                    {activeVehicles.map((vc) => {
+                      const price = currentZone
+                        ? direction === "round_trip"
+                          ? calculateRoundTripPrice(currentZone, vc.id, dynamicPricingConfig)
+                          : calculateTransferPrice(currentZone, vc.id, dynamicPricingConfig)
+                        : null;
 
-                    const isSelected = vehicleClass === vc.id;
+                      const isSelected = vehicleClass === vc.id;
 
-                    return (
-                      <div
-                        key={vc.id}
-                        onClick={() => setVehicleClass(vc.id)}
-                        className={`cursor-pointer rounded-xl border p-4 transition-all flex flex-col justify-between ${
-                          isSelected
-                            ? "border-sky-600 bg-sky-50/60 ring-2 ring-sky-200"
-                            : "border-slate-200 bg-white hover:border-slate-300"
-                        }`}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-2xl">{vc.icon}</span>
-                            <div className="text-right">
-                              <span className="text-sm font-extrabold text-sky-700">
-                                {isCustomZone ? t.transferPage.quoteOnRequest : price ? `$${price.totalAmount}` : "—"}
-                              </span>
-                              <div className="text-[9px] uppercase font-bold text-slate-400">
-                                {direction === "round_trip" ? t.transferPage.roundTripLabel : t.transferPage.oneWay}
+                      return (
+                        <div
+                          key={vc.id}
+                          onClick={() => setVehicleClass(vc.id)}
+                          className={`cursor-pointer rounded-xl border p-4 transition-all flex flex-col justify-between ${
+                            isSelected
+                              ? "border-sky-600 bg-sky-50/60 ring-2 ring-sky-200"
+                              : "border-slate-200 bg-white hover:border-slate-300"
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-2xl">{vc.icon}</span>
+                              <div className="text-right">
+                                <span className="text-sm font-extrabold text-sky-700">
+                                  {isCustomZone ? t.transferPage.quoteOnRequest : price ? `$${price.totalAmount}` : "—"}
+                                </span>
+                                <div className="text-[9px] uppercase font-bold text-slate-400">
+                                  {direction === "round_trip" ? t.transferPage.roundTripLabel : t.transferPage.oneWay}
+                                </div>
                               </div>
                             </div>
+                            <h3 className="font-bold text-slate-900 text-sm">{getVehicleLabel(vc.id)}</h3>
+                            <p className="text-[11px] text-slate-500 mt-0.5">{getVehicleDesc(vc.id)}</p>
                           </div>
-                          <h3 className="font-bold text-slate-900 text-sm">{getVehicleLabel(vc.id)}</h3>
-                          <p className="text-[11px] text-slate-500 mt-0.5">{getVehicleDesc(vc.id)}</p>
-                        </div>
 
-                        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-3 text-[11px] text-slate-600">
-                          <span className="flex items-center gap-1 font-medium">
-                            <Users className="h-3 w-3 text-sky-600" /> {getVehicleCapacity(vc.id)}
-                          </span>
-                          <span className="flex items-center gap-1 font-medium">
-                            <Briefcase className="h-3 w-3 text-sky-600" /> {getVehicleLuggage(vc.id)}
-                          </span>
+                          <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-3 text-[11px] text-slate-600">
+                            <span className="flex items-center gap-1 font-medium">
+                              <Users className="h-3 w-3 text-sky-600" /> {getVehicleCapacity(vc.id)}
+                            </span>
+                            <span className="flex items-center gap-1 font-medium">
+                              <Briefcase className="h-3 w-3 text-sky-600" /> {getVehicleLuggage(vc.id)}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Action Button */}
               <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-end gap-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={handleNextFromStep1}
-                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm shrink-0"
-                >
-                  <span>{tb.btnContinueFlight}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
+                {(!activeVehicles || activeVehicles.length === 0) ? (
+                  <button
+                    type="button"
+                    disabled={true}
+                    className="w-full sm:w-auto justify-center rounded-xl bg-slate-300 text-slate-500 px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-none cursor-not-allowed shrink-0"
+                  >
+                    <span>{language === "AZ" ? "Rezervasiya Dayandırılıb" : "Booking Unavailable"}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleNextFromStep1}
+                    className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-sm shrink-0 cursor-pointer"
+                  >
+                    <span>{tb.btnContinueFlight}</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
   );

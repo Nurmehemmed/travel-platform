@@ -1,19 +1,23 @@
 "use client";
 
 import React from "react";
-import { DollarSign, ShieldCheck, Car, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { DollarSign, ShieldCheck, Car, AlertTriangle, CheckCircle2, Save } from "lucide-react";
 import { AdminLanguage } from "../types";
 
 interface PricingSettingsCardProps {
   language: AdminLanguage;
   settingsDraft: Record<string, any>;
   setSettingsDraft: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  handleSaveSettings?: () => void;
+  settingsSaving?: boolean;
 }
 
 export const PricingSettingsCard: React.FC<PricingSettingsCardProps> = ({
   language,
   settingsDraft,
   setSettingsDraft,
+  handleSaveSettings,
+  settingsSaving = false,
 }) => {
   const isAZ = language === "AZ";
 
@@ -79,20 +83,35 @@ export const PricingSettingsCard: React.FC<PricingSettingsCardProps> = ({
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-7">
       {/* ─── Header ─── */}
-      <div className="border-b border-slate-100 pb-3">
-        <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-          <DollarSign className="h-4 w-4 text-emerald-600" />
-          <span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-emerald-600" />
+            <span>
+              {isAZ
+                ? "e-Viza və Aeroport Transfer Qiymət və Nəqliyyat İdarəetməsi"
+                : "e-Visa & Airport Transfer Fleet & Pricing Management"}
+            </span>
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
             {isAZ
-              ? "e-Viza və Aeroport Transfer Qiymət və Nəqliyyat İdarəetməsi"
-              : "e-Visa & Airport Transfer Fleet & Pricing Management"}
-          </span>
-        </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
-          {isAZ
-            ? "Müştəri tariflərini tənzimləyin və maşınların mövcudluğunu (aktiv/məşğul) bir toxunuşla idarə edin."
-            : "Adjust customer tariffs and toggle vehicle availability (active/busy) with instant live reflection."}
-        </p>
+              ? "Müştəri tariflərini tənzimləyin və maşınların mövcudluğunu (aktiv/məşğul) tənzimləyib Yadda Saxla düyməsinə basın."
+              : "Adjust customer tariffs, toggle vehicle availability, and click Save to apply immediately to the live platform."}
+          </p>
+        </div>
+
+        {handleSaveSettings && (
+          <button
+            type="button"
+            onClick={handleSaveSettings}
+            disabled={settingsSaving}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-95 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+            style={{ backgroundColor: "#0f3460" }}
+          >
+            <Save className={`h-3.5 w-3.5 text-[#f59e0b] ${settingsSaving ? "animate-spin" : ""}`} />
+            <span>{settingsSaving ? (isAZ ? "Saxlanılır..." : "Saving...") : (isAZ ? "Dəyişiklikləri Saxla" : "Save Changes")}</span>
+          </button>
+        )}
       </div>
 
       {/* ─── SECTION 1: e-Visa Pricing ─── */}
@@ -160,8 +179,8 @@ export const PricingSettingsCard: React.FC<PricingSettingsCardProps> = ({
             </h4>
             <p className="text-[11px] text-slate-500 mt-0.5">
               {isAZ
-                ? "Avtomobil məşğul olduqda və ya təmirə getdikdə söndürün. Söndürülmüş maşınlar müştəri səhifəsində gizlədilir."
-                : "Disable any vehicle when busy, booked up, or in maintenance. Inactive vehicles are automatically hidden from customer bookings."}
+                ? "Avtomobil məşğul olduqda və ya təmirə getdikdə söndürün və yuxarıdakı / aşağıdakı 'Saxla' düyməsinə basın."
+                : "Toggle off any vehicle when busy or in maintenance, then save to update live customer availability."}
             </p>
           </div>
         </div>
@@ -233,7 +252,7 @@ export const PricingSettingsCard: React.FC<PricingSettingsCardProps> = ({
                     </div>
                     {!isActive && (
                       <span className="text-[10px] font-medium text-amber-700">
-                        {isAZ ? "Saytda görünmür" : "Hidden from booking"}
+                        {isAZ ? "Saytda gizlədilib" : "Hidden from booking"}
                       </span>
                     )}
                   </div>

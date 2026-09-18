@@ -265,6 +265,14 @@ function TransferBookForm() {
   // Validation per step
   const handleNextFromStep1 = () => {
     setInvalidField(null);
+    if (activeVehicles.length === 0) {
+      triggerValidationError(
+        language === "AZ"
+          ? "Hal-hazırda heç bir nəqliyyat vasitəsi aktiv deyil. Zəhmət olmasa dispetçerlə əlaqə saxlayın."
+          : "No vehicles are currently available for booking. Please contact our 24/7 operations."
+      );
+      return;
+    }
     if (!dropoffAddress.trim()) {
       triggerValidationError(tb.errAddressRequired, "dropoffAddress");
       return;
