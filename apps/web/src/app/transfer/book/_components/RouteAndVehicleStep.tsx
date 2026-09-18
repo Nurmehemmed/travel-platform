@@ -19,6 +19,7 @@ interface RouteAndVehicleStepProps {
   setDropoffAddress: (val: string) => void;
   vehicleClass: VehicleClass;
   setVehicleClass: (vc: VehicleClass) => void;
+  activeVehicles?: any[];
   currentZone: any;
   dynamicPricingConfig: any;
   isCustomZone: boolean;
@@ -48,6 +49,7 @@ export const RouteAndVehicleStep: React.FC<RouteAndVehicleStepProps> = ({
   setDropoffAddress,
   vehicleClass,
   setVehicleClass,
+  activeVehicles,
   currentZone,
   dynamicPricingConfig,
   isCustomZone,
@@ -200,8 +202,16 @@ export const RouteAndVehicleStep: React.FC<RouteAndVehicleStepProps> = ({
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                   {t.transferPage.selectVehicle}
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {VEHICLE_CLASSES.map((vc) => {
+                <div className={`grid gap-3 ${
+                  (activeVehicles || VEHICLE_CLASSES).length === 4
+                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                    : (activeVehicles || VEHICLE_CLASSES).length === 2
+                    ? "grid-cols-1 sm:grid-cols-2"
+                    : (activeVehicles || VEHICLE_CLASSES).length === 1
+                    ? "grid-cols-1"
+                    : "grid-cols-1 sm:grid-cols-3"
+                }`}>
+                  {(activeVehicles || VEHICLE_CLASSES).map((vc) => {
                     const price = currentZone
                       ? direction === "round_trip"
                         ? calculateRoundTripPrice(currentZone, vc.id, dynamicPricingConfig)

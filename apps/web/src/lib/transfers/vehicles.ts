@@ -1,11 +1,11 @@
 /**
  * @file vehicles.ts
- * @description Vehicle configurations, specs, and helper functions.
+ * @description Vehicle configurations, specs, and dynamic availability helpers.
  */
 
-import { VehicleConfig } from "./types";
+import { VehicleClass, VehicleConfig } from "./types";
 
-export const VEHICLE_CLASSES: VehicleConfig[] = [
+export const ALL_VEHICLE_CLASSES: VehicleConfig[] = [
   {
     id: "sedan",
     label: "Sedan",
@@ -40,7 +40,7 @@ export const VEHICLE_CLASSES: VehicleConfig[] = [
     maxPax: 7,
     luggage: "6 large bags",
     maxLuggage: 6,
-    baseRate: 55,
+    baseRate: 40,
     perKmRate: 0.75,
     icon: "🚐",
     features: ["Spacious 7-seater cabin", "Large luggage capacity", "Child seat on request", "Flight monitoring"],
@@ -48,19 +48,58 @@ export const VEHICLE_CLASSES: VehicleConfig[] = [
   {
     id: "sprinter",
     label: "Minibus (Sprinter)",
-    description: "Mercedes-Benz Sprinter or equivalent. Perfect for large delegations, corporate groups, and tours.",
+    description: "Mercedes-Benz Sprinter or equivalent for larger groups, corporate delegations, and tours.",
     capacity: "8–16 passengers",
     maxPax: 16,
     luggage: "15 large bags",
     maxLuggage: 15,
-    baseRate: 90,
+    baseRate: 65,
     perKmRate: 1.10,
     icon: "🚌",
-    features: ["16-passenger capacity", "Massive luggage space", "High roof & AC", "Flight monitoring"],
+    features: ["Spacious 16-seater cabin", "Extensive luggage room", "Tour sound system", "Flight monitoring"],
   },
 ];
 
-/** Get vehicle config by class */
+/** Baseline alias for backward compatibility */
+export const VEHICLE_CLASSES = ALL_VEHICLE_CLASSES;
+
+/** Helper to check if a specific vehicle class is active according to site operations */
+export function isVehicleClassActive(
+  vehicleId: string,
+  operations?: {
+    vehicleSedanActive?: boolean;
+    vehicleSuvActive?: boolean;
+    vehicleMinivanActive?: boolean;
+    vehicleSprinterActive?: boolean;
+  }
+): boolean {
+  if (!operations) {
+    // Default fallback: sedan, suv, minivan active; sprinter inactive by default
+    return vehicleId !== "sprinter";
+  }
+
+  const vId = vehicleId.toLowerCase();
+  if (vId === "sedan") return operations.vehicleSedanActive !== false;
+  if (vId === "suv") return operations.vehicleSuvActive !== false;
+  if (vId === "minivan") return operations.vehicleMinivanActive !== false;
+  if (vId === "sprinter") return Boolean(operations.vehicleSprinterActive);
+
+  return true;
+}
+
+/** Get list of active vehicle classes dynamically */
+export function getActiveVehicleClasses(
+  operations?: {
+    vehicleSedanActive?: boolean;
+    vehicleSuvActive?: boolean;
+    vehicleMinivanActive?: boolean;
+    vehicleSprinterActive?: boolean;
+  }
+): VehicleConfig[] {
+  return ALL_VEHICLE_CLASSES.filter((vc) => isVehicleClassActive(vc.id, operations));
+}
+
+/** Get vehicle config by class identifier */
 export function getVehicleConfig(vehicleClass: string): VehicleConfig | undefined {
-  return VEHICLE_CLASSES.find((v) => v.id.toLowerCase() === vehicleClass.toLowerCase());
+  return ALL_VEHICLE_CLASSES.find((v) => v.id.toLowerCase() === vehicleClass.toLowerCase());
 }

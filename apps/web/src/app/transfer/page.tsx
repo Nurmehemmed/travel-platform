@@ -27,11 +27,13 @@ import LanguageSelector from "@/components/LanguageSelector";
 import CurrencySelector from "@/components/CurrencySelector";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
+import { useSiteSettings } from "@/lib/settings-context";
 import { CustomSelect } from "@/components/CustomSelect";
 import { MapLocationPickerModal, MapLocationPickerResult } from "@/components/MapLocationPickerModal";
 import {
   AIRPORTS,
   VEHICLE_CLASSES,
+  getActiveVehicleClasses,
   TRANSFER_ZONES,
   AirportCode,
   VehicleClass,
@@ -56,6 +58,25 @@ export default function TransferLandingPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { formatPrice } = useCurrency();
+  const { settings } = useSiteSettings();
+
+  const activeVehicles = getActiveVehicleClasses(settings.operations);
+
+  const dynamicPricingConfig = {
+    baseRates: {
+      sedan: settings.pricing.transferSedan,
+      suv: settings.pricing.transferSuv,
+      minivan: settings.pricing.transferMinivan,
+      sprinter: settings.pricing.transferSprinter,
+    },
+    perKmRates: {
+      sedan: settings.pricing.transferPerKmSedan,
+      suv: settings.pricing.transferPerKmSuv,
+      minivan: settings.pricing.transferPerKmMinivan,
+      sprinter: settings.pricing.transferPerKmSprinter,
+    },
+    roundTripDiscountPercent: settings.pricing.transferRoundTripDiscountPercent,
+  };
 
   // Estimator state
   const [selectedAirport, setSelectedAirport] = useState<AirportCode>("GYD");
@@ -79,24 +100,44 @@ export default function TransferLandingPage() {
   const getVehicleLabel = (id: VehicleClass) => {
     if (id === "sedan") return t.transferPage.sedan;
     if (id === "suv") return t.transferPage.suv;
+    if (id === "sprinter") {
+      return language === "AZ"
+        ? "Mikroavtobus (Sprinter)"
+        : language === "RU"
+        ? "Микроавтобус (Sprinter)"
+        : language === "AR"
+        ? "حافلة صغيرة (Sprinter)"
+        : "Minibus (Sprinter)";
+    }
     return t.transferPage.minivan;
   };
 
   const getVehicleDesc = (id: VehicleClass) => {
     if (id === "sedan") return t.transferPage.sedanDesc;
     if (id === "suv") return t.transferPage.suvDesc;
+    if (id === "sprinter") {
+      return language === "AZ"
+        ? "Böyük qruplar və turlar üçün 16 nəfərlik Mercedes-Benz Sprinter və ya analoqu."
+        : language === "RU"
+        ? "Mercedes-Benz Sprinter или аналог на 16 мест для больших групп и делегаций."
+        : language === "AR"
+        ? "مرسيدس سبرينتر أو ما يعادلها تتسع حتى 16 راكباً وحقائب كبيرة."
+        : "Mercedes-Benz Sprinter or equivalent for up to 16 passengers and large luggage.";
+    }
     return t.transferPage.minivanDesc;
   };
 
   const getVehicleCapacity = (id: VehicleClass) => {
     if (id === "sedan") return `1–3 ${t.transferPage.paxMax}`;
     if (id === "suv") return `1–4 ${t.transferPage.paxMax}`;
+    if (id === "sprinter") return `8–16 ${t.transferPage.paxMax}`;
     return `4–7 ${t.transferPage.paxMax}`;
   };
 
   const getVehicleLuggage = (id: VehicleClass) => {
     if (id === "sedan") return `2 ${t.transferPage.bagsMax}`;
     if (id === "suv") return `4 ${t.transferPage.bagsMax}`;
+    if (id === "sprinter") return `15 ${t.transferPage.bagsMax}`;
     return `6 ${t.transferPage.bagsMax}`;
   };
 
@@ -340,12 +381,20 @@ export default function TransferLandingPage() {
             </div>
 
             {/* Vehicle Options Grid with Live Pricing */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-              {VEHICLE_CLASSES.map((vc) => {
+            <div className={`grid gap-4 pt-2 ${
+              activeVehicles.length === 4
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                : activeVehicles.length === 2
+                ? "grid-cols-1 sm:grid-cols-2"
+                : activeVehicles.length === 1
+                ? "grid-cols-1"
+                : "grid-cols-1 sm:grid-cols-3"
+            }`}>
+              {activeVehicles.map((vc) => {
                 let priceObj = currentZone
                   ? direction === "round_trip"
-                    ? calculateRoundTripPrice(currentZone, vc.id)
-                    : calculateTransferPrice(currentZone, vc.id)
+                    ? calculateRoundTripPrice(currentZone, vc.id, dynamicPricingConfig)
+                    : calculateTransferPrice(currentZone, vc.id, dynamicPricingConfig)
                   : null;
 
                 const isCustom = currentZone?.isCustom;
@@ -510,63 +559,78 @@ export default function TransferLandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {VEHICLE_CLASSES.map((vc) => (
-              <div
-                key={vc.id}
-                className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="text-3xl">{vc.icon}</div>
-                      <div>
-                        <h3 className="font-bold text-slate-900 text-lg">{getVehicleLabel(vc.id)}</h3>
-                        <p className="text-xs text-slate-500">{getVehicleDesc(vc.id)}</p>
+          <div className={`grid gap-6 ${
+            activeVehicles.length === 4
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+              : activeVehicles.length === 2
+              ? "grid-cols-1 sm:grid-cols-2"
+              : activeVehicles.length === 1
+              ? "grid-cols-1"
+              : "grid-cols-1 md:grid-cols-3"
+          }`}>
+            {activeVehicles.map((vc) => {
+              const baseMap = dynamicPricingConfig.baseRates as Record<string, number>;
+              const perKmMap = dynamicPricingConfig.perKmRates as Record<string, number>;
+              const currentBaseRate = baseMap[vc.id] ?? vc.baseRate;
+              const currentPerKmRate = perKmMap[vc.id] ?? vc.perKmRate;
+
+              return (
+                <div
+                  key={vc.id}
+                  className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="text-3xl">{vc.icon}</div>
+                        <div>
+                          <h3 className="font-bold text-slate-900 text-lg">{getVehicleLabel(vc.id)}</h3>
+                          <p className="text-xs text-slate-500">{getVehicleDesc(vc.id)}</p>
+                        </div>
                       </div>
                     </div>
+
+                    <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-600 border-y border-slate-100 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="h-4 w-4 text-sky-600" />
+                        <span className="font-semibold">{getVehicleCapacity(vc.id)}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Briefcase className="h-4 w-4 text-sky-600" />
+                        <span className="font-semibold">{getVehicleLuggage(vc.id)}</span>
+                      </div>
+                    </div>
+
+                    <ul className="mt-4 space-y-2">
+                      {(LOCALIZED_VEHICLE_FEATURES[language]?.[vc.id] || vc.features).map((feat, idx) => (
+                        <li key={idx} className="flex items-center gap-2 text-xs text-slate-600">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-600 border-y border-slate-100 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <Users className="h-4 w-4 text-sky-600" />
-                      <span className="font-semibold">{getVehicleCapacity(vc.id)}</span>
+                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400">{t.transferPage.startingFrom}</span>
+                      <div className="text-xl font-extrabold text-slate-900">
+                        ${currentBaseRate}{" "}
+                        <span className="text-xs font-normal text-slate-500">{t.transferPage.baseFee} + ${currentPerKmRate.toFixed(2)}/{t.transferPage.perKm}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Briefcase className="h-4 w-4 text-sky-600" />
-                      <span className="font-semibold">{getVehicleLuggage(vc.id)}</span>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleBookNow(vc.id)}
+                      className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                      <span>{t.transferPage.bookVehicle} {getVehicleLabel(vc.id)}</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
                   </div>
-
-                  <ul className="mt-4 space-y-2">
-                    {(LOCALIZED_VEHICLE_FEATURES[language]?.[vc.id] || vc.features).map((feat, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-xs text-slate-600">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">{t.transferPage.startingFrom}</span>
-                    <div className="text-xl font-extrabold text-slate-900">
-                      ${vc.baseRate}{" "}
-                      <span className="text-xs font-normal text-slate-500">{t.transferPage.baseFee} + ${vc.perKmRate.toFixed(2)}/{t.transferPage.perKm}</span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleBookNow(vc.id)}
-                    className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
-                  >
-                    <span>{t.transferPage.bookVehicle} {getVehicleLabel(vc.id)}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

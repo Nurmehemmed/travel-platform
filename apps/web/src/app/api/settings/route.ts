@@ -66,6 +66,10 @@ export async function GET() {
         floatingItinerary: settingsMap["operations_floating_itinerary"] !== false && settingsMap["operations_floating_itinerary"] !== "false",
         visaServiceActive: settingsMap["operations_visa_service"] !== false && settingsMap["operations_visa_service"] !== "false",
         transferServiceActive: settingsMap["operations_transfer_service"] !== false && settingsMap["operations_transfer_service"] !== "false",
+        vehicleSedanActive: settingsMap["operations_vehicle_sedan_active"] !== false && settingsMap["operations_vehicle_sedan_active"] !== "false",
+        vehicleSuvActive: settingsMap["operations_vehicle_suv_active"] !== false && settingsMap["operations_vehicle_suv_active"] !== "false",
+        vehicleMinivanActive: settingsMap["operations_vehicle_minivan_active"] !== false && settingsMap["operations_vehicle_minivan_active"] !== "false",
+        vehicleSprinterActive: Boolean(settingsMap["operations_vehicle_sprinter_active"] === true || settingsMap["operations_vehicle_sprinter_active"] === "true"),
       },
     };
 
@@ -125,6 +129,10 @@ export async function GET() {
         floatingItinerary: true,
         visaServiceActive: true,
         transferServiceActive: true,
+        vehicleSedanActive: true,
+        vehicleSuvActive: true,
+        vehicleMinivanActive: true,
+        vehicleSprinterActive: false,
       },
     });
   }

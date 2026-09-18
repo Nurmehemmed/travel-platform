@@ -33,6 +33,26 @@ function getSettingMetadata(key: string): { category: string; label: string; des
       label: "Airport Transfer Booking Active",
       description: "Kill-switch for airport transfer reservations",
     },
+    operations_vehicle_sedan_active: {
+      category: "operations",
+      label: "Sedan Fleet Active",
+      description: "Enable/disable Sedan booking (turn off if busy/unavailable)",
+    },
+    operations_vehicle_suv_active: {
+      category: "operations",
+      label: "SUV Fleet Active",
+      description: "Enable/disable SUV booking (turn off if busy/unavailable)",
+    },
+    operations_vehicle_minivan_active: {
+      category: "operations",
+      label: "Minivan Fleet Active",
+      description: "Enable/disable Minivan booking (turn off if busy/unavailable)",
+    },
+    operations_vehicle_sprinter_active: {
+      category: "operations",
+      label: "Sprinter VIP Fleet Active",
+      description: "Enable/disable Sprinter VIP booking (turn off if busy/unavailable)",
+    },
     contact_whatsapp: {
       category: "contact",
       label: "Primary WhatsApp Number",

@@ -8,6 +8,7 @@ import { useSiteSettings } from "@/lib/settings-context";
 import {
   AIRPORTS,
   VEHICLE_CLASSES,
+  getActiveVehicleClasses,
   TRANSFER_ZONES,
   AirportCode,
   VehicleClass,
@@ -225,6 +226,14 @@ function TransferBookForm() {
   });
 
   const { settings } = useSiteSettings();
+  const activeVehicles = getActiveVehicleClasses(settings.operations);
+
+  // Auto-switch to an available active vehicle if selected vehicle is disabled/busy
+  useEffect(() => {
+    if (activeVehicles.length > 0 && !activeVehicles.some((v) => v.id === vehicleClass)) {
+      setVehicleClass(activeVehicles[0]!.id);
+    }
+  }, [activeVehicles, vehicleClass]);
 
   const dynamicPricingConfig = {
     baseRates: {
@@ -406,6 +415,7 @@ function TransferBookForm() {
               setDropoffAddress={setDropoffAddress}
               vehicleClass={vehicleClass}
               setVehicleClass={setVehicleClass}
+              activeVehicles={activeVehicles}
               currentZone={currentZone}
               dynamicPricingConfig={dynamicPricingConfig}
               isCustomZone={Boolean(isCustomZone)}

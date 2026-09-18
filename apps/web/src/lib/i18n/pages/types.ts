@@ -53,6 +53,8 @@ export interface TransferPageTranslations {
   suvDesc: string;
   minivan: string;
   minivanDesc: string;
+  sprinter?: string;
+  sprinterDesc?: string;
   paxMax: string;
   bagsMax: string;
   whyTitle: string;

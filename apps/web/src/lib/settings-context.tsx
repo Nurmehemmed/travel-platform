@@ -49,6 +49,10 @@ export interface PublicSettings {
     floatingItinerary: boolean;
     visaServiceActive: boolean;
     transferServiceActive: boolean;
+    vehicleSedanActive: boolean;
+    vehicleSuvActive: boolean;
+    vehicleMinivanActive: boolean;
+    vehicleSprinterActive: boolean;
   };
 }
 
@@ -98,6 +102,10 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
     floatingItinerary: true,
     visaServiceActive: true,
     transferServiceActive: true,
+    vehicleSedanActive: true,
+    vehicleSuvActive: true,
+    vehicleMinivanActive: true,
+    vehicleSprinterActive: false,
   },
 };
 
@@ -134,6 +142,10 @@ export const DEFAULT_SETTINGS_MAP: Record<string, any> = {
   operations_floating_itinerary: true,
   operations_visa_service: true,
   operations_transfer_service: true,
+  operations_vehicle_sedan_active: true,
+  operations_vehicle_suv_active: true,
+  operations_vehicle_minivan_active: true,
+  operations_vehicle_sprinter_active: false,
 };
 
 const SETTINGS_CACHE_KEY = "addmetour_site_settings_cache";
