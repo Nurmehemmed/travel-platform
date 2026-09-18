@@ -6,6 +6,7 @@ import { SettingsProvider } from "@/lib/settings-context";
 import { CurrencyProvider } from "@/lib/currency-context";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import FloatingWidgetsContainer from "@/components/FloatingWidgetsContainer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // ─── Font Optimization via Next.js Font Engine (Zero render-blocking requests) ───
 const outfit = Outfit({
@@ -359,6 +360,7 @@ export default function RootLayout({
             </CurrencyProvider>
           </LanguageProvider>
         </SettingsProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
