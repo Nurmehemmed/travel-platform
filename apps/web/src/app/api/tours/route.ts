@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db, packages, destinations } from "@travel/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 
 // Always serve real-time dynamic tour catalog without stale edge caching
 export const dynamic = "force-dynamic";
@@ -27,7 +27,7 @@ export async function GET() {
       .from(packages)
       .leftJoin(destinations, eq(packages.destinationId, destinations.id))
       .where(eq(packages.isActive, true))
-      .orderBy(desc(packages.createdAt));
+      .orderBy(asc(packages.createdAt));
 
     // Map into frontend landing page tour format
     const formatted = list.map((pkg, idx) => {
