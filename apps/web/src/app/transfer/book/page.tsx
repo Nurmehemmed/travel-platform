@@ -33,12 +33,20 @@ import {
   VehicleClass,
   getZonesByAirport,
   getZoneById,
+  getDestinationsByAirport,
+  getLocationById,
+  resolveLocationOrZone,
   calculateTransferPrice,
   calculateRoundTripPrice,
   getAirportByCode,
   getVehicleConfig,
 } from "@/lib/transfer-zones";
-import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES, TRANSFER_BOOK_TRANSLATIONS } from "@/lib/pages-i18n";
+import {
+  LOCALIZED_AIRPORTS,
+  LOCALIZED_ZONES,
+  LOCALIZED_DESTINATION_CATEGORIES,
+  TRANSFER_BOOK_TRANSLATIONS,
+} from "@/lib/pages-i18n";
 import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
 import { CustomSelect } from "@/components/CustomSelect";
@@ -77,7 +85,9 @@ function TransferBookForm() {
   // Query param defaults
   const paramAirport = (searchParams.get("airport") as AirportCode) || "GYD";
   const paramDirection = (searchParams.get("direction") as "arrival" | "departure" | "round_trip") || "arrival";
-  const paramZone = searchParams.get("zone") || "GYD-baku-center";
+  const paramZone = searchParams.get("zone") || "";
+  const paramLocation = searchParams.get("location") || "";
+  const paramHotel = searchParams.get("hotel") || "";
   const paramVehicle = (searchParams.get("vehicle") as VehicleClass) || "sedan";
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -94,10 +104,14 @@ function TransferBookForm() {
   }, []);
 
   // Step 1: Route & Vehicle
+  const initialLocationObj = paramLocation ? getLocationById(paramLocation) : undefined;
+  const initialLocationId = paramLocation || paramZone || "loc-jw-marriott";
+  const initialAddress = paramHotel || (initialLocationObj ? (initialLocationObj.address || initialLocationObj.name) : "");
+
   const [airport, setAirport] = useState<AirportCode>(paramAirport);
   const [direction, setDirection] = useState<"arrival" | "departure" | "round_trip">(paramDirection);
-  const [zoneId, setZoneId] = useState<string>(paramZone);
-  const [dropoffAddress, setDropoffAddress] = useState<string>("");
+  const [selectedDestinationId, setSelectedDestinationId] = useState<string>(initialLocationId);
+  const [dropoffAddress, setDropoffAddress] = useState<string>(initialAddress);
   const [vehicleClass, setVehicleClass] = useState<VehicleClass>(paramVehicle);
 
   // Step 2: Flight Details
@@ -136,15 +150,53 @@ function TransferBookForm() {
     }
   };
 
-  // Sync available zones when airport changes
-  const airportZones = getZonesByAirport(airport);
-  useEffect(() => {
-    if (!airportZones.some((z) => z.id === zoneId)) {
-      setZoneId(airportZones[0]?.id || "");
-    }
-  }, [airport]);
+  const { location: selectedLocation, zone: currentZone } = resolveLocationOrZone(
+    selectedDestinationId,
+    airport
+  );
+  const zoneId = currentZone.id;
 
-  const currentZone = getZoneById(zoneId) || airportZones[0];
+  const handleAirportChange = (code: AirportCode) => {
+    setAirport(code);
+    const dests = getDestinationsByAirport(code);
+    if (dests.length > 0 && dests[0]) {
+      setSelectedDestinationId(dests[0].id);
+      setDropoffAddress(dests[0].address || dests[0].name);
+    }
+  };
+
+  const handleDestinationChange = (val: string) => {
+    setSelectedDestinationId(val);
+    if (val.startsWith("custom:")) {
+      const customName = val.replace(/^custom:/, "");
+      setDropoffAddress(customName);
+    } else {
+      const loc = getLocationById(val);
+      if (loc) {
+        setDropoffAddress(loc.address || loc.name);
+      }
+    }
+  };
+
+  const destinationCategoryI18n =
+    LOCALIZED_DESTINATION_CATEGORIES[language] || LOCALIZED_DESTINATION_CATEGORIES.EN;
+
+  const destinationOptions = getDestinationsByAirport(airport).map((dest) => {
+    const groupLabel = destinationCategoryI18n[dest.category] || dest.category;
+    const destZone = TRANSFER_ZONES.find((z) => z.id === dest.zoneId);
+    const distanceStr =
+      destZone && destZone.distanceKm > 0 ? `~${destZone.distanceKm} km` : undefined;
+
+    return {
+      value: dest.id,
+      label: dest.name,
+      description: dest.address,
+      badge: dest.badge || distanceStr,
+      group: groupLabel,
+      aliases: dest.aliases,
+    };
+  });
+
   const currentVehicle = getVehicleConfig(vehicleClass) || VEHICLE_CLASSES[0];
   const airportInfo = getAirportByCode(airport) || AIRPORTS[0];
 
@@ -426,7 +478,7 @@ function TransferBookForm() {
                   </label>
                   <CustomSelect
                     value={airport}
-                    onChange={(val) => setAirport(val as AirportCode)}
+                    onChange={(val) => handleAirportChange(val as AirportCode)}
                     options={AIRPORTS.map((a) => ({
                       value: a.code,
                       label: LOCALIZED_AIRPORTS[language]?.[a.code] || a.fullName,
@@ -440,12 +492,13 @@ function TransferBookForm() {
                     {t.transferPage.destinationZone}
                   </label>
                   <CustomSelect
-                    value={zoneId}
-                    onChange={(val) => setZoneId(val)}
-                    options={airportZones.map((z) => ({
-                      value: z.id,
-                      label: `${LOCALIZED_ZONES[language]?.[z.id] || z.name} ${z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}`,
-                    }))}
+                    value={selectedDestinationId}
+                    onChange={(val) => handleDestinationChange(String(val))}
+                    options={destinationOptions}
+                    searchable={true}
+                    searchPlaceholder={destinationCategoryI18n.searchPlaceholder}
+                    allowCustomValue={true}
+                    customValueLabelPrefix={destinationCategoryI18n.useCustomPrefix}
                   />
                 </div>
               </div>

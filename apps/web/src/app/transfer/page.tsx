@@ -35,12 +35,15 @@ import {
   AirportCode,
   VehicleClass,
   getZonesByAirport,
+  getDestinationsByAirport,
+  resolveLocationOrZone,
   calculateTransferPrice,
   calculateRoundTripPrice,
 } from "@/lib/transfer-zones";
 import {
   LOCALIZED_AIRPORTS,
   LOCALIZED_ZONES,
+  LOCALIZED_DESTINATION_CATEGORIES,
   LOCALIZED_AIRPORT_DESCRIPTIONS,
   LOCALIZED_TRANSFER_FAQS,
   LOCALIZED_VEHICLE_FEATURES,
@@ -55,8 +58,7 @@ export default function TransferLandingPage() {
   // Estimator state
   const [selectedAirport, setSelectedAirport] = useState<AirportCode>("GYD");
   const [direction, setDirection] = useState<"arrival" | "departure" | "round_trip">("arrival");
-  const zones = getZonesByAirport(selectedAirport);
-  const [selectedZoneId, setSelectedZoneId] = useState<string>(zones[0]?.id || "GYD-baku-center");
+  const [selectedLocationId, setSelectedLocationId] = useState<string>("loc-jw-marriott");
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -95,21 +97,49 @@ export default function TransferLandingPage() {
     return `6 ${t.transferPage.bagsMax}`;
   };
 
-  // When airport changes, reset zone
+  // When airport changes, reset destination
   const handleAirportChange = (code: AirportCode) => {
     setSelectedAirport(code);
-    const newZones = getZonesByAirport(code);
-    setSelectedZoneId(newZones[0]?.id || "");
+    const airportDests = getDestinationsByAirport(code);
+    setSelectedLocationId(airportDests[0]?.id || "");
   };
 
-  const currentZone = TRANSFER_ZONES.find((z) => z.id === selectedZoneId) || zones[0];
+  const { location: selectedLocation, zone: currentZone } = resolveLocationOrZone(
+    selectedLocationId,
+    selectedAirport
+  );
+
+  const destinationCategoryI18n =
+    LOCALIZED_DESTINATION_CATEGORIES[language] || LOCALIZED_DESTINATION_CATEGORIES.EN;
+
+  const destinationOptions = getDestinationsByAirport(selectedAirport).map((dest) => {
+    const groupLabel = destinationCategoryI18n[dest.category] || dest.category;
+    const destZone = TRANSFER_ZONES.find((z) => z.id === dest.zoneId);
+    const distanceStr =
+      destZone && destZone.distanceKm > 0 ? `~${destZone.distanceKm} km` : undefined;
+
+    return {
+      value: dest.id,
+      label: dest.name,
+      description: dest.address,
+      badge: dest.badge || distanceStr,
+      group: groupLabel,
+      aliases: dest.aliases,
+    };
+  });
 
   const handleBookNow = (vehicleClass?: VehicleClass) => {
     const params = new URLSearchParams({
       airport: selectedAirport,
       direction,
-      zone: selectedZoneId,
+      zone: currentZone.id,
     });
+    if (selectedLocation) {
+      params.set("location", selectedLocation.id);
+      params.set("hotel", selectedLocation.name);
+    } else if (selectedLocationId.startsWith("custom:")) {
+      params.set("hotel", selectedLocationId.replace(/^custom:/, ""));
+    }
     if (vehicleClass) {
       params.set("vehicle", vehicleClass);
     }
@@ -273,12 +303,13 @@ export default function TransferLandingPage() {
                   {t.transferPage.destinationZone}
                 </label>
                 <CustomSelect
-                  value={selectedZoneId}
-                  onChange={(val) => setSelectedZoneId(val)}
-                  options={zones.map((z) => ({
-                    value: z.id,
-                    label: `${LOCALIZED_ZONES[language]?.[z.id] || z.name} ${z.distanceKm > 0 ? `(~${z.distanceKm} km)` : `— ${t.transferPage.customQuoteText}`}`,
-                  }))}
+                  value={selectedLocationId}
+                  onChange={(val) => setSelectedLocationId(String(val))}
+                  options={destinationOptions}
+                  searchable={true}
+                  searchPlaceholder={destinationCategoryI18n.searchPlaceholder}
+                  allowCustomValue={true}
+                  customValueLabelPrefix={destinationCategoryI18n.useCustomPrefix}
                 />
               </div>
             </div>

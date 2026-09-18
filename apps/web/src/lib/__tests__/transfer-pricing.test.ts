@@ -5,6 +5,10 @@ import {
   getZoneById,
   getAirportByCode,
   generateTransferRef,
+  getDestinationsByAirport,
+  getLocationById,
+  searchDestinations,
+  resolveLocationOrZone,
 } from "../transfer-zones";
 
 describe("Transfer Pricing Engine", () => {
@@ -59,9 +63,37 @@ describe("Transfer Pricing Engine", () => {
     const ref1 = generateTransferRef();
     const ref2 = generateTransferRef();
 
-    expect(ref1).toMatch(/^ATR-[A-Z0-9]{6}$/);
-    expect(ref2).toMatch(/^ATR-[A-Z0-9]{6}$/);
+    expect(ref1).toMatch(/^ATR-[A-HJ-NP-Z2-9]{6}$/);
+    expect(ref2).toMatch(/^ATR-[A-HJ-NP-Z2-9]{6}$/);
     expect(ref1).not.toBe(ref2);
+  });
+
+  it("finds destinations by airport and category", () => {
+    const gydDests = getDestinationsByAirport("GYD");
+    expect(gydDests.length).toBeGreaterThan(20);
+
+    // Verify hotel category exists
+    const marriott = getLocationById("loc-jw-marriott");
+    expect(marriott).toBeDefined();
+    expect(marriott?.name).toContain("JW Marriott");
+    expect(marriott?.category).toBe("hotel");
+
+    // Verify regional search
+    const shahdagResults = searchDestinations("Shahdag", "GYD");
+    expect(shahdagResults.length).toBeGreaterThan(0);
+    expect(shahdagResults.some((d: any) => d.id === "loc-reg-shahdag")).toBe(true);
+
+    // Verify alias search (e.g. search "marriott" finds JW Marriott and Courtyard)
+    const marriottResults = searchDestinations("marriott", "GYD");
+    expect(marriottResults.length).toBeGreaterThanOrEqual(2);
+
+    // Verify location or zone resolution
+    const resolvedLoc = resolveLocationOrZone("loc-jw-marriott", "GYD");
+    expect(resolvedLoc.location).toBeDefined();
+    expect(resolvedLoc.zone.id).toBe("GYD-baku-center");
+
+    const resolvedZone = resolveLocationOrZone("GYD-baku-center", "GYD");
+    expect(resolvedZone.zone.id).toBe("GYD-baku-center");
   });
 
   it("retrieves valid airport by IATA code", () => {
