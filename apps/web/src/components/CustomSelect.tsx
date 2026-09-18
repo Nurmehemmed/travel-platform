@@ -90,7 +90,14 @@ export function CustomSelect({
       ? {
           value: String(value),
           label: String(value).startsWith("custom:")
-            ? String(value).replace(/^custom:/, "").trim()
+            ? (() => {
+                const rest = String(value).replace(/^custom:/, "").trim();
+                const colonIdx = rest.indexOf(":");
+                if (colonIdx > 0 && rest.substring(0, colonIdx).includes("-")) {
+                  return rest.substring(colonIdx + 1).trim();
+                }
+                return rest;
+              })()
             : String(value),
           badge: String(value).startsWith("custom:") ? "📍 Map / Custom" : undefined,
           icon: <span className="shrink-0 text-base">📍</span>,
@@ -187,7 +194,7 @@ export function CustomSelect({
         onClick={() => {
           if (!disabled) setIsOpen(!isOpen);
         }}
-        className={`group flex w-full items-center justify-between rounded-xl border bg-white px-3.5 py-2.5 text-left text-sm font-medium transition-all duration-200 cursor-pointer select-none ${
+        className={`group flex w-full min-h-[44px] items-center justify-between rounded-xl border bg-white px-3.5 py-2.5 text-left text-sm font-medium transition-all duration-200 cursor-pointer select-none ${
           disabled
             ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
             : hasError

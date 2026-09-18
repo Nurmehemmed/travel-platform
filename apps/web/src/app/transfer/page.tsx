@@ -295,9 +295,11 @@ export default function TransferLandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {/* Airport Selector */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                  {t.transferPage.airport}
-                </label>
+                <div className="flex items-center justify-between mb-1.5 min-h-[24px]">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 leading-none">
+                    {t.transferPage.airport}
+                  </label>
+                </div>
                 <CustomSelect
                   value={selectedAirport}
                   onChange={(val) => handleAirportChange(val as AirportCode)}
@@ -310,14 +312,14 @@ export default function TransferLandingPage() {
 
               {/* Destination Zone Selector */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                <div className="flex items-center justify-between mb-1.5 min-h-[24px]">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 leading-none">
                     {t.transferPage.destinationZone}
                   </label>
                   <button
                     type="button"
                     onClick={() => setIsMapModalOpen(true)}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 px-2.5 py-0.5 rounded-lg border border-sky-200 transition-colors shadow-2xs cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-lg border border-sky-200 transition-colors shadow-2xs cursor-pointer leading-none"
                   >
                     <span>🗺️</span>
                     <span>{destinationCategoryI18n.pickOnMap}</span>

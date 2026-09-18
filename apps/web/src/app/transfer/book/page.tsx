@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
+import { useSiteSettings } from "@/lib/settings-context";
 import {
   AIRPORTS,
   VEHICLE_CLASSES,
@@ -52,12 +53,15 @@ import { DatePicker } from "@/components/DatePicker";
 import { TimePicker } from "@/components/TimePicker";
 import { CustomSelect } from "@/components/CustomSelect";
 import { MapLocationPickerModal, MapLocationPickerResult } from "@/components/MapLocationPickerModal";
+import { TransferPolicyModal } from "@/components/TransferPolicyModal";
 
 function TransferBookForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, language, showToast } = useLanguage();
   const tb = (TRANSFER_BOOK_TRANSLATIONS[language] || TRANSFER_BOOK_TRANSLATIONS.EN)!;
+
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState<boolean>(false);
 
   // Dynamic vehicle translation helpers
   const getVehicleLabel = (id: VehicleClass) => {
@@ -171,8 +175,13 @@ function TransferBookForm() {
   const handleDestinationChange = (val: string) => {
     setSelectedDestinationId(val);
     if (val.startsWith("custom:")) {
-      const customName = val.replace(/^custom:/, "");
-      setDropoffAddress(customName);
+      const rest = val.replace(/^custom:/, "").trim();
+      const firstColonIdx = rest.indexOf(":");
+      if (firstColonIdx > 0 && rest.substring(0, firstColonIdx).includes("-")) {
+        setDropoffAddress(rest.substring(firstColonIdx + 1).trim());
+      } else {
+        setDropoffAddress(rest);
+      }
     } else {
       const loc = getLocationById(val);
       if (loc) {
@@ -185,6 +194,8 @@ function TransferBookForm() {
     setDropoffAddress(result.address);
     if (result.locationId) {
       setSelectedDestinationId(result.locationId);
+    } else if (result.zoneId) {
+      setSelectedDestinationId(`custom:${result.zoneId}:${result.address}`);
     } else {
       setSelectedDestinationId(`custom:${result.address}`);
     }
@@ -209,6 +220,24 @@ function TransferBookForm() {
     };
   });
 
+  const { settings } = useSiteSettings();
+
+  const dynamicPricingConfig = {
+    baseRates: {
+      sedan: settings.pricing.transferSedan,
+      suv: settings.pricing.transferSuv,
+      minivan: settings.pricing.transferMinivan,
+      sprinter: settings.pricing.transferSprinter,
+    },
+    perKmRates: {
+      sedan: settings.pricing.transferPerKmSedan,
+      suv: settings.pricing.transferPerKmSuv,
+      minivan: settings.pricing.transferPerKmMinivan,
+      sprinter: settings.pricing.transferPerKmSprinter,
+    },
+    roundTripDiscountPercent: settings.pricing.transferRoundTripDiscountPercent,
+  };
+
   const currentVehicle = getVehicleConfig(vehicleClass) || VEHICLE_CLASSES[0];
   const airportInfo = getAirportByCode(airport) || AIRPORTS[0];
 
@@ -216,8 +245,8 @@ function TransferBookForm() {
   const isCustomZone = currentZone?.isCustom;
   const pricing = currentZone
     ? direction === "round_trip"
-      ? calculateRoundTripPrice(currentZone, vehicleClass)
-      : calculateTransferPrice(currentZone, vehicleClass)
+      ? calculateRoundTripPrice(currentZone, vehicleClass, dynamicPricingConfig)
+      : calculateTransferPrice(currentZone, vehicleClass, dynamicPricingConfig)
     : null;
 
   const totalAmount = isCustomZone ? 0 : pricing?.totalAmount || 0;
@@ -485,9 +514,11 @@ function TransferBookForm() {
               {/* Airport & Zone */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    {t.transferPage.airport}
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5 min-h-[24px]">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 leading-none">
+                      {t.transferPage.airport}
+                    </label>
+                  </div>
                   <CustomSelect
                     value={airport}
                     onChange={(val) => handleAirportChange(val as AirportCode)}
@@ -500,14 +531,14 @@ function TransferBookForm() {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  <div className="flex items-center justify-between mb-1.5 min-h-[24px]">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 leading-none">
                       {t.transferPage.destinationZone}
                     </label>
                     <button
                       type="button"
                       onClick={() => setIsMapModalOpen(true)}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-lg border border-sky-200 transition-colors shadow-2xs cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-lg border border-sky-200 transition-colors shadow-2xs cursor-pointer leading-none"
                     >
                       <span>🗺️</span>
                       <span>{destinationCategoryI18n.pickOnMap}</span>
@@ -582,8 +613,8 @@ function TransferBookForm() {
                   {VEHICLE_CLASSES.map((vc) => {
                     const price = currentZone
                       ? direction === "round_trip"
-                        ? calculateRoundTripPrice(currentZone, vc.id)
-                        : calculateTransferPrice(currentZone, vc.id)
+                        ? calculateRoundTripPrice(currentZone, vc.id, dynamicPricingConfig)
+                        : calculateTransferPrice(currentZone, vc.id, dynamicPricingConfig)
                       : null;
 
                     const isSelected = vehicleClass === vc.id;
@@ -1134,7 +1165,7 @@ function TransferBookForm() {
                 className={`flex items-start gap-2.5 p-3.5 rounded-xl border transition-all ${
                   invalidField === "agreedTerms"
                     ? "border-red-400 bg-red-50/60 ring-2 ring-red-200 animate-shake"
-                    : "border-transparent"
+                    : "border-slate-100 bg-slate-50/70"
                 }`}
               >
                 <input
@@ -1144,13 +1175,157 @@ function TransferBookForm() {
                   onChange={(e) => {
                     setAgreedTerms(e.target.checked);
                     if (invalidField === "agreedTerms") setInvalidField(null);
-
                   }}
-                  className="mt-0.5 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
                 />
-                <label htmlFor="transferTerms" className="text-xs text-slate-600 leading-relaxed cursor-pointer">
-                  {tb.termsCheckbox}
-                </label>
+                <div className="text-xs text-slate-600 leading-relaxed">
+                  <label htmlFor="transferTerms" className="cursor-pointer">
+                    {language === "AZ" ? (
+                      <>
+                        24 saatlıq pulsuz ləğvetmə və uçuş izləmə şərtləri daxil olmaqla{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          transfer qaydaları
+                        </button>{" "}
+                        ilə razıyam.
+                      </>
+                    ) : language === "RU" ? (
+                      <>
+                        Я согласен с{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          правилами бронирования трансфера
+                        </button>
+                        , включая бесплатную отмену за 24 часа и{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          условия отслеживания рейса
+                        </button>
+                        .
+                      </>
+                    ) : language === "AR" ? (
+                      <>
+                        أوافق على{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          سياسة حجز التوصيل
+                        </button>
+                        ، بما في ذلك الإلغاء المجاني قبل 24 ساعة وشروط تتبع الرحلة.
+                      </>
+                    ) : language === "DE" ? (
+                      <>
+                        Ich akzeptiere die{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          Transfer-Buchungsrichtlinien
+                        </button>
+                        , einschließlich der 24-stündigen kostenlosen Stornierung und{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          Flugüberwachungsbedingungen
+                        </button>
+                        .
+                      </>
+                    ) : language === "FR" ? (
+                      <>
+                        J&apos;accepte les{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          conditions de réservation
+                        </button>
+                        , incluant l&apos;annulation gratuite jusqu&apos;à 24h et les{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          conditions de suivi de vol
+                        </button>
+                        .
+                      </>
+                    ) : (
+                      <>
+                        I agree to the{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          transfer booking policy
+                        </button>
+                        , including 24-hour free cancellation and{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setIsPolicyModalOpen(true);
+                          }}
+                          className="font-bold text-sky-600 underline hover:text-sky-800 transition-colors inline-block cursor-pointer"
+                        >
+                          flight monitoring terms
+                        </button>
+                        .
+                      </>
+                    )}
+                  </label>
+                  <div className="mt-1 flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsPolicyModalOpen(true)}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:text-sky-900 transition-colors cursor-pointer"
+                    >
+                      <span>🛡️ {language === "AZ" ? "Şərtləri oxu" : language === "RU" ? "Читать правила" : language === "AR" ? "قراءة الشروط" : language === "DE" ? "Bedingungen lesen" : language === "FR" ? "Lire les conditions" : "Read Policy & Guarantees"}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Step 4 Buttons & Bottom Inline Feedback */}
@@ -1159,22 +1334,19 @@ function TransferBookForm() {
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => {
-
                     setInvalidField(null);
                     setStep(3);
                   }}
-                  className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5 disabled:opacity-50"
+                  className="w-full sm:w-auto justify-center rounded-xl border border-slate-200 px-5 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>{tb.btnBack}</span>
                 </button>
 
-
-
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                  className="w-full sm:w-auto justify-center rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 text-xs font-bold transition-all flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed shrink-0 cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
@@ -1212,6 +1384,13 @@ function TransferBookForm() {
         airportCode={airport}
         initialLocationId={selectedDestinationId}
         initialAddress={dropoffAddress}
+      />
+
+      {/* Transfer Policy & Guarantee Modal */}
+      <TransferPolicyModal
+        isOpen={isPolicyModalOpen}
+        onClose={() => setIsPolicyModalOpen(false)}
+        onAccept={() => setAgreedTerms(true)}
       />
     </div>
   );

@@ -91,17 +91,72 @@ function getSettingMetadata(key: string): { category: string; label: string; des
     pricing_transfer_sedan: {
       category: "pricing",
       label: "Transfer Sedan Base (USD)",
-      description: "Standard sedan airport transfer rate to Central Baku",
+      description: "Standard sedan base transfer fee",
+    },
+    pricing_transfer_suv: {
+      category: "pricing",
+      label: "Transfer SUV Base (USD)",
+      description: "Standard SUV base transfer fee",
     },
     pricing_transfer_minivan: {
       category: "pricing",
       label: "Transfer Minivan Base (USD)",
-      description: "Minivan (Mercedes Vito) airport transfer rate",
+      description: "Minivan (Mercedes Vito) base transfer fee",
     },
     pricing_transfer_sprinter: {
       category: "pricing",
       label: "Transfer Sprinter Base (USD)",
-      description: "Sprinter VIP airport transfer rate",
+      description: "Sprinter VIP base transfer fee",
+    },
+    pricing_transfer_per_km_sedan: {
+      category: "pricing",
+      label: "Sedan Rate per KM ($/km)",
+      description: "Distance rate for sedan transfers",
+    },
+    pricing_transfer_per_km_suv: {
+      category: "pricing",
+      label: "SUV Rate per KM ($/km)",
+      description: "Distance rate for SUV transfers",
+    },
+    pricing_transfer_per_km_minivan: {
+      category: "pricing",
+      label: "Minivan Rate per KM ($/km)",
+      description: "Distance rate for minivan transfers",
+    },
+    pricing_transfer_per_km_sprinter: {
+      category: "pricing",
+      label: "Sprinter Rate per KM ($/km)",
+      description: "Distance rate for Sprinter transfers",
+    },
+    pricing_transfer_roundtrip_discount: {
+      category: "pricing",
+      label: "Round-Trip Discount (%)",
+      description: "Percentage discount applied to both legs of round-trip transfers",
+    },
+    transfer_cancellation_hours: {
+      category: "operations",
+      label: "Transfer Free Cancellation Window (Hours)",
+      description: "Minimum hours prior to pickup for 100% full refund",
+    },
+    transfer_wait_time_intl_mins: {
+      category: "operations",
+      label: "International Flight Free Waiting (Minutes)",
+      description: "Complimentary chauffeur waiting time after international flight touchdown",
+    },
+    transfer_wait_time_dom_mins: {
+      category: "operations",
+      label: "Domestic / Hotel Free Waiting (Minutes)",
+      description: "Complimentary waiting time for domestic flights & hotel pickups",
+    },
+    transfer_dispatch_phone: {
+      category: "contact",
+      label: "Transfer Dispatch Emergency Phone",
+      description: "Direct operations telephone line for airport chauffeurs & guests",
+    },
+    transfer_dispatch_whatsapp: {
+      category: "contact",
+      label: "Transfer Dispatch WhatsApp",
+      description: "Direct WhatsApp dispatch number for live flight coordination",
     },
     marketing_tripadvisor_rating: {
       category: "marketing",

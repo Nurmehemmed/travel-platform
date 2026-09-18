@@ -8,7 +8,7 @@
 
 // ─── Vehicle Class Config ─────────────────────────────────────────────────────
 
-export type VehicleClass = "sedan" | "suv" | "minivan" | "economy" | "business" | "executive";
+export type VehicleClass = "sedan" | "suv" | "minivan" | "sprinter" | "economy" | "business" | "executive";
 
 export interface VehicleConfig {
   id: VehicleClass;
@@ -63,6 +63,19 @@ export const VEHICLE_CLASSES: VehicleConfig[] = [
     perKmRate: 0.75,
     icon: "🚐",
     features: ["Spacious 7-seater cabin", "Large luggage capacity", "Child seat on request", "Flight monitoring"],
+  },
+  {
+    id: "sprinter",
+    label: "Minibus (Sprinter)",
+    description: "Mercedes-Benz Sprinter or equivalent. Perfect for large delegations, corporate groups, and tours.",
+    capacity: "8–16 passengers",
+    maxPax: 16,
+    luggage: "15 large bags",
+    maxLuggage: 15,
+    baseRate: 90,
+    perKmRate: 1.10,
+    icon: "🚌",
+    features: ["16-passenger capacity", "Massive luggage space", "High roof & AC", "Flight monitoring"],
   },
 ];
 
@@ -211,6 +224,41 @@ export const TRANSFER_ZONES: TransferZone[] = [
     distanceKm: 340,
   },
   {
+    id: "GYD-mingachevir",
+    airport: "GYD",
+    name: "Mingachevir City / Hydro City",
+    description: "Mingachevir downtown, Kura Riverside, Ag Saray Deluxe, Olympic Center",
+    distanceKm: 285,
+  },
+  {
+    id: "GYD-ganja",
+    airport: "GYD",
+    name: "Ganja City (from Baku)",
+    description: "Ganja downtown, Nizami Mausoleum, Ramada Plaza",
+    distanceKm: 360,
+  },
+  {
+    id: "GYD-ismayilli",
+    airport: "GYD",
+    name: "Ismayilli / Lahij Ancient Village",
+    description: "Ismayilli city, Lahij craft village, Basgal silk center",
+    distanceKm: 185,
+  },
+  {
+    id: "GYD-goychay",
+    airport: "GYD",
+    name: "Goychay / Central Region",
+    description: "Goychay pomegranate capital, Agdash, Ujar",
+    distanceKm: 220,
+  },
+  {
+    id: "GYD-yevlakh",
+    airport: "GYD",
+    name: "Yevlakh Junction",
+    description: "Yevlakh city and transit railway hub",
+    distanceKm: 275,
+  },
+  {
     id: "GYD-lankaran",
     airport: "GYD",
     name: "Lankaran / Caspian South Coast",
@@ -233,6 +281,13 @@ export const TRANSFER_ZONES: TransferZone[] = [
     name: "Ganja City Center",
     description: "Ganja downtown, hotels, and city center",
     distanceKm: 8,
+  },
+  {
+    id: "GJA-mingachevir",
+    airport: "GJA",
+    name: "Mingachevir (from Ganja)",
+    description: "Mingachevir city, Kura River resorts",
+    distanceKm: 60,
   },
   {
     id: "GJA-goygol",
@@ -837,6 +892,83 @@ export const POPULAR_DESTINATIONS: DestinationLocation[] = [
     badge: "Health & Wellness",
   },
   {
+    id: "loc-reg-mingachevir",
+    name: "Mingachevir City (Hydro City & Kura River)",
+    category: "region",
+    zoneId: "GYD-mingachevir",
+    airport: "GYD",
+    distanceKm: 285,
+    address: "Mingachevir City, Kura River Promenade",
+    aliases: ["mingachevir", "mingəçevir", "mingecevir", "mingechaur", "kura river", "ag saray", "kur olympic"],
+    badge: "Hydro City",
+  },
+  {
+    id: "loc-hotel-ag-saray-mingachevir",
+    name: "Ag Saray Deluxe Hotel Mingachevir",
+    category: "hotel",
+    zoneId: "GYD-mingachevir",
+    airport: "GYD",
+    distanceKm: 285,
+    address: "Islamzade Street, Mingachevir",
+    aliases: ["ag saray", "ag saray deluxe", "mingachevir hotel", "mingəçevir otel"],
+    badge: "5★ Riverside",
+  },
+  {
+    id: "loc-hotel-kur-olympic-mingachevir",
+    name: "Kur Olympic Center Mingachevir",
+    category: "hotel",
+    zoneId: "GYD-mingachevir",
+    airport: "GYD",
+    distanceKm: 285,
+    address: "Heydar Aliyev Avenue, Mingachevir",
+    aliases: ["kur olympic", "kur resort", "kür olimpiya", "olympic rowing center"],
+    badge: "Resort & Spa",
+  },
+  {
+    id: "loc-reg-ganja",
+    name: "Ganja City & Historic Center",
+    category: "region",
+    zoneId: "GYD-ganja",
+    airport: "GYD",
+    distanceKm: 360,
+    address: "Ganja Downtown & Cultural District",
+    aliases: ["ganja", "gəncə", "nizami mausoleum", "bottle house", "javad khan"],
+    badge: "Historic City",
+  },
+  {
+    id: "loc-reg-ismayilli",
+    name: "Ismayilli & Lahij Ancient Craft Village",
+    category: "region",
+    zoneId: "GYD-ismayilli",
+    airport: "GYD",
+    distanceKm: 185,
+    address: "Ismayilli District, Lahij / Basgal",
+    aliases: ["ismayilli", "ismayıllı", "lahij", "lahıc", "basgal", "basqal"],
+    badge: "Craft Village",
+  },
+  {
+    id: "loc-reg-goychay",
+    name: "Goychay (Pomegranate Capital & Agdash)",
+    category: "region",
+    zoneId: "GYD-goychay",
+    airport: "GYD",
+    distanceKm: 220,
+    address: "Goychay / Agdash Central Region",
+    aliases: ["goychay", "göyçay", "nar bayrami", "pomegranate capital", "agdash", "ağdaş"],
+    badge: "Pomegranate Capital",
+  },
+  {
+    id: "loc-reg-yevlakh",
+    name: "Yevlakh Junction Hub",
+    category: "region",
+    zoneId: "GYD-yevlakh",
+    airport: "GYD",
+    distanceKm: 275,
+    address: "Yevlakh City Center & Station",
+    aliases: ["yevlakh", "yevlax", "yevlakh junction"],
+    badge: "Transit Hub",
+  },
+  {
     id: "loc-reg-lankaran",
     name: "Lankaran & Lerik Subtropical South",
     category: "region",
@@ -1029,39 +1161,187 @@ export function resolveLocationOrZone(idOrZoneId: string, airport: AirportCode =
     return { zone: defaultZone };
   }
 
-  // Handle custom address or map-selected pin (e.g. "custom:JW Marriott Baku" or "custom:Nizami St 45")
+  // Handle custom address or map-selected pin (e.g. "custom:GYD-mingachevir:Heydər Hüseynov küç., Mingachevir" or "custom:JW Marriott Baku" or "custom:Nizami St 45")
   if (idOrZoneId.startsWith("custom:")) {
-    const rawAddress = idOrZoneId.replace(/^custom:/, "").trim();
+    const rest = idOrZoneId.replace(/^custom:/, "").trim();
+    let rawAddress = rest;
+    let explicitZone: TransferZone | undefined;
+
+    // Check if format is custom:<zoneId>:<address>
+    const firstColonIdx = rest.indexOf(":");
+    if (firstColonIdx > 0) {
+      const possibleZoneId = rest.substring(0, firstColonIdx).trim();
+      const possibleAddress = rest.substring(firstColonIdx + 1).trim();
+      const foundZone = getZoneById(possibleZoneId);
+      if (foundZone) {
+        explicitZone = foundZone;
+        rawAddress = possibleAddress || foundZone.name;
+      }
+    }
+
     const lower = rawAddress.toLowerCase();
     const airportZones = getZonesByAirport(airport);
 
-    // Keyword heuristics to assign appropriate zone
-    let matchedZone = airportZones[0]!;
-    if (airport === "GYD") {
-      if (lower.includes("shahdag") || lower.includes("gusar") || lower.includes("qusar")) {
-        matchedZone = getZoneById("GYD-shahdag") || matchedZone;
-      } else if (lower.includes("quba") || lower.includes("guba")) {
-        matchedZone = getZoneById("GYD-quba") || matchedZone;
-      } else if (lower.includes("qabala") || lower.includes("gabala") || lower.includes("tufandag")) {
-        matchedZone = getZoneById("GYD-qabala") || matchedZone;
-      } else if (lower.includes("sheki") || lower.includes("shaki")) {
-        matchedZone = getZoneById("GYD-sheki") || matchedZone;
-      } else if (lower.includes("bilgah") || lower.includes("mardakan") || lower.includes("novkhani") || lower.includes("absheron")) {
-        matchedZone = getZoneById("GYD-absheron") || matchedZone;
-      } else if (lower.includes("sumqayit") || lower.includes("sumgait")) {
-        matchedZone = getZoneById("GYD-sumqayit") || matchedZone;
-      } else if (lower.includes("khirdalan") || lower.includes("xirdalan")) {
-        matchedZone = getZoneById("GYD-khirdalan") || matchedZone;
-      } else if (lower.includes("lankaran") || lower.includes("lenkoran")) {
-        matchedZone = getZoneById("GYD-lankaran") || matchedZone;
-      } else if (lower.includes("naftalan")) {
-        matchedZone = getZoneById("GYD-naftalan") || matchedZone;
-      } else if (lower.includes("shamakhi") || lower.includes("samaxi")) {
-        matchedZone = getZoneById("GYD-shamakhi") || matchedZone;
-      } else if (lower.includes("sabail") || lower.includes("flame") || lower.includes("icherisheher") || lower.includes("old city")) {
-        matchedZone = getZoneById("GYD-sabail") || matchedZone;
-      } else {
-        matchedZone = getZoneById("GYD-baku-center") || matchedZone;
+    // Keyword heuristics to assign appropriate zone if not explicitly passed
+    let matchedZone = explicitZone || airportZones[0]!;
+
+    if (!explicitZone) {
+      if (airport === "GYD") {
+        if (
+          lower.includes("mingachevir") ||
+          lower.includes("mingəçevir") ||
+          lower.includes("mingecevir") ||
+          lower.includes("mingechaur") ||
+          lower.includes("mingecaur")
+        ) {
+          matchedZone = getZoneById("GYD-mingachevir") || matchedZone;
+        } else if (lower.includes("ganja") || lower.includes("gəncə") || lower.includes("gence")) {
+          matchedZone = getZoneById("GYD-ganja") || matchedZone;
+        } else if (
+          lower.includes("ismayilli") ||
+          lower.includes("ismayıllı") ||
+          lower.includes("lahij") ||
+          lower.includes("lahıc") ||
+          lower.includes("basgal") ||
+          lower.includes("basqal")
+        ) {
+          matchedZone = getZoneById("GYD-ismayilli") || matchedZone;
+        } else if (
+          lower.includes("goychay") ||
+          lower.includes("göyçay") ||
+          lower.includes("goycay") ||
+          lower.includes("agdash") ||
+          lower.includes("ağdaş") ||
+          lower.includes("ujar") ||
+          lower.includes("ucar")
+        ) {
+          matchedZone = getZoneById("GYD-goychay") || matchedZone;
+        } else if (lower.includes("yevlakh") || lower.includes("yevlax")) {
+          matchedZone = getZoneById("GYD-yevlakh") || matchedZone;
+        } else if (
+          lower.includes("shahdag") ||
+          lower.includes("şahdağ") ||
+          lower.includes("gusar") ||
+          lower.includes("qusar")
+        ) {
+          matchedZone = getZoneById("GYD-shahdag") || matchedZone;
+        } else if (
+          lower.includes("quba") ||
+          lower.includes("guba") ||
+          lower.includes("krasnaya sloboda")
+        ) {
+          matchedZone = getZoneById("GYD-quba") || matchedZone;
+        } else if (
+          lower.includes("qabala") ||
+          lower.includes("qəbələ") ||
+          lower.includes("gabala") ||
+          lower.includes("tufandag") ||
+          lower.includes("tufandağ") ||
+          lower.includes("nohur")
+        ) {
+          matchedZone = getZoneById("GYD-qabala") || matchedZone;
+        } else if (
+          lower.includes("sheki") ||
+          lower.includes("şəki") ||
+          lower.includes("shaki") ||
+          lower.includes("marxal")
+        ) {
+          matchedZone = getZoneById("GYD-sheki") || matchedZone;
+        } else if (
+          lower.includes("naftalan") ||
+          lower.includes("gashalti") ||
+          lower.includes("chinar hotel")
+        ) {
+          matchedZone = getZoneById("GYD-naftalan") || matchedZone;
+        } else if (
+          lower.includes("lankaran") ||
+          lower.includes("lənkəran") ||
+          lower.includes("lenkoran") ||
+          lower.includes("astara") ||
+          lower.includes("lerik")
+        ) {
+          matchedZone = getZoneById("GYD-lankaran") || matchedZone;
+        } else if (
+          lower.includes("shamakhi") ||
+          lower.includes("şamaxı") ||
+          lower.includes("samaxi") ||
+          lower.includes("sharadil")
+        ) {
+          matchedZone = getZoneById("GYD-shamakhi") || matchedZone;
+        } else if (
+          lower.includes("sumqayit") ||
+          lower.includes("sumqayıt") ||
+          lower.includes("sumgait")
+        ) {
+          matchedZone = getZoneById("GYD-sumqayit") || matchedZone;
+        } else if (
+          lower.includes("khirdalan") ||
+          lower.includes("xırdalan") ||
+          lower.includes("masazir") ||
+          lower.includes("masazır") ||
+          lower.includes("binagadi") ||
+          lower.includes("binəqədi")
+        ) {
+          matchedZone = getZoneById("GYD-khirdalan") || matchedZone;
+        } else if (
+          lower.includes("bilgah") ||
+          lower.includes("bilgəh") ||
+          lower.includes("mardakan") ||
+          lower.includes("mərdəkan") ||
+          lower.includes("novkhani") ||
+          lower.includes("novxanı") ||
+          lower.includes("pirallahi") ||
+          lower.includes("pirallahı") ||
+          lower.includes("shuvalan") ||
+          lower.includes("absheron") ||
+          lower.includes("abşeron")
+        ) {
+          matchedZone = getZoneById("GYD-absheron") || matchedZone;
+        } else if (
+          lower.includes("sabail") ||
+          lower.includes("səbail") ||
+          lower.includes("flame") ||
+          lower.includes("icherisheher") ||
+          lower.includes("içərişəhər") ||
+          lower.includes("old city") ||
+          lower.includes("sahil") ||
+          lower.includes("fountain")
+        ) {
+          matchedZone = getZoneById("GYD-sabail") || matchedZone;
+        } else if (
+          lower.includes("white city") ||
+          lower.includes("ağ şəhər") ||
+          lower.includes("port baku") ||
+          lower.includes("khatai") ||
+          lower.includes("xətai")
+        ) {
+          matchedZone = getZoneById("GYD-white-city") || matchedZone;
+        } else if (
+          lower.includes("bulvar") ||
+          lower.includes("boulevard") ||
+          lower.includes("waterfront")
+        ) {
+          matchedZone = getZoneById("GYD-baku-bulvar") || matchedZone;
+        } else {
+          matchedZone = getZoneById("GYD-baku-center") || matchedZone;
+        }
+      } else if (airport === "GJA") {
+        if (
+          lower.includes("mingachevir") ||
+          lower.includes("mingəçevir") ||
+          lower.includes("mingecevir") ||
+          lower.includes("mingechaur")
+        ) {
+          matchedZone = getZoneById("GJA-mingachevir") || matchedZone;
+        } else if (lower.includes("goygol") || lower.includes("göygöl")) {
+          matchedZone = getZoneById("GJA-goygol") || matchedZone;
+        } else if (lower.includes("naftalan")) {
+          matchedZone = getZoneById("GJA-naftalan") || matchedZone;
+        } else if (lower.includes("sheki") || lower.includes("şəki")) {
+          matchedZone = getZoneById("GJA-sheki") || matchedZone;
+        } else {
+          matchedZone = getZoneById("GJA-ganja-center") || matchedZone;
+        }
       }
     }
 
@@ -1095,6 +1375,12 @@ export function resolveLocationOrZone(idOrZoneId: string, airport: AirportCode =
   return { zone: defaultZone };
 }
 
+export interface DynamicTransferPricingConfig {
+  baseRates?: Partial<Record<VehicleClass, number>>;
+  perKmRates?: Partial<Record<VehicleClass, number>>;
+  roundTripDiscountPercent?: number;
+}
+
 // ─── Pricing Engine ───────────────────────────────────────────────────────────
 
 /**
@@ -1103,30 +1389,36 @@ export function resolveLocationOrZone(idOrZoneId: string, airport: AirportCode =
  */
 export function calculateTransferPrice(
   zone: TransferZone,
-  vehicleClass: VehicleClass
+  vehicleClass: VehicleClass,
+  config?: DynamicTransferPricingConfig
 ): { basePrice: number; totalAmount: number } | null {
   if (zone.isCustom) return null;
 
   const vehicle = VEHICLE_CLASSES.find((v) => v.id === vehicleClass);
   if (!vehicle) return null;
 
-  const basePrice = vehicle.baseRate + vehicle.perKmRate * zone.distanceKm;
+  const baseRate = config?.baseRates?.[vehicleClass] ?? vehicle.baseRate;
+  const perKmRate = config?.perKmRates?.[vehicleClass] ?? vehicle.perKmRate;
+
+  const basePrice = baseRate + perKmRate * zone.distanceKm;
   const totalAmount = Math.ceil(basePrice); // round up to nearest dollar
 
   return { basePrice, totalAmount };
 }
 
 /**
- * Calculates the round-trip price (2× one-way with a 10% discount).
+ * Calculates the round-trip price (2× one-way with a discount, default 10%).
  */
 export function calculateRoundTripPrice(
   zone: TransferZone,
-  vehicleClass: VehicleClass
+  vehicleClass: VehicleClass,
+  config?: DynamicTransferPricingConfig
 ): { basePrice: number; totalAmount: number } | null {
-  const oneWay = calculateTransferPrice(zone, vehicleClass);
+  const oneWay = calculateTransferPrice(zone, vehicleClass, config);
   if (!oneWay) return null;
 
-  const basePrice = oneWay.basePrice * 2 * 0.9;  // 10% round-trip discount
+  const discountFraction = (config?.roundTripDiscountPercent ?? 10) / 100;
+  const basePrice = oneWay.basePrice * 2 * (1 - discountFraction);
   const totalAmount = Math.ceil(basePrice);
 
   return { basePrice, totalAmount };
@@ -1241,30 +1533,67 @@ export function resolveLocationByCoords(
       const zone = getZoneById("GYD-quba") || getZonesByAirport("GYD")[0]!;
       return { zone, distanceKm: 170 };
     }
-    // Qabala / Sheki (North-West corridor)
-    if (lat >= 40.7 && lng <= 48.0) {
-      if (lng <= 47.4) {
-        const zone = getZoneById("GYD-sheki") || getZonesByAirport("GYD")[0]!;
-        return { zone, distanceKm: 300 };
-      }
+
+    // Sheki / Qakh / North-West mountain corridor (lat >= 41.05, lng <= 47.5)
+    if (lat >= 41.05 && lng <= 47.5) {
+      const zone = getZoneById("GYD-sheki") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 310 };
+    }
+
+    // Qabala / Tufandag (lat >= 40.85, lng between 47.5 and 48.15)
+    if (lat >= 40.85 && lat < 41.15 && lng >= 47.5 && lng <= 48.15) {
       const zone = getZoneById("GYD-qabala") || getZonesByAirport("GYD")[0]!;
-      return { zone, distanceKm: 225 };
+      return { zone, distanceKm: 240 };
     }
-    // Shamakhi
-    if (lng <= 48.8 && lat >= 40.4) {
+
+    // Ismayilli / Lahij / Basgal
+    if (lat >= 40.75 && lat <= 40.98 && lng > 48.0 && lng <= 48.45) {
+      const zone = getZoneById("GYD-ismayilli") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 185 };
+    }
+
+    // Shamakhi / Sharadil
+    if (lat >= 40.5 && lat <= 40.78 && lng >= 48.45 && lng <= 48.85) {
       const zone = getZoneById("GYD-shamakhi") || getZonesByAirport("GYD")[0]!;
-      return { zone, distanceKm: 125 };
+      return { zone, distanceKm: 135 };
     }
+
+    // Ganja City (lat ~40.55-40.8, lng <= 46.55)
+    if (lng <= 46.55 && lat >= 40.4) {
+      const zone = getZoneById("GYD-ganja") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 360 };
+    }
+
+    // Naftalan Thermal Spa (lat ~40.45-40.6, lng 46.65-47.0)
+    if (lat >= 40.42 && lat <= 40.62 && lng >= 46.65 && lng <= 47.0) {
+      const zone = getZoneById("GYD-naftalan") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 340 };
+    }
+
+    // Mingachevir City & Hydro Reservoir (lat ~40.65-40.95, lng 46.85-47.25)
+    if (lat >= 40.65 && lat <= 40.95 && lng >= 46.85 && lng <= 47.25) {
+      const zone = getZoneById("GYD-mingachevir") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 285 };
+    }
+
+    // Yevlakh Junction (lat ~40.52-40.72, lng 47.05-47.38)
+    if (lat >= 40.52 && lat <= 40.72 && lng >= 47.05 && lng <= 47.38) {
+      const zone = getZoneById("GYD-yevlakh") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 275 };
+    }
+
+    // Goychay / Agdash Central Region (lat ~40.45-40.82, lng 47.45-48.0)
+    if (lat >= 40.45 && lat <= 40.82 && lng >= 47.45 && lng <= 48.0) {
+      const zone = getZoneById("GYD-goychay") || getZonesByAirport("GYD")[0]!;
+      return { zone, distanceKm: 220 };
+    }
+
     // Lankaran / South Coast
     if (lat <= 39.5) {
       const zone = getZoneById("GYD-lankaran") || getZonesByAirport("GYD")[0]!;
       return { zone, distanceKm: 260 };
     }
-    // Naftalan
-    if (lng <= 47.0) {
-      const zone = getZoneById("GYD-naftalan") || getZonesByAirport("GYD")[0]!;
-      return { zone, distanceKm: 330 };
-    }
+
     // Sumqayit
     if (lat >= 40.55 && lng <= 49.75) {
       const zone = getZoneById("GYD-sumqayit") || getZonesByAirport("GYD")[0]!;
@@ -1296,6 +1625,10 @@ export function resolveLocationByCoords(
   }
 
   if (airport === "GJA") {
+    if (lat >= 40.65 && lat <= 40.95 && lng >= 46.85 && lng <= 47.25) {
+      const zone = getZoneById("GJA-mingachevir") || getZonesByAirport("GJA")[0]!;
+      return { zone, distanceKm: 60 };
+    }
     if (lat <= 40.6) {
       const zone = getZoneById("GJA-goygol") || getZonesByAirport("GJA")[0]!;
       return { zone, distanceKm: 35 };

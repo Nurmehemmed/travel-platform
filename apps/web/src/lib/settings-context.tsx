@@ -23,8 +23,21 @@ export interface PublicSettings {
     visaStandard: number;
     visaUrgent: number;
     transferSedan: number;
+    transferSuv: number;
     transferMinivan: number;
     transferSprinter: number;
+    transferPerKmSedan: number;
+    transferPerKmSuv: number;
+    transferPerKmMinivan: number;
+    transferPerKmSprinter: number;
+    transferRoundTripDiscountPercent: number;
+  };
+  transferPolicy: {
+    cancellationHours: number;
+    waitTimeIntlMins: number;
+    waitTimeDomMins: number;
+    dispatchPhone: string;
+    dispatchWhatsapp: string;
   };
   marketing: {
     tripadvisorRating: string;
@@ -59,8 +72,21 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
     visaStandard: 45,
     visaUrgent: 85,
     transferSedan: 25,
+    transferSuv: 40,
     transferMinivan: 40,
     transferSprinter: 65,
+    transferPerKmSedan: 0.45,
+    transferPerKmSuv: 0.60,
+    transferPerKmMinivan: 0.75,
+    transferPerKmSprinter: 1.10,
+    transferRoundTripDiscountPercent: 10,
+  },
+  transferPolicy: {
+    cancellationHours: 24,
+    waitTimeIntlMins: 60,
+    waitTimeDomMins: 30,
+    dispatchPhone: "+994 12 404 78 88",
+    dispatchWhatsapp: "+994 12 404 78 88",
   },
   marketing: {
     tripadvisorRating: "4.9",
@@ -75,7 +101,6 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
   },
 };
 
-
 export const DEFAULT_SETTINGS_MAP: Record<string, any> = {
   contact_whatsapp: COMPANY_CONTACT.whatsappPhone,
   contact_phone: COMPANY_CONTACT.whatsappPhone,
@@ -89,8 +114,19 @@ export const DEFAULT_SETTINGS_MAP: Record<string, any> = {
   pricing_visa_standard: 45,
   pricing_visa_urgent: 85,
   pricing_transfer_sedan: 25,
+  pricing_transfer_suv: 40,
   pricing_transfer_minivan: 40,
   pricing_transfer_sprinter: 65,
+  pricing_transfer_per_km_sedan: 0.45,
+  pricing_transfer_per_km_suv: 0.60,
+  pricing_transfer_per_km_minivan: 0.75,
+  pricing_transfer_per_km_sprinter: 1.10,
+  pricing_transfer_roundtrip_discount: 10,
+  transfer_cancellation_hours: 24,
+  transfer_wait_time_intl_mins: 60,
+  transfer_wait_time_dom_mins: 30,
+  transfer_dispatch_phone: "+994 12 404 78 88",
+  transfer_dispatch_whatsapp: "+994 12 404 78 88",
   marketing_tripadvisor_rating: "4.9",
   marketing_tripadvisor_reviews: "2,400+",
   operations_floating_whatsapp: true,

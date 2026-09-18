@@ -116,6 +116,11 @@ describe("Transfer Pricing Engine", () => {
     // Resolve coordinates in Ganja
     const goygolCoords = resolveLocationByCoords(40.5500, 46.3000, "GJA");
     expect(goygolCoords.zone.id).toBe("GJA-goygol");
+
+    // Resolve coordinates in Mingachevir
+    const mingachevirCoords = resolveLocationByCoords(40.7700, 47.0500, "GYD");
+    expect(mingachevirCoords.zone.id).toBe("GYD-mingachevir");
+    expect(mingachevirCoords.distanceKm).toBe(285);
   });
 
   it("resolves custom map location pins to valid locations and calculates pricing", () => {
@@ -128,6 +133,11 @@ describe("Transfer Pricing Engine", () => {
     const price = calculateTransferPrice(customBaku.zone, "sedan");
     expect(price).not.toBeNull();
     expect(price?.totalAmount).toBeGreaterThan(0);
+
+    // Custom pin in Mingachevir
+    const customMing = resolveLocationOrZone("custom:Mingachevir Kur Riverside Hotel", "GYD");
+    expect(customMing.location).toBeDefined();
+    expect(customMing.zone.id).toBe("GYD-mingachevir");
 
     // Custom pin in Shahdag
     const customShahdag = resolveLocationOrZone("custom:Shahdag Chalet 12", "GYD");
@@ -149,3 +159,4 @@ describe("Transfer Pricing Engine", () => {
     expect(gyd?.lng).toBeCloseTo(50.0469, 2);
   });
 });
+
