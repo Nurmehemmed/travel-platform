@@ -5,11 +5,11 @@
       <stop offset="100%" stop-color="#d97706" />
     </linearGradient>
   </defs>
-  <!-- Squircle Background -->
-  <rect width="512" height="512" rx="112" fill="url(#amberGrad)" />
-  <!-- Crisp Center Map Pin Icon -->
+  <!-- Squircle Background with Transparent Canvas -->
+  <rect x="15" y="15" width="482" height="482" rx="112" fill="url(#amberGrad)" />
+  <!-- Crisp Center Map Pin -->
   <path
-    d="M256 100 C185.3 100 128 157.3 128 228 C128 320 256 416 256 416 C256 416 384 320 384 228 C384 157.3 326.7 100 256 100 Z M256 268 C233.9 268 216 250.1 216 228 C216 205.9 233.9 188 256 188 C278.1 188 296 205.9 296 228 C296 250.1 278.1 268 256 268 Z"
+    d="M256 92 C194 92 143.4 142.6 143.4 204.6 C143.4 286 256 410 256 410 C256 410 368.6 286 368.6 204.6 C368.6 142.6 318 92 256 92 Z M256 250 C230.9 250 210.6 229.7 210.6 204.6 C210.6 179.5 230.9 159.2 256 159.2 C281.1 159.2 301.4 179.5 301.4 204.6 C301.4 229.7 281.1 250 256 250 Z"
     fill="#ffffff"
   />
 </svg>
