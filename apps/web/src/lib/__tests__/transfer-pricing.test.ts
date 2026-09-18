@@ -118,6 +118,28 @@ describe("Transfer Pricing Engine", () => {
     expect(goygolCoords.zone.id).toBe("GJA-goygol");
   });
 
+  it("resolves custom map location pins to valid locations and calculates pricing", () => {
+    // Custom pin in Baku center
+    const customBaku = resolveLocationOrZone("custom:Nizami Street 45, Baku", "GYD");
+    expect(customBaku.location).toBeDefined();
+    expect(customBaku.location?.name).toBe("Nizami Street 45, Baku");
+    expect(customBaku.zone.id).toBe("GYD-baku-center");
+
+    const price = calculateTransferPrice(customBaku.zone, "sedan");
+    expect(price).not.toBeNull();
+    expect(price?.totalAmount).toBeGreaterThan(0);
+
+    // Custom pin in Shahdag
+    const customShahdag = resolveLocationOrZone("custom:Shahdag Chalet 12", "GYD");
+    expect(customShahdag.location).toBeDefined();
+    expect(customShahdag.zone.id).toBe("GYD-shahdag");
+
+    // Custom pin in Bilgah
+    const customBilgah = resolveLocationOrZone("custom:Bilgah Seafront Villa", "GYD");
+    expect(customBilgah.location).toBeDefined();
+    expect(customBilgah.zone.id).toBe("GYD-absheron");
+  });
+
   it("retrieves valid airport by IATA code", () => {
     const gyd = getAirportByCode("GYD");
     expect(gyd).toBeDefined();

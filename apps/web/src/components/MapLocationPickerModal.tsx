@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import {
   AirportCode,
-  getAirportByCode,
-  POPULAR_DESTINATIONS,
   resolveLocationByCoords,
   resolveLocationOrZone,
 } from "@/lib/transfer-zones";
@@ -54,6 +52,7 @@ export function MapLocationPickerModal({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // State for selected coords & resolved details
   const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number }>({
@@ -73,9 +72,13 @@ export function MapLocationPickerModal({
     Array<{
       title: string;
       subtitle?: string;
+      address?: string;
       lat: number;
       lng: number;
       locationId?: string;
+      zoneId?: string;
+      zoneName?: string;
+      distanceKm?: number;
     }>
   >([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -110,46 +113,28 @@ export function MapLocationPickerModal({
     }
   }, [initialLocationId, airportCode]);
 
-  // Reverse geocoding lookup
+  // Reverse geocoding lookup via internal API route (bypasses browser CORS & User-Agent blocks)
   const performReverseGeocode = useCallback(
     async (lat: number, lng: number) => {
       setIsGeocoding(true);
       try {
-        // First check if matching any known luxury hotel/district directly
-        const { location } = resolveLocationByCoords(lat, lng, airportCode);
-        if (location) {
-          setResolvedAddress(location.address || location.name);
-          setResolvedLocationName(location.name);
-          setResolvedLocationId(location.id);
-          setIsGeocoding(false);
-          return;
-        }
-
-        // Otherwise reverse geocode with OpenStreetMap Nominatim
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-          {
-            headers: {
-              "Accept-Language": language.toLowerCase(),
-            },
-            signal: AbortSignal.timeout(4000),
-          }
+          `/api/transfer/places?lat=${lat}&lng=${lng}&airport=${airportCode}&lang=${language.toLowerCase()}`,
+          { signal: AbortSignal.timeout(6000) }
         );
 
         if (res.ok) {
           const data = await res.json();
-          const displayName = data.display_name;
-          if (displayName) {
-            // Format nice compact address: Road / Building / District / City
-            const parts = displayName.split(", ");
-            const compact = parts.slice(0, 3).join(", ");
-            setResolvedAddress(compact || displayName);
-            setResolvedLocationName(undefined);
-            setResolvedLocationId(undefined);
+          if (data.address) {
+            setResolvedAddress(data.address);
+            setResolvedLocationName(data.name || undefined);
+            setResolvedLocationId(data.locationId || undefined);
+            return;
           }
         }
+        setResolvedAddress(`${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E (Azerbaijan)`);
       } catch (err) {
-        // Fallback to coordinates label if offline
+        console.warn("Reverse geocode error:", err);
         setResolvedAddress(`${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E (Azerbaijan)`);
       } finally {
         setIsGeocoding(false);
@@ -270,84 +255,88 @@ export function MapLocationPickerModal({
     };
   }, [isOpen]);
 
-  // Fly to location helper
-  const flyToCoords = (lat: number, lng: number, addressStr?: string, locId?: string) => {
-    setCurrentCoords({ lat, lng });
-    if (addressStr) setResolvedAddress(addressStr);
-    if (locId) setResolvedLocationId(locId);
+  // Debounced search places via internal API route
+  const fetchSearchResults = useCallback(
+    async (query: string) => {
+      if (!query.trim() || query.trim().length < 2) {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const res = await fetch(
+          `/api/transfer/places?q=${encodeURIComponent(
+            query.trim()
+          )}&airport=${airportCode}&lang=${language.toLowerCase()}`,
+          { signal: AbortSignal.timeout(6000) }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          setSearchResults(data.results || []);
+        } else {
+          setSearchResults([]);
+        }
+      } catch (err) {
+        console.warn("Location search error:", err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [airportCode, language]
+  );
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    if (!query.trim() || query.trim().length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchSearchResults(query);
+    }, 250);
+  };
+
+  // Select a search result or quick shortcut
+  const selectSearchResult = (item: {
+    title: string;
+    subtitle?: string;
+    address?: string;
+    lat: number;
+    lng: number;
+    locationId?: string;
+  }) => {
+    setCurrentCoords({ lat: item.lat, lng: item.lng });
+    setResolvedAddress(item.address || item.title);
+    setResolvedLocationName(item.title);
+    setResolvedLocationId(item.locationId);
+    setSearchResults([]);
+    setSearchQuery("");
 
     if (mapInstanceRef.current && markerRef.current) {
-      markerRef.current.setLatLng([lat, lng]);
-      mapInstanceRef.current.flyTo([lat, lng], 15, {
+      markerRef.current.setLatLng([item.lat, item.lng]);
+      mapInstanceRef.current.flyTo([item.lat, item.lng], 15, {
         duration: 1.2,
       });
     }
-    performReverseGeocode(lat, lng);
   };
 
-  // Search places in Azerbaijan
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    if (!query.trim() || query.trim().length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      // First find local popular destination matches
-      const localMatches = POPULAR_DESTINATIONS.filter((d) => {
-        const q = query.toLowerCase();
-        return (
-          d.name.toLowerCase().includes(q) ||
-          (d.address && d.address.toLowerCase().includes(q)) ||
-          (d.aliases && d.aliases.some((a) => a.toLowerCase().includes(q)))
-        );
-      }).map((d) => ({
-        title: d.name,
-        subtitle: d.address || d.badge || `${d.category.toUpperCase()}`,
-        lat: d.lat || (d.zoneId.includes("shahdag") ? 41.3214 : d.zoneId.includes("qabala") ? 40.9825 : 40.3756),
-        lng: d.lng || (d.zoneId.includes("shahdag") ? 48.1464 : d.zoneId.includes("qabala") ? 47.8492 : 49.8450),
-        locationId: d.id,
-      }));
-
-      // Then fetch from Nominatim with countrycodes=az
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          query
-        )}&countrycodes=az&limit=5&addressdetails=1`,
-        {
-          headers: { "Accept-Language": language.toLowerCase() },
-          signal: AbortSignal.timeout(4000),
-        }
-      );
-
-      let remoteMatches: any[] = [];
-      if (res.ok) {
-        const data = await res.json();
-        remoteMatches = data.map((item: any) => ({
-          title: item.display_name.split(",")[0] || item.display_name,
-          subtitle: item.display_name.split(",").slice(1, 3).join(", "),
-          lat: parseFloat(item.lat),
-          lng: parseFloat(item.lon),
-        }));
+  // Clean up search timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
       }
-
-      // Merge results avoiding exact coordinate duplicates
-      const merged = [...localMatches];
-      for (const rm of remoteMatches) {
-        if (!merged.some((m) => Math.abs(m.lat - rm.lat) < 0.001 && Math.abs(m.lng - rm.lng) < 0.001)) {
-          merged.push(rm);
-        }
-      }
-
-      setSearchResults(merged.slice(0, 6));
-    } catch (err) {
-      console.warn("Location search error:", err);
-    } finally {
-      setIsSearching(false);
-    }
-  };
+    };
+  }, []);
 
   // Close on Escape
   useEffect(() => {
@@ -406,7 +395,7 @@ export function MapLocationPickerModal({
             type="button"
             onClick={onClose}
             aria-label="Close Map Picker"
-            className="rounded-full p-1.5 text-sky-200 hover:text-white hover:bg-white/10 transition-colors"
+            className="rounded-full p-1.5 text-sky-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -420,7 +409,7 @@ export function MapLocationPickerModal({
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               placeholder={mp.searchPlaceholder}
               className="w-full rounded-xl border border-slate-200 bg-white pl-10 pr-10 py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500 transition-all shadow-sm"
             />
@@ -433,7 +422,7 @@ export function MapLocationPickerModal({
                   setSearchQuery("");
                   setSearchResults([]);
                 }}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -446,12 +435,8 @@ export function MapLocationPickerModal({
                   <button
                     key={`${item.title}-${idx}`}
                     type="button"
-                    onClick={() => {
-                      flyToCoords(item.lat, item.lng, item.title, item.locationId);
-                      setSearchResults([]);
-                      setSearchQuery("");
-                    }}
-                    className="w-full px-3.5 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors border-b border-slate-50 last:border-0"
+                    onClick={() => selectSearchResult(item)}
+                    className="w-full px-3.5 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors border-b border-slate-50 last:border-0 cursor-pointer"
                   >
                     <MapPin className="h-4 w-4 text-sky-600 shrink-0" />
                     <div className="min-w-0 flex-1">
@@ -479,8 +464,16 @@ export function MapLocationPickerModal({
               <button
                 key={sc.name}
                 type="button"
-                onClick={() => flyToCoords(sc.lat, sc.lng, sc.query, sc.id)}
-                className="rounded-lg bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:text-sky-700 whitespace-nowrap transition-all shadow-2xs shrink-0"
+                onClick={() =>
+                  selectSearchResult({
+                    title: sc.name,
+                    address: sc.query,
+                    lat: sc.lat,
+                    lng: sc.lng,
+                    locationId: sc.id,
+                  })
+                }
+                className="rounded-lg bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:text-sky-700 whitespace-nowrap transition-all shadow-2xs shrink-0 cursor-pointer"
               >
                 {sc.name}
               </button>
@@ -546,14 +539,14 @@ export function MapLocationPickerModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 {mp.cancelButton}
               </button>
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 text-xs font-bold transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]"
+                className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 text-xs font-bold transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
               >
                 <Check className="h-4 w-4 stroke-[2.5]" />
                 <span>{mp.confirmButton}</span>
@@ -565,3 +558,5 @@ export function MapLocationPickerModal({
     </div>
   );
 }
+
+export default MapLocationPickerModal;

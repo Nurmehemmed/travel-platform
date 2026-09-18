@@ -1024,6 +1024,62 @@ export function resolveLocationOrZone(idOrZoneId: string, airport: AirportCode =
   location?: DestinationLocation;
   zone: TransferZone;
 } {
+  if (!idOrZoneId) {
+    const defaultZone = getZonesByAirport(airport)[0]!;
+    return { zone: defaultZone };
+  }
+
+  // Handle custom address or map-selected pin (e.g. "custom:JW Marriott Baku" or "custom:Nizami St 45")
+  if (idOrZoneId.startsWith("custom:")) {
+    const rawAddress = idOrZoneId.replace(/^custom:/, "").trim();
+    const lower = rawAddress.toLowerCase();
+    const airportZones = getZonesByAirport(airport);
+
+    // Keyword heuristics to assign appropriate zone
+    let matchedZone = airportZones[0]!;
+    if (airport === "GYD") {
+      if (lower.includes("shahdag") || lower.includes("gusar") || lower.includes("qusar")) {
+        matchedZone = getZoneById("GYD-shahdag") || matchedZone;
+      } else if (lower.includes("quba") || lower.includes("guba")) {
+        matchedZone = getZoneById("GYD-quba") || matchedZone;
+      } else if (lower.includes("qabala") || lower.includes("gabala") || lower.includes("tufandag")) {
+        matchedZone = getZoneById("GYD-qabala") || matchedZone;
+      } else if (lower.includes("sheki") || lower.includes("shaki")) {
+        matchedZone = getZoneById("GYD-sheki") || matchedZone;
+      } else if (lower.includes("bilgah") || lower.includes("mardakan") || lower.includes("novkhani") || lower.includes("absheron")) {
+        matchedZone = getZoneById("GYD-absheron") || matchedZone;
+      } else if (lower.includes("sumqayit") || lower.includes("sumgait")) {
+        matchedZone = getZoneById("GYD-sumqayit") || matchedZone;
+      } else if (lower.includes("khirdalan") || lower.includes("xirdalan")) {
+        matchedZone = getZoneById("GYD-khirdalan") || matchedZone;
+      } else if (lower.includes("lankaran") || lower.includes("lenkoran")) {
+        matchedZone = getZoneById("GYD-lankaran") || matchedZone;
+      } else if (lower.includes("naftalan")) {
+        matchedZone = getZoneById("GYD-naftalan") || matchedZone;
+      } else if (lower.includes("shamakhi") || lower.includes("samaxi")) {
+        matchedZone = getZoneById("GYD-shamakhi") || matchedZone;
+      } else if (lower.includes("sabail") || lower.includes("flame") || lower.includes("icherisheher") || lower.includes("old city")) {
+        matchedZone = getZoneById("GYD-sabail") || matchedZone;
+      } else {
+        matchedZone = getZoneById("GYD-baku-center") || matchedZone;
+      }
+    }
+
+    return {
+      location: {
+        id: idOrZoneId,
+        name: rawAddress || "Custom Map Location",
+        category: "hotel",
+        zoneId: matchedZone.id,
+        airport,
+        distanceKm: matchedZone.distanceKm || 30,
+        address: rawAddress,
+        badge: "📍 Map / Custom",
+      },
+      zone: matchedZone,
+    };
+  }
+
   const location = getLocationById(idOrZoneId);
   if (location) {
     const zone = getZoneById(location.zoneId) || getZonesByAirport(airport)[0]!;

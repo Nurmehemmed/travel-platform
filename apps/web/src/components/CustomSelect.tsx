@@ -80,23 +80,49 @@ export function CustomSelect({
     return opt as SelectOption;
   });
 
-  const selectedOption = normalizedOptions.find(
+  const matchedOption = normalizedOptions.find(
     (opt) => String(opt.value) === String(value)
   );
 
+  const selectedOption: SelectOption | undefined =
+    matchedOption ||
+    (value !== undefined && value !== null && String(value).trim() !== ""
+      ? {
+          value: String(value),
+          label: String(value).startsWith("custom:")
+            ? String(value).replace(/^custom:/, "").trim()
+            : String(value),
+          badge: String(value).startsWith("custom:") ? "📍 Map / Custom" : undefined,
+          icon: <span className="shrink-0 text-base">📍</span>,
+        }
+      : undefined);
+
+  // If a custom or map-pinned option is active but not in normalizedOptions, include it at the top of options
+  const displayOptions =
+    selectedOption && !matchedOption
+      ? [
+          {
+            ...selectedOption,
+            group: "Selected Custom / Map Location",
+          },
+          ...normalizedOptions,
+        ]
+      : normalizedOptions;
+
   // Multi-keyword and alias search filtering
-  const filteredOptions = searchable && searchTerm.trim() !== ""
-    ? normalizedOptions.filter((opt) => {
-        const q = searchTerm.toLowerCase().trim();
-        if (opt.label.toLowerCase().includes(q)) return true;
-        if (String(opt.value).toLowerCase().includes(q)) return true;
-        if (opt.description && opt.description.toLowerCase().includes(q)) return true;
-        if (opt.badge && opt.badge.toLowerCase().includes(q)) return true;
-        if (opt.group && opt.group.toLowerCase().includes(q)) return true;
-        if (opt.aliases && opt.aliases.some((a) => a.toLowerCase().includes(q))) return true;
-        return false;
-      })
-    : normalizedOptions;
+  const filteredOptions =
+    searchable && searchTerm.trim() !== ""
+      ? displayOptions.filter((opt) => {
+          const q = searchTerm.toLowerCase().trim();
+          if (opt.label.toLowerCase().includes(q)) return true;
+          if (String(opt.value).toLowerCase().includes(q)) return true;
+          if (opt.description && opt.description.toLowerCase().includes(q)) return true;
+          if (opt.badge && opt.badge.toLowerCase().includes(q)) return true;
+          if (opt.group && opt.group.toLowerCase().includes(q)) return true;
+          if (opt.aliases && opt.aliases.some((a) => a.toLowerCase().includes(q))) return true;
+          return false;
+        })
+      : displayOptions;
 
   // Outside click & Escape listener
   useEffect(() => {
