@@ -51,24 +51,44 @@ function TransferBookForm() {
   const getVehicleLabel = (id: VehicleClass) => {
     if (id === "sedan") return t.transferPage.sedan;
     if (id === "suv") return t.transferPage.suv;
+    if (id === "sprinter") {
+      return language === "AZ"
+        ? "Mikroavtobus (Sprinter)"
+        : language === "RU"
+        ? "Микроавтобус (Sprinter)"
+        : language === "AR"
+        ? "حافلة صغيرة (Sprinter)"
+        : "Minibus (Sprinter)";
+    }
     return t.transferPage.minivan;
   };
 
   const getVehicleDesc = (id: VehicleClass) => {
     if (id === "sedan") return t.transferPage.sedanDesc;
     if (id === "suv") return t.transferPage.suvDesc;
+    if (id === "sprinter") {
+      return language === "AZ"
+        ? "Böyük qruplar və turlar üçün 16 nəfərlik Mercedes-Benz Sprinter və ya analoqu."
+        : language === "RU"
+        ? "Mercedes-Benz Sprinter или аналог на 16 мест для больших групп и делегаций."
+        : language === "AR"
+        ? "مرسيدس سبرينتر أو ما يعادلها تتسع حتى 16 راكباً وحقائب كبيرة."
+        : "Mercedes-Benz Sprinter or equivalent for up to 16 passengers and large luggage.";
+    }
     return t.transferPage.minivanDesc;
   };
 
   const getVehicleCapacity = (id: VehicleClass) => {
     if (id === "sedan") return `1–3 ${t.transferPage.paxMax}`;
     if (id === "suv") return `1–4 ${t.transferPage.paxMax}`;
+    if (id === "sprinter") return `8–16 ${t.transferPage.paxMax}`;
     return `4–7 ${t.transferPage.paxMax}`;
   };
 
   const getVehicleLuggage = (id: VehicleClass) => {
     if (id === "sedan") return `2 ${t.transferPage.bagsMax}`;
     if (id === "suv") return `4 ${t.transferPage.bagsMax}`;
+    if (id === "sprinter") return `15 ${t.transferPage.bagsMax}`;
     return `6 ${t.transferPage.bagsMax}`;
   };
 
