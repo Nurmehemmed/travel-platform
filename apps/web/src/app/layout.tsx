@@ -66,6 +66,19 @@ export const metadata: Metadata = {
   creator: "AddmeTour",
   publisher: "AddmeTour",
   metadataBase: new URL(APP_URL),
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+  },
+  manifest: "/manifest.json",
   alternates: {
     canonical: "/",
     languages: {
@@ -119,15 +132,6 @@ export const metadata: Metadata = {
     "geo.position": "40.4093;49.8671",
     ICBM: "40.4093, 49.8671",
   },
-  icons: {
-    icon: [
-      { url: "/icon.svg?v=5", type: "image/svg+xml" },
-      { url: "/favicon.ico?v=5", sizes: "32x32" },
-    ],
-    shortcut: "/favicon.ico?v=5",
-    apple: "/icon.svg?v=5",
-  },
-  manifest: "/manifest.json",
   category: "travel",
 };
 
@@ -334,9 +338,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="icon" href="/icon.svg?v=5" type="image/svg+xml" />
-        <link rel="alternate icon" href="/favicon.ico?v=5" />
-        <link rel="apple-touch-icon" href="/icon.svg?v=5" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+        <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
+        <link rel="alternate icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
         <script
           type="application/ld+json"
