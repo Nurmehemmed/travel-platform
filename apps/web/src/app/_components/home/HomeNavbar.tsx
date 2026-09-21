@@ -249,23 +249,25 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                 const el = document.getElementById("tours");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }}
-              className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+              className="relative flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
               title={t.nav.saved}
             >
-              <Heart
-                className={`h-4 w-4 shrink-0 transition-colors ${
-                  savedTourIds.length > 0 ? "fill-[#f59e0b] text-[#f59e0b]" : "text-white/80"
-                }`}
-              />
+              <div className="relative flex items-center justify-center">
+                <Heart
+                  className={`h-4 w-4 shrink-0 transition-colors ${
+                    savedTourIds.length > 0 ? "fill-[#f59e0b] text-[#f59e0b]" : "text-white/80"
+                  }`}
+                />
+                {savedTourIds.length > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-2 flex h-3.5 min-w-3.5 items-center justify-center rounded-full text-[9px] font-bold px-0.5 shadow-sm"
+                    style={{ backgroundColor: "#f59e0b", color: "#061225" }}
+                  >
+                    {savedTourIds.length}
+                  </span>
+                )}
+              </div>
               <span className="hidden 2xl:inline">{t.nav.saved}</span>
-              {savedTourIds.length > 0 && (
-                <span
-                  className="flex h-4 min-w-4 items-center justify-center rounded-full text-[10px] font-bold px-1 shrink-0"
-                  style={{ backgroundColor: "#f59e0b", color: "#061225" }}
-                >
-                  {savedTourIds.length}
-                </span>
-              )}
             </button>
 
             {!mounted ? (

@@ -42,14 +42,14 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
 <section id="tours" className="py-16" style={{ backgroundColor: "#f0f9ff" }}>
         <div className="container-section">
           {/* Header + Filter tabs */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
             <div>
               <p className="section-label mb-2">{t.tours.badge}</p>
-              <h2 className="font-display text-4xl font-bold text-slate-900">
+              <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900">
                 {t.tours.title}
               </h2>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {[
                 { id: "All", label: t.search.filterAll },
                 { id: "City", label: t.search.filterCity },
@@ -73,7 +73,7 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
 
               <button
                 onClick={() => setActiveFilter("Saved")}
-                className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all duration-200 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-full px-4 sm:px-5 py-2 text-sm font-medium transition-all duration-200 cursor-pointer select-none"
                 style={
                   activeFilter === "Saved"
                     ? { backgroundColor: "#0f3460", color: "#ffffff" }
@@ -81,7 +81,7 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                 }
               >
                 <Heart
-                  className={`h-3.5 w-3.5 transition-colors ${
+                  className={`h-3.5 w-3.5 shrink-0 transition-colors ${
                     activeFilter === "Saved"
                       ? "fill-[#f59e0b] text-[#f59e0b]"
                       : savedTourIds.length > 0
@@ -90,17 +90,17 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                   }`}
                 />
                 <span>{t.nav.saved}</span>
-                {savedTourIds.length > 0 && (
-                  <span
-                    className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                      activeFilter === "Saved"
-                        ? "bg-white/20 text-white"
-                        : "bg-amber-100 text-amber-900"
-                    }`}
-                  >
-                    {savedTourIds.length}
-                  </span>
-                )}
+                <span
+                  className={`ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold transition-colors duration-200 ${
+                    activeFilter === "Saved"
+                      ? "bg-white/20 text-white"
+                      : savedTourIds.length > 0
+                      ? "bg-amber-100 text-amber-900"
+                      : "bg-slate-100 text-slate-400"
+                  }`}
+                >
+                  {savedTourIds.length}
+                </span>
               </button>
             </div>
           </div>
