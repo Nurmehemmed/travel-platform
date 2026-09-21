@@ -9,6 +9,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
+    "test:e2e": "pnpm --filter @travel/web test:e2e",
+    "test:e2e:report": "pnpm --filter @travel/web test:e2e:report",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "db:studio": "pnpm --filter @travel/db db:studio",
     "clean": "turbo run clean && rm -rf node_modules"

@@ -106,6 +106,30 @@ export default function TourDetailClient({ tour, relatedTours }: TourDetailClien
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("travel_saved_tour_ids");
+      if (saved) {
+        const ids: string[] = JSON.parse(saved);
+        setIsSaved(ids.includes(tour.id));
+      }
+    } catch {}
+  }, [tour.id]);
+
+  const toggleSave = () => {
+    try {
+      const saved = localStorage.getItem("travel_saved_tour_ids");
+      const ids: string[] = saved ? JSON.parse(saved) : [];
+      const exists = ids.includes(tour.id);
+      const next = exists ? ids.filter((id) => id !== tour.id) : [...ids, tour.id];
+      localStorage.setItem("travel_saved_tour_ids", JSON.stringify(next));
+      setIsSaved(!exists);
+      showToast(exists ? t.tours.savedToastRemove : t.tours.savedToastAdd);
+    } catch {
+      setIsSaved(!isSaved);
+    }
+  };
+
   const totalGuests = adults + children;
 
   // Calculate pricing
@@ -275,10 +299,11 @@ Please confirm guide availability and pickup details.`;
 
           <div className="flex items-center gap-2 shrink-0 self-start">
             <button
-              onClick={() => setIsSaved(!isSaved)}
+              onClick={toggleSave}
+              aria-label={isSaved ? "Remove from saved tours" : "Save this tour"}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-sm"
             >
-              <Heart className={`h-4 w-4 ${isSaved ? "fill-red-500 text-red-500" : "text-slate-400"}`} />
+              <Heart className={`h-4 w-4 ${isSaved ? "fill-[#f59e0b] text-[#f59e0b]" : "text-slate-400"}`} />
               <span>{isSaved ? "Saved" : "Save"}</span>
             </button>
             <button

@@ -203,15 +203,18 @@ export default function HomePage() {
   const filteredTours = useMemo(() => {
     return toursList.filter((tour) => {
       const matchesCategory =
-        activeFilter === "All" ||
-        tour.category?.toLowerCase() === activeFilter.toLowerCase();
+        activeFilter === "All"
+          ? true
+          : activeFilter === "Saved"
+          ? savedTourIds.includes(tour.id)
+          : tour.category?.toLowerCase() === activeFilter.toLowerCase();
 
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
         tour.title.toLowerCase().includes(q) ||
         tour.desc.toLowerCase().includes(q) ||
-        tour.tags.some((tag: string) => tag.toLowerCase().includes(q));
+        tour.tags?.some((tag: string) => tag.toLowerCase().includes(q));
 
       const matchesDuration =
         activeDuration === DURATIONS[0] ||
@@ -226,7 +229,7 @@ export default function HomePage() {
 
       return matchesCategory && matchesSearch && matchesDuration;
     });
-  }, [toursList, activeFilter, searchQuery, activeDuration]);
+  }, [toursList, activeFilter, searchQuery, activeDuration, savedTourIds]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
@@ -237,6 +240,8 @@ export default function HomePage() {
         setAuthMode={setAuthMode}
         handleLogout={handleLogout}
         savedCount={savedTourIds.length}
+        savedTourIds={savedTourIds}
+        setActiveFilter={setActiveFilter}
         isScrolled={isScrolled}
         shareCopied={shareCopied}
         handleCopyLink={handleCopyLink}
