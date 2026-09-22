@@ -38,14 +38,15 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
                   src={slide.image}
                   alt={slide.alt}
                   fill
-                  sizes="(max-width: 768px) 828px, (max-width: 1200px) 1200px, 1600px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
+                  quality={75}
                   style={{ objectFit: "cover" }}
                   className={`object-cover object-center transition-opacity duration-700 ${
                     index === currentSlide ? "animate-ken-burns" : "scale-100"
                   }`}
                   priority={index === 0}
                   loading={index === 0 ? "eager" : "lazy"}
-                  {...(index === 0 ? { fetchPriority: "high" as const } : {})}
+                  {...(index === 0 ? { fetchPriority: "high" as const, unoptimized: true } : {})}
                 />
               </div>
             );

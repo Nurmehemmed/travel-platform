@@ -20,7 +20,7 @@ export const TOUR_FILTERS = ["All", "City", "Day Trip", "Overnight", "Adventure"
 
 export const HERO_SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=85&auto=format",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80&auto=format&fm=webp",
     alt: "Great Caucasus Mountains in Azerbaijan",
     badge: "TripAdvisor Travelers' Choice · Baku, Azerbaijan",
     title: "Into the Great Caucasus",
