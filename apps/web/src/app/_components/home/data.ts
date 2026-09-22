@@ -20,7 +20,7 @@ export const TOUR_FILTERS = ["All", "City", "Day Trip", "Overnight", "Adventure"
 
 export const HERO_SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=85",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=85&auto=format",
     alt: "Great Caucasus Mountains in Azerbaijan",
     badge: "TripAdvisor Travelers' Choice · Baku, Azerbaijan",
     title: "Into the Great Caucasus",
@@ -38,7 +38,7 @@ export const HERO_SLIDES = [
     secondaryCta: { text: "Apply for e-Visa", href: "/visa" },
   },
   {
-    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1600&q=85",
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=1600&q=85&auto=format",
     alt: "Gobustan and Land of Sacred Fire Azerbaijan",
     badge: "Mystical Land of Fire · Ancient Wonders",
     title: "Gobustan & The Land of Sacred Fire",

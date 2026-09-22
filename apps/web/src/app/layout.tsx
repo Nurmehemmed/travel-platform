@@ -345,6 +345,18 @@ export default function RootLayout({
         <link rel="alternate icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
+        {/* Preconnect to Unsplash CDN for LCP hero image */}
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        {/* Preload LCP hero image via Next.js image optimizer for cache match */}
+        <link
+          rel="preload"
+          as="image"
+          href="/_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1464822759023-fed622ff2c3b%3Fw%3D1600%26q%3D85%26auto%3Dformat&w=828&q=85"
+          imageSrcSet="/_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1464822759023-fed622ff2c3b%3Fw%3D1600%26q%3D85%26auto%3Dformat&w=828&q=85 828w, /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1464822759023-fed622ff2c3b%3Fw%3D1600%26q%3D85%26auto%3Dformat&w=1200&q=85 1200w, /_next/image?url=https%3A%2F%2Fimages.unsplash.com%2Fphoto-1464822759023-fed622ff2c3b%3Fw%3D1600%26q%3D85%26auto%3Dformat&w=1920&q=85 1920w"
+          imageSizes="(max-width: 768px) 828px, (max-width: 1200px) 1200px, 1920px"
+          fetchPriority="high"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
