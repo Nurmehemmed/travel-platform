@@ -164,7 +164,7 @@ export class ItineraryService {
 👥 *Party:* ${adultCount} Adults${childCount > 0 ? `, ${childCount} Children` : ""}
 📍 *Destinations Selected:*
 ${selectedDests.map((d: string) => `  • ${d}`).join("\n")}
-💰 *Estimated Budget:* ~$${priceUsd} USD (${currency})
+💰 *Pricing:* ${priceUsd > 0 ? `~$${priceUsd} USD (${currency})` : "Custom Proposal Requested (On Request)"}
 📝 *Special Requests:* ${input.customer.notes || "None"}
 ━━━━━━━━━━━━━━━━━━━━━━━━━`;
 

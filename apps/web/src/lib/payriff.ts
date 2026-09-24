@@ -38,25 +38,23 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
   // Check if live/sandbox Payriff keys are present
   const isMock = !PAYRIFF_SECRET_KEY || PAYRIFF_SECRET_KEY === "mock" || PAYRIFF_SECRET_KEY.startsWith("test_mock");
 
-  // Detect service type by reference prefix: ATR- = transfer, AZV- = visa
+  // Detect service type by reference prefix: ATR- = transfer, ESIM- = esim, AZV- = visa
   const isTransfer = applicationNumber.startsWith("ATR-");
+  const isEsim = applicationNumber.startsWith("ESIM-");
   const callbackBase = isTransfer
     ? `${APP_URL}/api/payment/transfer-callback`
+    : isEsim
+    ? `${APP_URL}/api/payment/esim-callback`
     : `${APP_URL}/api/payment/payriff-callback`;
-  const mockPayPage = isTransfer
-    ? `${APP_URL}/transfer/track`
-    : `${APP_URL}/visa/pay`;
 
   if (isMock) {
     if (process.env.NODE_ENV === "production") {
       throw new Error("Payment gateway credentials (PAYRIFF_SECRET_KEY / PAYRIFF_MERCHANT_ID) are missing or invalid in production.");
     }
-    // Return local Payriff Sandbox checkout simulation
+    // Return local Payriff Sandbox checkout simulation for all services (eSIM, Transfer, Visa)
     const mockOrderId = `PR-SIM-${Math.floor(100000 + Math.random() * 900000)}`;
-    const emailQuery = isTransfer ? `&email=${encodeURIComponent(email)}` : "";
-    const paymentUrl = isTransfer
-      ? `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}${emailQuery}&orderId=${mockOrderId}&status=success`
-      : `${APP_URL}/visa/pay?ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&amount=${amount}&currency=${currency}`;
+    const serviceTag = isTransfer ? "transfer" : isEsim ? "esim" : "visa";
+    const paymentUrl = `${APP_URL}/pay/sandbox?service=${serviceTag}&ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&amount=${Number(amount).toFixed(2)}&currency=${currency}`;
     return {
       orderId: mockOrderId,
       paymentUrl,
@@ -114,11 +112,10 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     }
     // Fall back to sandbox simulation in development only
     const fallbackOrderId = `PR-FALLBACK-${Math.floor(100000 + Math.random() * 900000)}`;
+    const serviceTag = isTransfer ? "transfer" : isEsim ? "esim" : "visa";
     return {
       orderId: fallbackOrderId,
-      paymentUrl: isTransfer
-        ? `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}&orderId=${fallbackOrderId}&status=success`
-        : `${APP_URL}/visa/pay?ref=${encodeURIComponent(applicationNumber)}&orderId=${fallbackOrderId}&amount=${amount}&currency=${currency}&notice=fallback`,
+      paymentUrl: `${APP_URL}/pay/sandbox?service=${serviceTag}&ref=${encodeURIComponent(applicationNumber)}&orderId=${fallbackOrderId}&amount=${amount}&currency=${currency}&notice=fallback`,
       isMock: true,
     };
   }

@@ -629,6 +629,10 @@ export const transferBookings = pgTable(
     email:           varchar("email",         { length: 255 }).notNull(),
     luggageNotes:    text("luggage_notes"),
 
+    // Driver preferences & add-ons
+    femaleDriver:    boolean("female_driver").default(false),
+    additionalGuide: boolean("additional_guide").default(false),
+
     // Payment
     paymentMethod:  transferPaymentMethodEnum("payment_method").notNull().default("online"),
     paymentStatus:  varchar("payment_status", { length: 30 }).notNull().default("pending"),
@@ -767,6 +771,56 @@ export const siteSettings = pgTable(
   ]
 );
 
+export const esimStatusEnum = pgEnum("esim_status", [
+  "pending",
+  "confirmed",
+  "delivered",
+  "cancelled",
+]);
+
+export const esimOrders = pgTable(
+  "esim_orders",
+  {
+    id:              uuid("id").primaryKey().defaultRandom(),
+    orderNumber:     varchar("order_number", { length: 32 }).notNull().unique(),
+    userId:          text("user_id").references(() => users.id, { onDelete: "set null" }),
+    customerName:    varchar("customer_name", { length: 200 }).notNull(),
+    email:           varchar("email", { length: 255 }).notNull(),
+    phone:           varchar("phone", { length: 50 }).notNull(),
+    planId:          varchar("plan_id", { length: 50 }).notNull(),
+    planName:        varchar("plan_name", { length: 100 }).notNull(),
+    dataAmountGb:    integer("data_amount_gb").notNull(),
+    durationDays:    integer("duration_days").notNull(),
+    priceUsd:        numeric("price_usd", { precision: 10, scale: 2 }).notNull(),
+    costPriceUsd:    numeric("cost_price_usd", { precision: 10, scale: 2 }),
+    commissionUsd:   numeric("commission_usd", { precision: 10, scale: 2 }),
+    currency:        varchar("currency", { length: 10 }).notNull().default("USD"),
+    deviceModel:     varchar("device_model", { length: 100 }),
+    arrivalDate:     date("arrival_date"),
+    status:          esimStatusEnum("status").notNull().default("pending"),
+    paymentMethod:   varchar("payment_method", { length: 30 }).notNull().default("online"),
+    paymentStatus:   varchar("payment_status", { length: 30 }).notNull().default("pending"),
+    payriffOrderId:  varchar("payriff_order_id", { length: 100 }),
+    payriffSessionId: varchar("payriff_session_id", { length: 100 }),
+    qrCodeUrl:       text("qr_code_url"),
+    activationNotes: text("activation_notes"),
+    adminNotes:      text("admin_notes"),
+    ...timestamps,
+  },
+  (t) => [
+    index("esim_orders_status_idx").on(t.status),
+    index("esim_orders_email_idx").on(t.email),
+    uniqueIndex("esim_orders_num_idx").on(t.orderNumber),
+  ]
+);
+
+export const esimOrdersRelations = relations(esimOrders, ({ one }) => ({
+  user: one(users, {
+    fields: [esimOrders.userId],
+    references: [users.id],
+  }),
+}));
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Type exports — infer insert/select types from schema for use in app code
 // ─────────────────────────────────────────────────────────────────────────────
@@ -813,5 +867,9 @@ export type NewCustomItinerary = typeof customItineraries.$inferInsert;
 
 export type SiteSetting        = typeof siteSettings.$inferSelect;
 export type NewSiteSetting     = typeof siteSettings.$inferInsert;
+
+export type EsimOrder          = typeof esimOrders.$inferSelect;
+export type NewEsimOrder       = typeof esimOrders.$inferInsert;
+
 
 

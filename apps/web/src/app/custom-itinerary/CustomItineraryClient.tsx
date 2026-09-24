@@ -8,12 +8,13 @@ import {
   MessageCircle, ArrowRight, ArrowLeft, ShieldCheck, Star,
   Compass, CheckCircle2, ChevronRight, PhoneCall, Heart, Award
 } from "lucide-react";
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, LanguageCode } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { DatePicker } from "@/components/DatePicker";
+import { ITINERARY_PAGE_TRANSLATIONS } from "@/lib/i18n/pages/itinerary-i18n";
 
 
 interface DestinationTheme {
@@ -139,31 +140,31 @@ interface VehicleOption {
 const VEHICLE_OPTIONS: VehicleOption[] = [
   {
     id: "sedan",
-    name: "Mercedes E-Class / Premium Sedan",
+    name: "Comfort Sedan",
     capacity: "1–3 Passengers",
-    desc: "Sleek executive comfort for couples or solo travelers.",
+    desc: "Sleek executive comfort with climate control and luggage hold for couples or solo travelers.",
     extraPerDay: 0,
   },
   {
     id: "suv",
-    name: "Toyota Prado 4x4 / Luxury SUV",
+    name: "4x4 SUV",
     capacity: "1–4 Passengers",
-    desc: "High-clearance all-wheel drive for mountain passes and rugged highlands.",
-    extraPerDay: 25,
+    desc: "High-clearance all-wheel drive vehicle designed for mountain passes and rugged highlands.",
+    extraPerDay: 0,
   },
   {
     id: "vclass",
-    name: "Mercedes V-Class VIP Van (Top Pick)",
+    name: "VIP Minivan",
     capacity: "4–7 Passengers",
-    desc: "Executive leather captain seats, panoramic roof, WiFi, and large luggage hold.",
-    extraPerDay: 45,
+    desc: "Spacious executive captain seats, dual AC, and generous luggage hold for families and small groups.",
+    extraPerDay: 0,
   },
   {
     id: "sprinter",
-    name: "Mercedes VIP Sprinter Minibus",
+    name: "Executive Minibus",
     capacity: "8–16 Passengers",
-    desc: "Spacious luxury coach for extended families and group delegations.",
-    extraPerDay: 80,
+    desc: "Spacious luxury coach with panoramic windows for extended families and group delegations.",
+    extraPerDay: 0,
   },
 ];
 
@@ -171,6 +172,19 @@ export default function CustomItineraryClient() {
   const { t, isRtl, language, showToast } = useLanguage();
   const { formatPrice, formatPriceWithSubtext, activeCurrency } = useCurrency();
   const { settings } = useSiteSettings();
+
+  const tItinerary = ITINERARY_PAGE_TRANSLATIONS[language as LanguageCode] || ITINERARY_PAGE_TRANSLATIONS.EN;
+
+  const getVehicleName = (id: string) => tItinerary.vehicles[id as keyof typeof tItinerary.vehicles]?.name || id;
+  const getVehicleCapacity = (id: string) => tItinerary.vehicles[id as keyof typeof tItinerary.vehicles]?.capacity || "";
+  const getVehicleDesc = (id: string) => tItinerary.vehicles[id as keyof typeof tItinerary.vehicles]?.desc || "";
+
+  const getHotelName = (id: string) => tItinerary.hotelTiers[id as keyof typeof tItinerary.hotelTiers]?.name || id;
+  const getHotelDesc = (id: string) => tItinerary.hotelTiers[id as keyof typeof tItinerary.hotelTiers]?.desc || "";
+
+  const getDestName = (id: string) => tItinerary.destinations[id]?.name || DESTINATION_OPTIONS.find((d) => d.id === id)?.name || id;
+  const getDestTag = (id: string) => tItinerary.destinations[id]?.tag || DESTINATION_OPTIONS.find((d) => d.id === id)?.tag || "";
+  const getDestDesc = (id: string) => tItinerary.destinations[id]?.desc || DESTINATION_OPTIONS.find((d) => d.id === id)?.desc || "";
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -225,18 +239,10 @@ export default function CustomItineraryClient() {
   const hotelObj = HOTEL_TIERS.find((h) => h.id === selectedHotelTier) || HOTEL_TIERS[1]!;
   const vehicleObj = VEHICLE_OPTIONS.find((v) => v.id === selectedVehicle) || VEHICLE_OPTIONS[2]!;
 
-  // Dynamic Price Estimation Algorithm
-  const totalGuests = adults + children;
-  const baseDayCostPerPerson = 95; // Base private guide + vehicle + logistics
-  const hotelCostPerNightPerRoom = 80 * hotelObj.multiplier;
-  const roomsNeeded = Math.ceil(totalGuests / 2);
-  const totalHotelCost = hotelCostPerNightPerRoom * (durationDays - 1) * roomsNeeded;
-  const totalTransportCost = (baseDayCostPerPerson * adults + baseDayCostPerPerson * 0.5 * children + vehicleObj.extraPerDay) * durationDays;
-  const rawEstimatedUSD = Math.round(totalHotelCost + totalTransportCost);
-
+  // Custom Quote on Request (No arbitrary fixed prices)
   const buildWhatsAppMessage = () => {
     const destNames = selectedDestIds
-      .map((id) => DESTINATION_OPTIONS.find((d) => d.id === id)?.name)
+      .map((id) => getDestName(id))
       .filter(Boolean)
       .join("\n • ");
 
@@ -245,15 +251,13 @@ export default function CustomItineraryClient() {
 📅 Duration: ${durationDays} Days / ${durationDays - 1} Nights
 🗓️ Arrival Date: ${arrivalDate}
 👥 Party Size: ${adults} Adults${children > 0 ? `, ${children} Children` : ""}
-🏨 Accommodation: ${hotelObj.name} (${hotelObj.stars})
-🚗 Private Chauffeur: ${vehicleObj.name}
+🏨 Accommodation: ${getHotelName(selectedHotelTier)} (${hotelObj.stars})
+🚗 Vehicle: ${getVehicleName(selectedVehicle)}
 
 📍 Selected Destinations:
  • ${destNames}
 
-💰 Estimated Budget: ~${formatPrice(rawEstimatedUSD)} (${rawEstimatedUSD} USD)
-
-Please send me the detailed day-by-day itinerary proposal and official quote.`;
+💰 Quotation: Please send me the tailored proposal and exact pricing based on current hotel availability.`;
 
     const cleanNumber = settings?.contact?.whatsappClean || "994551003146";
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
@@ -277,7 +281,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
           ),
           hotelTier: hotelObj.name,
           vehicleClass: vehicleObj.name,
-          estimatedPriceUSD: rawEstimatedUSD,
+          estimatedPriceUSD: 0,
           currency: activeCurrency.code,
           customer: { fullName, email, phone, notes },
         }),
@@ -345,16 +349,16 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
         <div className="container-section text-center max-w-3xl mx-auto relative z-10">
           <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold bg-amber-400/15 text-amber-300 border border-amber-400/30 mb-3.5 shadow-sm backdrop-blur-md">
             <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
-            <span>100% Tailored Private Journeys</span>
+            <span>{tItinerary.badge}</span>
           </span>
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            Design Your Dream{" "}
+            {tItinerary.heroTitle}{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-amber-400">
-              Caucasus Itinerary
+              {tItinerary.heroHighlight}
             </span>
           </h1>
           <p className="text-sm sm:text-base text-slate-200 mt-3.5 max-w-xl mx-auto font-normal leading-relaxed">
-            Choose your days, preferred destinations, luxury hotels, and private Mercedes chauffeur. Get an instant quote in 60 seconds.
+            {tItinerary.heroSubtitle}
           </p>
         </div>
       </section>
@@ -363,10 +367,10 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
       <div className="container-section py-6 max-w-4xl mx-auto">
         <div className="grid grid-cols-4 gap-2 sm:gap-4 text-center">
           {[
-            { num: 1, label: "Dates & Group", icon: Calendar },
-            { num: 2, label: "Destinations", icon: MapPin },
-            { num: 3, label: "Hotels & Transport", icon: Hotel },
-            { num: 4, label: "Instant Proposal", icon: Award },
+            { num: 1, label: tItinerary.stepLabels[0], icon: Calendar },
+            { num: 2, label: tItinerary.stepLabels[1], icon: MapPin },
+            { num: 3, label: tItinerary.stepLabels[2], icon: Hotel },
+            { num: 4, label: tItinerary.stepLabels[3], icon: Award },
           ].map((s) => {
             const isDone = step > s.num;
             const isCurrent = step === s.num;
@@ -415,21 +419,21 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-sky-100 shadow-md animate-scale-up space-y-6">
             <div>
               <h2 className="font-display text-xl sm:text-2xl font-bold text-slate-900">
-                1. How many days would you like to travel?
+                {tItinerary.step1Title}
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Select your trip duration. We balance scenic drives with relaxing multi-night hotel stays.
+                {tItinerary.step1Subtitle}
               </p>
             </div>
 
             {/* Duration Pills */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {[
-                { days: 3, label: "3 Days", tag: "Weekend Getaway" },
-                { days: 5, label: "5 Days", tag: "Signature Tour", popular: true },
-                { days: 7, label: "7 Days", tag: "Full Caucasus", popular: true },
-                { days: 10, label: "10 Days", tag: "Grand Expedition" },
-                { days: 14, label: "14 Days", tag: "VIP In-Depth" },
+                { days: 3, label: `3 ${tItinerary.summaryDuration}`, tag: "Weekend Getaway" },
+                { days: 5, label: `5 ${tItinerary.summaryDuration}`, tag: "Signature Tour", popular: true },
+                { days: 7, label: `7 ${tItinerary.summaryDuration}`, tag: "Full Caucasus", popular: true },
+                { days: 10, label: `10 ${tItinerary.summaryDuration}`, tag: "Grand Expedition" },
+                { days: 14, label: `14 ${tItinerary.summaryDuration}`, tag: "VIP In-Depth" },
               ].map((d) => (
                 <button
                   key={d.days}
@@ -456,7 +460,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Approximate Arrival Date
+                  {tItinerary.startDateLabel}
                 </label>
                 <DatePicker
                   value={arrivalDate}
@@ -468,11 +472,11 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Number of Travelers
+                  {tItinerary.adultsLabel} & {tItinerary.childrenLabel}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-700">Adults</span>
+                    <span className="text-xs font-semibold text-slate-700">{tItinerary.adultsLabel}</span>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -493,7 +497,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                   </div>
 
                   <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-700">Children</span>
+                    <span className="text-xs font-semibold text-slate-700">{tItinerary.childrenLabel}</span>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -522,7 +526,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                 onClick={() => setStep(2)}
                 className="rounded-2xl px-8 py-3.5 text-xs font-bold text-[#061225] bg-amber-500 hover:opacity-90 transition-opacity flex items-center gap-2 cursor-pointer shadow-md"
               >
-                <span>Continue to Destinations</span>
+                <span>{tItinerary.btnContinueDestinations}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -535,14 +539,14 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h2 className="font-display text-xl sm:text-2xl font-bold text-slate-900">
-                  2. Select Destinations & Highlights
+                  {tItinerary.step2Title}
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Choose regions you wish to explore during your {durationDays}-day trip.
+                  {tItinerary.step2Subtitle}
                 </p>
               </div>
               <span className="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 self-start">
-                {selectedDestIds.length} Selected
+                {selectedDestIds.length} {tItinerary.selectedBadge}
               </span>
             </div>
 
@@ -581,12 +585,12 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                       <div>
                         <div className="flex items-center gap-1.5 mb-1">
                           <span className="rounded-full px-2 py-0.5 text-[9px] font-bold bg-sky-100 text-sky-800">
-                            {dest.tag}
+                            {getDestTag(dest.id)}
                           </span>
                           <span className="text-[10px] text-slate-400 truncate">{dest.region}</span>
                         </div>
-                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm line-clamp-1">{dest.name}</h3>
-                        <p className="text-[11px] text-slate-500 leading-tight mt-1 line-clamp-2">{dest.desc}</p>
+                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm line-clamp-1">{getDestName(dest.id)}</h3>
+                        <p className="text-[11px] text-slate-500 leading-tight mt-1 line-clamp-2">{getDestDesc(dest.id)}</p>
                       </div>
                     </div>
                   </div>
@@ -601,7 +605,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                 className="rounded-2xl px-6 py-3 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center gap-2 cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back</span>
+                <span>{tItinerary.btnBack}</span>
               </button>
 
               <button
@@ -609,7 +613,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                 onClick={() => setStep(3)}
                 className="rounded-2xl px-8 py-3.5 text-xs font-bold text-[#061225] bg-amber-500 hover:opacity-90 transition-opacity flex items-center gap-2 cursor-pointer shadow-md"
               >
-                <span>Continue to Hotels & Vehicles</span>
+                <span>{tItinerary.btnContinueHotels}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -621,17 +625,17 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-sky-100 shadow-md animate-scale-up space-y-6">
             <div>
               <h2 className="font-display text-xl sm:text-2xl font-bold text-slate-900">
-                3. Choose Accommodation & Vehicle Standard
+                {tItinerary.step3Title}
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Customize your stay comfort and private transport style.
+                {tItinerary.step3Subtitle}
               </p>
             </div>
 
             {/* Hotel Tier Selection */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                🏨 Accommodation Category
+                {tItinerary.hotelCategoryLabel}
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {HOTEL_TIERS.map((tier) => {
@@ -648,8 +652,8 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                     >
                       <div>
                         <span className="text-amber-500 font-bold text-sm block">{tier.stars}</span>
-                        <h3 className="font-bold text-slate-900 text-sm mt-1">{tier.name}</h3>
-                        <p className="text-xs text-slate-500 mt-1">{tier.desc}</p>
+                        <h3 className="font-bold text-slate-900 text-sm mt-1">{getHotelName(tier.id)}</h3>
+                        <p className="text-xs text-slate-500 mt-1">{getHotelDesc(tier.id)}</p>
                       </div>
                       <div className="mt-3 pt-2 border-t border-slate-100 text-[10px] text-slate-400 italic">
                         {tier.sampleHotels}
@@ -663,7 +667,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
             {/* Vehicle Selection */}
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
-                🚗 Private Chauffeur Vehicle
+                {tItinerary.vehicleCategoryLabel}
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {VEHICLE_OPTIONS.map((veh) => {
@@ -680,12 +684,12 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="font-bold text-slate-900 text-sm">{veh.name}</h3>
+                          <h3 className="font-bold text-slate-900 text-sm">{getVehicleName(veh.id)}</h3>
                           <span className="rounded-full px-2 py-0.5 text-[9px] font-semibold bg-sky-100 text-sky-800">
-                            {veh.capacity}
+                            {getVehicleCapacity(veh.id)}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1">{veh.desc}</p>
+                        <p className="text-xs text-slate-500 mt-1">{getVehicleDesc(veh.id)}</p>
                       </div>
                       {isSelected && (
                         <div className="h-5 w-5 rounded-full bg-amber-500 text-[#061225] flex items-center justify-center text-xs font-bold shrink-0">
@@ -698,32 +702,37 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
               </div>
             </div>
 
-            {/* Live Real-time Price Estimation Banner */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0f3460] to-[#1a4478] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
-              <div>
-                <span className="text-[11px] uppercase tracking-wider font-bold text-amber-400 block">
-                  Estimated Private Package Price
-                </span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-black">{formatPrice(rawEstimatedUSD)}</span>
-                  <span className="text-xs text-white/70">
-                    ({formatPriceWithSubtext(rawEstimatedUSD).secondary})
-                  </span>
+            {/* Transparent Custom Quote on Request Banner */}
+            <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#0f3460] to-[#163f73] text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg border border-white/10">
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                  <Sparkles className="h-3 w-3 text-amber-400" />
+                  <span>{tItinerary.bespokeBannerBadge}</span>
                 </div>
-                <span className="text-[11px] text-white/60">
-                  Includes {durationDays} days private guide, {hotelObj.name}, and private {vehicleObj.name}.
-                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-white">
+                  {tItinerary.bespokeBannerTitle}
+                </h3>
+                <p className="text-xs text-slate-200 max-w-xl leading-relaxed">
+                  {tItinerary.bespokeBannerDesc}
+                </p>
+                <div className="pt-1 flex flex-wrap items-center gap-2.5 text-[11px] text-amber-200/90 font-medium">
+                  <span>✓ {durationDays} {tItinerary.summaryDuration} / {durationDays - 1} {language === "RU" ? "ночей" : language === "AZ" ? "gecə" : language === "FR" ? "nuits" : language === "AR" ? "ليالي" : language === "DE" ? "Nächte" : "Nights"}</span>
+                  <span>•</span>
+                  <span>✓ {getHotelName(selectedHotelTier)}</span>
+                  <span>•</span>
+                  <span>✓ {getVehicleName(selectedVehicle)}</span>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
                 <a
                   href={buildWhatsAppMessage()}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto rounded-xl px-5 py-3 text-xs font-bold text-[#061225] bg-amber-500 hover:opacity-90 flex items-center justify-center gap-1.5 shadow-md whitespace-nowrap"
+                  className="w-full sm:w-auto rounded-2xl px-6 py-3.5 text-xs font-bold text-[#061225] bg-amber-500 hover:bg-amber-400 flex items-center justify-center gap-2 shadow-md whitespace-nowrap cursor-pointer transition-all"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  <span>Instant WhatsApp Proposal</span>
+                  <span>{tItinerary.btnWhatsAppProposal}</span>
                 </a>
               </div>
             </div>
@@ -731,10 +740,10 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
             {/* Lead Capture Form for Official PDF Proposal */}
             <div className="pt-4 border-t border-slate-200">
               <h3 className="font-bold text-slate-900 text-sm mb-1">
-                Receive Full Day-by-Day Proposal & Hotel Vouchers
+                {tItinerary.specialRequestsLabel}
               </h3>
               <p className="text-xs text-slate-500 mb-4">
-                Our Baku travel specialists will verify room availability and message you within 30 minutes.
+                {tItinerary.step4Subtitle}
               </p>
 
               <form onSubmit={handleInquirySubmit} className="space-y-3">
@@ -742,7 +751,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                   <input
                     type="text"
                     required
-                    placeholder="Full Name *"
+                    placeholder={tItinerary.contactNameLabel}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
@@ -750,7 +759,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                   <input
                     type="tel"
                     required
-                    placeholder="WhatsApp Phone Number *"
+                    placeholder={tItinerary.contactPhoneLabel}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
@@ -758,7 +767,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                   <input
                     type="email"
                     required
-                    placeholder="Email Address *"
+                    placeholder={tItinerary.contactEmailLabel}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
@@ -767,7 +776,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
 
                 <textarea
                   rows={2}
-                  placeholder="Optional: Dietary preferences, children's ages, flight times, or specific sites you'd like to include..."
+                  placeholder={tItinerary.notesPlaceholder}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
@@ -780,7 +789,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                     className="rounded-2xl px-6 py-3 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 flex items-center gap-2 cursor-pointer"
                   >
                     <ArrowLeft className="h-4 w-4" />
-                    <span>Back</span>
+                    <span>{tItinerary.btnBack}</span>
                   </button>
 
                   <button
@@ -789,7 +798,7 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                     className="rounded-2xl px-8 py-3.5 text-xs font-bold text-white bg-[#0f3460] hover:opacity-95 shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     <CheckCircle2 className="h-4 w-4 text-amber-400" />
-                    <span>{submitting ? "Sending Request..." : "Submit Bespoke Request"}</span>
+                    <span>{submitting ? tItinerary.submittingText : tItinerary.btnSubmitInquiry}</span>
                   </button>
                 </div>
               </form>
@@ -805,42 +814,45 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
             </div>
 
             <span className="inline-block rounded-full px-3 py-1 text-xs font-bold bg-amber-100 text-amber-800 mb-2">
-              Reference: #{submittedCode}
+              {tItinerary.successRef}: #{submittedCode}
             </span>
 
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
-              Bespoke Proposal Requested!
+              {tItinerary.successTitle}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed">
-              Thank you, <strong>{fullName || "Valued Traveler"}</strong>! Our senior Azerbaijan itinerary planner has received your <strong>{durationDays}-day custom tour request</strong>. We will message you on WhatsApp (<strong>{phone}</strong>) within 30 minutes.
+              {tItinerary.successDescTemplate
+                .replace("{name}", fullName || "Valued Traveler")
+                .replace("{days}", String(durationDays))
+                .replace("{phone}", phone || "")}
             </p>
 
             <div className="p-4 rounded-2xl bg-sky-50 border border-sky-100 text-xs text-start space-y-1.5 text-slate-700 mb-6">
               <div className="flex justify-between font-bold">
-                <span>Trip Duration:</span>
-                <span>{durationDays} Days / {durationDays - 1} Nights</span>
+                <span>{tItinerary.successDurationLabel}</span>
+                <span>{durationDays} {tItinerary.summaryDuration}</span>
               </div>
               <div className="flex justify-between">
-                <span>Hotel Tier:</span>
-                <span>{hotelObj.name}</span>
+                <span>{tItinerary.successHotelLabel}</span>
+                <span>{getHotelName(selectedHotelTier)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Chauffeur:</span>
-                <span>{vehicleObj.name}</span>
+                <span>{tItinerary.successChauffeurLabel}</span>
+                <span>{getVehicleName(selectedVehicle)}</span>
               </div>
               <div className="flex justify-between font-bold text-slate-900 border-t border-sky-200/60 pt-1.5">
-                <span>Estimated Budget:</span>
-                <span>{formatPrice(rawEstimatedUSD)} ({rawEstimatedUSD} USD)</span>
+                <span>{tItinerary.successQuotationLabel}</span>
+                <span className="text-emerald-700 font-bold">{tItinerary.successQuotationValue}</span>
               </div>
             </div>
 
             <div className="space-y-3">
               <Link
-                href={`/voucher?ref=${encodeURIComponent(submittedCode || "ITN-2026-CUSTOM")}&title=${encodeURIComponent(`${durationDays}-Day Bespoke Azerbaijan & Caucasus Tour`)}&name=${encodeURIComponent(fullName || "Valued Traveler")}&email=${encodeURIComponent(email || "")}&phone=${encodeURIComponent(phone || "")}&date=${encodeURIComponent(arrivalDate)}&guests=${adults + children}&total=${rawEstimatedUSD}&pickup=${encodeURIComponent(`Baku Hotel / ${vehicleObj.name} VIP Chauffeur`)}&addons=${encodeURIComponent(`${hotelObj.name}, ${vehicleObj.name}, ${selectedDestIds.join(" + ")}`)}&type=${encodeURIComponent("Bespoke Custom Itinerary")}`}
+                href={`/voucher?ref=${encodeURIComponent(submittedCode || "ITN-2026-CUSTOM")}&title=${encodeURIComponent(`${durationDays}-Day Bespoke Azerbaijan & Caucasus Tour`)}&name=${encodeURIComponent(fullName || "Valued Traveler")}&email=${encodeURIComponent(email || "")}&phone=${encodeURIComponent(phone || "")}&date=${encodeURIComponent(arrivalDate)}&guests=${adults + children}&total=0&pickup=${encodeURIComponent(`Baku Hotel / ${getVehicleName(selectedVehicle)} Chauffeur`)}&addons=${encodeURIComponent(`${getHotelName(selectedHotelTier)}, ${getVehicleName(selectedVehicle)}, ${selectedDestIds.map(id => getDestName(id)).join(" + ")}`)}&type=${encodeURIComponent("Bespoke Custom Itinerary")}`}
                 className="w-full rounded-2xl py-3.5 px-4 text-xs font-bold text-white bg-[#0f3460] hover:bg-[#1a4a84] shadow-md flex items-center justify-center gap-2 cursor-pointer transition-colors"
               >
                 <Sparkles className="h-4 w-4 text-amber-400" />
-                <span>View & Print Itinerary Confirmation Voucher</span>
+                <span>{tItinerary.btnViewVoucher}</span>
               </Link>
 
               <a
@@ -850,14 +862,14 @@ Please send me the detailed day-by-day itinerary proposal and official quote.`;
                 className="w-full rounded-2xl py-3.5 px-4 text-xs font-bold text-[#061225] bg-amber-500 hover:opacity-90 shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 <MessageCircle className="h-4 w-4" />
-                <span>Chat Directly with Concierge on WhatsApp</span>
+                <span>{tItinerary.btnChatWhatsApp}</span>
               </a>
 
               <Link
                 href="/"
                 className="block w-full rounded-2xl py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
               >
-                Return to Homepage
+                {tItinerary.btnReturnHome}
               </Link>
             </div>
           </div>

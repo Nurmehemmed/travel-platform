@@ -177,17 +177,7 @@ const SettingsContext = createContext<SettingsContextType>({
 });
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<PublicSettings>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
-        if (cached) {
-          return JSON.parse(cached);
-        }
-      } catch {}
-    }
-    return DEFAULT_PUBLIC_SETTINGS;
-  });
+  const [settings, setSettings] = useState<PublicSettings>(DEFAULT_PUBLIC_SETTINGS);
   const [loading, setLoading] = useState(true);
 
   const fetchSettings = async () => {
@@ -210,6 +200,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Hydrate cached settings after mount to avoid SSR hydration mismatch
+    try {
+      const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
+      if (cached) {
+        setSettings(JSON.parse(cached));
+      }
+    } catch {}
+
     fetchSettings();
 
     // Listen for cross-tab or in-app settings updates

@@ -28,7 +28,7 @@ describe("Unified Payment Gateway Router", () => {
 
     expect(result.provider).toBe("payriff");
     expect(result.isMock).toBe(true);
-    expect(result.paymentUrl).toContain("visa/pay");
+    expect(result.paymentUrl).toMatch(/(pay\/sandbox|visa\/pay)/);
   });
 
   it("routes international payments to Stripe when STRIPE_SECRET_KEY is present", async () => {

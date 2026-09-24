@@ -30,7 +30,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useSiteSettings } from "@/lib/settings-context";
 import { getVehicleConfig } from "@/lib/transfer-zones";
 import { TransferBookingSkeleton } from "@/components/Skeletons";
-import { TRANSFER_TRACK_TRANSLATIONS, LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
+import { TRANSFER_TRACK_TRANSLATIONS, TRANSFER_BOOK_TRANSLATIONS, LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
 import VoucherShareActions from "@/components/VoucherShareActions";
 
 
@@ -55,6 +55,8 @@ interface BookingData {
   paymentStatus: string;
   driverName?: string | null;
   driverPhone?: string | null;
+  femaleDriver?: boolean | null;
+  additionalGuide?: boolean | null;
   createdAt: string;
 }
 
@@ -63,6 +65,7 @@ function TransferTrackContent() {
   const { settings } = useSiteSettings();
   const searchParams = useSearchParams();
   const tt = (TRANSFER_TRACK_TRANSLATIONS[language] || TRANSFER_TRACK_TRANSLATIONS.EN)!;
+  const tb = (TRANSFER_BOOK_TRANSLATIONS[language] || TRANSFER_BOOK_TRANSLATIONS.EN)!;
 
   const initialRef = searchParams.get("ref") || "";
   const initialEmail = searchParams.get("email") || "";
@@ -394,6 +397,20 @@ function TransferTrackContent() {
                     <span>{booking.vehicleClass === "sedan" ? t.transferPage.sedan : booking.vehicleClass === "suv" ? t.transferPage.suv : t.transferPage.minivan}</span>
                   </p>
                 </div>
+                {(booking.femaleDriver || booking.additionalGuide) && (
+                  <div className="pt-1 flex flex-wrap gap-1.5">
+                    {booking.femaleDriver && (
+                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-pink-100 text-pink-700 border border-pink-200">
+                        👩‍🦰 {tb.femaleDriverLabel} ({tb.subjectToAvailabilityBadge})
+                      </span>
+                    )}
+                    {booking.additionalGuide && (
+                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-sky-100 text-sky-700 border border-sky-200">
+                        🧭 {tb.additionalGuideLabel} ({tb.subjectToAvailabilityBadge})
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 print:p-3 space-y-2">

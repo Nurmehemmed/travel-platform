@@ -37,6 +37,8 @@ interface TransferSummaryStepProps {
   luggageNotes: string;
   currentVehicle: any;
   vehicleClass: VehicleClass;
+  femaleDriver?: boolean;
+  additionalGuide?: boolean;
   pricing: any;
   isCustomZone: boolean;
   paymentMethod: "online" | "on_arrival";
@@ -75,6 +77,8 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
   luggageNotes,
   currentVehicle,
   vehicleClass,
+  femaleDriver = false,
+  additionalGuide = false,
   pricing,
   isCustomZone,
   paymentMethod,
@@ -153,6 +157,27 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
                     <p className="font-semibold text-slate-800">{phoneNumber} · {email}</p>
                   </div>
                 </div>
+
+                {(femaleDriver || additionalGuide) && (
+                  <div className="pt-2 border-t border-sky-100 space-y-2 text-xs">
+                    <div className="flex flex-wrap gap-2">
+                      {femaleDriver && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-pink-100 text-pink-800 border border-pink-200">
+                          👩‍🦰 {tb.femaleDriverLabel} <span className="opacity-75 font-medium">({tb.subjectToAvailabilityBadge})</span>
+                        </span>
+                      )}
+                      {additionalGuide && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
+                          🧭 {tb.additionalGuideLabel} <span className="opacity-75 font-medium">({tb.subjectToAvailabilityBadge})</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className="rounded-lg bg-amber-50/90 border border-amber-200/80 px-2.5 py-1.5 text-[11px] text-amber-800 flex items-start gap-1.5">
+                      <span className="shrink-0 mt-0.5 text-xs">ℹ️</span>
+                      <p className="leading-snug">{tb.subjectToAvailabilityNote}</p>
+                    </div>
+                  </div>
+                )}
 
                 {luggageNotes && (
                   <div className="pt-2 border-t border-sky-100 text-xs">

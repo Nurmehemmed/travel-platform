@@ -35,6 +35,8 @@ export interface CreateTransferBookingInput {
   phoneNumber: string;
   email: string;
   luggageNotes?: string | null;
+  femaleDriver?: boolean;
+  additionalGuide?: boolean;
   paymentMethod?: "online" | "on_arrival";
   userId?: string | null;
   clientIp?: string | null;
@@ -228,6 +230,8 @@ export class TransferService {
         phoneNumber: String(input.phoneNumber).trim(),
         email: cleanEmail,
         luggageNotes: input.luggageNotes ? String(input.luggageNotes).trim() : null,
+        femaleDriver: Boolean(input.femaleDriver),
+        additionalGuide: Boolean(input.additionalGuide),
         paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
         paymentStatus: paymentMethod === "on_arrival" || zone.isCustom ? "on_arrival" : "pending",
         status: "pending",
@@ -245,6 +249,8 @@ export class TransferService {
           airport: input.airport,
           zone: zone.name,
           vehicleClass: input.vehicleClass,
+          femaleDriver: Boolean(input.femaleDriver),
+          additionalGuide: Boolean(input.additionalGuide),
           flightNumber: input.flightNumber,
           flightDate: input.flightDate,
           totalAmount: pricing.totalAmount,
@@ -297,6 +303,8 @@ export class TransferService {
         email: cleanEmail,
         totalAmount: pricing.totalAmount,
         paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
+        femaleDriver: Boolean(input.femaleDriver),
+        additionalGuide: Boolean(input.additionalGuide),
       }).catch(console.error);
 
       return {

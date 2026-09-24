@@ -124,6 +124,8 @@ function TransferBookForm() {
   const [selectedDestinationId, setSelectedDestinationId] = useState<string>(initialLocationId);
   const [dropoffAddress, setDropoffAddress] = useState<string>(initialAddress);
   const [vehicleClass, setVehicleClass] = useState<VehicleClass>(paramVehicle);
+  const [femaleDriver, setFemaleDriver] = useState<boolean>(false);
+  const [additionalGuide, setAdditionalGuide] = useState<boolean>(false);
   const [isMapModalOpen, setIsMapModalOpen] = useState<boolean>(false);
 
   // Step 2: Flight Details
@@ -362,6 +364,8 @@ function TransferBookForm() {
         phoneNumber: phoneNumber.trim(),
         email: email.trim().toLowerCase(),
         luggageNotes: luggageNotes.trim() || undefined,
+        femaleDriver,
+        additionalGuide,
         paymentMethod: isCustomZone ? "on_arrival" : paymentMethod,
       };
 
@@ -423,6 +427,10 @@ function TransferBookForm() {
               setDropoffAddress={setDropoffAddress}
               vehicleClass={vehicleClass}
               setVehicleClass={setVehicleClass}
+              femaleDriver={femaleDriver}
+              setFemaleDriver={setFemaleDriver}
+              additionalGuide={additionalGuide}
+              setAdditionalGuide={setAdditionalGuide}
               activeVehicles={activeVehicles}
               currentZone={currentZone}
               dynamicPricingConfig={dynamicPricingConfig}
@@ -510,6 +518,8 @@ function TransferBookForm() {
               luggageNotes={luggageNotes}
               currentVehicle={currentVehicle}
               vehicleClass={vehicleClass}
+              femaleDriver={femaleDriver}
+              additionalGuide={additionalGuide}
               pricing={pricing}
               isCustomZone={Boolean(isCustomZone)}
               paymentMethod={paymentMethod}

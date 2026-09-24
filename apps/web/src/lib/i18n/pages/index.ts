@@ -8,3 +8,7 @@ export * from "./visa-page";
 export * from "./visa-apply";
 export * from "./visa-track";
 export * from "./transfer-policy";
+export * from "./esim-i18n";
+export * from "./services-hub";
+export * from "./itinerary-i18n";
+export * from "./payment-sandbox";

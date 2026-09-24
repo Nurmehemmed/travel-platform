@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useLanguage } from "@/lib/i18n";
-import { TOURS, DURATIONS } from "./_components/home/data";
+import { TOURS } from "./_components/home/data";
 import {
   HomeNavbar,
   HomeHero,
@@ -13,6 +13,7 @@ import {
   HomeWhyUs,
   HomeDestinations,
   HomeTransferPromo,
+  HomeServicesHub,
   HomeTestimonials,
   HomeTravelGuide,
   HomeFaq,
@@ -27,7 +28,6 @@ const TourReservationModal = dynamic(() => import("@/components/TourReservationM
 
 export default function HomePage() {
   const [activeFilter, setActiveFilter] = useState<string>("All");
-  const [activeDuration, setActiveDuration] = useState<string>(DURATIONS[0]);
   const [searchQuery, setSearchQuery] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [toursList, setToursList] = useState(TOURS);
@@ -216,20 +216,9 @@ export default function HomePage() {
         tour.desc.toLowerCase().includes(q) ||
         tour.tags?.some((tag: string) => tag.toLowerCase().includes(q));
 
-      const matchesDuration =
-        activeDuration === DURATIONS[0] ||
-        (activeDuration === DURATIONS[1] &&
-          (tour.duration.includes("3") || tour.duration.includes("4"))) ||
-        (activeDuration === DURATIONS[2] &&
-          (tour.duration.includes("6") ||
-            tour.duration.includes("8") ||
-            tour.duration.toLowerCase().includes("full"))) ||
-        (activeDuration === DURATIONS[3] &&
-          (tour.duration.includes("day") || tour.duration.includes("2")));
-
-      return matchesCategory && matchesSearch && matchesDuration;
+      return matchesCategory && matchesSearch;
     });
-  }, [toursList, activeFilter, searchQuery, activeDuration, savedTourIds]);
+  }, [toursList, activeFilter, searchQuery, savedTourIds]);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f0f9ff" }}>
@@ -254,11 +243,11 @@ export default function HomePage() {
 
       <HomeStatsAndTrust />
 
+      <HomeServicesHub />
+
       <HomeSearchBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        activeDuration={activeDuration}
-        setActiveDuration={setActiveDuration}
         activeFilter={activeFilter}
         setActiveFilter={setActiveFilter}
         toursCount={filteredTours.length}

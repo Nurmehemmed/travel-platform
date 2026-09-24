@@ -11,4 +11,6 @@ export * from "./HomeTestimonials";
 export * from "./HomeTravelGuide";
 export * from "./HomeFaq";
 export * from "./HomeCtaBanner";
+export * from "./HomeServicesHub";
 export * from "./HomeFooter";
+

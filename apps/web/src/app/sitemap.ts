@@ -80,5 +80,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.7,
     },
+    // ─── Tourist eSIM & Mobile Data ─────────────────────────────────
+    {
+      url: `${baseUrl}/esim`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+
+    // ─── Medical & MICE Corporate ────────────────────────────────────
+    {
+      url: `${baseUrl}/medical`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/mice`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
   ];
 }

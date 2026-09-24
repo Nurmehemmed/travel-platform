@@ -137,6 +137,8 @@ export interface TransferTelegramAlertPayload {
   email: string;
   totalAmount: number | string;
   paymentMethod: "online" | "on_arrival";
+  femaleDriver?: boolean;
+  additionalGuide?: boolean;
 }
 
 /**
@@ -178,6 +180,13 @@ export async function sendTelegramTransferAlert(
       ? `\n↩️ <b>Return Flight:</b> ${payload.returnFlightNumber} on ${payload.returnDate}`
       : "";
 
+  const prefsSection = [
+    payload.femaleDriver ? "👩‍🦰 <b>Driver:</b> Female Chauffeur (Priority Request · Subject to Availability)" : null,
+    payload.additionalGuide ? "🧭 <b>Service Option:</b> Driver + Licensed Guide (Subject to Confirmation)" : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   const text = `
 🚖 <b>NEW AIRPORT TRANSFER BOOKING</b>
 
@@ -193,6 +202,7 @@ ${vehicleLabel}
 👤 <b>Name:</b> ${payload.passengerName}
 📱 <b>Phone:</b> ${payload.phoneNumber}
 📧 <b>Email:</b> ${payload.email}
+${prefsSection ? `\n${prefsSection}` : ""}
 
 💰 <b>Total:</b> $${Number(payload.totalAmount).toFixed(2)} — ${paymentLabel}
 

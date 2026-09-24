@@ -227,6 +227,14 @@ export interface TransferBookTranslations {
   errFlightDateRequired: string;
   errFlightTimeRequired: string;
   errReturnFlightRequired: string;
+  driverGuidePrefTitle: string;
+  femaleDriverLabel: string;
+  femaleDriverDesc: string;
+  femaleDriverTag: string;
+  additionalGuideLabel: string;
+  additionalGuideDesc: string;
+  subjectToAvailabilityNote: string;
+  subjectToAvailabilityBadge: string;
 }
 
 export interface TransferTrackTranslations {

@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   MapPin, Shield, Star, Award, ChevronDown, User as UserIcon, LogOut, Bookmark, FileText, Car,
-  Sparkles, Globe, Menu, X, Share2, Copy, CheckCheck, Loader2, Heart, Check, ArrowRight
+  Sparkles, Globe, Menu, X, Share2, Copy, CheckCheck, Loader2, Heart, Check, ArrowRight, Wifi
 } from "lucide-react";
 import { useLanguage, LanguageCode } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
@@ -43,6 +43,42 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted] = useState(true);
+
+  // Hover grace period to eliminate hover jitter/flickering
+  const servicesTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleServicesMouseEnter = () => {
+    if (servicesTimeoutRef.current) {
+      clearTimeout(servicesTimeoutRef.current);
+      servicesTimeoutRef.current = null;
+    }
+    setServicesDropdownOpen(true);
+  };
+
+  const handleServicesMouseLeave = () => {
+    if (servicesTimeoutRef.current) {
+      clearTimeout(servicesTimeoutRef.current);
+    }
+    servicesTimeoutRef.current = setTimeout(() => {
+      setServicesDropdownOpen(false);
+    }, 150);
+  };
+
+  const closeServicesDropdown = () => {
+    if (servicesTimeoutRef.current) {
+      clearTimeout(servicesTimeoutRef.current);
+      servicesTimeoutRef.current = null;
+    }
+    setServicesDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (servicesTimeoutRef.current) {
+        clearTimeout(servicesTimeoutRef.current);
+      }
+    };
+  }, []);
   const { language, setLanguage, t, isRtl, currentLangInfo, languages } = useLanguage();
   const { currency, setCurrency, currencies, activeCurrency } = useCurrency();
 
@@ -82,25 +118,37 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap"
+                className="text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap shrink-0"
               >
                 {item.label}
               </Link>
             ))}
 
             {/* ── Services Dropdown (Zero mystery icons, zero overflow in any language) ── */}
+            {/* ── Services Dropdown (Eye-catching pill, zero mystery icons, zero overflow) ── */}
             <div
               id="services-dropdown-container"
-              className="relative"
-              onMouseEnter={() => setServicesDropdownOpen(true)}
-              onMouseLeave={() => setServicesDropdownOpen(false)}
+              className="relative shrink-0"
+              onMouseEnter={handleServicesMouseEnter}
+              onMouseLeave={handleServicesMouseLeave}
             >
               <button
                 type="button"
-                onClick={() => setServicesDropdownOpen((prev) => !prev)}
-                className="flex items-center gap-1 text-sm font-medium text-white/80 hover:text-white transition-colors cursor-pointer py-1.5 whitespace-nowrap"
+                onClick={() => {
+                  if (servicesTimeoutRef.current) {
+                    clearTimeout(servicesTimeoutRef.current);
+                    servicesTimeoutRef.current = null;
+                  }
+                  setServicesDropdownOpen((prev) => !prev);
+                }}
+                className={`flex items-center gap-1.5 text-xs font-bold transition-colors duration-150 cursor-pointer py-1.5 px-3 rounded-full border whitespace-nowrap shadow-sm shrink-0 ${
+                  servicesDropdownOpen
+                    ? "bg-amber-400 text-[#061225] border-amber-300 ring-2 ring-amber-400/30"
+                    : "bg-white/10 hover:bg-white/20 text-white border-white/20 hover:border-amber-400/60"
+                }`}
                 aria-expanded={servicesDropdownOpen}
               >
+                <Sparkles className={`h-3.5 w-3.5 shrink-0 ${servicesDropdownOpen ? "text-[#061225]" : "text-amber-400"}`} />
                 <span>
                   {language === "AZ"
                     ? "Xidmətlər"
@@ -114,36 +162,91 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                     ? "Services"
                     : "Services"}
                 </span>
+                <span className={`text-[9px] font-black rounded-full px-1.5 py-0.5 leading-none shrink-0 border ${
+                  servicesDropdownOpen
+                    ? "bg-[#061225] text-amber-300 border-transparent"
+                    : "bg-amber-400/20 text-amber-300 border-amber-400/30"
+                }`}>
+                  6
+                </span>
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                    servicesDropdownOpen ? "rotate-180 text-[#f59e0b]" : "text-white/70"
+                  className={`h-3 w-3 shrink-0 transition-transform duration-200 ${
+                    servicesDropdownOpen ? "rotate-180 text-[#061225]" : "text-white/70"
                   }`}
                 />
               </button>
 
               {servicesDropdownOpen && (
-                <div className="absolute start-0 top-full pt-2 w-72 z-50 animate-scale-up">
+                <div
+                  className="absolute start-0 top-full pt-2 w-80 z-50"
+                  onMouseEnter={handleServicesMouseEnter}
+                  onMouseLeave={handleServicesMouseLeave}
+                >
                   <div
-                    className="rounded-2xl p-2 shadow-2xl backdrop-blur-xl border border-white/10"
+                    className="rounded-2xl p-2.5 shadow-2xl backdrop-blur-xl border border-white/10"
                     style={{ backgroundColor: "#061225" }}
                   >
-                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-white/10 mb-1">
-                      {language === "AZ"
-                        ? "Səyahət Xidmətləri"
-                        : language === "RU"
-                        ? "Туристические Услуги"
-                        : "Travel Services"}
+                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-white/10 mb-1 flex items-center justify-between">
+                      <span>
+                        {language === "AZ"
+                          ? "Səyahət Xidmətləri"
+                          : language === "RU"
+                          ? "Туристические Услуги"
+                          : language === "FR"
+                          ? "Services Touristiques"
+                          : language === "AR"
+                          ? "خدمات السفر"
+                          : language === "DE"
+                          ? "Reise-Services"
+                          : "Travel Services"}
+                      </span>
+                      <span className="text-[9px] text-amber-400 font-semibold">6 Services</span>
                     </div>
 
+                    {/* eSIM Internet */}
+                    <Link
+                      href="/esim"
+                      onClick={closeServicesDropdown}
+                      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="p-2 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-400 shrink-0 group-hover:scale-105 transition-transform">
+                        <Wifi className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                            {language === "AZ" ? "eSIM Mobil İnternet" : language === "RU" ? "eSIM Интернет" : language === "FR" ? "eSIM Internet" : language === "AR" ? "شريحة إنترنت eSIM" : language === "DE" ? "eSIM Internet" : "Tourist eSIM Internet"}
+                          </span>
+                          <span className="rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 px-1.5 py-0.5 text-[9px] font-semibold">
+                            4G/5G
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                          {language === "AZ"
+                            ? "Sürətli internet, ani QR kod aktivasiyası"
+                            : language === "RU"
+                            ? "Высокоскоростной интернет, мгновенный QR"
+                            : language === "FR"
+                            ? "Internet 4G/5G, activation QR immédiate"
+                            : language === "AR"
+                            ? "إنترنت 4G/5G فائق السرعة مع رمز QR فوري"
+                            : language === "DE"
+                            ? "Highspeed 4G/5G, sofortige QR-Aktivierung"
+                            : "High-speed 4G/5G tourist data, instant QR"}
+                        </p>
+                      </div>
+                    </Link>
+
+                    {/* e-Visa */}
                     <Link
                       href="/visa"
-                      onClick={() => setServicesDropdownOpen(false)}
+                      onClick={closeServicesDropdown}
                       className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
                     >
                       <div className="p-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
                         <FileText className="h-4 w-4" />
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
                             {t.nav.evisa}
@@ -157,47 +260,72 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                             ? "Rəsmi ASAN Elektron Viza"
                             : language === "RU"
                             ? "Официальная виза ASAN за 3 часа"
+                            : language === "FR"
+                            ? "e-Visa officiel ASAN en 3h"
+                            : language === "AR"
+                            ? "تأشيرة ASAN الرسمية خلال 3 ساعات"
+                            : language === "DE"
+                            ? "Offizielles ASAN e-Visum in 3 Std."
                             : "Official ASAN 3-hour electronic visa"}
                         </p>
                       </div>
                     </Link>
 
+                    {/* Airport Transfer */}
                     <Link
                       href="/transfer"
-                      onClick={() => setServicesDropdownOpen(false)}
+                      onClick={closeServicesDropdown}
                       className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
                     >
                       <div className="p-2 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
                         <Car className="h-4 w-4" />
                       </div>
-                      <div>
-                        <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
-                          {t.nav.transfer}
-                        </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                            {t.nav.transfer}
+                          </span>
+                          <span className="rounded bg-sky-500/20 text-sky-300 border border-sky-500/30 px-1.5 py-0.5 text-[9px] font-semibold">
+                            24/7 VIP
+                          </span>
+                        </div>
                         <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                           {language === "AZ"
-                            ? "Heydər Əliyev Hava Limanı (GYD) transferi"
+                            ? "GYD Hava Limanı transferi · Qadın sürücü seçimi"
                             : language === "RU"
-                            ? "Встреча в аэропорту Баку 24/7"
-                            : "Baku GYD Airport 24/7 VIP pickup"}
+                            ? "Трансфер из GYD · Женщина-водитель"
+                            : language === "FR"
+                            ? "Transfert aéroport GYD · Option chauffeuse"
+                            : language === "AR"
+                            ? "توصيل مطار باكو · خيار سائقة أنثى"
+                            : language === "DE"
+                            ? "Baku GYD Transfer · Chauffeurin"
+                            : "Baku GYD Airport pickup · Female chauffeur"}
                         </p>
                       </div>
                     </Link>
 
+                    {/* Custom Itinerary */}
                     <Link
                       href="/custom-itinerary"
-                      onClick={() => setServicesDropdownOpen(false)}
+                      onClick={closeServicesDropdown}
                       className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
                     >
                       <div className="p-2 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
                         <Sparkles className="h-4 w-4" />
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
                           {language === "AZ"
-                            ? "Xüsusi Tur Planlayıcı"
+                            ? "Fərdi Tur Planlayıcı"
                             : language === "RU"
-                            ? "Индивидуальный Тур"
+                            ? "Конструктор Туров"
+                            : language === "FR"
+                            ? "Circuit Sur-Mesure"
+                            : language === "AR"
+                            ? "تصميم برنامج خاص"
+                            : language === "DE"
+                            ? "Individueller Reiseplaner"
                             : "Custom Tour Planner"}
                         </span>
                         <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
@@ -205,26 +333,57 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                             ? "Fərdi səyahət marşrutu qurun"
                             : language === "RU"
                             ? "Индивидуальный маршрут под ключ"
+                            : language === "FR"
+                            ? "Votre voyage personnalisé en Azerbaïdjan"
+                            : language === "AR"
+                            ? "صمم برنامجك السياحي الخاص"
+                            : language === "DE"
+                            ? "Maßgeschneiderte Reise durch Aserbaidschan"
                             : "Tailor-made Caucasus bespoke journeys"}
                         </p>
                       </div>
                     </Link>
 
+                    {/* Medical & MICE */}
                     <div className="border-t border-white/10 my-1 pt-1">
                       <Link
                         href="/medical"
-                        onClick={() => setServicesDropdownOpen(false)}
+                        onClick={closeServicesDropdown}
                         className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
                       >
-                        <span>{language === "AZ" ? "🩺 Tibbi Turizm" : language === "RU" ? "🩺 Медицинский Туризм" : "🩺 Medical Tourism"}</span>
+                        <span>
+                          {language === "AZ"
+                            ? "🩺 Müalicəvi Turizm & Naftalan"
+                            : language === "RU"
+                            ? "🩺 Медицинский Туризм и СПА"
+                            : language === "FR"
+                            ? "🩺 Tourisme Médical & Spa"
+                            : language === "AR"
+                            ? "🩺 السياحة العلاجية والاستشفاء"
+                            : language === "DE"
+                            ? "🩺 Medizintourismus & Kur"
+                            : "🩺 Medical Tourism & SPA"}
+                        </span>
                         <ArrowRight className="h-3 w-3 text-slate-500" />
                       </Link>
                       <Link
                         href="/mice"
-                        onClick={() => setServicesDropdownOpen(false)}
+                        onClick={closeServicesDropdown}
                         className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
                       >
-                        <span>{language === "AZ" ? "🏢 MICE & Korporativ" : language === "RU" ? "🏢 MICE и Корпоративы" : "🏢 MICE & Corporate"}</span>
+                        <span>
+                          {language === "AZ"
+                            ? "🏢 MICE & Korporativ Tədbirlər"
+                            : language === "RU"
+                            ? "🏢 MICE и Корпоративы"
+                            : language === "FR"
+                            ? "🏢 MICE & Événements d'Entreprise"
+                            : language === "AR"
+                            ? "🏢 سياحة المؤتمرات والشركات"
+                            : language === "DE"
+                            ? "🏢 MICE & Firmenevents"
+                            : "🏢 MICE & Corporate"}
+                        </span>
                         <ArrowRight className="h-3 w-3 text-slate-500" />
                       </Link>
                     </div>
@@ -424,11 +583,32 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                 </Link>
               ))}
 
+              {/* eSIM link in mobile menu */}
+              <Link
+                href="/esim"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm shadow-md mt-2 transition-transform active:scale-98 bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+              >
+                <div className="flex items-center gap-2">
+                  <Wifi className="h-4 w-4" />
+                  <span>
+                    {language === "AZ"
+                      ? "eSIM Mobil İnternet"
+                      : language === "RU"
+                      ? "eSIM Интернет"
+                      : "Tourist eSIM Internet"}
+                  </span>
+                </div>
+                <span className="rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-white/20 text-white">
+                  4G/5G
+                </span>
+              </Link>
+
               {/* e-Visa link in mobile menu */}
               <Link
                 href="/visa"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm shadow-md mt-2 transition-transform active:scale-98"
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-sm shadow-md mt-1 transition-transform active:scale-98"
                 style={{ backgroundColor: "#f59e0b", color: "#061225" }}
               >
                 <div className="flex items-center gap-2">

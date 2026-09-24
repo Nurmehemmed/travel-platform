@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { db, visaApplications, recordAuditLog } from "@travel/db";
+import { db, visaApplications, esimOrders, transferBookings, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
-import { sendTelegramVisaAlert } from "@/lib/telegram";
+import { sendTelegramVisaAlert, sendTelegramTransferAlert, notifyTelegram } from "@/lib/telegram";
 import { verifyPayriffOrder } from "@/lib/payriff";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
@@ -22,10 +22,10 @@ export async function POST(req: Request) {
     const { applicationNumber, orderId, simulated } = await req.json();
 
     if (!applicationNumber) {
-      return NextResponse.json({ error: "Missing application number" }, { status: 400 });
+      return NextResponse.json({ error: "Missing application / order reference" }, { status: 400 });
     }
 
-    logger.info("Processing payment confirmation", {
+    logger.info("Processing Payriff payment confirmation", {
       applicationNumber,
       orderId,
       simulated: !!simulated,
@@ -59,7 +59,123 @@ export async function POST(req: Request) {
       }
     }
 
-    // Find visa application
+    // ── Handle eSIM Orders (ESIM-YYYY-XXXX) ──
+    if (applicationNumber.startsWith("ESIM-")) {
+      const esim = await db.query.esimOrders.findFirst({
+        where: eq(esimOrders.orderNumber, applicationNumber),
+      });
+
+      if (!esim) {
+        return NextResponse.json({ error: "eSIM order not found" }, { status: 404 });
+      }
+
+      const lpaCode = `LPA:1$smdp.io$AZ-TOURIST-${esim.orderNumber.replace(/[^A-Z0-9]/g, "")}`;
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(lpaCode)}`;
+
+      await db.transaction(async (tx) => {
+        await tx
+          .update(esimOrders)
+          .set({
+            paymentStatus: "paid",
+            status: "confirmed",
+            payriffOrderId: orderId || `PR-SANDBOX-${esim.orderNumber}`,
+            qrCodeUrl,
+            activationNotes: `LPA Code: ${lpaCode}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(esimOrders.orderNumber, applicationNumber));
+
+        await recordAuditLog(
+          {
+            action: "payment.confirmed",
+            entityType: "esim" as any,
+            entityId: applicationNumber,
+            actorType: "customer",
+            actorEmail: esim.email,
+            ipAddress: ip,
+            metadata: {
+              orderId: orderId || null,
+              amount: esim.priceUsd,
+              costPriceUsd: esim.costPriceUsd,
+              commissionUsd: esim.commissionUsd,
+              simulated: !!simulated,
+            },
+          },
+          tx
+        );
+      });
+
+      const profitStr = esim.commissionUsd ? `\n💵 *Net Commission Profit:* +$${esim.commissionUsd} USD` : "";
+      const alertMsg = `💳 *PAID eSIM ORDER CONFIRMED (PAYRIFF SANDBOX)*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+🔖 *Order Number:* \`${esim.orderNumber}\`
+👤 *Customer:* ${esim.customerName}
+✉️ *Email:* ${esim.email}
+📱 *Phone:* \`${esim.phone}\`
+📦 *Plan:* ${esim.planName} (${esim.dataAmountGb} GB / ${esim.durationDays} Days)
+💰 *Amount Paid:* $${esim.priceUsd} USD${profitStr}
+💳 *Payriff Order ID:* \`${orderId || "Sandbox Simulated"}\`
+━━━━━━━━━━━━━━━━━━━━━━━━━
+👉 *QR Code Profile Activated and Delivered to Traveler!*`;
+
+      notifyTelegram(alertMsg).catch((err) => logger.warn("Telegram alert failed for eSIM", { err: err?.message }));
+
+      return NextResponse.json({
+        success: true,
+        applicationNumber,
+        redirectUrl: `/esim?payment=success&orderNumber=${encodeURIComponent(applicationNumber)}`,
+      });
+    }
+
+    // ── Handle Airport Transfer Bookings (ATR-XXXX) ──
+    if (applicationNumber.startsWith("ATR-")) {
+      const transfer = await db.query.transferBookings.findFirst({
+        where: eq(transferBookings.bookingNumber, applicationNumber),
+      });
+
+      if (!transfer) {
+        return NextResponse.json({ error: "Transfer booking not found" }, { status: 404 });
+      }
+
+      await db
+        .update(transferBookings)
+        .set({
+          paymentStatus: "paid",
+          status: "pending",
+          payriffOrderId: orderId || `PR-SANDBOX-${transfer.bookingNumber}`,
+          adminNotes: `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(transferBookings.bookingNumber, applicationNumber));
+
+      sendTelegramTransferAlert({
+        bookingNumber: transfer.bookingNumber,
+        direction: transfer.direction,
+        airport: transfer.airport,
+        vehicleClass: transfer.vehicleClass,
+        passengerName: transfer.passengerName,
+        passengerCount: transfer.passengerCount,
+        phoneNumber: transfer.phoneNumber,
+        email: transfer.email,
+        flightNumber: transfer.flightNumber,
+        flightDate: transfer.flightDate,
+        flightTime: transfer.flightTime,
+        pickupZone: transfer.pickupZone,
+        dropoffAddress: transfer.dropoffAddress,
+        totalAmount: transfer.totalAmount,
+        paymentMethod: "online",
+        femaleDriver: (transfer as any).femaleDriver,
+        additionalGuide: (transfer as any).additionalGuide,
+      }).catch((err) => logger.warn("Telegram transfer alert failed", { err: err?.message }));
+
+      return NextResponse.json({
+        success: true,
+        applicationNumber,
+        redirectUrl: `/transfer/track?booking=${encodeURIComponent(applicationNumber)}&paid=true`,
+      });
+    }
+
+    // ── Handle Visa Applications (AZV-XXXX / Standard) ──
     const app = await db.query.visaApplications.findFirst({
       where: eq(visaApplications.applicationNumber, applicationNumber),
     });
@@ -69,7 +185,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Application not found" }, { status: 404 });
     }
 
-    // Update payment status to paid
     await db
       .update(visaApplications)
       .set({
@@ -80,7 +195,6 @@ export async function POST(req: Request) {
       })
       .where(eq(visaApplications.applicationNumber, applicationNumber));
 
-    // Record audit trail
     await recordAuditLog({
       action: "payment.confirmed",
       entityType: "payment",
@@ -97,13 +211,6 @@ export async function POST(req: Request) {
       },
     });
 
-    logger.info("Payment confirmed successfully", {
-      applicationNumber,
-      orderId,
-      totalAmount: app.totalAmount,
-    });
-
-    // Send Telegram alert with payment confirmation
     sendTelegramVisaAlert({
       applicationNumber: app.applicationNumber,
       visaType: app.visaType,

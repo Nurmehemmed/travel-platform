@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MapPin, AlertCircle, ArrowRight, Users, Briefcase } from "lucide-react";
+import { MapPin, AlertCircle, ArrowRight, Users, Briefcase, Check } from "lucide-react";
 import { AirportCode, AIRPORTS, VEHICLE_CLASSES, VehicleClass, calculateTransferPrice, calculateRoundTripPrice } from "@/lib/transfer-zones";
 import { LOCALIZED_AIRPORTS } from "@/lib/pages-i18n";
 import { LanguageCode } from "@/lib/i18n";
@@ -19,6 +19,10 @@ interface RouteAndVehicleStepProps {
   setDropoffAddress: (val: string) => void;
   vehicleClass: VehicleClass;
   setVehicleClass: (vc: VehicleClass) => void;
+  femaleDriver?: boolean;
+  setFemaleDriver?: (val: boolean) => void;
+  additionalGuide?: boolean;
+  setAdditionalGuide?: (val: boolean) => void;
   activeVehicles?: any[];
   currentZone: any;
   dynamicPricingConfig: any;
@@ -49,6 +53,10 @@ export const RouteAndVehicleStep: React.FC<RouteAndVehicleStepProps> = ({
   setDropoffAddress,
   vehicleClass,
   setVehicleClass,
+  femaleDriver = false,
+  setFemaleDriver,
+  additionalGuide = false,
+  setAdditionalGuide,
   activeVehicles,
   currentZone,
   dynamicPricingConfig,
@@ -278,6 +286,92 @@ export const RouteAndVehicleStep: React.FC<RouteAndVehicleStepProps> = ({
                     })}
                   </div>
                 )}
+              </div>
+
+              {/* ── Driver & Service Preferences (Female Driver & Licensed Tour Guide) ── */}
+              <div className="pt-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+                  {tb.driverGuidePrefTitle}
+                </label>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Choice 1: Female Driver */}
+                  <div
+                    onClick={() => setFemaleDriver?.(!femaleDriver)}
+                    className={`cursor-pointer rounded-2xl border p-4 transition-all flex items-start gap-3.5 select-none ${
+                      femaleDriver
+                        ? "border-pink-500 bg-pink-50/70 ring-2 ring-pink-200 shadow-sm"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <div
+                      className={`flex h-5 w-5 mt-0.5 items-center justify-center rounded-md border shrink-0 transition-colors ${
+                        femaleDriver
+                          ? "bg-pink-600 border-pink-600 text-white"
+                          : "border-slate-300 bg-white"
+                      }`}
+                    >
+                      {femaleDriver && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900">
+                          {tb.femaleDriverLabel}
+                        </span>
+                        <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold bg-pink-100 text-pink-700 border border-pink-200">
+                          {tb.femaleDriverTag}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                        {tb.femaleDriverDesc}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Choice 2: Driver + Tour Guide Accompaniment */}
+                  <div
+                    onClick={() => setAdditionalGuide?.(!additionalGuide)}
+                    className={`cursor-pointer rounded-2xl border p-4 transition-all flex items-start gap-3.5 select-none ${
+                      additionalGuide
+                        ? "border-sky-600 bg-sky-50/70 ring-2 ring-sky-200 shadow-sm"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <div
+                      className={`flex h-5 w-5 mt-0.5 items-center justify-center rounded-md border shrink-0 transition-colors ${
+                        additionalGuide
+                          ? "bg-sky-600 border-sky-600 text-white"
+                          : "border-slate-300 bg-white"
+                      }`}
+                    >
+                      {additionalGuide && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900">
+                          {tb.additionalGuideLabel}
+                        </span>
+                        <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold bg-sky-100 text-sky-700 border border-sky-200">
+                          {tb.subjectToAvailabilityBadge}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                        {tb.additionalGuideDesc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subject to availability informational notice */}
+                <div className="mt-3 rounded-xl bg-amber-50/90 border border-amber-200/80 p-3 text-[11px] text-amber-900 flex items-start gap-2.5">
+                  <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="leading-relaxed">
+                    <span className="font-bold">{tb.subjectToAvailabilityBadge}:</span>{" "}
+                    {tb.subjectToAvailabilityNote}
+                  </p>
+                </div>
               </div>
 
               {/* Action Button */}
