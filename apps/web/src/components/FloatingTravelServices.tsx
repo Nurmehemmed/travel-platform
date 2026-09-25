@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { FileText, Car, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useSiteSettings } from "@/lib/settings-context";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 export default function FloatingTravelServices() {
   const pathname = usePathname();
@@ -41,113 +42,113 @@ export default function FloatingTravelServices() {
     >
       {/* Quick Services Dock (e-Visa / Airport Transfer) */}
       {showServices && isVisaPage && !isTransferPage && (
-        /* CASE 1: On Visa page -> Slim Airport Transfer Pill */
+        /* CASE 1: On Visa page -> Refined Airport Transfer Pill */
         <Link
           href="/transfer"
           aria-label="Book Baku Airport Transfer (GYD)"
-          className="group flex items-center gap-1.5 sm:gap-2.5 rounded-full pl-2 sm:pl-3 pr-2.5 sm:pr-4 py-1.5 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-sky-300/50 shrink-0"
+          className="group flex items-center gap-2 sm:gap-2.5 rounded-full pl-2 sm:pl-2.5 pr-2.5 sm:pr-3.5 py-1.5 sm:py-2 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-sky-300/50 shrink-0"
           style={{
-            backgroundColor: "rgba(15, 52, 96, 0.94)",
-            boxShadow: "0 10px 30px -5px rgba(2, 132, 199, 0.4)",
+            backgroundColor: "rgba(11, 30, 59, 0.95)",
+            boxShadow: "0 12px 35px -5px rgba(11, 30, 59, 0.7), 0 0 20px -4px rgba(14, 165, 233, 0.35)",
           }}
         >
-          <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-sky-400/20 text-sky-300 border border-sky-400/30">
-            <Car className="h-3 w-3 sm:h-3.5 sm:w-3.5" strokeWidth={2.3} />
+          <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-sky-400/25 text-sky-300 border border-sky-400/40 shadow-sm transition-transform group-hover:scale-110">
+            <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2.4} />
           </div>
-          <div className="flex flex-col text-left leading-none">
-            <span className="hidden sm:block text-[9px] font-bold uppercase tracking-wider text-sky-300/80">
-              {t.nav.transfer}
+          <div className="flex flex-col text-left leading-tight">
+            <span className="text-[9px] sm:text-[9.5px] font-extrabold uppercase tracking-wider text-sky-300/90">
+              {t.nav.transfer} · GYD
             </span>
-            <span className="text-xs font-black text-white sm:mt-0.5 flex items-center gap-1">
+            <span className="text-[12.5px] sm:text-[13.5px] font-black text-white flex items-center gap-1 tracking-tight group-hover:text-sky-200 transition-colors">
               {t.floating.transfer} <ArrowRight className="h-3 w-3 text-sky-400 group-hover:translate-x-0.5 transition-transform" />
             </span>
           </div>
-          <span className="hidden sm:inline-block ml-1 rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider bg-sky-400/20 text-sky-300 border border-sky-400/30">
+          <span className="ml-1 rounded-full px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-sky-400 to-sky-500 text-slate-950 border border-sky-200 shadow-sm shadow-sky-500/40 shrink-0">
             {t.floating.transferSupport}
           </span>
         </Link>
       )}
 
       {showServices && isTransferPage && !isVisaPage && (
-        /* CASE 2: On Transfer page -> Slim e-Visa Pill */
+        /* CASE 2: On Transfer page -> Refined e-Visa Pill */
         <Link
           href="/visa"
           aria-label="Official Azerbaijan ASAN e-Visa Online Application"
-          className="group flex items-center gap-1.5 sm:gap-2.5 rounded-full pl-2 sm:pl-3 pr-2.5 sm:pr-4 py-1.5 sm:py-2 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-amber-300/50 shrink-0"
+          className="group flex items-center gap-2 sm:gap-2.5 rounded-full pl-2 sm:pl-2.5 pr-2.5 sm:pr-3.5 py-1.5 sm:py-2 shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20 hover:border-amber-300/50 shrink-0"
           style={{
-            backgroundColor: "rgba(15, 52, 96, 0.94)",
-            boxShadow: "0 10px 30px -5px rgba(245, 158, 11, 0.4)",
+            backgroundColor: "rgba(11, 30, 59, 0.95)",
+            boxShadow: "0 12px 35px -5px rgba(11, 30, 59, 0.7), 0 0 20px -4px rgba(245, 158, 11, 0.35)",
           }}
         >
-          <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
-            <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5" strokeWidth={2.3} />
+          <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/25 text-amber-300 border border-amber-400/40 shadow-sm transition-transform group-hover:scale-110">
+            <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2.4} />
           </div>
-          <div className="flex flex-col text-left leading-none">
-            <span className="hidden sm:block text-[9px] font-bold uppercase tracking-wider text-amber-300/80">
-              Azerbaijan
+          <div className="flex flex-col text-left leading-tight">
+            <span className="text-[9px] sm:text-[9.5px] font-extrabold uppercase tracking-wider text-amber-300/90">
+              ASAN · 3H
             </span>
-            <span className="text-xs font-black text-white sm:mt-0.5 flex items-center gap-1">
+            <span className="text-[12.5px] sm:text-[13.5px] font-black text-white flex items-center gap-1 tracking-tight group-hover:text-amber-200 transition-colors">
               {t.floating.evisa} <ArrowRight className="h-3 w-3 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
             </span>
           </div>
-          <span className="hidden sm:inline-block ml-1 rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
+          <span className="ml-1 rounded-full px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 border border-amber-300 shadow-sm shadow-amber-500/40 shrink-0">
             {t.floating.evisaSpeed}
           </span>
         </Link>
       )}
 
       {showServices && !isVisaPage && !isTransferPage && (
-        /* CASE 3: Everywhere else -> Unified 2-in-1 Segmented Capsule */
+        /* CASE 3: Everywhere else -> Unified 2-in-1 Compact Refined Capsule */
         <div
-          className="flex items-center rounded-full p-1 shadow-2xl backdrop-blur-xl border border-white/20 transition-all duration-300 hover:border-white/30 shrink-0"
+          className="relative flex items-center rounded-full p-1 sm:p-1.5 shadow-2xl backdrop-blur-2xl border border-white/20 hover:border-amber-400/40 transition-all duration-300 shrink-0"
           style={{
-            backgroundColor: "rgba(15, 52, 96, 0.92)",
-            boxShadow: "0 12px 35px -5px rgba(15, 52, 96, 0.55), 0 0 20px -5px rgba(14, 165, 233, 0.25)",
+            backgroundColor: "rgba(11, 30, 59, 0.95)",
+            boxShadow: "0 14px 35px -5px rgba(11, 30, 59, 0.7), 0 0 20px -4px rgba(14, 165, 233, 0.3)",
           }}
         >
           {/* Left Segment: e-Visa */}
           <Link
             href="/visa"
             aria-label="Official Azerbaijan ASAN e-Visa Application (3h Fast Track)"
-            className="group flex items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 transition-all duration-200 hover:bg-white/12 active:scale-95 cursor-pointer whitespace-nowrap"
+            className="group flex items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 transition-all duration-200 hover:bg-amber-400/15 active:scale-95 cursor-pointer whitespace-nowrap"
           >
-            <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 transition-transform group-hover:scale-110">
-              <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5" strokeWidth={2.3} />
+            <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/25 text-amber-300 border border-amber-400/40 shadow-sm transition-transform group-hover:scale-110">
+              <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2.4} />
             </div>
-            <div className="flex flex-col text-left leading-none">
-              <span className="hidden sm:block text-[9px] font-bold uppercase tracking-wider text-amber-300/85">
-                ASAN · 3h
+            <div className="flex flex-col text-left leading-tight">
+              <span className="text-[9px] sm:text-[9.5px] font-extrabold uppercase tracking-wider text-amber-300/90">
+                ASAN · 3H
               </span>
-              <span className="text-xs font-black text-white sm:mt-0.5 whitespace-nowrap">
+              <span className="text-[12.5px] sm:text-[13.5px] font-black text-white whitespace-nowrap tracking-tight group-hover:text-amber-200 transition-colors">
                 {t.floating.evisa}
               </span>
             </div>
-            <span className="hidden sm:inline-block rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+            <span className="rounded-full px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 border border-amber-300 shadow-sm shadow-amber-500/40 shrink-0">
               {t.floating.evisaSpeed}
             </span>
           </Link>
 
           {/* Vertical Divider */}
-          <div className="h-5 sm:h-6 w-px bg-white/20 mx-0.5 shrink-0" />
+          <div className="h-5 sm:h-6 w-px bg-white/20 mx-0.5 sm:mx-1 shrink-0" />
 
           {/* Right Segment: Airport Transfer */}
           <Link
             href="/transfer"
             aria-label="Book Baku Airport (GYD) Private Transfer"
-            className="group flex items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 transition-all duration-200 hover:bg-white/12 active:scale-95 cursor-pointer whitespace-nowrap"
+            className="group flex items-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 transition-all duration-200 hover:bg-sky-400/15 active:scale-95 cursor-pointer whitespace-nowrap"
           >
-            <div className="flex h-6 w-6 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full bg-sky-400/20 text-sky-300 border border-sky-400/30 transition-transform group-hover:scale-110">
-              <Car className="h-3 w-3 sm:h-3.5 sm:w-3.5" strokeWidth={2.3} />
+            <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-sky-400/25 text-sky-300 border border-sky-400/40 shadow-sm transition-transform group-hover:scale-110">
+              <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2.4} />
             </div>
-            <div className="flex flex-col text-left leading-none">
-              <span className="hidden sm:block text-[9px] font-bold uppercase tracking-wider text-sky-300/85">
-                Airport · GYD
+            <div className="flex flex-col text-left leading-tight">
+              <span className="text-[9px] sm:text-[9.5px] font-extrabold uppercase tracking-wider text-sky-300/90">
+                AIRPORT · GYD
               </span>
-              <span className="text-xs font-black text-white sm:mt-0.5 whitespace-nowrap">
+              <span className="text-[12.5px] sm:text-[13.5px] font-black text-white whitespace-nowrap tracking-tight group-hover:text-sky-200 transition-colors">
                 {t.floating.transfer}
               </span>
             </div>
-            <span className="hidden sm:inline-block rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider bg-sky-400/20 text-sky-300 border border-sky-400/30 shrink-0">
+            <span className="rounded-full px-1.5 sm:px-2 py-0.5 text-[8px] sm:text-[8.5px] font-black uppercase tracking-wider bg-gradient-to-r from-sky-400 to-sky-500 text-slate-950 border border-sky-200 shadow-sm shadow-sky-500/40 shrink-0">
               {t.floating.transferSupport}
             </span>
           </Link>
@@ -160,9 +161,9 @@ export default function FloatingTravelServices() {
           href={settings.contact.whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`Chat with AddmeTour travel specialist on WhatsApp (${settings.contact.whatsappPhone})`}
+          aria-label={`Chat with ${CURRENT_BRAND.name} travel specialist on WhatsApp (${settings.contact.whatsappPhone})`}
           title={`Chat with us on WhatsApp (${settings.contact.whatsappPhone})`}
-          className="relative group flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full text-white shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 border border-white/25"
+          className="relative group flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full text-white shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 border border-white/20"
           style={{
             backgroundColor: "#25D366",
             boxShadow: "0 4px 20px rgba(37, 211, 102, 0.45)",
@@ -171,11 +172,11 @@ export default function FloatingTravelServices() {
           {/* Online Pulse Indicator */}
           <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-400 border-2 border-[#0f3460]" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-400 border-2 border-[#0b1e3b]" />
           </span>
 
           <svg
-            className="h-5 w-5 sm:h-6 sm:w-6 fill-current transition-transform group-hover:scale-110"
+            className="h-5 w-5 sm:h-5.5 sm:w-5.5 fill-current transition-transform group-hover:scale-110"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -186,4 +187,3 @@ export default function FloatingTravelServices() {
     </aside>
   );
 }
-
