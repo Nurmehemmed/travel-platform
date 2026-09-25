@@ -12,6 +12,7 @@ import {
 import { TransferItem, AdminLanguage } from "./types";
 import { TRANSFER_ZONES } from "@/lib/transfer-zones";
 import { TransferZonesModal } from "./modals/TransferZonesModal";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface TransfersTabProps {
   language: AdminLanguage;
@@ -370,7 +371,7 @@ export const TransfersTab: React.FC<TransfersTabProps> = ({
                       <div className="flex items-center justify-end gap-1.5">
                         <a
                           href={`https://wa.me/${item.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
-                            `Hello ${item.passengerName}! Your AddmeTour airport transfer is confirmed for flight ${item.flightNumber} (${item.flightDate} at ${item.flightTime}). Chauffeur: ${item.driverName || 'Assigned Driver'} (${item.driverPhone || 'On standby'}). Meetup: Arrival Hall exit after baggage reclaim.`
+                            `Hello ${item.passengerName}! Your ${CURRENT_BRAND.name} airport transfer is confirmed for flight ${item.flightNumber} (${item.flightDate} at ${item.flightTime}). Chauffeur: ${item.driverName || 'Assigned Driver'} (${item.driverPhone || 'On standby'}). Meetup: Arrival Hall exit after baggage reclaim.`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"

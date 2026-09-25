@@ -1,5 +1,6 @@
 import type { LanguageCode } from "../../i18n";
 import type { TransferPageTranslations } from "./types";
+import { CURRENT_BRAND } from "../../brand";
 
 export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTranslations> = {
   EN: {
@@ -32,7 +33,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     minivanDesc: "Maximum room for families, travel groups, and heavy luggage.",
     paxMax: "Passengers",
     bagsMax: "Bags",
-    whyTitle: "Why Choose AddmeTour Transfers?",
+    whyTitle: `Why Choose ${CURRENT_BRAND.name} Transfers?`,
     whyDesc: "Punctual, transparent, and completely stress-free arrival in Azerbaijan.",
     f1Title: "Flight Delay Monitoring",
     f1Desc:
@@ -100,7 +101,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     minivanDesc: "Ailələr, qruplar və çoxsaylı baqaj üçün maksimum rahatlıq.",
     paxMax: "sərnişin",
     bagsMax: "Baqaj",
-    whyTitle: "Niyə AddmeTour Transferləri?",
+    whyTitle: `Niyə ${CURRENT_BRAND.name} Transferləri?`,
     whyDesc: "Dəqiq, şəffaf və narahatlıqsız qarşılama xidməti.",
     f1Title: "Uçuşun İzlənməsi",
     f1Desc:
@@ -167,7 +168,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     minivanDesc: "Идеально для семей, компаний друзей и большого багажа.",
     paxMax: "Пассажиров",
     bagsMax: "Мест багажа",
-    whyTitle: "Преимущества трансферов AddmeTour",
+    whyTitle: `Преимущества трансферов ${CURRENT_BRAND.name}`,
     whyDesc: "Пунктуальность, комфорт и безопасность с первых минут в стране.",
     f1Title: "Отслеживание рейсов",
     f1Desc: "Мы следим за статусом рейса. При задержке водитель приедет вовремя без доплат.",
@@ -234,7 +235,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     minivanDesc: "Espace maximal pour familles, groupes et bagages volumineux.",
     paxMax: "passagers",
     bagsMax: "Bagages",
-    whyTitle: "Pourquoi Choisir AddmeTour ?",
+    whyTitle: `Pourquoi Choisir ${CURRENT_BRAND.name} ?`,
     whyDesc: "Ponctualité irréprochable et sérénité dès votre atterrissage.",
     f1Title: "Suivi des Vols en Direct",
     f1Desc: "Votre chauffeur surveille l'horaire réel du vol et s'adapte sans surcoût.",
@@ -299,7 +300,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     minivanDesc: "مساحة واسعة جداً للعائلات والمجموعات وحقائب السفر الكبيرة.",
     paxMax: "ركاب",
     bagsMax: "حقائب",
-    whyTitle: "لماذا تختار خدمات AddmeTour؟",
+    whyTitle: `لماذا تختار خدمات ${CURRENT_BRAND.name}؟`,
     whyDesc: "دقة بالمواعيد وراحة وأمان منذ لحظة وصولك إلى أذربيجان.",
     f1Title: "تتبع مواعيد الطيران",
     f1Desc: "نتابع رحلتك مباشرة، ويتواجد السائق بالموعد الدقيق مع 60 دقيقة انتظار مجانية.",
@@ -366,7 +367,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     minivanDesc: "Maximaler Raum für Familien, Reisegruppen und umfangreiches Gepäck.",
     paxMax: "Passagiere",
     bagsMax: "Gepäckstücke",
-    whyTitle: "Warum AddmeTour Transfers?",
+    whyTitle: `Warum ${CURRENT_BRAND.name} Transfers?`,
     whyDesc: "Pünktliche, zuverlässige und stressfreie Ankunft in Aserbaidschan.",
     f1Title: "Echtzeit-Flugüberwachung",
     f1Desc:

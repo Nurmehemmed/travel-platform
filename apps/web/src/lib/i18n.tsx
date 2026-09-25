@@ -10,6 +10,7 @@ import {
   VisaPageTranslations,
   NavExtraTranslations,
 } from "./pages-i18n";
+import { CURRENT_BRAND } from "./brand";
 
 export type LanguageCode = "EN" | "AZ" | "RU" | "FR" | "AR" | "DE";
 
@@ -270,7 +271,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       savedToastRemove: "Removed from saved tours",
     },
     whyUs: {
-      badge: "The AddmeTour Standard",
+      badge: `The ${CURRENT_BRAND.name} Standard`,
       title: "Why Travelers Choose Us",
       subtitle: "We believe true travel is measured in authentic human connections, not just checkboxes on a map.",
       feature1Title: "Certified Local Storytellers",
@@ -323,7 +324,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       desc: "Boutique private tours, verified airport transfers, and 3-hour expedited e-Visas across Azerbaijan.",
       quickLinks: "Quick Navigation",
       contact: "Contact Operations",
-      rights: "All rights reserved. AddmeTour Travel Services LLC.",
+      rights: `All rights reserved. ${CURRENT_BRAND.legalName}.`,
       supportAvailable: "24/7 Operations Support via WhatsApp & Phone",
     },
     floating: {
@@ -444,7 +445,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       savedToastRemove: "Seçilmişlərdən silindi",
     },
     whyUs: {
-      badge: "AddmeTour Üstünlükləri",
+      badge: `${CURRENT_BRAND.name} Üstünlükləri`,
       title: "Niyə Bizi Seçirlər?",
       subtitle: "Biz səyahəti sadəcə xəritədə nöqtələr deyil, unudulmaz xatirələr və səmimi münasibət hesab edirik.",
       feature1Title: "Sertifikatlı Yerli Bələdçilər",
@@ -497,7 +498,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       desc: "Azərbaycan üzrə butik fərdi turlar, hava limanı transferləri və 3 saatlıq təcili e-Viza xidməti.",
       quickLinks: "Keçidlər",
       contact: "Əlaqə Mərkəzi",
-      rights: "Bütün hüquqlar qorunur. AddmeTour MMC.",
+      rights: `Bütün hüquqlar qorunur. ${CURRENT_BRAND.legalName}.`,
       supportAvailable: "WhatsApp və zənglə 24/7 operativ dəstək",
     },
     floating: {
@@ -618,7 +619,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       savedToastRemove: "Удалено из избранного",
     },
     whyUs: {
-      badge: "Стандарты AddmeTour",
+      badge: `Стандарты ${CURRENT_BRAND.name}`,
       title: "Почему выбирают нас",
       subtitle: "Для нас путешествие — это искренние эмоции и душевные встречи, а не формальные галочки на карте.",
       feature1Title: "Лицензированные гиды-историки",
@@ -671,7 +672,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       desc: "Авторские туры по Азербайджану, надежные трансферы и срочные e-Визы за 3 часа.",
       quickLinks: "Навигация",
       contact: "Служба заботы",
-      rights: "Все права защищены. AddmeTour Travel LLC.",
+      rights: `Все права защищены. ${CURRENT_BRAND.legalName}.`,
       supportAvailable: "Круглосуточная поддержка в WhatsApp и по телефону",
     },
     floating: {
@@ -792,7 +793,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       savedToastRemove: "Retiré des favoris",
     },
     whyUs: {
-      badge: "L'Excellence AddmeTour",
+      badge: `L'Excellence ${CURRENT_BRAND.name}`,
       title: "Pourquoi Voyager Avec Nous",
       subtitle: "Nous croyons que le vrai voyage repose sur des connexions humaines authentiques, pas sur de simples cases cochées.",
       feature1Title: "Guides Locaux Certifiés",
@@ -845,7 +846,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       desc: "Circuits privés sur mesure, transferts aéroport fiables et e-Visas officiels express en 3h en Azerbaïdjan.",
       quickLinks: "Navigation Rapide",
       contact: "Contact Opérations",
-      rights: "Tous droits réservés. AddmeTour Voyages SARL.",
+      rights: `Tous droits réservés. ${CURRENT_BRAND.legalName}.`,
       supportAvailable: "Assistance opérationnelle 24/7 via WhatsApp & Téléphone",
     },
     floating: {
@@ -966,7 +967,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       savedToastRemove: "تم الحذف من المفضلة",
     },
     whyUs: {
-      badge: "معايير AddmeTour",
+      badge: `معايير ${CURRENT_BRAND.name}`,
       title: "لماذا يختارنا المسافرون؟",
       subtitle: "نحن نؤمن بأن السفر الحقيقي هو تجارب إنسانية وذكريات لا تُنسى، وليس مجرد نقاط على الخريطة.",
       feature1Title: "مرشدون محليون معتمدون",
@@ -1019,7 +1020,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       desc: "برامج سياحية خاصة وراقية، خدمات نقل المطار المعتمدة، وتأشيرة أذربيجان السريعة خلال 3 ساعات.",
       quickLinks: "روابط سريعة",
       contact: "مركز العمليات",
-      rights: "جميع الحقوق محفوظة. شركة AddmeTour للسياحة والخدمات.",
+      rights: `جميع الحقوق محفوظة. شركة ${CURRENT_BRAND.name} للسياحة والخدمات.`,
       supportAvailable: "دعم فوري متواصل 24/7 عبر واتساب والمكالمات",
     },
     floating: {
@@ -1140,7 +1141,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       savedToastRemove: "Aus Favoriten entfernt",
     },
     whyUs: {
-      badge: "Der AddmeTour-Standard",
+      badge: `Der ${CURRENT_BRAND.name}-Standard`,
       title: "Warum Reisende uns wählen",
       subtitle: "Wir glauben, dass echtes Reisen durch authentische Begegnungen entsteht, nicht durch bloßes Abhaken von Sehenswürdigkeiten.",
       feature1Title: "Zertifizierte lokale Guides",
@@ -1193,7 +1194,7 @@ export const TRANSLATIONS: Record<LanguageCode, BaseTranslations> = {
       desc: "Individuelle Boutique-Touren, zuverlässige Flughafentransfers und 3-Stunden-Express-Visas in Aserbaidschan.",
       quickLinks: "Navigation",
       contact: "Betriebszentrale",
-      rights: "Alle Rechte vorbehalten. AddmeTour Travel Services LLC.",
+      rights: `Alle Rechte vorbehalten. ${CURRENT_BRAND.legalName}.`,
       supportAvailable: "24/7 Kundenservice via WhatsApp & Telefon",
     },
     floating: {

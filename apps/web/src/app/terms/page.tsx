@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import CurrencySelector from "@/components/CurrencySelector";
+import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 import { useLanguage } from "@/lib/i18n";
 
 export default function TermsOfServicePage() {
@@ -28,12 +30,7 @@ export default function TermsOfServicePage() {
       <header className="sticky top-0 z-50 bg-[#0f3460] shadow-md border-b border-white/10">
         <div className="container-section flex h-16 items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "#0ea5e9" }}>
-              <Compass className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg sm:text-xl tracking-tight text-white">
-              addmetour
-            </span>
+            <BrandLogo variant="light" />
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -62,7 +59,7 @@ export default function TermsOfServicePage() {
             Terms of Service & Booking Conditions
           </h1>
           <p className="mt-2 text-sm sm:text-base text-sky-100/85 max-w-2xl">
-            Please read these terms carefully before booking airport transfers, tours, custom itineraries, or e-Visa services through AddmeTour.
+            Please read these terms carefully before booking airport transfers, tours, custom itineraries, or e-Visa services through {CURRENT_BRAND.name}.
           </p>
           <div className="mt-4 text-xs text-sky-300/75">
             Effective Date: September 1, 2026 · Baku, Republic of Azerbaijan
@@ -79,7 +76,7 @@ export default function TermsOfServicePage() {
             <span>Acceptance of Terms & Company Information</span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            These Terms of Service (&ldquo;Terms&rdquo;) constitute a legally binding agreement between you (&ldquo;Customer&rdquo;, &ldquo;Traveler&rdquo;) and <strong>AddmeTour LLC</strong> (&ldquo;AddmeTour&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;), registered in the Republic of Azerbaijan. By accessing our website (<a href="https://addmetour.com" className="text-sky-600 underline">addmetour.com</a>) or booking any travel service, you acknowledge that you have read, understood, and agreed to be bound by these Terms.
+            These Terms of Service (&ldquo;Terms&rdquo;) constitute a legally binding agreement between you (&ldquo;Customer&rdquo;, &ldquo;Traveler&rdquo;) and <strong>{CURRENT_BRAND.legalName}</strong> (&ldquo;{CURRENT_BRAND.name}&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;), registered in the Republic of Azerbaijan. By accessing our website (<a href={`https://${CURRENT_BRAND.domain}`} className="text-sky-600 underline">{CURRENT_BRAND.domain}</a>) or booking any travel service, you acknowledge that you have read, understood, and agreed to be bound by these Terms.
           </p>
         </div>
 
@@ -90,7 +87,7 @@ export default function TermsOfServicePage() {
             <span>Services Provided</span>
           </h2>
           <div className="text-xs sm:text-sm text-slate-600 leading-relaxed space-y-2">
-            <p>AddmeTour provides premium travel technology and destination management services across Azerbaijan, including:</p>
+            <p>{CURRENT_BRAND.name} provides premium travel technology and destination management services across Azerbaijan, including:</p>
             <ul className="list-disc pl-6 space-y-1.5 marker:text-sky-500">
               <li><strong>Private Airport Transfers:</strong> Door-to-door meet & greet transfers across GYD (Baku), GJA (Ganja), and NAJ (Nakhchivan) airports.</li>
               <li><strong>Guided Tours & Excursions:</strong> Day tours, mountain excursions (Shahdag, Qabala), historical tours, and private cultural journeys.</li>
@@ -108,7 +105,7 @@ export default function TermsOfServicePage() {
           </h2>
           <div className="text-xs sm:text-sm text-slate-600 leading-relaxed space-y-2">
             <p>
-              All prices displayed on AddmeTour are transparent and all-inclusive of taxes, tolls, and booking fees. 
+              All prices displayed on {CURRENT_BRAND.name} are transparent and all-inclusive of taxes, tolls, and booking fees. 
               Online card payments are securely processed in real-time through our licensed banking partner <strong>Payriff</strong> (supporting Visa, Mastercard, and 3D-Secure 2.0).
             </p>
             <p>
@@ -186,11 +183,11 @@ export default function TermsOfServicePage() {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href="mailto:support@addmetour.com"
+              href={`mailto:${CURRENT_BRAND.supportEmail}`}
               className="rounded-xl bg-slate-100 hover:bg-sky-50 text-sky-700 px-4 py-2 text-xs font-bold transition-all border border-slate-200 flex items-center gap-1.5"
             >
               <Mail className="h-3.5 w-3.5" />
-              <span>support@addmetour.com</span>
+              <span>{CURRENT_BRAND.supportEmail}</span>
             </a>
             <a
               href="tel:+994124047888"

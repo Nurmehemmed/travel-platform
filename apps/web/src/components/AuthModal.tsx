@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MapPin, Eye, EyeOff, X, Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export interface AuthUser {
   id: string;
@@ -127,15 +128,7 @@ export function AuthModal({
 
         {/* Logo */}
         <div className="flex items-center gap-2 mb-6">
-          <div
-            className="flex h-7 w-7 items-center justify-center rounded-full"
-            style={{ backgroundColor: "#f59e0b" }}
-          >
-            <MapPin className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
-          </div>
-          <span className="font-bold text-base tracking-tight" style={{ color: "#f59e0b" }}>
-            addmetour
-          </span>
+          <BrandLogo variant="dark" />
         </div>
 
         {/* Tab Pill Switcher */}

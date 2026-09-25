@@ -1,4 +1,5 @@
 import { LanguageCode } from "./i18n";
+import { CURRENT_BRAND } from "./brand";
 
 export interface AdminTranslations {
   sidebar: {
@@ -247,7 +248,7 @@ export interface AdminTranslations {
 export const ADMIN_TRANSLATIONS: Record<"EN" | "AZ", AdminTranslations> = {
   EN: {
     sidebar: {
-      portalTitle: "addmetour",
+      portalTitle: CURRENT_BRAND.brandMark || CURRENT_BRAND.name.toLowerCase(),
       brandSubtitle: "Admin Portal",
       overview: "Overview",
       tours: "Tours & Packages",
@@ -490,7 +491,7 @@ export const ADMIN_TRANSLATIONS: Record<"EN" | "AZ", AdminTranslations> = {
   },
   AZ: {
     sidebar: {
-      portalTitle: "addmetour",
+      portalTitle: CURRENT_BRAND.brandMark || CURRENT_BRAND.name.toLowerCase(),
       brandSubtitle: "Admin Panel",
       overview: "Ümumi Baxış",
       tours: "Turlar və Paketlər",

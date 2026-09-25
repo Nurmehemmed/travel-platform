@@ -1,4 +1,5 @@
 import { TourDetailData, TOURS_CATALOG } from "./tours-data";
+import { CURRENT_BRAND } from "./brand";
 
 export interface DestinationHighlight {
   title: string;
@@ -304,7 +305,7 @@ export const DESTINATIONS_CATALOG: DestinationDetailData[] = [
       { name: "Ganja Shah Pilaf & Dovga", desc: "Herb-rich yogurt soup (Dovga) followed by saffron lamb pilaf." },
     ],
     localTips: [
-      "A complete medical course is typically 7 to 14 days under doctor supervision, with medical package packages available via AddmeTour.",
+      `A complete medical course is typically 7 to 14 days under doctor supervision, with medical package packages available via ${CURRENT_BRAND.name}.`,
     ],
     tourSlugs: ["sheki-cultural-journey"],
   },

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useLanguage, LanguageCode } from "@/lib/i18n";
 import { PAYMENT_SANDBOX_TRANSLATIONS } from "@/lib/i18n/pages/payment-sandbox";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 function PayriffSandboxContent() {
   const searchParams = useSearchParams();
@@ -149,7 +150,7 @@ function PayriffSandboxContent() {
           <div className="flex items-start justify-between border-b border-slate-700 pb-5 mb-6">
             <div>
               <p className="text-xs text-slate-400 uppercase font-semibold tracking-wider">{tPay.merchantLabel} • {serviceTitle}</p>
-              <p className="font-bold text-white text-base">AddmeTour Azerbaijan</p>
+              <p className="font-bold text-white text-base">{CURRENT_BRAND.name} Azerbaijan</p>
               <p className="text-xs text-slate-400 mt-0.5">{tPay.orderRefLabel}: <span className="font-mono text-cyan-400">{ref || "TEST-DIRECT"}</span></p>
             </div>
             <div className="text-right">

@@ -1,17 +1,17 @@
-# AddmeTour
+# Bakuya
 
 > Handcrafted Azerbaijan tours, boutique travel experiences, and fast online electronic visa (ASAN Visa) assistance.
 
-AddmeTour is a boutique travel agency based in Baku, Azerbaijan. We specialize in private and small-group authentic travel experiences across Baku, Gobustan, Sheki, and the Great Caucasus mountains.
+Bakuya is a boutique travel agency based in Baku, Azerbaijan. We specialize in private and small-group authentic travel experiences across Baku, Gobustan, Sheki, and the Great Caucasus mountains.
 
 ## Core Offerings
 
-- [Tours & Experiences](https://addmetour.com/#tours): Authentic guided tours across Azerbaijan including cultural, historical, mountain adventure, and day trips.
-- [Azerbaijan e-Visa Portal](https://addmetour.com/visa): Fast-track electronic visa application for over 95 countries with standard (3 days) and urgent (3 hours) processing.
-- [Baku Old City Walking Tour](https://addmetour.com/#tours): In-depth historical walking tour of UNESCO-listed Icherisheher, Maiden Tower, and Shirvanshahs Palace.
-- [Gobustan Petroglyphs & Mud Volcanoes](https://addmetour.com/#tours): Exploration of 40,000-year-old rock carvings, active bubbling mud volcanoes, and prehistoric sites.
-- [Absheron Peninsula Fire Temple Tour](https://addmetour.com/#tours): Visit the historic Ateshgah Fire Temple and the burning mountain Yanar Dag.
-- [Sheki & Great Caucasus Tour](https://addmetour.com/#tours): 2-day heritage journey through mountain foothills to Sheki Khan Palace and ancient caravanserais.
+- [Tours & Experiences](https://bakuya.com/#tours): Authentic guided tours across Azerbaijan including cultural, historical, mountain adventure, and day trips.
+- [Azerbaijan e-Visa Portal](https://bakuya.com/visa): Fast-track electronic visa application for over 95 countries with standard (3 days) and urgent (3 hours) processing.
+- [Baku Old City Walking Tour](https://bakuya.com/#tours): In-depth historical walking tour of UNESCO-listed Icherisheher, Maiden Tower, and Shirvanshahs Palace.
+- [Gobustan Petroglyphs & Mud Volcanoes](https://bakuya.com/#tours): Exploration of 40,000-year-old rock carvings, active bubbling mud volcanoes, and prehistoric sites.
+- [Absheron Peninsula Fire Temple Tour](https://bakuya.com/#tours): Visit the historic Ateshgah Fire Temple and the burning mountain Yanar Dag.
+- [Sheki & Great Caucasus Tour](https://bakuya.com/#tours): 2-day heritage journey through mountain foothills to Sheki Khan Palace and ancient caravanserais.
 
 ## Customer Support & Booking
 
@@ -21,6 +21,6 @@ AddmeTour is a boutique travel agency based in Baku, Azerbaijan. We specialize i
 
 ## Key Links
 
-- [Home](https://addmetour.com/): Official website and tour catalog
-- [Visa Application](https://addmetour.com/visa/apply): Apply for an Azerbaijan eVisa online
-- [Visa Tracking](https://addmetour.com/visa/track): Check status of an existing visa application
+- [Home](https://bakuya.com/): Official website and tour catalog
+- [Visa Application](https://bakuya.com/visa/apply): Apply for an Azerbaijan eVisa online
+- [Visa Tracking](https://bakuya.com/visa/track): Check status of an existing visa application

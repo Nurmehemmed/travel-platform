@@ -32,7 +32,7 @@ export function constructMetadata({
   noIndex = false,
   type = "website",
 }: ConstructMetadataProps = {}): Metadata {
-  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://addmetour.com").replace(/\/$/, "");
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || `https://${CURRENT_BRAND.domain}`).replace(/\/$/, "");
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const canonicalUrl = `${baseUrl}${normalizedPath === "/" ? "" : normalizedPath}`;
 
@@ -77,7 +77,7 @@ export function constructMetadata({
       title,
       description,
       images: [image.startsWith("http") ? image : `${baseUrl}${image.startsWith("/") ? "" : "/"}${image}`],
-      creator: "@AddmeTour",
+      creator: `@${CURRENT_BRAND.name}`,
     },
     robots: {
       index: !noIndex,

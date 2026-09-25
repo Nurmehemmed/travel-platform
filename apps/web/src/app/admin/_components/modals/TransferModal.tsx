@@ -3,6 +3,7 @@
 import React from "react";
 import { X, MapPin, MessageCircle } from "lucide-react";
 import { TransferItem, AdminLanguage } from "../types";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface TransferModalProps {
   isOpen: boolean;
@@ -257,7 +258,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({
                     href={`https://wa.me/${
                       editDriverPhone.replace(/\D/g, "") || ""
                     }?text=${encodeURIComponent(
-                      `🚖 *ADDMETOUR — CHAUFFEUR DISPATCH*\n• Ref: ${
+                      `🚖 *${CURRENT_BRAND.name.toUpperCase()} — CHAUFFEUR DISPATCH*\n• Ref: ${
                         selectedTransfer.bookingNumber
                       }\n• Flight: ${selectedTransfer.flightNumber} (${
                         selectedTransfer.airport
@@ -302,7 +303,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({
                     )}?text=${encodeURIComponent(
                       `👋 Hello ${
                         selectedTransfer.passengerName
-                      }! Your AddmeTour airport transfer is confirmed for flight ${
+                      }! Your ${CURRENT_BRAND.name} airport transfer is confirmed for flight ${
                         selectedTransfer.flightNumber
                       }:\n• Chauffeur: ${
                         editDriverName ||
@@ -318,7 +319,7 @@ export const TransferModal: React.FC<TransferModalProps> = ({
                           : ""
                       }\n• Airport: ${
                         selectedTransfer.airport
-                      }\n• Meeting Point: Arrival Hall exit after baggage reclaim (Chauffeur will hold AddmeTour sign with your name).\n• Free Waiting: 60 minutes after actual landing.\nWishing you a safe flight to Baku!`
+                      }\n• Meeting Point: Arrival Hall exit after baggage reclaim (Chauffeur will hold ${CURRENT_BRAND.name} sign with your name).\n• Free Waiting: 60 minutes after actual landing.\nWishing you a safe flight to Baku!`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

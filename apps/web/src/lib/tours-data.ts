@@ -1,4 +1,5 @@
 import type { LanguageCode } from "./i18n";
+import { CURRENT_BRAND } from "./brand";
 
 export interface TourItineraryStop {
   time: string;
@@ -91,7 +92,7 @@ export const TOURS_CATALOG: TourDetailData[] = [
     meetingPoint: {
       name: "Icherisheher Metro Station Square (Near Maiden Tower Gate)",
       address: "Istiglaliyyat Street, Icherisheher, Baku 1005",
-      instructions: "Your guide will be holding an orange AddmeTour sign next to the main ancient stone gate arches directly outside the Icherisheher metro exit.",
+      instructions: `Your guide will be holding an orange ${CURRENT_BRAND.name} sign next to the main ancient stone gate arches directly outside the Icherisheher metro exit.`,
       lat: 40.3664,
       lng: 49.8315,
     },

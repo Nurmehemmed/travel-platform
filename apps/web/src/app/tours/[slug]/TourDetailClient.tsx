@@ -16,6 +16,8 @@ import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { DatePicker } from "@/components/DatePicker";
+import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 
 interface TourDetailClientProps {
@@ -169,7 +171,7 @@ export default function TourDetailClient({ tour, relatedTours }: TourDetailClien
       .filter(Boolean)
       .join(", ");
 
-    const text = `Hello AddmeTour! I'd like to book:
+    const text = `Hello ${CURRENT_BRAND.name}! I'd like to book:
 🏛️ Tour: ${tour.title}
 📅 Date: ${formattedDateString}
 👥 Guests: ${adults} Adults${children > 0 ? `, ${children} Children` : ""}
@@ -227,12 +229,7 @@ Please confirm guide availability and pickup details.`;
       >
         <div className="container-section flex h-16 items-center justify-between gap-3">
           <Link href="/" className="flex shrink-0 items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500">
-              <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg tracking-tight text-amber-500">
-              addmetour
-            </span>
+            <BrandLogo variant="light" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-4 text-sm font-medium text-white/80">

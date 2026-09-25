@@ -15,6 +15,8 @@ import { useCurrency } from "@/lib/currency-context";
 import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
+import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface DestinationDetailClientProps {
   destination: DestinationDetailData;
@@ -53,12 +55,7 @@ export default function DestinationDetailClient({
       >
         <div className="container-section flex h-16 items-center justify-between gap-3">
           <Link href="/" className="flex shrink-0 items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500">
-              <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg tracking-tight text-amber-500">
-              addmetour
-            </span>
+            <BrandLogo variant="light" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-4 text-sm font-medium text-white/80">
@@ -77,7 +74,7 @@ export default function DestinationDetailClient({
             <CurrencySelector variant="dark" />
             <a
               href={`https://wa.me/${settings?.contact?.whatsappClean || "994551003146"}?text=${encodeURIComponent(
-                `Hello AddmeTour! I'd like information on visiting ${destination.name}.`
+                `Hello ${CURRENT_BRAND.name}! I'd like information on visiting ${destination.name}.`
               )}`}
               target="_blank"
               rel="noopener noreferrer"

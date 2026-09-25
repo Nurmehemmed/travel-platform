@@ -37,7 +37,7 @@ const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
-  "https://addmetour.com";
+  `https://${CURRENT_BRAND.domain}`;
 
 export const metadata: Metadata = {
   title: {
@@ -48,9 +48,7 @@ export const metadata: Metadata = {
     "Official Azerbaijan Inbound DMC & Tour Operator. Fast 3-hour ASAN Electronic Visa (e-Visa), 24/7 Baku Airport VIP transfers, and curated Caucasus private & group tour packages. 4.9★ Rated.",
   keywords: [
     CURRENT_BRAND.name,
-    "Bakuya Azerbaijan",
-    "AddmeTour",
-    "AddmeTravel",
+    `${CURRENT_BRAND.name} Azerbaijan`,
     "Azerbaijan tours",
     "Baku tours",
     "Azerbaijan visa online",
@@ -157,7 +155,7 @@ const jsonLd = {
       description:
         "Premier Destination Management Company (DMC) in Baku offering official ASAN e-Visas, 24/7 airport chauffeur transfers, small-group cultural journeys, and luxury Caucasus itineraries.",
       telephone: "+994 55 100 31 46",
-      email: "bookings@addmetour.com",
+      email: CURRENT_BRAND.supportEmail,
       priceRange: "$$",
       currenciesAccepted: "USD, EUR, AZN, GBP, AED, SAR",
       paymentAccepted: "Credit Card, Debit Card, Visa, MasterCard, Cash on Arrival",
@@ -190,10 +188,10 @@ const jsonLd = {
         },
       ],
       sameAs: [
-        "https://instagram.com/addmetour",
-        "https://x.com/addmetour",
-        "https://linkedin.com/company/addmetour",
-        "https://facebook.com/addmetour",
+        `https://instagram.com/${CURRENT_BRAND.brandKey}`,
+        `https://x.com/${CURRENT_BRAND.brandKey}`,
+        `https://linkedin.com/company/${CURRENT_BRAND.brandKey}`,
+        `https://facebook.com/${CURRENT_BRAND.brandKey}`,
       ],
       hasOfferCatalog: {
         "@type": "OfferCatalog",
@@ -228,7 +226,7 @@ const jsonLd = {
       "@type": "WebSite",
       "@id": `${APP_URL}/#website`,
       url: APP_URL,
-      name: "AddmeTour",
+      name: CURRENT_BRAND.name,
       publisher: {
         "@id": `${APP_URL}/#organization`,
       },

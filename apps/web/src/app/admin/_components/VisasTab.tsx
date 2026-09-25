@@ -11,6 +11,7 @@ import {
   Copy,
 } from "lucide-react";
 import { VisaItem, LightboxImage, AdminLanguage } from "./types";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface VisasTabProps {
   language: AdminLanguage;
@@ -266,7 +267,7 @@ export const VisasTab: React.FC<VisasTabProps> = ({
                         )}
                         <a
                           href={`https://wa.me/${visa.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
-                            `Hello ${visa.givenNames}! This is AddmeTour regarding your Azerbaijan eVisa order (${visa.applicationNumber}).`
+                            `Hello ${visa.givenNames}! This is ${CURRENT_BRAND.name} regarding your Azerbaijan eVisa order (${visa.applicationNumber}).`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"

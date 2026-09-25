@@ -6,16 +6,19 @@ import { MapPin } from "lucide-react";
 import { CURRENT_BRAND } from "@/lib/brand";
 
 export interface BrandLogoProps {
-  variant?: "header" | "footer" | "full" | "emblem" | "compact";
+  /** 'light' = alias for 'header' (white/light background), 'dark' = alias for 'footer' (dark background) */
+  variant?: "header" | "footer" | "full" | "emblem" | "compact" | "light" | "dark";
   className?: string;
   showTagline?: boolean;
 }
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
-  variant = "header",
+  variant: rawVariant = "header",
   className = "",
   showTagline = true,
 }) => {
+  // Normalize convenience aliases
+  const variant = rawVariant === "light" ? "header" : rawVariant === "dark" ? "footer" : rawVariant;
   const isModern = CURRENT_BRAND.brandKey === "bakuya" || CURRENT_BRAND.brandKey === "hibaku";
 
   // Helper for styled wordmark
@@ -111,7 +114,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
           <MapPin className="h-5 w-5 text-white" strokeWidth={2.5} />
         </div>
         <span className="font-bold text-xl tracking-tight text-amber-500">
-          addmetour
+          {CURRENT_BRAND.name}
         </span>
       </div>
     );
@@ -146,14 +149,14 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     );
   }
 
-  // Fallback to classic AddmeTour
+  // Fallback to classic wordmark
   return (
     <div className={`flex shrink-0 items-center gap-2 group ${className}`}>
       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500">
         <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
       </div>
       <span className="font-bold text-lg tracking-tight text-amber-500">
-        addmetour
+        {CURRENT_BRAND.name}
       </span>
     </div>
   );

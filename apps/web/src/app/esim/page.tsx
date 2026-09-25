@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { CURRENT_BRAND } from "@/lib/brand";
 import EsimClient from "./EsimClient";
 
 export const metadata: Metadata = {
-  title: "Azerbaijan Tourist eSIM (4G/5G) | High-Speed Mobile Internet",
+  title: `Azerbaijan Tourist eSIM (4G/5G) | High-Speed Mobile Internet | ${CURRENT_BRAND.name}`,
   description:
     "Instant high-speed 4G/5G tourist eSIM for Azerbaijan. Instant QR delivery via email & WhatsApp. Keep your home number & WhatsApp active. Compatible with iPhone, Galaxy & Pixel.",
   keywords: [
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     title: "Azerbaijan Tourist eSIM | Instant 4G/5G QR Delivery",
     description:
       "Stay connected the second you land in Baku. High-speed 4G/5G tourist data packages from 3GB to 20GB. Instant QR activation.",
-    url: "https://addmetour.com/esim",
+    url: `https://${CURRENT_BRAND.domain}/esim`,
     type: "website",
   },
 };

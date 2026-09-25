@@ -3,6 +3,7 @@
 import React from "react";
 import { X, MessageCircle } from "lucide-react";
 import { TourReservationItem, AdminLanguage } from "../types";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface TourReservationModalProps {
   isOpen: boolean;
@@ -137,7 +138,7 @@ export const TourReservationModal: React.FC<TourReservationModalProps> = ({
                       /\D/g,
                       ""
                     )}?text=${encodeURIComponent(
-                      `Hello ${selectedTourRes.travelerName}! This is AddmeTour regarding your tour reservation for "${selectedTourRes.tourTitle}" on ${selectedTourRes.tourDate} (Ref: ${selectedTourRes.reservationNumber}).`
+                      `Hello ${selectedTourRes.travelerName}! This is ${CURRENT_BRAND.name} regarding your tour reservation for "${selectedTourRes.tourTitle}" on ${selectedTourRes.tourDate} (Ref: ${selectedTourRes.reservationNumber}).`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

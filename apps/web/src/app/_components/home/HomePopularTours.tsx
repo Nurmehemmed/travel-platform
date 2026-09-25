@@ -9,6 +9,7 @@ import { useCurrency } from "@/lib/currency-context";
 import { useSiteSettings } from "@/lib/settings-context";
 import { getLocalizedTour } from "@/lib/tours-i18n";
 import { TourCardsSkeleton } from "@/components/Skeletons";
+import { CURRENT_BRAND } from "@/lib/brand";
 import { TOUR_FILTERS } from "./data";
 
 interface HomePopularToursProps {
@@ -264,7 +265,7 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                         </button>
                         <a
                           href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(
-                            `Hello AddmeTour! I would like to book the "${tourTitle}" tour (${formatPrice(tour.price)} / $${tour.price} USD).`
+                            `Hello ${CURRENT_BRAND.name}! I would like to book the "${tourTitle}" tour (${formatPrice(tour.price)} / $${tour.price} USD).`
                           )}`}
                           target="_blank"
                           rel="noopener noreferrer"

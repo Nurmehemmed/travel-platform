@@ -7,7 +7,7 @@ function getSecretKey(): Uint8Array {
     if (process.env.NODE_ENV === "production") {
       throw new Error("FATAL: AUTH_SECRET must be configured in production environment.");
     }
-    return new TextEncoder().encode("addmetour-dev-fallback-secret-2025");
+    return new TextEncoder().encode("bakuya-dev-fallback-secret-2025");
   }
   return new TextEncoder().encode(secret);
 }
@@ -101,7 +101,7 @@ export async function requireAdmin(): Promise<SessionPayload | null> {
     if (process.env.NODE_ENV !== "production" && process.env.DEV_ADMIN_BYPASS === "true") {
       return {
         id: "dev-admin",
-        email: "admin@addmetour.az",
+        email: "admin@bakuya.az",
         name: "Dev Admin",
         role: "admin",
       };

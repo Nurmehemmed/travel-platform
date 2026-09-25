@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
-  "https://addmetour.com";
+  `https://${CURRENT_BRAND.domain}`;
 
 export const metadata: Metadata = {
   title: "Azerbaijan e-Visa Service — Fast Official ASAN Visa Processing",
@@ -48,8 +49,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: `${APP_URL}/visa`,
-    siteName: "AddmeTour",
-    title: "Azerbaijan e-Visa Service — Get Your Visa in 3 Hours | AddmeTour",
+    siteName: CURRENT_BRAND.name,
+    title: `Azerbaijan e-Visa Service — Get Your Visa in 3 Hours | ${CURRENT_BRAND.name}`,
     description:
       "Official ASAN e-Visa processing service. Apply online, receive your approved electronic visa by email. 95+ eligible countries. Urgent 3-hour processing available.",
     images: [
@@ -57,13 +58,13 @@ export const metadata: Metadata = {
         url: "/images/og-visa-cover.jpg",
         width: 1200,
         height: 630,
-        alt: "Baku Old City Maiden Tower — Azerbaijan e-Visa Service by AddmeTour",
+        alt: `Baku Old City Maiden Tower — Azerbaijan e-Visa Service by ${CURRENT_BRAND.name}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Azerbaijan e-Visa — Fast Official ASAN Visa Processing | AddmeTour",
+    title: `Azerbaijan e-Visa — Fast Official ASAN Visa Processing | ${CURRENT_BRAND.name}`,
     description:
       "Get your Azerbaijan e-Visa in 3 hours. 95+ eligible countries. Trusted by 2,400+ travelers.",
     images: [
@@ -85,7 +86,7 @@ const visaJsonLd = {
       provider: {
         "@type": "TravelAgency",
         "@id": `${APP_URL}/#organization`,
-        name: "AddmeTour",
+        name: CURRENT_BRAND.name,
       },
       serviceType: "Visa Processing",
       areaServed: {

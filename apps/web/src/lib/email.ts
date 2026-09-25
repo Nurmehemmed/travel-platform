@@ -5,6 +5,8 @@
  * Supports Resend API (RESEND_API_KEY) with safe fallback to operations log.
  */
 
+import { CURRENT_BRAND } from "./brand";
+
 export interface EmailOptions {
   to: string;
   subject: string;
@@ -14,7 +16,7 @@ export interface EmailOptions {
 export async function sendTransactionalEmail(options: EmailOptions): Promise<boolean> {
   const { to, subject, html } = options;
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.FROM_EMAIL || "AddmeTour Support <noreply@addmetour.com>";
+  const fromEmail = process.env.FROM_EMAIL || `${CURRENT_BRAND.name} Support <noreply@${CURRENT_BRAND.domain}>`;
 
   if (!apiKey) {
     console.log(`[Email Dispatcher] (RESEND_API_KEY not configured): Would email "${subject}" to ${to}`);
@@ -61,7 +63,7 @@ export async function sendVisaConfirmationEmail(params: {
   arrivalDate: string;
   totalAmount: number;
 }): Promise<boolean> {
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://addmetour.com").replace(/\/$/, "");
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || `https://${CURRENT_BRAND.domain}`).replace(/\/$/, "");
   const trackUrl = `${appUrl}/visa/track?ref=${params.referenceNumber}`;
 
   const html = `
@@ -71,7 +73,7 @@ export async function sendVisaConfirmationEmail(params: {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b1329; color: #ffffff; padding: 40px 20px;">
   <div style="max-width: 580px; margin: 0 auto; background-color: #111d3d; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
     <div style="text-align: center; margin-bottom: 24px;">
-      <h1 style="color: #fbbf24; margin: 0; font-size: 24px; font-weight: 700;">AddmeTour Azerbaijan</h1>
+      <h1 style="color: #fbbf24; margin: 0; font-size: 24px; font-weight: 700;">${CURRENT_BRAND.name} Azerbaijan</h1>
       <p style="color: #94a3b8; font-size: 14px; margin-top: 4px;">Official ASAN e-Visa Agency & Inbound DMC</p>
     </div>
 
@@ -104,7 +106,7 @@ export async function sendVisaConfirmationEmail(params: {
     </div>
 
     <p style="color: #64748b; font-size: 12px; text-align: center; margin-top: 32px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
-      AddmeTour Azerbaijan LLC • Nizami St, Baku • 24/7 Support: support@addmetour.com
+      ${CURRENT_BRAND.legalName} • Nizami St, Baku • 24/7 Support: ${CURRENT_BRAND.supportEmail}
     </p>
   </div>
 </body>
@@ -134,7 +136,7 @@ export async function sendTransferConfirmationEmail(params: {
   femaleDriver?: boolean;
   additionalGuide?: boolean;
 }): Promise<boolean> {
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://addmetour.com").replace(/\/$/, "");
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || `https://${CURRENT_BRAND.domain}`).replace(/\/$/, "");
   const trackUrl = `${appUrl}/transfer/track?ref=${params.bookingNumber}&email=${encodeURIComponent(params.to)}`;
 
   const html = `
@@ -144,7 +146,7 @@ export async function sendTransferConfirmationEmail(params: {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0b1329; color: #ffffff; padding: 40px 20px;">
   <div style="max-width: 580px; margin: 0 auto; background-color: #111d3d; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); padding: 32px;">
     <div style="text-align: center; margin-bottom: 24px;">
-      <h1 style="color: #fbbf24; margin: 0; font-size: 24px; font-weight: 700;">AddmeTour Transfers</h1>
+      <h1 style="color: #fbbf24; margin: 0; font-size: 24px; font-weight: 700;">${CURRENT_BRAND.name} Transfers</h1>
       <p style="color: #94a3b8; font-size: 14px; margin-top: 4px;">VIP Baku Airport Transfer Voucher</p>
     </div>
 

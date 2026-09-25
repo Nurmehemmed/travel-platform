@@ -72,8 +72,8 @@ export const HomeFooter: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#about" aria-label="Why travel with AddmeTour" className="hover:text-amber-400 transition-colors">
-                    {language === "AZ" ? "Niyə AddmeTour?" : language === "RU" ? "Почему AddmeTour" : "Why Choose Us"}
+                  <Link href="#about" aria-label={`Why travel with ${CURRENT_BRAND.name}`} className="hover:text-amber-400 transition-colors">
+                    {language === "AZ" ? `Niyə ${CURRENT_BRAND.name}?` : language === "RU" ? `Почему ${CURRENT_BRAND.name}` : "Why Choose Us"}
                   </Link>
                 </li>
                 <li>
@@ -102,7 +102,7 @@ export const HomeFooter: React.FC = () => {
                   <span className="text-amber-400">💬</span> WhatsApp: {siteConfig.contact.whatsappPhone}
                 </p>
                 <p className="flex items-center gap-2">
-                  <span className="text-amber-400">✉️</span> {siteConfig.contact.supportEmail || "info@addmetour.com"}
+                  <span className="text-amber-400">✉️</span> {siteConfig.contact.supportEmail || "info@bakuya.com"}
                 </p>
                 <p className="text-[11px] text-white/50 pt-1">
                   {t.footer.supportAvailable}
@@ -122,17 +122,17 @@ export const HomeFooter: React.FC = () => {
                   href={`https://wa.me/${siteConfig.contact.whatsappClean}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Connect with AddmeTour on WhatsApp"
+                  aria-label={`Connect with ${CURRENT_BRAND.name} on WhatsApp`}
                   title="WhatsApp"
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#25D366] hover:text-white transition-all duration-200"
                 >
                   <MessageCircle className="h-4 w-4" />
                 </a>
                 <a
-                  href={`https://t.me/${(siteConfig.contact.telegramHandle || "addmetour").replace(/^@/, "")}`}
+                  href={`https://t.me/${(siteConfig.contact.telegramHandle || "bakuya").replace(/^@/, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Follow AddmeTour on Telegram"
+                  aria-label={`Follow ${CURRENT_BRAND.name} on Telegram`}
                   title="Telegram"
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#0088cc] hover:text-white transition-all duration-200"
                 >
@@ -140,20 +140,20 @@ export const HomeFooter: React.FC = () => {
                 </a>
 
                 <a
-                  href="https://instagram.com/addmetour"
+                  href="https://instagram.com/bakuya"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Follow AddmeTour on Instagram"
+                  aria-label={`Follow ${CURRENT_BRAND.name} on Instagram`}
                   title="Instagram"
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#E1306C] hover:text-white transition-all duration-200"
                 >
                   <Star className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://facebook.com/addmetour"
+                  href="https://facebook.com/bakuya"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Follow AddmeTour on Facebook"
+                  aria-label={`Follow ${CURRENT_BRAND.name} on Facebook`}
                   title="Facebook"
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white hover:bg-[#1877F2] hover:text-white transition-all duration-200"
                 >
@@ -169,28 +169,28 @@ export const HomeFooter: React.FC = () => {
                 </span>
                 <div className="flex items-center gap-1.5">
                   <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Discover Azerbaijan with AddmeTour: https://addmetour.vercel.app")}`}
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Discover Azerbaijan with ${CURRENT_BRAND.name}: https://bakuya.com`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Share AddmeTour on WhatsApp"
+                    aria-label={`Share ${CURRENT_BRAND.name} on WhatsApp`}
                     className="flex-1 rounded-lg py-1.5 bg-[#25D366]/20 hover:bg-[#25D366] text-white text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1"
                   >
                     WA
                   </a>
                   <a
-                    href={`https://t.me/share/url?url=${encodeURIComponent("https://addmetour.vercel.app")}&text=${encodeURIComponent("Discover Azerbaijan Tours & Travel Experiences")}`}
+                    href={`https://t.me/share/url?url=${encodeURIComponent("https://bakuya.com")}&text=${encodeURIComponent(`Discover Azerbaijan with ${CURRENT_BRAND.name} — Tours & Travel Experiences`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Share AddmeTour on Telegram"
+                    aria-label={`Share ${CURRENT_BRAND.name} on Telegram`}
                     className="flex-1 rounded-lg py-1.5 bg-[#0088cc]/20 hover:bg-[#0088cc] text-white text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1"
                   >
                     TG
                   </a>
                   <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://addmetour.vercel.app")}`}
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://bakuya.com")}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="Share AddmeTour on Facebook"
+                    aria-label={`Share ${CURRENT_BRAND.name} on Facebook`}
                     className="flex-1 rounded-lg py-1.5 bg-[#1877F2]/20 hover:bg-[#1877F2] text-white text-[11px] font-medium text-center transition-colors flex items-center justify-center gap-1"
                   >
                     FB
@@ -225,7 +225,7 @@ export const HomeFooter: React.FC = () => {
               </div>
             </div>
             <a
-              href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent("I'd like to receive the AddmeTour tour catalogue (PDF brochure).")}`}
+              href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(`I'd like to receive the ${CURRENT_BRAND.name} tour catalogue (PDF brochure).`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="shrink-0 flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold text-[#061225] transition-all hover:opacity-90 hover:scale-105"
@@ -238,7 +238,7 @@ export const HomeFooter: React.FC = () => {
 
           {/* Bottom Row */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
-            <p>{t.footer.rights.replace("AddmeTour", CURRENT_BRAND.name)}</p>
+            <p>{t.footer.rights}</p>
             <div className="flex items-center gap-6">
               <Link href="/medical" aria-label="Medical & Wellness Tourism" className="hover:text-white transition-colors">
                 {language === "AZ" ? "Tibbi Turizm" : language === "RU" ? "Медицинский туризм" : language === "AR" ? "السياحة الطبية" : "Medical Tourism"}

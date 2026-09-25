@@ -5,6 +5,8 @@ import Image from "next/image";
 import { MapPin, MessageCircle, ArrowLeft, Users, Check, Building2, Award, Globe } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useSiteSettings } from "@/lib/settings-context";
+import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 const SERVICES = [
   {
@@ -62,10 +64,7 @@ export default function MicePage() {
       <header className="sticky top-0 z-50 bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10">
         <div className="container-section flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
-              <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg tracking-tight" style={{ color: "#f59e0b" }}>addmetour</span>
+            <BrandLogo variant="light" />
           </Link>
           <Link href="/" className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors">
             <ArrowLeft className="h-4 w-4" /><span>{backHome}</span>
@@ -84,7 +83,7 @@ export default function MicePage() {
           <h1 className="font-display text-5xl md:text-6xl font-black text-white leading-tight mb-6">{title}</h1>
           <p className="text-white/70 text-lg leading-relaxed mb-10">{subtitle}</p>
           <a
-            href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent("Hello AddmeTour! I'm interested in a MICE / Corporate event package in Azerbaijan.")}`}
+            href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(`Hello ${CURRENT_BRAND.name}! I'm interested in a MICE / Corporate event package in Azerbaijan.`)}`}
             target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full px-8 py-4 font-bold text-sm hover:opacity-90 hover:scale-105 transition-all shadow-lg"
             style={{ backgroundColor: "#f59e0b", color: "#061225" }}
@@ -135,7 +134,7 @@ export default function MicePage() {
                   </ul>
                   <div className="mt-auto pt-4 border-t border-slate-100">
                     <a
-                      href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(`Hello AddmeTour! I'm interested in the "${svcNames[i]}" MICE/Corporate service.`)}`}
+                      href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(`Hello ${CURRENT_BRAND.name}! I'm interested in the "${svcNames[i]}" MICE/Corporate service.`)}`}
                       target="_blank" rel="noopener noreferrer"
                       className="w-full flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold text-white hover:opacity-90 transition-all"
                       style={{ backgroundColor: "#0f3460" }}
@@ -162,7 +161,7 @@ export default function MicePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent("Hello AddmeTour! I'd like to discuss a MICE/Corporate event in Azerbaijan.")}`}
+              href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(`Hello ${CURRENT_BRAND.name}! I'd like to discuss a MICE/Corporate event in Azerbaijan.`)}`}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 font-bold text-sm hover:opacity-90 hover:scale-105 transition-all shadow-lg"
               style={{ backgroundColor: "#f59e0b", color: "#061225" }}
@@ -170,17 +169,17 @@ export default function MicePage() {
               <MessageCircle className="h-4 w-4" />WhatsApp
             </a>
             <a
-              href="mailto:mice@addmetour.com"
+              href={`mailto:mice@${CURRENT_BRAND.domain}`}
               className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 font-bold text-sm text-white border-2 border-white/40 hover:border-white hover:bg-white/10 transition-all"
             >
-              mice@addmetour.com
+              mice@{CURRENT_BRAND.domain}
             </a>
           </div>
         </div>
       </section>
 
       <footer className="py-8 text-center text-xs text-white/40" style={{ backgroundColor: "#061225" }}>
-        <Link href="/" className="hover:text-white/80 transition-colors">© AddmeTour · {new Date().getFullYear()} · All rights reserved</Link>
+        <Link href="/" className="hover:text-white/80 transition-colors">© {CURRENT_BRAND.name} · {new Date().getFullYear()} · All rights reserved</Link>
       </footer>
     </div>
   );

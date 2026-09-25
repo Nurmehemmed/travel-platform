@@ -63,7 +63,8 @@ const COOKIE_TEXTS: Record<string, CookieDictionary> = {
   },
 };
 
-const CONSENT_STORAGE_KEY = "addmetour_cookie_consent_v1";
+const CONSENT_STORAGE_KEY = "bakuya_cookie_consent_v1";
+const LEGACY_CONSENT_STORAGE_KEY = "addmetour_cookie_consent_v1";
 
 export function CookieConsent() {
   const { language, isRtl } = useLanguage();
@@ -71,7 +72,7 @@ export function CookieConsent() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(CONSENT_STORAGE_KEY);
+      const stored = localStorage.getItem(CONSENT_STORAGE_KEY) || localStorage.getItem(LEGACY_CONSENT_STORAGE_KEY);
       if (!stored) {
         // Small delay for smooth entry animation
         const timer = setTimeout(() => setIsVisible(true), 1200);
@@ -85,13 +86,12 @@ export function CookieConsent() {
 
   const handleConsent = (level: "all" | "essential") => {
     try {
-      localStorage.setItem(
-        CONSENT_STORAGE_KEY,
-        JSON.stringify({
-          level,
-          timestamp: new Date().toISOString(),
-        })
-      );
+      const payload = JSON.stringify({
+        level,
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem(CONSENT_STORAGE_KEY, payload);
+      localStorage.setItem(LEGACY_CONSENT_STORAGE_KEY, payload);
     } catch {
       // Ignore write errors
     }

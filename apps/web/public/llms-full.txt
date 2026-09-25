@@ -1,15 +1,15 @@
-# AddmeTour — Comprehensive Documentation for AI Agents
+# Bakuya — Comprehensive Documentation for AI Agents
 
-> AddmeTour is a premier inbound travel agency based in Baku, Azerbaijan, providing guided tours, excursion packages, private custom itineraries, and online electronic visa (ASAN Visa) processing.
+> Bakuya is a premier inbound travel agency based in Baku, Azerbaijan, providing guided tours, excursion packages, private custom itineraries, and online electronic visa (ASAN Visa) processing.
 
 ## Contact Information
-- Website: https://addmetour.com
+- Website: https://bakuya.com
 - Location: Baku, Azerbaijan
 - Languages Supported: English, Azerbaijani, Russian, Arabic
 - WhatsApp Support: +994 55 100 31 46 (Available 24/7, https://wa.me/994551003146)
 
 ## Electronic Visa (e-Visa) Service
-AddmeTour assists international travelers in obtaining official electronic visas to Azerbaijan:
+Bakuya assists international travelers in obtaining official electronic visas to Azerbaijan:
 - Processing Options:
   - Standard Processing: 3 business days, $45 USD
   - Urgent Fast-Track: 3 hours, $85 USD

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import CurrencySelector from "@/components/CurrencySelector";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useLanguage } from "@/lib/i18n";
 import { useSiteSettings } from "@/lib/settings-context";
 import { LOCALIZED_TRANSFER_POLICY } from "@/lib/pages-i18n";
@@ -58,12 +59,7 @@ export default function TransferPolicyPage() {
       <header className="sticky top-0 z-50 bg-[#0f3460] shadow-md border-b border-white/10">
         <div className="container-section flex h-16 items-center justify-between gap-2">
           <Link href="/transfer" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "#0ea5e9" }}>
-              <Car className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg sm:text-xl tracking-tight text-white">
-              addmetour
-            </span>
+            <BrandLogo variant="light" />
             <span className="hidden sm:inline-block ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-sky-400/20 text-sky-200 border border-sky-300/30 whitespace-nowrap">
               {t.transferPage.headerBadge}
             </span>

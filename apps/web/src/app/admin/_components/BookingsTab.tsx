@@ -3,6 +3,7 @@
 import React from "react";
 import { MessageCircle } from "lucide-react";
 import { BookingItem, TourReservationItem, AdminLanguage } from "./types";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface BookingsTabProps {
   language: AdminLanguage;
@@ -124,7 +125,7 @@ export const BookingsTab: React.FC<BookingsTabProps> = ({
                       <p className="font-bold text-slate-900">{r.travelerName}</p>
                       <a
                         href={`https://wa.me/${r.phoneNumber.replace(/\D/g, "")}?text=${encodeURIComponent(
-                          `Hello ${r.travelerName}! This is AddmeTour regarding your reservation for "${r.tourTitle}" on ${r.tourDate} (Ref: ${r.reservationNumber}).`
+                          `Hello ${r.travelerName}! This is ${CURRENT_BRAND.name} regarding your reservation for "${r.tourTitle}" on ${r.tourDate} (Ref: ${r.reservationNumber}).`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"

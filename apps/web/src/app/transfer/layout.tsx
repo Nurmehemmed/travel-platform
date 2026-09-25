@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
-  "https://addmetour.com";
+  `https://${CURRENT_BRAND.domain}`;
 
 export const metadata: Metadata = {
-  title: "Airport Transfer — Baku, Ganja & Nakhchivan | AddmeTour",
+  title: `Airport Transfer — Baku, Ganja & Nakhchivan | ${CURRENT_BRAND.name}`,
   description:
     "Book private airport transfers in Baku (GYD), Ganja & Nakhchivan. Fixed prices, flight monitoring, meet & greet, and 24/7 support in Azerbaijan.",
   keywords: [
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
     "meet and greet Baku airport",
     "Ganja airport transfer",
     "Nakhchivan airport transfer",
-    "AddmeTour transfer",
+    `${CURRENT_BRAND.name} transfer`,
   ],
   alternates: {
     canonical: "/transfer",
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: `${APP_URL}/transfer`,
-    siteName: "AddmeTour",
+    siteName: CURRENT_BRAND.name,
     title: "Airport Transfer in Azerbaijan — Fixed Prices, Professional Drivers",
     description:
       "Book a private airport transfer across Azerbaijan. Fixed prices, meet & greet, flight monitoring. Available at GYD, GJA, and NAJ airports.",
@@ -58,13 +59,13 @@ const transferJsonLd = {
   "@context": "https://schema.org",
   "@type": "TaxiService",
   "@id": `${APP_URL}/transfer#service`,
-  name: "AddmeTour Airport Transfer",
+  name: `${CURRENT_BRAND.name} Airport Transfer`,
   description:
     "Professional private airport transfer service in Azerbaijan. Fixed prices, meet & greet, flight tracking at Heydar Aliyev International (GYD), Ganja (GJA), and Nakhchivan (NAJ) airports.",
   provider: {
     "@type": "TravelAgency",
     "@id": `${APP_URL}/#organization`,
-    name: "AddmeTour",
+    name: CURRENT_BRAND.name,
   },
   areaServed: {
     "@type": "Country",

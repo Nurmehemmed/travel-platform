@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined) ||
-  "https://addmetour.com";
+  `https://${CURRENT_BRAND.domain}`;
 
 export const metadata: Metadata = {
   title: "Apply for Azerbaijan e-Visa — Online ASAN Visa Application Form",
@@ -27,8 +28,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: `${APP_URL}/visa/apply`,
-    siteName: "AddmeTour",
-    title: "Apply for Azerbaijan e-Visa Online — 5 Minute Application | AddmeTour",
+    siteName: CURRENT_BRAND.name,
+    title: `Apply for Azerbaijan e-Visa Online — 5 Minute Application | ${CURRENT_BRAND.name}`,
     description:
       "Simple 4-step application. Passport details → Travel info → Upload photo → Submit. Get your e-Visa in as fast as 3 hours.",
     images: [
@@ -36,13 +37,13 @@ export const metadata: Metadata = {
         url: "/images/og-visa-cover.jpg",
         width: 1200,
         height: 630,
-        alt: "Apply for Azerbaijan e-Visa — AddmeTour",
+        alt: `Apply for Azerbaijan e-Visa — ${CURRENT_BRAND.name}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Apply for Azerbaijan e-Visa Online — AddmeTour",
+    title: `Apply for Azerbaijan e-Visa Online — ${CURRENT_BRAND.name}`,
     description: "Official ASAN e-Visa online application form. Fast 3-hour or 3-day approval.",
     images: ["/images/og-visa-cover.jpg"],
   },

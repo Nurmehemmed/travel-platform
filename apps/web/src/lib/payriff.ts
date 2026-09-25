@@ -8,6 +8,8 @@
  *  - Sandbox / Mock Simulation Mode (when PAYRIFF_SECRET_KEY is absent or in test mode)
  */
 
+import { CURRENT_BRAND } from "./brand";
+
 export interface PayriffCreateOrderParams {
   applicationNumber: string;
   amount: number;
@@ -68,7 +70,7 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     merchant: PAYRIFF_MERCHANT_ID,
     amount: Number(amount.toFixed(2)),
     currencyType: currency,
-    description: description || `AddmeTour Service ${applicationNumber}`,
+    description: description || `${CURRENT_BRAND.name} Service ${applicationNumber}`,
     language,
     email,
     approveURL: `${callbackBase}?ref=${encodeURIComponent(applicationNumber)}${emailParam}&status=success`,

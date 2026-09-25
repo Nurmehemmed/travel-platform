@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db, siteSettings } from "@travel/db";
 import { logger } from "@/lib/logger";
 import { COMPANY_CONTACT } from "@/lib/constants";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 const log = logger.withContext({ route: "/api/settings" });
 
@@ -26,9 +27,9 @@ export async function GET() {
         whatsappClean: cleanWhatsapp,
         whatsappUrl: `https://wa.me/${cleanWhatsapp}`,
         emergencyPhone: String(settingsMap["contact_phone"] || rawWhatsapp),
-        supportEmail: String(settingsMap["contact_email"] || "info@addmetour.com"),
+        supportEmail: String(settingsMap["contact_email"] || CURRENT_BRAND.supportEmail),
         officeAddress: String(settingsMap["contact_address"] || "Nizami Street 48, Baku, Azerbaijan"),
-        telegramHandle: String(settingsMap["contact_telegram"] || "addmetour"),
+        telegramHandle: String(settingsMap["contact_telegram"] || CURRENT_BRAND.brandKey),
       },
       announcement: {
         active: Boolean(settingsMap["announcement_active"] === true || settingsMap["announcement_active"] === "true"),
@@ -89,9 +90,9 @@ export async function GET() {
         whatsappClean: COMPANY_CONTACT.whatsappNumberClean,
         whatsappUrl: COMPANY_CONTACT.whatsappUrl,
         emergencyPhone: COMPANY_CONTACT.whatsappPhone,
-        supportEmail: "info@addmetour.com",
+        supportEmail: CURRENT_BRAND.supportEmail,
         officeAddress: "Nizami Street 48, Baku, Azerbaijan",
-        telegramHandle: "addmetour",
+        telegramHandle: CURRENT_BRAND.brandKey,
       },
       announcement: {
         active: false,

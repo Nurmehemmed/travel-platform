@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useCurrency } from "@/lib/currency-context";
 import { useLanguage } from "@/lib/i18n";
+import { CURRENT_BRAND } from "@/lib/brand";
 import VoucherShareActions from "@/components/VoucherShareActions";
 
 export default function VoucherClient() {
@@ -35,7 +36,7 @@ export default function VoucherClient() {
   const bookingRef = searchParams.get("ref") || "AT-2026-8942";
   const rawTitle = searchParams.get("title") || "Baku Old City & Modern Architecture VIP Tour";
   const rawGuestName = searchParams.get("name") || "Valued Traveler";
-  const rawEmail = searchParams.get("email") || "traveler@addmetour.com";
+  const rawEmail = searchParams.get("email") || `traveler@${CURRENT_BRAND.name.toLowerCase()}.com`;
   const rawPhone = searchParams.get("phone") || "+994 50 000 00 00";
   const rawDate = searchParams.get("date") || new Date().toISOString().split("T")[0];
   const rawGuests = searchParams.get("guests") || "2";
@@ -95,7 +96,7 @@ export default function VoucherClient() {
           href="/" 
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-sky-600 transition-colors bg-white px-3.5 py-2 rounded-xl shadow-sm border border-slate-200"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Return to AddmeTour
+          <ArrowLeft className="w-3.5 h-3.5" /> Return to {CURRENT_BRAND.name}
         </Link>
         <div className="text-xs text-slate-500 font-medium">
           Official Digital Confirmation
@@ -126,7 +127,7 @@ export default function VoucherClient() {
           "Pickup": pickup,
           "Total": mounted ? formatPrice(totalAmount) : `$${totalAmount}`,
         }}
-        pdfFilename={`AddmeTour-Voucher-${bookingRef}`}
+        pdfFilename={`${CURRENT_BRAND.name}-Voucher-${bookingRef}`}
         className="max-w-4xl mx-auto mb-6"
       />
 
@@ -147,7 +148,7 @@ export default function VoucherClient() {
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-white">
-                AddmeTour Incoming DMC
+                {CURRENT_BRAND.name} Incoming DMC
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 mt-1">
                 Premier Caucasus & Azerbaijan Incoming Tour Operator
@@ -307,7 +308,7 @@ export default function VoucherClient() {
             <div className="space-y-1 md:col-span-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">Important Instructions for Travelers</h4>
               <ul className="text-xs text-slate-600 space-y-1 list-disc pl-4">
-                <li>Your dedicated chauffeur will meet you in your hotel lobby holding an official <strong>AddmeTour</strong> name board.</li>
+                <li>Your dedicated chauffeur will meet you in your hotel lobby holding an official <strong>{CURRENT_BRAND.name}</strong> name board.</li>
                 <li>Please bring your original passports for regional highway checkpoints (e.g. Sheki/Shahdag routes).</li>
                 <li>Modest clothing is recommended when entering historical mosques in the Old City.</li>
               </ul>
@@ -335,7 +336,7 @@ export default function VoucherClient() {
               </div>
             </div>
             <div className="text-[11px] text-slate-400 text-right">
-              Powered by <strong className="text-white">AddmeTour Incoming DMC</strong>
+              Powered by <strong className="text-white">{CURRENT_BRAND.name} Incoming DMC</strong>
             </div>
           </div>
 

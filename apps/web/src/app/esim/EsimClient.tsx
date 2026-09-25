@@ -26,6 +26,7 @@ import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 import { ESIM_PLANS, EsimPlan, getLocalizedPlanName, getLocalizedPlanDesc } from "@/lib/esim-plans";
 import { ESIM_PAGE_TRANSLATIONS } from "@/lib/i18n/pages/esim-i18n";
 
@@ -127,7 +128,7 @@ export default function EsimClient() {
   };
 
   const buildWhatsAppOrderLink = (plan: EsimPlan) => {
-    const text = `📱 Hello AddmeTour! I'd like to get an Azerbaijan Tourist eSIM:
+    const text = `📱 Hello ${CURRENT_BRAND.name}! I'd like to get an Azerbaijan Tourist eSIM:
 • Plan: ${plan.name} (${plan.dataGb}GB / ${plan.durationDays} Days)
 • Price: $${plan.priceUsd} USD (~${Math.round(plan.priceUsd * 1.7)} AZN)
 • My Device: ${deviceModel || "iPhone / Android"}
@@ -162,7 +163,7 @@ Please send me the QR code activation details.`;
             <LanguageSelector variant="dark" />
             <CurrencySelector variant="dark" />
             <a
-              href={`https://wa.me/${settings?.contact?.whatsappClean || "994551003146"}?text=${encodeURIComponent("Hello AddmeTour! I need assistance with an Azerbaijan Tourist eSIM.")}`}
+              href={`https://wa.me/${settings?.contact?.whatsappClean || "994551003146"}?text=${encodeURIComponent(`Hello ${CURRENT_BRAND.name}! I need assistance with an Azerbaijan Tourist eSIM.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold bg-amber-500 text-[#061225] hover:opacity-90 transition-opacity"
@@ -276,7 +277,7 @@ Please send me the QR code activation details.`;
             {/* Actions */}
             <div className="flex flex-wrap justify-center gap-3 pt-2">
               <a
-                href={`https://wa.me/${settings?.contact?.whatsappClean || "994551003146"}?text=${encodeURIComponent(`Hello AddmeTour! I just completed Payriff payment for eSIM Order #${paymentParamOrder}. Please confirm activation.`)}`}
+                href={`https://wa.me/${settings?.contact?.whatsappClean || "994551003146"}?text=${encodeURIComponent(`Hello ${CURRENT_BRAND.name}! I just completed Payriff payment for eSIM Order #${paymentParamOrder}. Please confirm activation.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl px-5 py-3 text-xs font-bold text-[#061225] bg-amber-500 hover:bg-amber-400 flex items-center gap-2 shadow-sm transition-all"

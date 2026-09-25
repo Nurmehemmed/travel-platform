@@ -48,7 +48,7 @@ export default function HomePage() {
   // Hydrate local cache on mount and validate session immediately
   useEffect(() => {
     try {
-      const cached = localStorage.getItem("addmetour_user_session");
+      const cached = localStorage.getItem("bakuya_user_session") || localStorage.getItem("addmetour_user_session");
       if (cached) {
         setCurrentUser(JSON.parse(cached));
         setAuthChecking(false);
@@ -63,11 +63,13 @@ export default function HomePage() {
         if (data?.user) {
           setCurrentUser(data.user);
           try {
+            localStorage.setItem("bakuya_user_session", JSON.stringify(data.user));
             localStorage.setItem("addmetour_user_session", JSON.stringify(data.user));
           } catch {}
         } else {
           setCurrentUser(null);
           try {
+            localStorage.removeItem("bakuya_user_session");
             localStorage.removeItem("addmetour_user_session");
           } catch {}
         }
@@ -192,6 +194,7 @@ export default function HomePage() {
         cache: "no-store",
       });
       setCurrentUser(null);
+      localStorage.removeItem("bakuya_user_session");
       localStorage.removeItem("addmetour_user_session");
       showToast(language === "AZ" ? "Hesabdan çıxıldı" : "Logged out successfully");
     } catch {
@@ -292,6 +295,7 @@ export default function HomePage() {
         onSuccess={(user) => {
           setCurrentUser(user);
           try {
+            localStorage.setItem("bakuya_user_session", JSON.stringify(user));
             localStorage.setItem("addmetour_user_session", JSON.stringify(user));
           } catch {}
           setIsAuthOpen(false);

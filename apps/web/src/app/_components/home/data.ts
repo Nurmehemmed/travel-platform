@@ -1,3 +1,5 @@
+import { CURRENT_BRAND } from "@/lib/brand";
+
 export interface TourItem {
   id: string;
   slug: string;
@@ -197,7 +199,7 @@ export const TESTIMONIALS = [
   {
     id: "rev-2",
     quote:
-      "We did the Absheron Peninsula tour and couldn't believe how much was packed into one day. The fire temple at sunset was one of the most beautiful things I've ever seen. AddmeTour made it seamless.",
+      `We did the Absheron Peninsula tour and couldn't believe how much was packed into one day. The fire temple at sunset was one of the most beautiful things I've ever seen. ${CURRENT_BRAND.name} made it seamless.`,
     initials: "MF",
     name: "Marco Ferretti",
     subtitle: "Italy · Absheron Peninsula Day Trip",

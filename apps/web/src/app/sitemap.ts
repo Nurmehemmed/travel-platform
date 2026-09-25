@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { TOURS_CATALOG } from "@/lib/tours-data";
 import { DESTINATIONS_CATALOG } from "@/lib/destinations-data";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://addmetour.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? `https://${CURRENT_BRAND.domain}`;
   const now = new Date();
 
   // Signature Tour URLs

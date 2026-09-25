@@ -113,7 +113,7 @@ export const ContactSettingsCard: React.FC<ContactSettingsCardProps> = ({
                     contact_email: e.target.value,
                   }))
                 }
-                placeholder="info@addmetour.com"
+                placeholder="info@bakuya.com"
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-sky-500 focus:bg-white focus:outline-none"
               />
             </div>
@@ -133,7 +133,7 @@ export const ContactSettingsCard: React.FC<ContactSettingsCardProps> = ({
                     contact_telegram: e.target.value,
                   }))
                 }
-                placeholder="addmetour"
+                placeholder="bakuya"
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 font-mono focus:border-sky-500 focus:bg-white focus:outline-none"
               />
             </div>

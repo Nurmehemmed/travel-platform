@@ -1,4 +1,5 @@
 import type { LanguageCode } from "./i18n";
+import { CURRENT_BRAND } from "./brand";
 
 export interface LocalizedTourData {
   title: string;
@@ -431,7 +432,7 @@ export const LOCALIZED_TESTIMONIALS: Record<LanguageCode, LocalizedTestimonial[]
     },
     {
       quote:
-        "We did the Absheron Peninsula tour and couldn't believe how much was packed into one day. The fire temple at sunset was one of the most beautiful things I've ever seen. AddmeTour made it seamless.",
+        `We did the Absheron Peninsula tour and couldn't believe how much was packed into one day. The fire temple at sunset was one of the most beautiful things I've ever seen. ${CURRENT_BRAND.name} made it seamless.`,
       subtitle: "Italy · Absheron Peninsula Day Trip",
     },
     {
@@ -448,7 +449,7 @@ export const LOCALIZED_TESTIMONIALS: Record<LanguageCode, LocalizedTestimonial[]
     },
     {
       quote:
-        "Abşeron turunda bir günə bu qədər çox maraqlı yerin sığmasına inana bilmədik. Qürub vaxtı Atəşgah məbədi gördüyüm ən gözəl mənzərələrdən biri idi. AddmeTour hər şeyi qüsursuz təşkil etdi.",
+        `Abşeron turunda bir günə bu qədər çox maraqlı yerin sığmasına inana bilmədik. Qürub vaxtı Atəşgah məbədi gördüyüm ən gözəl mənzərələrdən biri idi. ${CURRENT_BRAND.name} hər şeyi qüsursuz təşkil etdi.`,
       subtitle: "İtaliya · Abşeron Yarımadası Turu",
     },
     {
@@ -465,7 +466,7 @@ export const LOCALIZED_TESTIMONIALS: Record<LanguageCode, LocalizedTestimonial[]
     },
     {
       quote:
-        "Мы взяли тур по Апшерону и были поражены насыщенностью программы! Храм огнепоклонников на закате — одно из красивейших зрелищ в моей жизни. AddmeTour сделали все на высшем уровне.",
+        `Мы взяли тур по Апшерону и были поражены насыщенностью программы! Храм огнепоклонников на закате — одно из красивейших зрелищ в моей жизни. ${CURRENT_BRAND.name} сделали все на высшем уровне.`,
       subtitle: "Италия · Однодневный тур по Апшерону",
     },
     {
@@ -482,7 +483,7 @@ export const LOCALIZED_TESTIMONIALS: Record<LanguageCode, LocalizedTestimonial[]
     },
     {
       quote:
-        "Nous avons fait l'excursion de la péninsule d'Abchéron : un programme d'une richesse incroyable en une journée. Le temple du feu au crépuscule était magique. Merci AddmeTour pour cette organisation impeccable.",
+        `Nous avons fait l'excursion de la péninsule d'Abchéron : un programme d'une richesse incroyable en une journée. Le temple du feu au crépuscule était magique. Merci ${CURRENT_BRAND.name} pour cette organisation impeccable.`,
       subtitle: "Italie · Excursion péninsule d'Abchéron",
     },
     {
@@ -499,7 +500,7 @@ export const LOCALIZED_TESTIMONIALS: Record<LanguageCode, LocalizedTestimonial[]
     },
     {
       quote:
-        "قمنا بجولة شبه جزيرة أبشوران وكانت تجربة تفوق الوصف في يوم واحد. معبد النار عند الغروب من أجمل المشاهد التي رأيتها في حياتي. تنظيم AddmeTour كان في غاية السلاسة والاحتراف.",
+        `قمنا بجولة شبه جزيرة أبشوران وكانت تجربة تفوق الوصف في يوم واحد. معبد النار عند الغروب من أجمل المشاهد التي رأيتها في حياتي. تنظيم ${CURRENT_BRAND.name} كان في غاية السلاسة والاحتراف.`,
       subtitle: "إيطاليا · رحلة شبه جزيرة أبشوران",
     },
     {
@@ -516,7 +517,7 @@ export const LOCALIZED_TESTIMONIALS: Record<LanguageCode, LocalizedTestimonial[]
     },
     {
       quote:
-        "Die Absheron-Tagestour hat unsere Erwartungen weit übertroffen. Der Feuertempel bei Sonnenuntergang war magisch schön. AddmeTour hat den gesamten Tag absolut reibungslos gestaltet.",
+        `Die Absheron-Tagestour hat unsere Erwartungen weit übertroffen. Der Feuertempel bei Sonnenuntergang war magisch schön. ${CURRENT_BRAND.name} hat den gesamten Tag absolut reibungslos gestaltet.`,
       subtitle: "Italien · Absheron-Halbinsel Tagestour",
     },
     {

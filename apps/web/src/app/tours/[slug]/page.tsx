@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { constructMetadata } from "@/lib/seo";
 import { TOURS_CATALOG, getTourBySlug, getAllTourSlugs } from "@/lib/tours-data";
+import { CURRENT_BRAND } from "@/lib/brand";
 import TourDetailClient from "./TourDetailClient";
 
 interface TourPageProps {
@@ -54,7 +55,7 @@ export default async function TourDetailPage({ params }: TourPageProps) {
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
       validFrom: new Date().toISOString().split("T")[0],
-      url: `https://addmetour.com/tours/${tour.slug}`,
+      url: `https://${CURRENT_BRAND.domain}/tours/${tour.slug}`,
     },
     aggregateRating: {
       "@type": "AggregateRating",
@@ -64,8 +65,8 @@ export default async function TourDetailPage({ params }: TourPageProps) {
     },
     provider: {
       "@type": "TravelAgency",
-      name: "AddmeTour",
-      url: "https://addmetour.com",
+      name: CURRENT_BRAND.name,
+      url: `https://${CURRENT_BRAND.domain}`,
     },
   };
 

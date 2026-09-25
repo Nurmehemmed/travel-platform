@@ -14,6 +14,10 @@ export interface BrandConfig {
   subMark: string;
   tagline: string;
   legalName: string;
+  /** Primary public-facing domain (without protocol or trailing slash) */
+  domain: string;
+  /** Default support/contact email address */
+  supportEmail: string;
   logo: {
     full: string;
     emblem: string;
@@ -24,11 +28,11 @@ export interface BrandConfig {
 
 /**
  * Brand Switcher:
- * - "hibaku"   -> HiBaku ("Hi, Baku! Discover Azerbaijan")
- * - "bakuya"   -> Bakuya ("Bakuya — Discover Azerbaijan")
- * - "addmetour"-> AddmeTour (Original brand identity)
+ * - "hibaku"    -> HiBaku ("Hi, Baku! Discover Azerbaijan")
+ * - "bakuya"    -> Bakuya ("Bakuya — Discover Azerbaijan")
+ * - "addmetour" -> AddmeTour (Original brand identity)
  */
-export const ACTIVE_BRAND: BrandKey = "hibaku";
+export const ACTIVE_BRAND: BrandKey = "bakuya";
 
 export const BRANDS: Record<BrandKey, BrandConfig> = {
   hibaku: {
@@ -38,6 +42,8 @@ export const BRANDS: Record<BrandKey, BrandConfig> = {
     subMark: "DISCOVER AZERBAIJAN",
     tagline: "Hi, Baku! More Than a Destination",
     legalName: "HiBaku Travel Services LLC",
+    domain: "hibaku.az",
+    supportEmail: "info@hibaku.az",
     logo: {
       full: "/images/bakuya-logo.png",
       emblem: "/images/bakuya-emblem.png",
@@ -52,6 +58,8 @@ export const BRANDS: Record<BrandKey, BrandConfig> = {
     subMark: "DISCOVER AZERBAIJAN",
     tagline: "More Than a Destination",
     legalName: "Bakuya Travel Services LLC",
+    domain: "bakuya.com",
+    supportEmail: "info@bakuya.com",
     logo: {
       full: "/images/bakuya-logo.png",
       emblem: "/images/bakuya-emblem.png",
@@ -66,6 +74,8 @@ export const BRANDS: Record<BrandKey, BrandConfig> = {
     subMark: "Baku & Azerbaijan",
     tagline: "Handcrafted Local Tours & VIP Travel",
     legalName: "AddmeTour Travel Services LLC",
+    domain: "addmetour.com",
+    supportEmail: "info@addmetour.com",
     logo: {
       full: "/images/bakuya-logo.png",
       emblem: "/images/bakuya-emblem.png",

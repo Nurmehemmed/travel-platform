@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { Users, Shield, Zap, Award, Globe, MessageCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 export const HomeWhyUs: React.FC = () => {
   const { t, language } = useLanguage();
@@ -22,16 +23,16 @@ export const HomeWhyUs: React.FC = () => {
               </h2>
               <p className="text-white/80 leading-relaxed mb-10 text-base">
                 {language === "AZ"
-                  ? "AddmeTour ilə Azərbaycanın əsl ruhunu kəşf edin. Biz qədim İpək Yolu irsini, zəngin mətbəxi və Qafqazın əsrarəngiz təbiətini birləşdirən xüsusi fərdi və kiçik qruplar üçün unikal səyahətlər təşkil edirik."
+                  ? `${CURRENT_BRAND.name} ilə Azərbaycanın əsl ruhunu kəşf edin. Biz qədim İpək Yolu irsini, zəngin mətbəxi və Qafqazın əsrarəngiz təbiətini birləşdirən xüsusi fərdi və kiçik qruplar üçün unikal səyahətlər təşkil edirik.`
                   : language === "RU"
-                  ? "Откройте для себя истинную душу Азербайджана с AddmeTour. Мы создаем индивидуальные и авторские экскурсии, объединяя древнее наследие Шелкового пути и кавказское гостеприимство."
+                  ? `Откройте для себя истинную душу Азербайджана с ${CURRENT_BRAND.name}. Мы создаем индивидуальные и авторские экскурсии, объединяя древнее наследие Шелкового пути и кавказское гостеприимство.`
                   : language === "FR"
-                  ? "Découvrez l'âme authentique de l'Azerbaïdjan avec AddmeTour. Nous concevons des circuits sur mesure alliant patrimoine historique et paysages grandioses du Caucase."
+                  ? `Découvrez l'âme authentique de l'Azerbaïdjan avec ${CURRENT_BRAND.name}. Nous concevons des circuits sur mesure alliant patrimoine historique et paysages grandioses du Caucase.`
                   : language === "AR"
-                  ? "اكتشف روح وسحر أذربيجان الحقيقية مع AddmeTour. نصمم رحلات سياحية خاصة تجمع بين عبق طريق الحرير وضيافة القوقاز الأصيلة."
+                  ? `اكتشف روح وسحر أذربيجان الحقيقية مع ${CURRENT_BRAND.name}. نصمم رحلات سياحية خاصة تجمع بين عبق طريق الحرير وضيافة القوقاز الأصيلة.`
                   : language === "DE"
-                  ? "Entdecken Sie die Seele Aserbaidschans mit AddmeTour. Wir gestalten maßgeschneiderte Touren, die Seidenstraßen-Kultur mit herrlicher Kaukasus-Natur verbinden."
-                  : "Discover the true soul of Azerbaijan with AddmeTour. We curate handcrafted private excursions and small-group journeys that blend centuries-old Silk Road heritage with authentic Caucasus hospitality."}
+                  ? `Entdecken Sie die Seele Aserbaidschans mit ${CURRENT_BRAND.name}. Wir gestalten maßgeschneiderte Touren, die Seidenstraßen-Kultur mit herrlicher Kaukasus-Natur verbinden.`
+                  : `Discover the true soul of Azerbaijan with ${CURRENT_BRAND.name}. We curate handcrafted private excursions and small-group journeys that blend centuries-old Silk Road heritage with authentic Caucasus hospitality.`}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[

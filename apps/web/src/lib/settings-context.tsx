@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { COMPANY_CONTACT } from "./constants";
+import { CURRENT_BRAND } from "./brand";
 
 export interface PublicSettings {
   contact: {
@@ -62,9 +63,9 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
     whatsappClean: COMPANY_CONTACT.whatsappNumberClean,
     whatsappUrl: COMPANY_CONTACT.whatsappUrl,
     emergencyPhone: COMPANY_CONTACT.whatsappPhone,
-    supportEmail: "info@addmetour.com",
+    supportEmail: CURRENT_BRAND.supportEmail,
     officeAddress: "Nizami Street 48, Baku, Azerbaijan",
-    telegramHandle: "addmetour",
+    telegramHandle: CURRENT_BRAND.brandKey,
   },
   announcement: {
     active: false,
@@ -112,8 +113,8 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
 export const DEFAULT_SETTINGS_MAP: Record<string, any> = {
   contact_whatsapp: COMPANY_CONTACT.whatsappPhone,
   contact_phone: COMPANY_CONTACT.whatsappPhone,
-  contact_email: "info@addmetour.com",
-  contact_telegram: "addmetour",
+  contact_email: CURRENT_BRAND.supportEmail,
+  contact_telegram: CURRENT_BRAND.brandKey,
   contact_address: "Nizami Street 48, Baku, Azerbaijan",
   announcement_active: false,
   announcement_text: "",
@@ -148,13 +149,15 @@ export const DEFAULT_SETTINGS_MAP: Record<string, any> = {
   operations_vehicle_sprinter_active: false,
 };
 
-const SETTINGS_CACHE_KEY = "addmetour_site_settings_cache";
-const SETTINGS_BROADCAST_CHANNEL = "addmetour_settings_channel";
+const SETTINGS_CACHE_KEY = `${CURRENT_BRAND.brandKey}_site_settings_cache`;
+const LEGACY_SETTINGS_CACHE_KEY = "addmetour_site_settings_cache";
+const SETTINGS_BROADCAST_CHANNEL = `${CURRENT_BRAND.brandKey}_settings_channel`;
 
 export function broadcastSettingsUpdate(newSettings: PublicSettings) {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(newSettings));
+    window.dispatchEvent(new CustomEvent(`${CURRENT_BRAND.brandKey}:settings_updated`, { detail: newSettings }));
     window.dispatchEvent(new CustomEvent("addmetour:settings_updated", { detail: newSettings }));
     if (typeof BroadcastChannel !== "undefined") {
       const channel = new BroadcastChannel(SETTINGS_BROADCAST_CHANNEL);
@@ -239,10 +242,12 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
+    window.addEventListener(`${CURRENT_BRAND.brandKey}:settings_updated`, handleCustomUpdate);
     window.addEventListener("addmetour:settings_updated", handleCustomUpdate);
     window.addEventListener("storage", handleStorageChange);
 
     return () => {
+      window.removeEventListener(`${CURRENT_BRAND.brandKey}:settings_updated`, handleCustomUpdate);
       window.removeEventListener("addmetour:settings_updated", handleCustomUpdate);
       window.removeEventListener("storage", handleStorageChange);
       if (bc) {

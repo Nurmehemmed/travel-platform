@@ -14,6 +14,8 @@ import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { DatePicker } from "@/components/DatePicker";
+import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 import { ITINERARY_PAGE_TRANSLATIONS } from "@/lib/i18n/pages/itinerary-i18n";
 
 
@@ -290,7 +292,7 @@ export default function CustomItineraryClient() {
       .filter(Boolean)
       .join("\n • ");
 
-    const text = `🌟 Hello AddmeTour Concierge! I just designed a custom private tour:
+    const text = `🌟 Hello ${CURRENT_BRAND.name} Concierge! I just designed a custom private tour:
 
 📅 Duration: ${durationDays} Days / ${durationDays - 1} Nights
 🗓️ Arrival Date: ${arrivalDate}
@@ -359,12 +361,7 @@ export default function CustomItineraryClient() {
       >
         <div className="container-section flex h-16 items-center justify-between gap-3">
           <Link href="/" className="flex shrink-0 items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500">
-              <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg tracking-tight text-amber-500">
-              addmetour
-            </span>
+            <BrandLogo variant="light" />
           </Link>
 
           <div className="flex items-center gap-2">

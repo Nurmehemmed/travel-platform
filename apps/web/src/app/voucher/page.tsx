@@ -1,10 +1,11 @@
 import React, { Suspense } from "react";
 import { Metadata } from "next";
+import { CURRENT_BRAND } from "@/lib/brand";
 import VoucherClient from "./VoucherClient";
 
 export const metadata: Metadata = {
-  title: "VIP Travel Voucher & Booking Confirmation | AddmeTour",
-  description: "Official travel confirmation voucher, itinerary breakdown, emergency concierge contacts, and QR validation for AddmeTour guests.",
+  title: `VIP Travel Voucher & Booking Confirmation | ${CURRENT_BRAND.name}`,
+  description: `Official travel confirmation voucher, itinerary breakdown, emergency concierge contacts, and QR validation for ${CURRENT_BRAND.name} guests.`,
 };
 
 export default function VoucherPage() {

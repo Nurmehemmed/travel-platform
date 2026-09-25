@@ -3,6 +3,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { LanguageProvider } from "@/lib/i18n";
+import { CURRENT_BRAND } from "@/lib/brand";
 import VoucherShareActions from "../VoucherShareActions";
 
 describe("VoucherShareActions Component", () => {
@@ -109,7 +110,7 @@ describe("VoucherShareActions Component", () => {
 
     expect(openSpy).toHaveBeenCalledTimes(1);
     const openedUrl = decodeURIComponent(String(openSpy.mock.calls[0]?.[0] || ""));
-    expect(openedUrl).toContain("تأكيد حجز AddmeTour");
+    expect(openedUrl).toContain(`تأكيد حجز ${CURRENT_BRAND.name}`);
     expect(openedUrl).toContain("رقم الحجز: *ATR-TEST12*");
     expect(openedUrl).toContain("المسافر: *سعيد أحمد*");
     expect(openedUrl).toContain("المطار: *مطار حيدر علييف الدولي (GYD)*");
@@ -139,7 +140,7 @@ describe("VoucherShareActions Component", () => {
 
     expect(openSpy).toHaveBeenCalledTimes(1);
     const openedUrl = decodeURIComponent(String(openSpy.mock.calls[0]?.[0] || ""));
-    expect(openedUrl).toContain("AddmeTour Rezervasiya Təsdiqi");
+    expect(openedUrl).toContain(`${CURRENT_BRAND.name} Rezervasiya Təsdiqi`);
     expect(openedUrl).toContain("Kod: *ATR-TEST12*");
     expect(openedUrl).toContain("Sərnişin: *Nurməhəmməd Nəbiyev*");
     expect(openedUrl).toContain("Hava limanı: *Heydər Əliyev Beynəlxalq Hava Limanı (GYD)*");
@@ -169,7 +170,7 @@ describe("VoucherShareActions Component", () => {
 
     expect(openSpy).toHaveBeenCalledTimes(1);
     const openedUrl = decodeURIComponent(String(openSpy.mock.calls[0]?.[0] || ""));
-    expect(openedUrl).toContain("Подтверждение бронирования AddmeTour");
+    expect(openedUrl).toContain(`Подтверждение бронирования ${CURRENT_BRAND.name}`);
     expect(openedUrl).toContain("Номер брони: *ATR-TEST12*");
     expect(openedUrl).toContain("Пассажир: *Иван Иванов*");
     expect(openedUrl).toContain("Аэропорт: *Международный аэропорт Гейдар Алиев (GYD)*");

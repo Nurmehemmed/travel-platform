@@ -1,4 +1,5 @@
 import type { VisaTrackTranslations } from "./types";
+import { CURRENT_BRAND } from "../../brand";
 
 export const VISA_TRACK_TRANSLATIONS: Record<string, VisaTrackTranslations> = {
   EN: {
@@ -28,7 +29,7 @@ export const VISA_TRACK_TRANSLATIONS: Record<string, VisaTrackTranslations> = {
     pdfSentTo: "PDF file sent to",
     progressTitle: "Application Progress",
     step1Title: "Application & Payment Received",
-    step1Desc: "Order confirmed in AddmeTour visa system.",
+    step1Desc: `Order confirmed in ${CURRENT_BRAND.name} visa system.`,
     step2Title: "Document & Passport Verification",
     step2Desc: "Passport details and photo validated against ASAN immigration criteria.",
     step3Title: "Submitted to Government (evisa.gov.az)",
@@ -70,7 +71,7 @@ export const VISA_TRACK_TRANSLATIONS: Record<string, VisaTrackTranslations> = {
     pdfSentTo: "PDF faylı bu ünvana göndərildi:",
     progressTitle: "Müraciətin İcra Mərhələləri",
     step1Title: "Müraciət və Ödəniş Qəbul Edildi",
-    step1Desc: "Sifariş AddmeTour viza sistemində qeydə alındı.",
+    step1Desc: `Sifariş ${CURRENT_BRAND.name} viza sistemində qeydə alındı.`,
     step2Title: "Sənəd və Pasport Yoxlanışı",
     step2Desc: "Pasport məlumatları və şəkil ASAN Viza meyarlarına uyğun yoxlanıldı.",
     step3Title: "Dövlət Sisteminə Göndərildi (evisa.gov.az)",
@@ -112,7 +113,7 @@ export const VISA_TRACK_TRANSLATIONS: Record<string, VisaTrackTranslations> = {
     pdfSentTo: "PDF файл отправлен на",
     progressTitle: "Ход рассмотрения заявки",
     step1Title: "Заявка и оплата приняты",
-    step1Desc: "Заказ зарегистрирован в системе AddmeTour.",
+    step1Desc: `Заказ зарегистрирован в системе ${CURRENT_BRAND.name}.`,
     step2Title: "Проверка документов и паспорта",
     step2Desc: "Паспортные данные и фото проверены по критериям ASAN Visa.",
     step3Title: "Передано в гос. систему (evisa.gov.az)",
@@ -154,7 +155,7 @@ export const VISA_TRACK_TRANSLATIONS: Record<string, VisaTrackTranslations> = {
     pdfSentTo: "Fichier PDF envoyé à",
     progressTitle: "Progression de la demande",
     step1Title: "Demande & Paiement reçus",
-    step1Desc: "Commande confirmée dans le système de visa AddmeTour.",
+    step1Desc: `Commande confirmée dans le système de visa ${CURRENT_BRAND.name}.`,
     step2Title: "Vérification des documents & du passeport",
     step2Desc: "Détails du passeport et photo validés selon les critères d'ASAN.",
     step3Title: "Soumis au gouvernement (evisa.gov.az)",
@@ -196,7 +197,7 @@ export const VISA_TRACK_TRANSLATIONS: Record<string, VisaTrackTranslations> = {
     pdfSentTo: "تم إرسال ملف PDF إلى",
     progressTitle: "مراحل معالجة الطلب",
     step1Title: "تم استلام الطلب والدفع",
-    step1Desc: "تم تسجيل الطلب في نظام تأشيرات AddmeTour.",
+    step1Desc: `تم تسجيل الطلب في نظام تأشيرات ${CURRENT_BRAND.name}.`,
     step2Title: "التحقق من بيانات الجواز والمستندات",
     step2Desc: "تمت مراجعة بيانات جواز السفر والصورة ومطابقتها لمعايير ASAN.",
     step3Title: "تم الرفع للنظام الحكومي (evisa.gov.az)",
@@ -238,7 +239,7 @@ export const VISA_TRACK_TRANSLATIONS: Record<string, VisaTrackTranslations> = {
     pdfSentTo: "PDF-Dokument gesendet an",
     progressTitle: "Bearbeitungsfortschritt",
     step1Title: "Antrag & Zahlung eingegangen",
-    step1Desc: "Auftrag im AddmeTour-Visasystem bestätigt.",
+    step1Desc: `Auftrag im ${CURRENT_BRAND.name}-Visasystem bestätigt.`,
     step2Title: "Dokumenten- & Passprüfung",
     step2Desc: "Passdaten und Foto nach ASAN-Kriterien validiert.",
     step3Title: "An Behörden übermittelt (evisa.gov.az)",

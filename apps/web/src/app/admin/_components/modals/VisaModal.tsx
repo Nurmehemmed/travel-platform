@@ -3,6 +3,7 @@
 import React from "react";
 import { X, Copy, Eye, MessageCircle } from "lucide-react";
 import { VisaItem, LightboxImage, AdminLanguage } from "../types";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface VisaModalProps {
   isOpen: boolean;
@@ -256,7 +257,7 @@ export const VisaModal: React.FC<VisaModalProps> = ({
                       /\D/g,
                       ""
                     )}?text=${encodeURIComponent(
-                      `Hello ${selectedVisa.givenNames}! This is AddmeTour regarding your Azerbaijan eVisa application (${selectedVisa.applicationNumber}).`
+                      `Hello ${selectedVisa.givenNames}! This is ${CURRENT_BRAND.name} regarding your Azerbaijan eVisa application (${selectedVisa.applicationNumber}).`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

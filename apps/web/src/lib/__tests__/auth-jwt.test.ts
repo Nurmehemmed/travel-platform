@@ -25,7 +25,7 @@ describe("Auth JWT Session Token Lifecycle", () => {
   it("signs and verifies an admin session token", async () => {
     const admin = {
       id: "adm_test_9999",
-      email: "admin@addmetour.com",
+      email: "admin@bakuya.com",
       name: "Super Admin",
       role: "admin",
     };

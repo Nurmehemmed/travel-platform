@@ -11,6 +11,7 @@ import {
   FileDown,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 export interface VoucherShareActionsProps {
   bookingRef: string;
@@ -34,7 +35,7 @@ const LABELS = {
     copyLink: "Copy Link",
     copied: "Link Copied!",
     toastCopied: "Voucher link copied to clipboard!",
-    voucherTitle: "AddmeTour Official Confirmation Voucher",
+    voucherTitle: `${CURRENT_BRAND.name} Official Confirmation Voucher`,
   },
   AZ: {
     savePdf: "PDF Yadda Saxla",
@@ -44,7 +45,7 @@ const LABELS = {
     copyLink: "Linki Kopyala",
     copied: "Kopyalandı!",
     toastCopied: "Vauçer linki buferə kopyalandı!",
-    voucherTitle: "AddmeTour Rəsmi Təsdiq Vauçeri",
+    voucherTitle: `${CURRENT_BRAND.name} Rəsmi Təsdiq Vauçeri`,
   },
   RU: {
     savePdf: "Сохранить как PDF",
@@ -54,7 +55,7 @@ const LABELS = {
     copyLink: "Копировать ссылку",
     copied: "Скопировано!",
     toastCopied: "Ссылка на ваучер скопирована в буфер!",
-    voucherTitle: "Официальный ваучер бронирования AddmeTour",
+    voucherTitle: `Официальный ваучер бронирования ${CURRENT_BRAND.name}`,
   },
   AR: {
     savePdf: "حفظ كـ PDF",
@@ -64,7 +65,7 @@ const LABELS = {
     copyLink: "نسخ الرابط",
     copied: "تم النسخ!",
     toastCopied: "تم نسخ رابط القسيمة بنجاح!",
-    voucherTitle: "قسيمة حجز AddmeTour الرسمية",
+    voucherTitle: `قسيمة حجز ${CURRENT_BRAND.name} الرسمية`,
   },
   FR: {
     savePdf: "Enregistrer en PDF",
@@ -74,7 +75,7 @@ const LABELS = {
     copyLink: "Copier le lien",
     copied: "Lien copié !",
     toastCopied: "Lien du bon copié dans le presse-papiers !",
-    voucherTitle: "Bon de confirmation officiel AddmeTour",
+    voucherTitle: `Bon de confirmation officiel ${CURRENT_BRAND.name}`,
   },
   DE: {
     savePdf: "Als PDF speichern",
@@ -84,13 +85,13 @@ const LABELS = {
     copyLink: "Link kopieren",
     copied: "Kopiert!",
     toastCopied: "Gutschein-Link in die Zwischenablage kopiert!",
-    voucherTitle: "Offizieller AddmeTour Buchungsbeleg",
+    voucherTitle: `Offizieller ${CURRENT_BRAND.name} Buchungsbeleg`,
   },
 };
 
 const SHARE_DICTIONARY = {
   EN: {
-    header: "🎟️ *AddmeTour Booking Confirmation*",
+    header: `🎟️ *${CURRENT_BRAND.name} Booking Confirmation*`,
     ref: "Ref",
     service: "Service",
     passenger: "Passenger",
@@ -112,7 +113,7 @@ const SHARE_DICTIONARY = {
     "Government ASAN ID": "Government ASAN ID",
   },
   AZ: {
-    header: "🎟️ *AddmeTour Rezervasiya Təsdiqi*",
+    header: `🎟️ *${CURRENT_BRAND.name} Rezervasiya Təsdiqi*`,
     ref: "Kod",
     service: "Xidmət",
     passenger: "Sərnişin",
@@ -134,7 +135,7 @@ const SHARE_DICTIONARY = {
     "Government ASAN ID": "Dövlət ASAN Kodu",
   },
   RU: {
-    header: "🎟️ *Подтверждение бронирования AddmeTour*",
+    header: `🎟️ *Подтверждение бронирования ${CURRENT_BRAND.name}*`,
     ref: "Номер брони",
     service: "Услуга",
     passenger: "Пассажир",
@@ -156,7 +157,7 @@ const SHARE_DICTIONARY = {
     "Government ASAN ID": "Государственный ID ASAN",
   },
   AR: {
-    header: "🎟️ *تأكيد حجز AddmeTour*",
+    header: `🎟️ *تأكيد حجز ${CURRENT_BRAND.name}*`,
     ref: "رقم الحجز",
     service: "الخدمة",
     passenger: "المسافر",
@@ -178,7 +179,7 @@ const SHARE_DICTIONARY = {
     "Government ASAN ID": "رقم طلب أسان الحكومي",
   },
   FR: {
-    header: "🎟️ *Confirmation de réservation AddmeTour*",
+    header: `🎟️ *Confirmation de réservation ${CURRENT_BRAND.name}*`,
     ref: "Réf",
     service: "Service",
     passenger: "Passager",
@@ -200,7 +201,7 @@ const SHARE_DICTIONARY = {
     "Government ASAN ID": "ID officiel ASAN",
   },
   DE: {
-    header: "🎟️ *AddmeTour Buchungsbestätigung*",
+    header: `🎟️ *${CURRENT_BRAND.name} Buchungsbestätigung*`,
     ref: "Ref-Nr.",
     service: "Leistung",
     passenger: "Passagier",
@@ -249,7 +250,7 @@ export default function VoucherShareActions({
   }, []);
 
   const getEffectiveUrl = () => {
-    const target = directUrl || (typeof window !== "undefined" ? window.location.href : "https://addmetour.vercel.app");
+    const target = directUrl || (typeof window !== "undefined" ? window.location.href : `https://${CURRENT_BRAND.domain}`);
     try {
       const url = new URL(target);
       if (language && language !== "EN") {
@@ -293,7 +294,7 @@ export default function VoucherShareActions({
     const originalTitle = document.title;
     const cleanFilename =
       pdfFilename ||
-      `AddmeTour-${serviceType.charAt(0).toUpperCase() + serviceType.slice(1)}-Voucher-${bookingRef}`;
+      `${CURRENT_BRAND.name}-${serviceType.charAt(0).toUpperCase() + serviceType.slice(1)}-Voucher-${bookingRef}`;
 
     document.title = cleanFilename;
 
@@ -341,7 +342,7 @@ export default function VoucherShareActions({
 
   const handleEmailShare = () => {
     const subject = `${l.voucherTitle} - ${bookingRef}`;
-    const body = `${getShareText()}\n\nAddmeTour Azerbaijan DMC\n24/7 Operations: +994 55 100 3146`;
+    const body = `${getShareText()}\n\n${CURRENT_BRAND.name} Azerbaijan DMC\n24/7 Operations: +994 55 100 3146`;
     const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoUrl;
   };

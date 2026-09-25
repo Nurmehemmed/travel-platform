@@ -11,6 +11,7 @@ import { useLanguage } from "@/lib/i18n";
 import { VISA_TRACK_TRANSLATIONS } from "@/lib/pages-i18n";
 import { VisaTrackingSkeleton } from "@/components/Skeletons";
 import VoucherShareActions from "@/components/VoucherShareActions";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 interface TrackedApplication {
   id: string;
@@ -213,7 +214,7 @@ export default function VisaTrackPage() {
             {/* Official Print Header for e-Visa */}
             <div className="hidden print:flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-3">
               <div>
-                <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">AddmeTour Azerbaijan DMC</h1>
+                <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">{CURRENT_BRAND.name} Azerbaijan DMC</h1>
                 <p className="text-[10px] text-slate-500 font-medium">Official ASAN Electronic Visa (e-Visa) Status & Application Certificate</p>
               </div>
               <div className="text-right text-[10px] text-slate-600 space-y-0.5">
@@ -379,7 +380,7 @@ export default function VisaTrackPage() {
                 "Processing": `${application.visaType.toUpperCase()} (${application.visaType === "urgent" ? vt.timeHours : vt.timeDays})`,
                 "Total Amount": `$${application.totalAmount} USD`,
               }}
-              pdfFilename={`AddmeTour-Visa-Certificate-${application.applicationNumber}`}
+              pdfFilename={`${CURRENT_BRAND.name}-Visa-Certificate-${application.applicationNumber}`}
               className="mt-6"
             />
           </div>

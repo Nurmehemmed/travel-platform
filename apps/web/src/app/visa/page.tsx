@@ -12,6 +12,8 @@ import { CurrencySelector } from "@/components/CurrencySelector";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { CustomSelect } from "@/components/CustomSelect";
+import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 export default function VisaLandingPage() {
   const { t } = useLanguage();
@@ -55,12 +57,7 @@ export default function VisaLandingPage() {
       >
         <div className="container-section flex h-16 items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
-              <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-base sm:text-lg tracking-tight" style={{ color: "#f59e0b" }}>
-              addmetour
-            </span>
+            <BrandLogo variant="light" />
             <span className="hidden md:inline-block ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase bg-white/10 text-white/90 whitespace-nowrap">
               {t.visaPage.headerBadge}
             </span>
@@ -408,7 +405,7 @@ export default function VisaLandingPage() {
 
       {/* ═══════════════════════════════════════════════════════ FOOTER */}
       <footer className="py-10 text-center text-xs text-slate-500" style={{ backgroundColor: "#f0f9ff" }}>
-        <p>&copy; {new Date().getFullYear()} AddmeTour &middot; Official Partner for Azerbaijan Travel & e-Visa Assistance.</p>
+        <p>&copy; {new Date().getFullYear()} {CURRENT_BRAND.name} &middot; Official Partner for Azerbaijan Travel & e-Visa Assistance.</p>
         <p className="mt-1">Compatible with the State Agency for Public Service and Social Innovations under the President of the Republic of Azerbaijan (ASAN Visa).</p>
       </footer>
     </div>

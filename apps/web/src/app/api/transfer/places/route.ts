@@ -7,6 +7,7 @@ import {
   calculateHaversineDistanceKm,
   checkLocationServiceability,
 } from "@/lib/transfer-zones";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 // Cache for geocoding to keep requests lightning-fast and avoid duplicate upstream calls
 const GEO_CACHE = new Map<string, { data: any; timestamp: number }>();
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
       const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
       const res = await fetch(url, {
         headers: {
-          "User-Agent": "AddmeTour-Platform/1.0 (dispatch@addmetour.com; https://addmetour.com)",
+          "User-Agent": `${CURRENT_BRAND.name}-Platform/1.0 (dispatch@${CURRENT_BRAND.domain}; https://${CURRENT_BRAND.domain})`,
           "Accept-Language": `${lang},az,en`,
         },
         signal: AbortSignal.timeout(4500),
@@ -175,7 +176,7 @@ export async function GET(request: NextRequest) {
 
     const res = await fetch(nominatimUrl, {
       headers: {
-        "User-Agent": "AddmeTour-Platform/1.0 (dispatch@addmetour.com; https://addmetour.com)",
+        "User-Agent": `${CURRENT_BRAND.name}-Platform/1.0 (dispatch@${CURRENT_BRAND.domain}; https://${CURRENT_BRAND.domain})`,
         "Accept-Language": `${lang},az,en`,
       },
       signal: AbortSignal.timeout(4000),

@@ -9,6 +9,7 @@
  */
 
 import { createPayriffOrder, PayriffOrderResult } from "./payriff";
+import { CURRENT_BRAND } from "./brand";
 
 export type PaymentProvider = "payriff" | "stripe";
 
@@ -76,7 +77,7 @@ export async function createUnifiedPaymentSession(
       );
       stripeBody.append(
         "line_items[0][price_data][product_data][name]",
-        `AddmeTour: ${description}`
+        `${CURRENT_BRAND.name}: ${description}`
       );
       stripeBody.append("line_items[0][quantity]", "1");
 
