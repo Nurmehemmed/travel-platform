@@ -134,6 +134,8 @@ export interface TransferItem {
   paymentMethod: "online" | "on_arrival";
   paymentStatus: string;
   status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
+  femaleDriver?: boolean | null;
+  additionalGuide?: boolean | null;
   driverName?: string | null;
   driverPhone?: string | null;
   adminNotes?: string | null;

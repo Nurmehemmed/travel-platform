@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Car, ArrowLeft } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/lib/i18n";
 
@@ -23,12 +24,7 @@ export const TransferBookHeader: React.FC<TransferBookHeaderProps> = ({ isScroll
     >
       <div className="container-section flex h-16 items-center justify-between">
         <Link href="/transfer" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "#0ea5e9" }}>
-            <Car className="h-5 w-5 text-white" strokeWidth={2.5} />
-          </div>
-          <span className="font-bold text-lg sm:text-xl tracking-tight text-white">
-            addmetour
-          </span>
+          <BrandLogo variant="header" />
           <span className="hidden sm:inline-block ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-sky-400/20 text-sky-200 border border-sky-300/30 whitespace-nowrap">
             {t.transferPage.headerBadge}
           </span>

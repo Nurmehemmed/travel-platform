@@ -5,6 +5,7 @@ import {
   AirportCode,
   getAirportByCode,
   calculateHaversineDistanceKm,
+  checkLocationServiceability,
 } from "@/lib/transfer-zones";
 
 // Cache for geocoding to keep requests lightning-fast and avoid duplicate upstream calls
@@ -26,6 +27,19 @@ export async function GET(request: NextRequest) {
 
     if (isNaN(lat) || isNaN(lng)) {
       return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
+    }
+
+    // Geographic boundary and water check
+    const serviceCheck = checkLocationServiceability(lat, lng);
+    if (!serviceCheck.isServiceable) {
+      return NextResponse.json({
+        isServiceable: false,
+        status: serviceCheck.status,
+        error: serviceCheck.message,
+        address: serviceCheck.message,
+        lat,
+        lng,
+      });
     }
 
     const cacheKey = `rev:${lat.toFixed(4)},${lng.toFixed(4)}:${lang}`;

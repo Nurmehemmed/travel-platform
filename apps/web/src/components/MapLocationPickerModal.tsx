@@ -9,11 +9,19 @@ import {
   Navigation,
   Loader2,
   Map as MapIcon,
+  AlertTriangle,
+  RotateCcw,
+  Sparkles,
+  Building2,
 } from "lucide-react";
 import {
   AirportCode,
   resolveLocationByCoords,
   resolveLocationOrZone,
+  AZERBAIJAN_MAP_BOUNDS,
+  checkLocationServiceability,
+  MAP_HOTSPOTS,
+  MapHotspot,
 } from "@/lib/transfer-zones";
 import { useLanguage } from "@/lib/i18n";
 import { LOCALIZED_MAP_PICKER, LOCALIZED_ZONES } from "@/lib/pages-i18n";
@@ -52,6 +60,7 @@ export function MapLocationPickerModal({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const leafletModuleRef = useRef<any>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // State for selected coords & resolved details
@@ -83,6 +92,9 @@ export function MapLocationPickerModal({
   >([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
+  // Instantaneous geographic validation (blocks water and Caspian Sea, out-of-bounds)
+  const serviceability = checkLocationServiceability(currentCoords.lat, currentCoords.lng);
+
   // Compute zone and distance
   const { zone: resolvedZone, distanceKm: resolvedDistanceKm } = resolveLocationByCoords(
     currentCoords.lat,
@@ -90,13 +102,57 @@ export function MapLocationPickerModal({
     airportCode
   );
 
+  // Helper to create high-contrast custom SVG pin icons reflecting serviceability state
+  const createPinIcon = useCallback((L: any, isServiceable: boolean) => {
+    const gradient = isServiceable
+      ? "linear-gradient(135deg, #0284c7, #0369a1)"
+      : "linear-gradient(135deg, #ef4444, #b91c1c)";
+    const shadow = isServiceable
+      ? "0 10px 25px -5px rgba(2, 132, 199, 0.6), 0 0 0 3px #ffffff"
+      : "0 10px 25px -5px rgba(239, 68, 68, 0.7), 0 0 0 3px #ffffff";
+    const iconEmoji = isServiceable ? "📍" : "⚠️";
+
+    return L.divIcon({
+      className: "custom-map-pin",
+      html: `
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%);">
+          <div style="
+            width: 38px;
+            height: 38px;
+            background: ${gradient};
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: ${shadow};
+            border: 2px solid #ffffff;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          ">
+            <span style="transform: rotate(45deg); font-size: 18px; line-height: 1;">${iconEmoji}</span>
+          </div>
+          <div style="
+            width: 14px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.28);
+            border-radius: 50%;
+            margin-top: 2px;
+            filter: blur(1px);
+          "></div>
+        </div>
+      `,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0],
+    });
+  }, []);
+
   // Quick chips for popular destinations in Azerbaijan
   const quickShortcuts = [
     { name: "JW Marriott", query: "JW Marriott Absheron Baku", lat: 40.3725, lng: 49.8530, id: "loc-jw-marriott" },
-    { name: "Flame Towers", query: "Flame Towers, Baku", lat: 40.3598, lng: 49.8258, id: "loc-fairmont-flame" },
-    { name: "Old City (Icherisheher)", query: "Icherisheher Baku", lat: 40.3660, lng: 49.8335, id: "loc-dst-old-city" },
-    { name: "Shahdag Ski Resort", query: "Shahdag Mountain Resort", lat: 41.3214, lng: 48.1464, id: "loc-reg-shahdag" },
-    { name: "Qabala Tufandag", query: "Tufandag Qabala", lat: 40.9825, lng: 47.8492, id: "loc-reg-qabala" },
+    { name: "Flame Towers", query: "Fairmont Baku (Flame Towers)", lat: 40.3598, lng: 49.8258, id: "loc-fairmont-flame" },
+    { name: "Old City", query: "Old City (Icherisheher Historic Quarter)", lat: 40.3660, lng: 49.8335, id: "loc-dst-old-city" },
+    { name: "Shahdag Resort", query: "Shahdag Mountain Resort", lat: 41.3214, lng: 48.1464, id: "loc-reg-shahdag" },
+    { name: "Qabala Tufandag", query: "Tufandag Mountain Resort", lat: 40.9825, lng: 47.8492, id: "loc-reg-qabala" },
     { name: "Bilgah Beach", query: "Bilgah Beach Hotel", lat: 40.5847, lng: 49.9824, id: "loc-bilgah-beach" },
   ];
 
@@ -116,6 +172,14 @@ export function MapLocationPickerModal({
   // Reverse geocoding lookup via internal API route (bypasses browser CORS & User-Agent blocks)
   const performReverseGeocode = useCallback(
     async (lat: number, lng: number) => {
+      const check = checkLocationServiceability(lat, lng);
+      if (!check.isServiceable) {
+        setResolvedAddress(check.message);
+        setResolvedLocationName(undefined);
+        setResolvedLocationId(undefined);
+        return;
+      }
+
       setIsGeocoding(true);
       try {
         const res = await fetch(
@@ -125,6 +189,12 @@ export function MapLocationPickerModal({
 
         if (res.ok) {
           const data = await res.json();
+          if (!data.isServiceable && data.error) {
+            setResolvedAddress(data.error);
+            setResolvedLocationName(undefined);
+            setResolvedLocationId(undefined);
+            return;
+          }
           if (data.address) {
             setResolvedAddress(data.address);
             setResolvedLocationName(data.name || undefined);
@@ -143,7 +213,44 @@ export function MapLocationPickerModal({
     [airportCode, language]
   );
 
-  // Initialize Leaflet Map
+  // Fast reset action to Baku City Center
+  const handleResetToBaku = useCallback(() => {
+    const bakuLat = 40.3725;
+    const bakuLng = 49.8530;
+    setCurrentCoords({ lat: bakuLat, lng: bakuLng });
+    setResolvedAddress("JW Marriott Absheron Baku, 674 Azadliq Square");
+    setResolvedLocationName("JW Marriott Absheron Baku");
+    setResolvedLocationId("loc-jw-marriott");
+
+    if (markerRef.current && leafletModuleRef.current) {
+      markerRef.current.setLatLng([bakuLat, bakuLng]);
+      markerRef.current.setIcon(createPinIcon(leafletModuleRef.current, true));
+    }
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([bakuLat, bakuLng], 15, { duration: 1.0 });
+    }
+  }, [createPinIcon]);
+
+  // Select a curated hotspot directly
+  const handleSelectHotspot = useCallback(
+    (spot: MapHotspot) => {
+      setCurrentCoords({ lat: spot.lat, lng: spot.lng });
+      setResolvedAddress(spot.address);
+      setResolvedLocationName(spot.name);
+      setResolvedLocationId(spot.id);
+
+      if (markerRef.current && leafletModuleRef.current) {
+        markerRef.current.setLatLng([spot.lat, spot.lng]);
+        markerRef.current.setIcon(createPinIcon(leafletModuleRef.current, true));
+      }
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo([spot.lat, spot.lng], 16, { duration: 1.0 });
+      }
+    },
+    [createPinIcon]
+  );
+
+  // Initialize Leaflet Map with boundary constraints and curated hotspots
   useEffect(() => {
     if (!isOpen || !mapContainerRef.current) return;
 
@@ -153,6 +260,7 @@ export function MapLocationPickerModal({
       if (typeof window === "undefined") return;
 
       const L = (await import("leaflet")).default;
+      leafletModuleRef.current = L;
 
       // Clean existing instance
       if (mapInstanceRef.current) {
@@ -162,46 +270,21 @@ export function MapLocationPickerModal({
 
       if (!mapContainerRef.current) return;
 
-      // Custom high-contrast SVG pin icon
-      const pinIcon = L.divIcon({
-        className: "custom-map-pin",
-        html: `
-          <div style="position: relative; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%);">
-            <div style="
-              width: 38px;
-              height: 38px;
-              background: linear-gradient(135deg, #0284c7, #0369a1);
-              border-radius: 50% 50% 50% 0;
-              transform: rotate(-45deg);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.6), 0 0 0 3px #ffffff;
-              border: 2px solid #ffffff;
-            ">
-              <span style="transform: rotate(45deg); font-size: 18px; line-height: 1;">📍</span>
-            </div>
-            <div style="
-              width: 14px;
-              height: 4px;
-              background: rgba(0, 0, 0, 0.25);
-              border-radius: 50%;
-              margin-top: 2px;
-              filter: blur(1px);
-            "></div>
-          </div>
-        `,
-        iconSize: [0, 0],
-        iconAnchor: [0, 0],
-      });
+      const initialCheck = checkLocationServiceability(currentCoords.lat, currentCoords.lng);
+      const pinIcon = createPinIcon(L, initialCheck.isServiceable);
 
+      // Initialize map locked strictly to Azerbaijan bounds
       const map = L.map(mapContainerRef.current, {
         center: [currentCoords.lat, currentCoords.lng],
         zoom: 14,
+        minZoom: 7,
+        maxZoom: 18,
+        maxBounds: AZERBAIJAN_MAP_BOUNDS,
+        maxBoundsViscosity: 1.0,
         zoomControl: true,
       });
 
-      // CartoDB Voyager raster tiles
+      // CartoDB Voyager clean raster tiles
       L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
         {
@@ -212,15 +295,76 @@ export function MapLocationPickerModal({
         }
       ).addTo(map);
 
-      // Add draggable marker
+      // Render Curated Hotspot POIs on the map
+      const hotspotLayer = L.layerGroup().addTo(map);
+      MAP_HOTSPOTS.forEach((spot) => {
+        const borderColor =
+          spot.category === "resort"
+            ? "#10b981"
+            : spot.category === "landmark"
+            ? "#8b5cf6"
+            : "#0284c7";
+
+        const spotMarkerIcon = L.divIcon({
+          className: "custom-hotspot-pin",
+          html: `
+            <div style="
+              width: 28px;
+              height: 28px;
+              border-radius: 9999px;
+              background: #ffffff;
+              border: 2px solid ${borderColor};
+              box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 13px;
+              cursor: pointer;
+              transform: translate(-50%, -50%);
+              transition: transform 0.15s ease, box-shadow 0.15s ease;
+            ">
+              ${spot.icon}
+            </div>
+          `,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0],
+        });
+
+        const spotMarker = L.marker([spot.lat, spot.lng], { icon: spotMarkerIcon }).addTo(hotspotLayer);
+        spotMarker.bindTooltip(
+          `
+            <div style="font-family: inherit; font-size: 11px; padding: 2px 4px;">
+              <div style="font-weight: 700; color: #0f172a;">${spot.name}</div>
+              <div style="font-size: 10px; color: #64748b; margin-top: 1px;">${spot.badge} • ${spot.address}</div>
+            </div>
+          `,
+          { direction: "top", offset: [0, -16], opacity: 0.95 }
+        );
+
+        spotMarker.on("click", (e: any) => {
+          L.DomEvent.stopPropagation(e);
+          handleSelectHotspot(spot);
+        });
+      });
+
+      // Add draggable main destination pin
       const marker = L.marker([currentCoords.lat, currentCoords.lng], {
         icon: pinIcon,
         draggable: true,
       }).addTo(map);
 
-      // Marker drag event
+      // Marker drag live feedback (changes to warning pin dynamically if over water/border)
+      marker.on("drag", () => {
+        const position = marker.getLatLng();
+        const check = checkLocationServiceability(position.lat, position.lng);
+        marker.setIcon(createPinIcon(L, check.isServiceable));
+      });
+
+      // Marker dragend event (resolves coords and updates state)
       marker.on("dragend", () => {
         const position = marker.getLatLng();
+        const check = checkLocationServiceability(position.lat, position.lng);
+        marker.setIcon(createPinIcon(L, check.isServiceable));
         setCurrentCoords({ lat: position.lat, lng: position.lng });
         performReverseGeocode(position.lat, position.lng);
       });
@@ -228,7 +372,9 @@ export function MapLocationPickerModal({
       // Map click event to move pin
       map.on("click", (e: any) => {
         const { lat, lng } = e.latlng;
+        const check = checkLocationServiceability(lat, lng);
         marker.setLatLng([lat, lng]);
+        marker.setIcon(createPinIcon(L, check.isServiceable));
         setCurrentCoords({ lat, lng });
         performReverseGeocode(lat, lng);
       });
@@ -305,7 +451,7 @@ export function MapLocationPickerModal({
     }, 250);
   };
 
-  // Select a search result or quick shortcut
+  // Select a search result
   const selectSearchResult = (item: {
     title: string;
     subtitle?: string;
@@ -323,6 +469,9 @@ export function MapLocationPickerModal({
 
     if (mapInstanceRef.current && markerRef.current) {
       markerRef.current.setLatLng([item.lat, item.lng]);
+      if (leafletModuleRef.current) {
+        markerRef.current.setIcon(createPinIcon(leafletModuleRef.current, true));
+      }
       mapInstanceRef.current.flyTo([item.lat, item.lng], 15, {
         duration: 1.2,
       });
@@ -351,6 +500,8 @@ export function MapLocationPickerModal({
   if (!isOpen) return null;
 
   const handleConfirm = () => {
+    if (!serviceability.isServiceable) return;
+
     onSelectLocation({
       address: resolvedAddress,
       lat: currentCoords.lat,
@@ -457,8 +608,9 @@ export function MapLocationPickerModal({
 
           {/* Quick Location Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0">
-              {mp.quickShortcuts}
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1">
+              <Sparkles className="h-3 w-3 text-sky-500" />
+              <span>{mp.quickShortcuts}</span>
             </span>
             {quickShortcuts.map((sc) => (
               <button
@@ -485,9 +637,19 @@ export function MapLocationPickerModal({
         <div className="relative flex-1 w-full bg-slate-100 overflow-hidden">
           <div ref={mapContainerRef} className="w-full h-full" />
 
-          {/* Floating Drag Hint */}
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] pointer-events-none">
-            <div className="rounded-full bg-slate-900/80 backdrop-blur-md px-3.5 py-1 text-[11px] font-medium text-white shadow-lg flex items-center gap-1.5 border border-white/10">
+          {/* Top Overlays */}
+          <div className="absolute top-3 inset-x-3 flex items-center justify-between z-[400] pointer-events-none">
+            {/* Curated Hotspots Badge */}
+            <div className="pointer-events-auto rounded-full bg-slate-950/80 backdrop-blur-md px-3 py-1 text-[11px] font-semibold text-white shadow-lg flex items-center gap-1.5 border border-white/10">
+              <Building2 className="h-3.5 w-3.5 text-emerald-400" />
+              <span>{mp.curatedPlaces || "Hotspots Active"}</span>
+              <span className="ml-0.5 rounded-full bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-bold text-emerald-300 border border-emerald-400/30">
+                {MAP_HOTSPOTS.length}
+              </span>
+            </div>
+
+            {/* Floating Drag Hint */}
+            <div className="hidden sm:flex rounded-full bg-slate-900/80 backdrop-blur-md px-3 py-1 text-[11px] font-medium text-white shadow-lg items-center gap-1.5 border border-white/10">
               <Navigation className="h-3 w-3 text-sky-400 animate-pulse" />
               <span>{mp.dragHint}</span>
             </div>
@@ -496,10 +658,47 @@ export function MapLocationPickerModal({
 
         {/* ═══════════════════════════════════════════════════════ BOTTOM DETAILS & ACTIONS BAR */}
         <div className="p-4 sm:p-5 bg-white border-t border-slate-200 shrink-0 space-y-3 shadow-lg">
+          {/* Unserviceable Warning Banner (if Caspian Sea or border clicked) */}
+          {!serviceability.isServiceable && (
+            <div className="flex items-center justify-between gap-3 p-2.5 sm:p-3 rounded-xl bg-rose-50 border border-rose-200/80 text-rose-900 text-xs animate-fadeIn">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-rose-100 text-rose-600">
+                  <AlertTriangle className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold text-[11px] sm:text-xs text-rose-900 flex items-center gap-1.5">
+                    <span>
+                      {serviceability.status === "water"
+                        ? "🌊 Caspian Sea Water Location"
+                        : mp.unserviceableWarning}
+                    </span>
+                  </div>
+                  <p className="text-[10px] sm:text-[11px] text-rose-700 truncate sm:whitespace-normal">
+                    {serviceability.message}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleResetToBaku}
+                className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] shadow-xs cursor-pointer transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>{mp.resetToCenter}</span>
+              </button>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             {/* Resolved Location Text */}
             <div className="flex items-start gap-2.5 min-w-0">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700 mt-0.5">
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl mt-0.5 transition-colors ${
+                  serviceability.isServiceable
+                    ? "bg-sky-100 text-sky-700"
+                    : "bg-rose-100 text-rose-700"
+                }`}
+              >
                 <MapPin className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
@@ -514,23 +713,34 @@ export function MapLocationPickerModal({
                     </span>
                   )}
                 </div>
-                <h4 className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                <h4
+                  className={`font-bold text-xs sm:text-sm truncate ${
+                    serviceability.isServiceable ? "text-slate-900" : "text-rose-700"
+                  }`}
+                >
                   {resolvedAddress}
                 </h4>
-                <div className="flex flex-wrap items-center gap-2 mt-1">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 border border-sky-200 px-2 py-0.5 text-[10px] font-bold text-sky-700">
-                    <span>{mp.zoneBadge}</span>
-                    <span className="text-slate-900">
-                      {LOCALIZED_ZONES[language]?.[resolvedZone.id] || resolvedZone.name}
+
+                {serviceability.isServiceable ? (
+                  <div className="flex flex-wrap items-center gap-2 mt-1">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 border border-sky-200 px-2 py-0.5 text-[10px] font-bold text-sky-700">
+                      <span>{mp.zoneBadge}</span>
+                      <span className="text-slate-900">
+                        {LOCALIZED_ZONES[language]?.[resolvedZone.id] || resolvedZone.name}
+                      </span>
                     </span>
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
-                    <span>{mp.distanceBadge}</span>
-                    <span className="font-bold text-slate-800">
-                      ~{resolvedDistanceKm} km
+                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                      <span>{mp.distanceBadge}</span>
+                      <span className="font-bold text-slate-800">
+                        ~{resolvedDistanceKm} km
+                      </span>
                     </span>
-                  </span>
-                </div>
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-rose-500 mt-0.5 font-medium">
+                    ⚠️ Drag the pin to any valid street or hotel in Azerbaijan to confirm.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -545,8 +755,13 @@ export function MapLocationPickerModal({
               </button>
               <button
                 type="button"
+                disabled={!serviceability.isServiceable || isGeocoding}
                 onClick={handleConfirm}
-                className="rounded-xl bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 text-xs font-bold transition-all shadow-md flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                className={`rounded-xl px-5 py-2.5 text-xs font-bold transition-all shadow-md flex items-center gap-1.5 ${
+                  serviceability.isServiceable && !isGeocoding
+                    ? "bg-sky-600 hover:bg-sky-700 text-white hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                    : "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
+                }`}
               >
                 <Check className="h-4 w-4 stroke-[2.5]" />
                 <span>{mp.confirmButton}</span>

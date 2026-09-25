@@ -5,6 +5,8 @@ import Link from "next/link";
 import { MapPin, MessageCircle, Globe, Shield, Star, Award, Heart, Check, Phone, Share2, Copy, CheckCheck, Download } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useSiteSettings } from "@/lib/settings-context";
+import { BrandLogo } from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 export const HomeFooter: React.FC = () => {
   const { language, t } = useLanguage();
@@ -26,11 +28,8 @@ export const HomeFooter: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
             {/* Col 1: Brand & Bio */}
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
-                  <MapPin className="h-5 w-5 text-white" strokeWidth={2.5} />
-                </div>
-                <span className="font-bold text-xl tracking-tight" style={{ color: "#f59e0b" }}>addmetour</span>
+              <div className="mb-4">
+                <BrandLogo variant="footer" />
               </div>
               <p className="text-xs text-white/70 leading-relaxed mb-6">
                 Discover the soul of Azerbaijan with boutique private tours, 24/7 airport pickups, and expedited 3-hour official e-Visas. Handcrafted with local passion.
@@ -239,7 +238,7 @@ export const HomeFooter: React.FC = () => {
 
           {/* Bottom Row */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
-            <p>{t.footer.rights}</p>
+            <p>{t.footer.rights.replace("AddmeTour", CURRENT_BRAND.name)}</p>
             <div className="flex items-center gap-6">
               <Link href="/medical" aria-label="Medical & Wellness Tourism" className="hover:text-white transition-colors">
                 {language === "AZ" ? "Tibbi Turizm" : language === "RU" ? "Медицинский туризм" : language === "AR" ? "السياحة الطبية" : "Medical Tourism"}

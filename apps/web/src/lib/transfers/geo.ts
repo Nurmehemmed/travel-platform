@@ -209,3 +209,303 @@ export function resolveLocationByCoords(
   const fallback = getZonesByAirport(airport)[0]!;
   return { zone: fallback, distanceKm: fallback.distanceKm || estDrivingDistance };
 }
+
+/**
+ * Azerbaijan geographic coordinate bounds for Leaflet map camera containment.
+ */
+export const AZERBAIJAN_MAP_BOUNDS: [[number, number], [number, number]] = [
+  [38.35, 44.75], // South-West (Astara / Sadarak)
+  [41.95, 50.95], // North-East (Balakan / Chilov tip)
+];
+
+export interface ServiceabilityCheckResult {
+  isServiceable: boolean;
+  status: "ok" | "water" | "out_of_bounds";
+  message: string;
+}
+
+/**
+ * Evaluates whether geographical coordinates fall on valid serviceable land in Azerbaijan,
+ * rejecting Caspian Sea water, international borders, and off-grid zones.
+ */
+export function checkLocationServiceability(lat: number, lng: number): ServiceabilityCheckResult {
+  // 1. Boundary bounding box check
+  if (lat < 38.35 || lat > 41.95 || lng < 44.75 || lng > 50.95) {
+    return {
+      isServiceable: false,
+      status: "out_of_bounds",
+      message: "Location is outside Azerbaijan's borders. We only service destinations within Azerbaijan.",
+    };
+  }
+
+  // 2. Caspian Sea (Water) detection:
+  // North Coast (lat >= 41.25): Yalama/Nabran/Khudat coast is around lng 48.70. East of 48.72 is water.
+  if (lat >= 41.25 && lng > 48.72) {
+    return {
+      isServiceable: false,
+      status: "water",
+      message: "Selected point is in the Caspian Sea. Please place the pin on land or near a coastal resort.",
+    };
+  }
+
+  // Shabran / Khachmaz / Siyazan coast (40.85 <= lat < 41.25): coast is around lng 49.1 - 49.30
+  if (lat >= 40.85 && lat < 41.25 && lng > 49.30) {
+    return {
+      isServiceable: false,
+      status: "water",
+      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+    };
+  }
+
+  // North of Absheron peninsula (40.62 <= lat < 40.85): Sumqayit to Pirallahi
+  if (lat >= 40.62 && lng > 49.80) {
+    if (lng > 50.48) {
+      return {
+        isServiceable: false,
+        status: "water",
+        message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+      };
+    }
+    if (lat > 40.63 && lng > 50.15) {
+      return {
+        isServiceable: false,
+        status: "water",
+        message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+      };
+    }
+  }
+
+  // Absheron Peninsula east tip: Pirallahi island is up to lng ~50.45. East of 50.48 is open sea.
+  if (lat >= 40.35 && lat < 40.62 && lng > 50.48) {
+    return {
+      isServiceable: false,
+      status: "water",
+      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+    };
+  }
+
+  // Baku Bay water area (lat between 40.32 and 40.365, east of the amphitheater coast ~49.87)
+  if (lat >= 40.32 && lat <= 40.365 && lng > 49.87 && lng < 50.05) {
+    return {
+      isServiceable: false,
+      status: "water",
+      message: "Selected point is in Baku Bay (water). Please place the pin along the Boulevard or street address.",
+    };
+  }
+
+  // Gobustan / Shirvan / Neftchala coast (39.50 <= lat < 40.32): coast is around lng 49.3 - 49.48
+  if (lat >= 39.50 && lat < 40.32 && lng > 49.48) {
+    return {
+      isServiceable: false,
+      status: "water",
+      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+    };
+  }
+
+  // South coast (Lankaran / Astara, lat < 39.50): coast is around lng 48.90
+  if (lat < 39.50 && lng > 48.95) {
+    return {
+      isServiceable: false,
+      status: "water",
+      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+    };
+  }
+
+  return {
+    isServiceable: true,
+    status: "ok",
+    message: "Valid destination in Azerbaijan.",
+  };
+}
+
+export interface MapHotspot {
+  id: string;
+  name: string;
+  category: "hotel" | "landmark" | "resort";
+  lat: number;
+  lng: number;
+  address: string;
+  badge: string;
+  icon: string;
+}
+
+/**
+ * Curated registry of verified popular hotels, resorts, and cultural landmarks across Azerbaijan.
+ * Rendered on the interactive map as clickable visual hotspots.
+ */
+export const MAP_HOTSPOTS: MapHotspot[] = [
+  // Top Baku Hotels
+  {
+    id: "loc-jw-marriott",
+    name: "JW Marriott Absheron Baku",
+    category: "hotel",
+    lat: 40.3725,
+    lng: 49.8530,
+    address: "674 Azadliq Square, Baku",
+    badge: "5★ Luxury",
+    icon: "🏨",
+  },
+  {
+    id: "loc-fairmont-flame",
+    name: "Fairmont Baku (Flame Towers)",
+    category: "hotel",
+    lat: 40.3598,
+    lng: 49.8258,
+    address: "1A Mehdi Huseyn Street, Flame Towers Complex",
+    badge: "5★ Icon",
+    icon: "🏨",
+  },
+  {
+    id: "loc-four-seasons",
+    name: "Four Seasons Hotel Baku",
+    category: "hotel",
+    lat: 40.3655,
+    lng: 49.8355,
+    address: "1 Neftchilar Avenue, Seaside Boulevard",
+    badge: "5★ Ultra-Luxury",
+    icon: "🏨",
+  },
+  {
+    id: "loc-hilton-baku",
+    name: "Hilton Baku",
+    category: "hotel",
+    lat: 40.3712,
+    lng: 49.8512,
+    address: "1B Azadliq Avenue, City Center",
+    badge: "5★ Waterfront",
+    icon: "🏨",
+  },
+  {
+    id: "loc-ritz-carlton",
+    name: "The Ritz-Carlton, Baku",
+    category: "hotel",
+    lat: 40.3842,
+    lng: 49.8710,
+    address: "3 Babek Avenue, Nasimi District",
+    badge: "5★ Luxury",
+    icon: "🏨",
+  },
+  {
+    id: "loc-intercontinental",
+    name: "InterContinental Baku",
+    category: "hotel",
+    lat: 40.3718,
+    lng: 49.8480,
+    address: "25 Zarifa Aliyeva Street, City Center",
+    badge: "5★ Hotel",
+    icon: "🏨",
+  },
+  {
+    id: "loc-marriott-boulevard",
+    name: "Baku Marriott Hotel Boulevard",
+    category: "hotel",
+    lat: 40.3785,
+    lng: 49.8820,
+    address: "Khagani Rustamov Street 4C, White City",
+    badge: "5★ Waterfront",
+    icon: "🏨",
+  },
+  {
+    id: "loc-intourist",
+    name: "Intourist Hotel Baku",
+    category: "hotel",
+    lat: 40.3540,
+    lng: 49.8370,
+    address: "Mikayil Useynov Avenue 51, Bayil",
+    badge: "5★ Boutique",
+    icon: "🏨",
+  },
+  {
+    id: "loc-bilgah-beach",
+    name: "Bilgah Beach Hotel",
+    category: "resort",
+    lat: 40.5847,
+    lng: 49.9824,
+    address: "Gelebe Street 94, Bilgah Coast",
+    badge: "5★ Seaside Resort",
+    icon: "🏖️",
+  },
+  // Key Landmarks
+  {
+    id: "loc-dst-old-city",
+    name: "Old City (Icherisheher & Maiden Tower)",
+    category: "landmark",
+    lat: 40.3660,
+    lng: 49.8335,
+    address: "Icherisheher Historic Quarter, Baku",
+    badge: "UNESCO Heritage",
+    icon: "🏰",
+  },
+  {
+    id: "loc-dst-fountain-sq",
+    name: "Fountain Square (Nizami Street)",
+    category: "landmark",
+    lat: 40.3703,
+    lng: 49.8375,
+    address: "Nizami Street & Fountain Square, Baku",
+    badge: "City Heart",
+    icon: "🛍️",
+  },
+  {
+    id: "loc-dst-heydar-aliyev",
+    name: "Heydar Aliyev Center",
+    category: "landmark",
+    lat: 40.3959,
+    lng: 49.8678,
+    address: "1 Heydar Aliyev Avenue, Baku",
+    badge: "Zaha Hadid Icon",
+    icon: "🏛️",
+  },
+  // Top Regional Resorts
+  {
+    id: "loc-reg-shahdag",
+    name: "Shahdag Mountain Resort",
+    category: "resort",
+    lat: 41.3214,
+    lng: 48.1464,
+    address: "Shahdag Ski Resort, Gusar Region",
+    badge: "Alpine Ski Resort",
+    icon: "🏔️",
+  },
+  {
+    id: "loc-reg-qabala",
+    name: "Tufandag Mountain Resort (Qabala)",
+    category: "resort",
+    lat: 40.9825,
+    lng: 47.8492,
+    address: "Tufandag Complex, Qabala",
+    badge: "Mountain Resort",
+    icon: "🚠",
+  },
+  {
+    id: "loc-reg-naftalan",
+    name: "Naftalan Health Sanatoriums",
+    category: "resort",
+    lat: 40.5067,
+    lng: 46.8250,
+    address: "Chinar / Gashalti Sanatorium, Naftalan",
+    badge: "Thermal Healing",
+    icon: "🛁",
+  },
+  {
+    id: "loc-reg-sheki",
+    name: "Sheki Historic Center (Khan's Palace)",
+    category: "landmark",
+    lat: 41.2045,
+    lng: 47.1975,
+    address: "Mirza Fatali Akhundov Street, Sheki",
+    badge: "UNESCO Silk Road",
+    icon: "🏰",
+  },
+  {
+    id: "loc-reg-ganja",
+    name: "Ganja City Center (Javad Khan St)",
+    category: "landmark",
+    lat: 40.6828,
+    lng: 46.3606,
+    address: "Heydar Aliyev Square, Ganja",
+    badge: "Historic Capital",
+    icon: "🏙️",
+  },
+];
+

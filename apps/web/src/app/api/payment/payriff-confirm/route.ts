@@ -137,13 +137,21 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Transfer booking not found" }, { status: 404 });
       }
 
+      const prefNotes = [
+        transfer.femaleDriver ? "⚠️ PREFERENCE: Female Chauffeur Requested" : null,
+        transfer.additionalGuide ? "⚠️ SERVICE: Driver + Licensed Tour Guide Requested" : null,
+      ].filter(Boolean).join(" | ");
+
+      const baseAdminNote = `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}`;
+      const finalAdminNotes = prefNotes ? `${baseAdminNote} — ${prefNotes}` : baseAdminNote;
+
       await db
         .update(transferBookings)
         .set({
           paymentStatus: "paid",
           status: "pending",
           payriffOrderId: orderId || `PR-SANDBOX-${transfer.bookingNumber}`,
-          adminNotes: `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}`,
+          adminNotes: finalAdminNotes,
           updatedAt: new Date(),
         })
         .where(eq(transferBookings.bookingNumber, applicationNumber));

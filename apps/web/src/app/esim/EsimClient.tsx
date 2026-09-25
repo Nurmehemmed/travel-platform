@@ -25,6 +25,7 @@ import { useCurrency } from "@/lib/currency-context";
 import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
+import { BrandLogo } from "@/components/BrandLogo";
 import { ESIM_PLANS, EsimPlan, getLocalizedPlanName, getLocalizedPlanDesc } from "@/lib/esim-plans";
 import { ESIM_PAGE_TRANSLATIONS } from "@/lib/i18n/pages/esim-i18n";
 
@@ -153,13 +154,8 @@ Please send me the QR code activation details.`;
       {/* ── Navbar ── */}
       <header className="sticky top-0 z-50 bg-[#0f3460]/95 backdrop-blur-xl shadow-lg border-b border-white/10">
         <div className="container-section flex h-16 items-center justify-between gap-3">
-          <Link href="/" className="flex shrink-0 items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500">
-              <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg tracking-tight text-amber-500">
-              addmetour
-            </span>
+          <Link href="/" className="flex shrink-0 items-center" aria-label="Bakuya — Home">
+            <BrandLogo variant="header" />
           </Link>
 
           <div className="flex items-center gap-2">

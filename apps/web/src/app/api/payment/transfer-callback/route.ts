@@ -89,6 +89,8 @@ export async function GET(req: Request) {
       email:              updated.email,
       totalAmount:        updated.totalAmount,
       paymentMethod:      "online",
+      femaleDriver:       Boolean(updated.femaleDriver),
+      additionalGuide:    Boolean(updated.additionalGuide),
     }).catch(console.error);
   }
 
@@ -169,6 +171,8 @@ export async function POST(req: Request) {
         email:              updated.email,
         totalAmount:        updated.totalAmount,
         paymentMethod:      "online",
+        femaleDriver:       Boolean(updated.femaleDriver),
+        additionalGuide:    Boolean(updated.additionalGuide),
       }).catch(console.error);
     }
 

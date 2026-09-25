@@ -18,12 +18,14 @@ export interface ConstructMetadataProps {
   type?: "website" | "article";
 }
 
+import { CURRENT_BRAND } from "@/lib/brand";
+
 /**
  * Enterprise SEO & Hreflang Canonical Metadata Generator
  * Ensures search engine crawlers (Google, Yandex, Bing) understand multi-regional localization without duplicate penalties.
  */
 export function constructMetadata({
-  title = "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
+  title = `${CURRENT_BRAND.name} | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers`,
   description = "Official Azerbaijan Inbound DMC & Tour Operator. Fast 3-hour ASAN Electronic Visa (e-Visa), 24/7 Baku Airport VIP transfers, and curated Caucasus private & group tour packages. 4.9★ Rated.",
   path = "",
   image = "/images/og-main-cover.jpg",
@@ -46,7 +48,7 @@ export function constructMetadata({
   return {
     title: {
       default: title,
-      template: "%s | AddmeTour Azerbaijan",
+      template: `%s | ${CURRENT_BRAND.name} Azerbaijan`,
     },
     description,
     metadataBase: new URL(baseUrl),
@@ -58,7 +60,7 @@ export function constructMetadata({
       title,
       description,
       url: canonicalUrl,
-      siteName: "AddmeTour Azerbaijan DMC",
+      siteName: `${CURRENT_BRAND.name} Azerbaijan DMC`,
       images: [
         {
           url: image.startsWith("http") ? image : `${baseUrl}${image.startsWith("/") ? "" : "/"}${image}`,

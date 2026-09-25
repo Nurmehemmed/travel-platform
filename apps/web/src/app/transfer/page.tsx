@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import CurrencySelector from "@/components/CurrencySelector";
+import BrandLogo from "@/components/BrandLogo";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { useSiteSettings } from "@/lib/settings-context";
@@ -226,12 +227,7 @@ export default function TransferLandingPage() {
       >
         <div className="container-section flex h-16 items-center justify-between gap-2">
           <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full shadow-inner" style={{ backgroundColor: "#0ea5e9" }}>
-              <Car className="h-4 w-4 sm:h-5 sm:w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-base sm:text-xl tracking-tight text-white">
-              addmetour
-            </span>
+            <BrandLogo variant="header" />
             <span className="hidden md:inline-block ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-sky-400/20 text-sky-200 border border-sky-300/30 whitespace-nowrap">
               {t.transferPage.headerBadge}
             </span>

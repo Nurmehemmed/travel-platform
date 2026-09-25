@@ -4,12 +4,13 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   MapPin, Shield, Star, Award, ChevronDown, User as UserIcon, LogOut, Bookmark, FileText, Car,
-  Sparkles, Globe, Menu, X, Share2, Copy, CheckCheck, Loader2, Heart, Check, ArrowRight, Wifi
+  Sparkles, Globe, Menu, X, Share2, Copy, CheckCheck, Loader2, Heart, Check, ArrowRight, Wifi,
+  HeartPulse, Briefcase
 } from "lucide-react";
-import { useLanguage, LanguageCode } from "@/lib/i18n";
-import { useCurrency } from "@/lib/currency-context";
+import { useLanguage } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
+import { BrandLogo } from "@/components/BrandLogo";
 import type { AuthUser } from "@/components/AuthModal";
 
 interface HomeNavbarProps {
@@ -79,12 +80,7 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
       }
     };
   }, []);
-  const { language, setLanguage, t, isRtl, currentLangInfo, languages } = useLanguage();
-  const { currency, setCurrency, currencies, activeCurrency } = useCurrency();
-
-  const handleSelectLanguage = (code: LanguageCode) => {
-    setLanguage(code);
-  };
+  const { language, t, isRtl } = useLanguage();
 
   return (
 <header
@@ -95,37 +91,15 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
             : "bg-[#0f3460] border-b border-transparent shadow-none"
         }`}
       >
-        <div className="container-section flex h-16 items-center justify-between gap-3">
+        <div className="container-section flex h-16 items-center justify-between gap-3 relative z-20">
           {/* Logo — always shrink-0 so it never gets crushed */}
-          <Link href="/" className="flex shrink-0 items-center gap-2 group">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: "#f59e0b" }}>
-              <MapPin className="h-4 w-4 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-lg tracking-tight" style={{ color: "#f59e0b" }}>
-              addmetour
-            </span>
+          <Link href="/" className="flex shrink-0 items-center" aria-label="Bakuya — Discover Azerbaijan">
+            <BrandLogo variant="header" />
           </Link>
 
           {/* Nav links — min-w-0 so it can shrink for long translations, no shrink-0 */}
           <nav className="hidden xl:flex items-center gap-3 min-w-0 flex-1 justify-center">
-            {[
-              { label: t.nav.tours, href: "#tours" },
-              { label: t.nav.destinations, href: "#destinations" },
-              { label: t.nav.about, href: "#about" },
-              { label: t.nav.reviews, href: "#reviews" },
-              { label: t.nav.faq, href: "#faq" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap shrink-0"
-              >
-                {item.label}
-              </Link>
-            ))}
-
-            {/* ── Services Dropdown (Zero mystery icons, zero overflow in any language) ── */}
-            {/* ── Services Dropdown (Eye-catching pill, zero mystery icons, zero overflow) ── */}
+            {/* ── Services Dropdown (Pill button with badge, placed first) ── */}
             <div
               id="services-dropdown-container"
               className="relative shrink-0"
@@ -178,12 +152,12 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
 
               {servicesDropdownOpen && (
                 <div
-                  className="absolute start-0 top-full pt-2 w-80 z-50"
+                  className="absolute start-0 top-full pt-2 w-[350px] sm:w-[370px] z-50 max-h-[calc(100vh-5rem)] overflow-y-auto"
                   onMouseEnter={handleServicesMouseEnter}
                   onMouseLeave={handleServicesMouseLeave}
                 >
                   <div
-                    className="rounded-2xl p-2.5 shadow-2xl backdrop-blur-xl border border-white/10"
+                    className="rounded-2xl p-2.5 shadow-2xl backdrop-blur-xl border border-white/10 space-y-1"
                     style={{ backgroundColor: "#061225" }}
                   >
                     <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-white/10 mb-1 flex items-center justify-between">
@@ -203,7 +177,7 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                       <span className="text-[9px] text-amber-400 font-semibold">6 Services</span>
                     </div>
 
-                    {/* eSIM Internet */}
+                    {/* 1. eSIM Internet */}
                     <Link
                       href="/esim"
                       onClick={closeServicesDropdown}
@@ -237,7 +211,7 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                       </div>
                     </Link>
 
-                    {/* e-Visa */}
+                    {/* 2. e-Visa */}
                     <Link
                       href="/visa"
                       onClick={closeServicesDropdown}
@@ -271,7 +245,7 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                       </div>
                     </Link>
 
-                    {/* Airport Transfer */}
+                    {/* 3. Airport Transfer */}
                     <Link
                       href="/transfer"
                       onClick={closeServicesDropdown}
@@ -305,7 +279,7 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                       </div>
                     </Link>
 
-                    {/* Custom Itinerary */}
+                    {/* 4. Custom Itinerary */}
                     <Link
                       href="/custom-itinerary"
                       onClick={closeServicesDropdown}
@@ -315,19 +289,34 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                         <Sparkles className="h-4 w-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
-                          {language === "AZ"
-                            ? "Fərdi Tur Planlayıcı"
-                            : language === "RU"
-                            ? "Конструктор Туров"
-                            : language === "FR"
-                            ? "Circuit Sur-Mesure"
-                            : language === "AR"
-                            ? "تصميم برنامج خاص"
-                            : language === "DE"
-                            ? "Individueller Reiseplaner"
-                            : "Custom Tour Planner"}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                            {language === "AZ"
+                              ? "Fərdi Tur Planlayıcı"
+                              : language === "RU"
+                              ? "Конструктор Туров"
+                              : language === "FR"
+                              ? "Circuit Sur-Mesure"
+                              : language === "AR"
+                              ? "تصميم برنامج خاص"
+                              : language === "DE"
+                              ? "Individueller Reiseplaner"
+                              : "Custom Tour Planner"}
+                          </span>
+                          <span className="rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 text-[9px] font-semibold">
+                            {language === "AZ"
+                              ? "Fərdi"
+                              : language === "RU"
+                              ? "Под ключ"
+                              : language === "FR"
+                              ? "Sur-Mesure"
+                              : language === "AR"
+                              ? "خاص"
+                              : language === "DE"
+                              ? "Individuell"
+                              : "Bespoke"}
+                          </span>
+                        </div>
                         <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                           {language === "AZ"
                             ? "Fərdi səyahət marşrutu qurun"
@@ -344,59 +333,133 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                       </div>
                     </Link>
 
-                    {/* Medical & MICE */}
-                    <div className="border-t border-white/10 my-1 pt-1">
-                      <Link
-                        href="/medical"
-                        onClick={closeServicesDropdown}
-                        className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <span>
+                    {/* 5. Medical Tourism & SPA */}
+                    <Link
+                      href="/medical"
+                      onClick={closeServicesDropdown}
+                      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="p-2 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 shrink-0 group-hover:scale-105 transition-transform">
+                        <HeartPulse className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                            {language === "AZ"
+                              ? "Müalicəvi Turizm & Naftalan"
+                              : language === "RU"
+                              ? "Медицинский Туризм и СПА"
+                              : language === "FR"
+                              ? "Tourisme Médical & Spa"
+                              : language === "AR"
+                              ? "السياحة العلاجية ونفطالان"
+                              : language === "DE"
+                              ? "Medizintourismus & Kur"
+                              : "Medical Tourism & SPA"}
+                          </span>
+                          <span className="rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 px-1.5 py-0.5 text-[9px] font-semibold">
+                            {language === "AZ"
+                              ? "Sağlamlıq"
+                              : language === "RU"
+                              ? "СПА и отдых"
+                              : language === "FR"
+                              ? "Bien-être"
+                              : language === "AR"
+                              ? "صحة واستجمام"
+                              : language === "DE"
+                              ? "Wellness"
+                              : "Wellness & SPA"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                           {language === "AZ"
-                            ? "🩺 Müalicəvi Turizm & Naftalan"
+                            ? "Naftalan neft vannaları və sanatoriya istirahəti"
                             : language === "RU"
-                            ? "🩺 Медицинский Туризм и СПА"
+                            ? "Лечебная нафталановая нефть и санатории"
                             : language === "FR"
-                            ? "🩺 Tourisme Médical & Spa"
+                            ? "Bains de pétrole de Naftalan et séjours bien-être"
                             : language === "AR"
-                            ? "🩺 السياحة العلاجية والاستشفاء"
+                            ? "حمامات نفط نفطالان ومصحات الاستشفاء"
                             : language === "DE"
-                            ? "🩺 Medizintourismus & Kur"
-                            : "🩺 Medical Tourism & SPA"}
-                        </span>
-                        <ArrowRight className="h-3 w-3 text-slate-500" />
-                      </Link>
-                      <Link
-                        href="/mice"
-                        onClick={closeServicesDropdown}
-                        className="flex items-center justify-between px-3 py-1.5 rounded-lg text-[11px] text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <span>
+                            ? "Naftalan Heilölbäder & Sanatorien"
+                            : "Naftalan crude oil baths & sanatorium retreats"}
+                        </p>
+                      </div>
+                    </Link>
+
+                    {/* 6. MICE & Corporate */}
+                    <Link
+                      href="/mice"
+                      onClick={closeServicesDropdown}
+                      className="flex items-start gap-3 p-2 rounded-xl hover:bg-white/10 transition-colors group"
+                    >
+                      <div className="p-2 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-400 shrink-0 group-hover:scale-105 transition-transform">
+                        <Briefcase className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-white group-hover:text-[#f59e0b] transition-colors">
+                            {language === "AZ"
+                              ? "MICE & Korporativ Tədbirlər"
+                              : language === "RU"
+                              ? "MICE и Корпоративы"
+                              : language === "FR"
+                              ? "MICE & Événements Pro"
+                              : language === "AR"
+                              ? "سياحة المؤتمرات والشركات"
+                              : language === "DE"
+                              ? "MICE & Firmenevents"
+                              : "MICE & Corporate Events"}
+                          </span>
+                          <span className="rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 text-[9px] font-semibold">
+                            {language === "AZ"
+                              ? "B2B Qrup"
+                              : language === "AR"
+                              ? "وفود B2B"
+                              : "B2B"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
                           {language === "AZ"
-                            ? "🏢 MICE & Korporativ Tədbirlər"
+                            ? "Konfranslar, şirkət səfərləri və qrup logistikası"
                             : language === "RU"
-                            ? "🏢 MICE и Корпоративы"
+                            ? "Конференции, деловой туризм и трансферы"
                             : language === "FR"
-                            ? "🏢 MICE & Événements d'Entreprise"
+                            ? "Séminaires d'entreprise et congrès à Bakou"
                             : language === "AR"
-                            ? "🏢 سياحة المؤتمرات والشركات"
+                            ? "تنظيم المؤتمرات وفعاليات الشركات والوفود"
                             : language === "DE"
-                            ? "🏢 MICE & Firmenevents"
-                            : "🏢 MICE & Corporate"}
-                        </span>
-                        <ArrowRight className="h-3 w-3 text-slate-500" />
-                      </Link>
-                    </div>
+                            ? "Kongresse, Tagungen und Firmenevents in Baku"
+                            : "Conferences, team retreats & corporate travel"}
+                        </p>
+                      </div>
+                    </Link>
                   </div>
                 </div>
               )}
             </div>
+
+            {[
+              { label: t.nav.tours, href: "#tours" },
+              { label: t.nav.destinations, href: "#destinations" },
+              { label: t.nav.about, href: "#about" },
+              { label: t.nav.reviews, href: "#reviews" },
+              { label: t.nav.faq, href: "#faq" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium text-white/80 hover:text-white transition-colors whitespace-nowrap shrink-0"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Right side — always shrink-0 so controls stay visible */}
           <div suppressHydrationWarning className="flex items-center gap-1.5 sm:gap-2 relative shrink-0">
-            {/* Interactive Language & Currency Selectors (Desktop Navbar only; on mobile, cleanly accessible in drawer) */}
-            <div className="hidden xl:flex items-center gap-1.5 sm:gap-2">
+            {/* Interactive Language & Currency Selectors (Always accessible in header on mobile and desktop) */}
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <LanguageSelector variant="dark" />
               <CurrencySelector variant="dark" />
             </div>
@@ -566,22 +629,25 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
         {mobileMenuOpen && (
           <div suppressHydrationWarning dir={isRtl ? "rtl" : "ltr"} className="xl:hidden border-t border-white/10 px-4 py-4 space-y-3 bg-[#0f3460] animate-fade-in shadow-xl">
             <div className="flex flex-col space-y-1">
-              {[
-                { label: t.nav.tours, href: "#tours" },
-                { label: t.nav.destinations, href: "#destinations" },
-                { label: t.nav.about, href: "#about" },
-                { label: t.nav.reviews, href: "#reviews" },
-                { label: t.nav.faq, href: "#faq" },
-              ].map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {/* Services Header */}
+              <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400 px-1 pt-1 pb-1 flex items-center justify-between">
+                <span>
+                  {language === "AZ"
+                    ? "Səyahət Xidmətləri"
+                    : language === "RU"
+                    ? "Туристические Услуги"
+                    : language === "FR"
+                    ? "Services Touristiques"
+                    : language === "AR"
+                    ? "خدمات السفر"
+                    : language === "DE"
+                    ? "Reise-Services"
+                    : "Travel Services"}
+                </span>
+                <span className="text-[9px] text-amber-300 font-bold bg-amber-400/20 px-1.5 py-0.5 rounded-full border border-amber-400/30">
+                  6 Services
+                </span>
+              </div>
 
               {/* eSIM link in mobile menu */}
               <Link
@@ -663,17 +729,40 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-white/10 text-slate-200 hover:bg-white/15 hover:text-white transition-colors text-center"
                 >
-                  <span>🩺</span>
-                  <span>{language === "AZ" ? "Tibbi Turizm" : language === "RU" ? "Медтуризм" : "Medical"}</span>
+                  <HeartPulse className="h-3.5 w-3.5 text-rose-400 shrink-0" />
+                  <span>{language === "AZ" ? "Tibbi Turizm" : language === "RU" ? "Медтуризм" : "Medical & SPA"}</span>
                 </Link>
                 <Link
                   href="/mice"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold bg-white/10 text-slate-200 hover:bg-white/15 hover:text-white transition-colors text-center"
                 >
-                  <span>🏢</span>
+                  <Briefcase className="h-3.5 w-3.5 text-blue-400 shrink-0" />
                   <span>{language === "AZ" ? "MICE Korporativ" : language === "RU" ? "MICE Бизнес" : "MICE"}</span>
                 </Link>
+              </div>
+
+              {/* Main navigation / page sections */}
+              <div className="pt-3 border-t border-white/10 mt-3 space-y-1">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pb-1">
+                  {language === "AZ" ? "Səhifələr" : language === "RU" ? "Разделы" : "Explore"}
+                </div>
+                {[
+                  { label: t.nav.tours, href: "#tours" },
+                  { label: t.nav.destinations, href: "#destinations" },
+                  { label: t.nav.about, href: "#about" },
+                  { label: t.nav.reviews, href: "#reviews" },
+                  { label: t.nav.faq, href: "#faq" },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-3 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors block"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </div>
 
               {/* Auth actions in mobile menu */}
@@ -746,71 +835,6 @@ export const HomeNavbar: React.FC<HomeNavbarProps> = ({
                 </div>
               ) : null}
 
-              {/* Language selection in mobile menu */}
-              <div className="pt-3 border-t border-white/10 mt-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/50 block mb-2 px-1">
-                  {t.nav.selectLanguage}
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  {languages.map((lang) => {
-                    const isSelected = language === lang.code;
-                    return (
-                      <button
-                        key={lang.code}
-                        type="button"
-                        onClick={() => {
-                          handleSelectLanguage(lang.code);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-sky-500 text-white shadow-sm ring-1 ring-white/30"
-                            : "bg-white/5 text-white/80 hover:bg-white/10"
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{lang.flag}</span>
-                          <span>{lang.nativeLabel}</span>
-                        </span>
-                        {isSelected && <Check className="h-3.5 w-3.5 text-white" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Currency selection in mobile menu */}
-              <div className="pt-3 border-t border-white/10 mt-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/50 block mb-2 px-1">
-                  Select Currency
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  {currencies.map((c) => {
-                    const isSelected = currency === c.code;
-                    return (
-                      <button
-                        key={c.code}
-                        type="button"
-                        onClick={() => {
-                          setCurrency(c.code);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-amber-500 text-[#061225] font-bold shadow-sm"
-                            : "bg-white/5 text-white/80 hover:bg-white/10"
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span className="font-bold">{c.symbol}</span>
-                          <span>{c.code}</span>
-                        </span>
-                        {isSelected && <Check className="h-3.5 w-3.5 text-[#061225]" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
           </div>
         )}

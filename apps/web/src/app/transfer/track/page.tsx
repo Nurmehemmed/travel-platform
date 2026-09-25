@@ -32,6 +32,8 @@ import { getVehicleConfig } from "@/lib/transfer-zones";
 import { TransferBookingSkeleton } from "@/components/Skeletons";
 import { TRANSFER_TRACK_TRANSLATIONS, TRANSFER_BOOK_TRANSLATIONS, LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
 import VoucherShareActions from "@/components/VoucherShareActions";
+import BrandLogo from "@/components/BrandLogo";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 
 interface BookingData {
@@ -185,12 +187,7 @@ function TransferTrackContent() {
       >
         <div className="container-section flex h-16 items-center justify-between">
           <Link href="/transfer" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full" style={{ backgroundColor: "#0ea5e9" }}>
-              <Car className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-white">
-              addmetour
-            </span>
+            <BrandLogo variant="header" />
             <span className="hidden sm:inline-block ml-2 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase bg-sky-400/20 text-sky-200 border border-sky-300/30 whitespace-nowrap">
               {t.transferPage.headerBadge}
             </span>
@@ -281,11 +278,9 @@ function TransferTrackContent() {
             {/* Official Print Header (Shown only on PDF / Physical Print) */}
             <div className="hidden print:flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-2">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-[#0f3460] flex items-center justify-center text-white font-black text-lg">
-                  A
-                </div>
+                <BrandLogo variant="emblem" className="!h-9 !w-9" />
                 <div>
-                  <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">AddmeTour Azerbaijan DMC</h1>
+                  <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">{CURRENT_BRAND.name} Azerbaijan DMC</h1>
                   <p className="text-[10px] text-slate-500 font-medium">Official Airport VIP Transfer & Chauffeur Boarding Voucher</p>
                 </div>
               </div>
@@ -452,7 +447,7 @@ function TransferTrackContent() {
             <div className="hidden print:grid grid-cols-3 gap-3 border border-slate-200 rounded-xl p-3 bg-slate-50 text-[10px]">
               <div className="space-y-0.5">
                 <span className="font-bold text-slate-900 block">🛬 Arrivals Hall Greeting</span>
-                <p className="text-slate-600">Chauffeur will meet you holding an AddmeTour nameboard at terminal exit.</p>
+                <p className="text-slate-600">Chauffeur will meet you holding a {CURRENT_BRAND.name} nameboard at terminal exit.</p>
               </div>
               <div className="space-y-0.5">
                 <span className="font-bold text-slate-900 block">⏱️ 60-Min Free Wait Time</span>
@@ -461,7 +456,7 @@ function TransferTrackContent() {
               <div className="space-y-0.5 text-right">
                 <span className="font-bold text-slate-900 block">Digital Dispatch Code</span>
                 <p className="font-mono font-bold text-sky-800 text-xs">{booking.bookingNumber}-VLD</p>
-                <p className="text-slate-500 text-[9px]">Official AddmeTour Voucher Guarantee</p>
+                <p className="text-slate-500 text-[9px]">Official {CURRENT_BRAND.name} Voucher Guarantee</p>
               </div>
             </div>
 
@@ -479,7 +474,7 @@ function TransferTrackContent() {
                 "Vehicle": booking.vehicleClass === "sedan" ? t.transferPage.sedan : booking.vehicleClass === "suv" ? t.transferPage.suv : t.transferPage.minivan,
                 "Payment": `$${booking.totalAmount} (${booking.paymentMethod === "online" ? tt.paidOnline : tt.payCash})`,
               }}
-              pdfFilename={`AddmeTour-Transfer-Voucher-${booking.bookingNumber}`}
+              pdfFilename={`${CURRENT_BRAND.name}-Transfer-Voucher-${booking.bookingNumber}`}
             />
 
             {/* Quick Actions Footer (Screen Only) */}

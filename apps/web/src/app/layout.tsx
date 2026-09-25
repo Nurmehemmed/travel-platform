@@ -7,6 +7,7 @@ import { CurrencyProvider } from "@/lib/currency-context";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import FloatingWidgetsContainer from "@/components/FloatingWidgetsContainer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { CURRENT_BRAND } from "@/lib/brand";
 
 // ─── Font Optimization via Next.js Font Engine (Zero render-blocking requests) ───
 const outfit = Outfit({
@@ -40,12 +41,14 @@ const APP_URL =
 
 export const metadata: Metadata = {
   title: {
-    default: "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
-    template: "%s | AddmeTour Azerbaijan",
+    default: `${CURRENT_BRAND.name} | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers`,
+    template: `%s | ${CURRENT_BRAND.name} Azerbaijan`,
   },
   description:
     "Official Azerbaijan Inbound DMC & Tour Operator. Fast 3-hour ASAN Electronic Visa (e-Visa), 24/7 Baku Airport VIP transfers, and curated Caucasus private & group tour packages. 4.9★ Rated.",
   keywords: [
+    CURRENT_BRAND.name,
+    "Bakuya Azerbaijan",
     "AddmeTour",
     "AddmeTravel",
     "Azerbaijan tours",
@@ -63,21 +66,22 @@ export const metadata: Metadata = {
     "Baku day trips",
     "Caucasus luxury travel",
   ],
-  authors: [{ name: "AddmeTour", url: APP_URL }],
-  creator: "AddmeTour",
-  publisher: "AddmeTour",
+  authors: [{ name: CURRENT_BRAND.name, url: APP_URL }],
+  creator: CURRENT_BRAND.name,
+  publisher: CURRENT_BRAND.name,
   metadataBase: new URL(APP_URL),
   icons: {
     icon: [
+      { url: CURRENT_BRAND.logo.favicon, sizes: "192x192", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
       { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon.ico" },
     ],
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: CURRENT_BRAND.logo.favicon, sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
+    shortcut: CURRENT_BRAND.logo.favicon,
   },
   manifest: "/manifest.json",
   alternates: {
@@ -96,8 +100,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: APP_URL,
-    siteName: "AddmeTour Azerbaijan DMC",
-    title: "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
+    siteName: `${CURRENT_BRAND.name} Azerbaijan DMC`,
+    title: `${CURRENT_BRAND.name} | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers`,
     description:
       "Explore Baku, the Great Caucasus, and Silk Road heritage with authentic local guides. Fast ASAN e-Visa processing and 24/7 Airport VIP transfers.",
     images: [
@@ -105,13 +109,13 @@ export const metadata: Metadata = {
         url: "/images/og-main-cover.jpg",
         width: 1200,
         height: 630,
-        alt: "Great Caucasus Mountains in Azerbaijan — AddmeTour",
+        alt: `Great Caucasus Mountains in Azerbaijan — ${CURRENT_BRAND.name}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AddmeTour | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers",
+    title: `${CURRENT_BRAND.name} | Azerbaijan Tours, Official ASAN e-Visa & VIP Transfers`,
     description:
       "Boutique private & small-group tours, 3-hour urgent ASAN e-Visas, and Baku airport transfers. 4.9★ TripAdvisor rating.",
     images: ["/images/og-main-cover.jpg"],
@@ -144,8 +148,8 @@ const jsonLd = {
     {
       "@type": "TravelAgency",
       "@id": `${APP_URL}/#organization`,
-      name: "AddmeTour",
-      legalName: "AddmeTour LLC",
+      name: CURRENT_BRAND.name,
+      legalName: `${CURRENT_BRAND.name} LLC`,
       url: APP_URL,
       logo: `${APP_URL}/icon.svg`,
       image:
@@ -339,11 +343,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="icon" href={CURRENT_BRAND.logo.favicon} />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
         <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
         <link rel="alternate icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+        <link rel="apple-touch-icon" href={CURRENT_BRAND.logo.favicon} sizes="180x180" />
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Context" />
         {/* Preconnect to Unsplash CDN — saves ~300ms DNS+TCP+TLS on mobile */}
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />

@@ -1,8 +1,10 @@
+import { CURRENT_BRAND } from "./brand";
+
 /**
  * Centralized Contact & Company Information
  */
 export const COMPANY_CONTACT = {
-  name: "AddmeTour",
+  name: CURRENT_BRAND.name,
   whatsappPhone: "+994 55 100 31 46",
   whatsappNumberClean: "994551003146",
   whatsappUrl: "https://wa.me/994551003146",

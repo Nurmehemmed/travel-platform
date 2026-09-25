@@ -15,6 +15,7 @@ import {
   LogOut,
 } from "lucide-react";
 import type { TabType, AdminStats, TourItem, VisaItem, TransferItem, UserItem, DestinationItem, AuditLogItem } from "./types";
+import { BrandLogo } from "@/components/BrandLogo";
 
 interface AdminSidebarProps {
   adminT: any;
@@ -87,22 +88,9 @@ export function AdminSidebar({
     >
       <div>
         {/* Brand Header */}
-        <div className="p-6 border-b border-white/10">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div
-              className="flex h-9 w-9 items-center justify-center rounded-full shadow-md shrink-0"
-              style={{ backgroundColor: "#f59e0b" }}
-            >
-              <MapPin className="h-5 w-5 text-white" strokeWidth={2.5} />
-            </div>
-            <div className="truncate">
-              <span className="font-bold text-lg tracking-tight block text-[#f59e0b] leading-tight">
-                addmetour
-              </span>
-              <span className="text-[10px] uppercase tracking-widest text-white/60 font-semibold">
-                {adminT.sidebar.brandSubtitle}
-              </span>
-            </div>
+        <div className="p-5 border-b border-white/10">
+          <Link href="/" className="flex items-center gap-2.5 group" aria-label="Bakuya — Home">
+            <BrandLogo variant="header" />
           </Link>
         </div>
 

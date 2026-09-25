@@ -281,6 +281,8 @@ export class TransferService {
       flightNumber: String(input.flightNumber).trim().toUpperCase(),
       flightDate: input.flightDate,
       totalAmount: pricing.totalAmount,
+      femaleDriver: Boolean(input.femaleDriver),
+      additionalGuide: Boolean(input.additionalGuide),
     }).catch((err) => console.warn("[Non-fatal transfer confirmation email error]:", err));
 
     // Handle on-arrival or custom quote

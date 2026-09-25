@@ -522,6 +522,9 @@ export const LOCALIZED_MAP_PICKER: Record<
     findingAddress: string;
     quickShortcuts: string;
     customPinAddress: string;
+    unserviceableWarning: string;
+    resetToCenter: string;
+    curatedPlaces: string;
   }
 > = {
   EN: {
@@ -537,6 +540,9 @@ export const LOCALIZED_MAP_PICKER: Record<
     findingAddress: "Locating address...",
     quickShortcuts: "Quick Places:",
     customPinAddress: "Pinned Map Location",
+    unserviceableWarning: "Outside Service Area",
+    resetToCenter: "Reset to Baku Center",
+    curatedPlaces: "Top Hotels & Landmarks",
   },
   AZ: {
     pickOnMap: "Xəritədə Seç",
@@ -551,6 +557,9 @@ export const LOCALIZED_MAP_PICKER: Record<
     findingAddress: "Ünvan müəyyən edilir...",
     quickShortcuts: "Məşhur Məkanlar:",
     customPinAddress: "Xəritədə qeyd olunan ünvan",
+    unserviceableWarning: "Xidmət zonasından kənar",
+    resetToCenter: "Bakı Mərkəzinə Qayıt",
+    curatedPlaces: "Məşhur Otellər və Məkanlar",
   },
   RU: {
     pickOnMap: "Выбрать на карте",
@@ -565,6 +574,9 @@ export const LOCALIZED_MAP_PICKER: Record<
     findingAddress: "Определение адреса...",
     quickShortcuts: "Популярные места:",
     customPinAddress: "Точка на карте",
+    unserviceableWarning: "Вне зоны обслуживания",
+    resetToCenter: "Сбросить в центр Баку",
+    curatedPlaces: "Отели и достопримечательности",
   },
   AR: {
     pickOnMap: "تحديد على الخريطة",
@@ -579,6 +591,9 @@ export const LOCALIZED_MAP_PICKER: Record<
     findingAddress: "جاري تحديد العنوان...",
     quickShortcuts: "أماكن سريعة:",
     customPinAddress: "الموقع المحدد على الخريطة",
+    unserviceableWarning: "خارج منطقة الخدمة",
+    resetToCenter: "إعادة التعيين إلى وسط باكو",
+    curatedPlaces: "أشهر الفنادق والمعالم",
   },
   FR: {
     pickOnMap: "Choisir sur la carte",
@@ -593,6 +608,9 @@ export const LOCALIZED_MAP_PICKER: Record<
     findingAddress: "Recherche de l'adresse...",
     quickShortcuts: "Lieux rapides :",
     customPinAddress: "Emplacement épinglé",
+    unserviceableWarning: "Zone non desservie",
+    resetToCenter: "Recentrer sur Bakou",
+    curatedPlaces: "Hôtels et sites populaires",
   },
   DE: {
     pickOnMap: "Auf Karte wählen",
@@ -607,6 +625,9 @@ export const LOCALIZED_MAP_PICKER: Record<
     findingAddress: "Adresse wird ermittelt...",
     quickShortcuts: "Beliebte Orte:",
     customPinAddress: "Ausgewählter Ort",
+    unserviceableWarning: "Außerhalb des Servicebereichs",
+    resetToCenter: "Zurück zum Baku-Zentrum",
+    curatedPlaces: "Beliebte Hotels & Sehenswürdigkeiten",
   },
 };
 

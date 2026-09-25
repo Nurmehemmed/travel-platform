@@ -131,6 +131,8 @@ export async function sendTransferConfirmationEmail(params: {
   flightNumber: string;
   flightDate: string;
   totalAmount: number;
+  femaleDriver?: boolean;
+  additionalGuide?: boolean;
 }): Promise<boolean> {
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://addmetour.com").replace(/\/$/, "");
   const trackUrl = `${appUrl}/transfer/track?ref=${params.bookingNumber}&email=${encodeURIComponent(params.to)}`;
@@ -164,6 +166,16 @@ export async function sendTransferConfirmationEmail(params: {
         <td style="padding: 10px 0; color: #94a3b8;">Flight & Date:</td>
         <td style="padding: 10px 0; text-align: right;">${params.flightNumber} (${params.flightDate})</td>
       </tr>
+      ${params.femaleDriver ? `
+      <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <td style="padding: 10px 0; color: #f472b6;">Driver Preference:</td>
+        <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #f472b6;">👩‍🦰 Female Chauffeur (Priority Request)</td>
+      </tr>` : ""}
+      ${params.additionalGuide ? `
+      <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <td style="padding: 10px 0; color: #38bdf8;">Service Add-on:</td>
+        <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #38bdf8;">🧭 Driver + Licensed Tour Guide</td>
+      </tr>` : ""}
       <tr>
         <td style="padding: 10px 0; color: #94a3b8;">Total Price:</td>
         <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #34d399;">$${params.totalAmount.toFixed(2)} USD</td>

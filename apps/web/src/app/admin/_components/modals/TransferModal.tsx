@@ -165,6 +165,67 @@ export const TransferModal: React.FC<TransferModalProps> = ({
                   </div>
                 )}
 
+                {/* Driver & Guide Preferences */}
+                {(selectedTransfer.femaleDriver || selectedTransfer.additionalGuide) && (
+                  <div className="border-t border-slate-200/60 pt-2 space-y-1.5">
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">
+                      {language === "AZ"
+                        ? "Xüsusi Sürücü / Bələdçi Tələbləri"
+                        : "Driver & Guide Preferences"}
+                    </span>
+                    {selectedTransfer.femaleDriver && (
+                      <div className="rounded-xl border border-pink-200 bg-gradient-to-r from-pink-50 to-rose-50 p-2.5 text-pink-900 shadow-2xs">
+                        <div className="flex items-start gap-2">
+                          <span className="text-base leading-none">👩‍🦰</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-bold text-xs text-pink-950">
+                                {language === "AZ"
+                                  ? "Xanım Sürücü Seçimi"
+                                  : "Female Chauffeur Preference"}
+                              </span>
+                              <span className="rounded-full bg-pink-200/90 px-1.5 py-0.2 text-[9px] font-extrabold text-pink-800 uppercase tracking-wider">
+                                {language === "AZ"
+                                  ? "Prioritetli Sorğu"
+                                  : "Priority Request"}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-pink-700 mt-0.5 leading-snug">
+                              {language === "AZ"
+                                ? "Müştəri qadın sürücü təyin olunmasını xahiş edib. Xanım sürücü təyin edin."
+                                : "Passenger requested a female chauffeur for privacy/comfort. Please assign a certified female driver."}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {selectedTransfer.additionalGuide && (
+                      <div className="rounded-xl border border-sky-200 bg-sky-50 p-2.5 text-sky-900 shadow-2xs">
+                        <div className="flex items-start gap-2">
+                          <span className="text-base leading-none">🧭</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-bold text-xs text-sky-950">
+                                {language === "AZ"
+                                  ? "Lisenziyalı Bələdçi Müşayiəti"
+                                  : "Driver + Licensed Tour Guide"}
+                              </span>
+                              <span className="rounded-full bg-sky-200 px-1.5 py-0.2 text-[9px] font-extrabold text-sky-800 uppercase tracking-wider">
+                                {language === "AZ" ? "Əlavə Xidmət" : "Service Add-on"}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-sky-700 mt-0.5 leading-snug">
+                              {language === "AZ"
+                                ? "Sərnişin transfer boyu bələdçi istəyib."
+                                : "Passenger requested an accompanying licensed guide during the transfer."}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="border-t border-slate-200/60 pt-2 flex items-center justify-between">
                   <div>
                     <span className="text-slate-400 block text-[10px] uppercase font-medium">
@@ -206,7 +267,15 @@ export const TransferModal: React.FC<TransferModalProps> = ({
                         selectedTransfer.passengerName
                       } (${selectedTransfer.passengerCount} pax)\n• Phone: ${
                         selectedTransfer.phoneNumber
-                      }\n• Vehicle: ${selectedTransfer.vehicleClass}\n• Payment: ${
+                      }\n• Vehicle: ${selectedTransfer.vehicleClass}${
+                        selectedTransfer.femaleDriver
+                          ? "\n• ⚠️ *DRIVER PREFERENCE:* 👩‍🦰 Female Chauffeur Requested (Priority Request)"
+                          : ""
+                      }${
+                        selectedTransfer.additionalGuide
+                          ? "\n• ⚠️ *SERVICE ADD-ON:* 🧭 Licensed Tour Guide Requested"
+                          : ""
+                      }\n• Payment: ${
                         selectedTransfer.paymentStatus === "paid"
                           ? "✅ Paid Online"
                           : `💵 Collect $${
@@ -243,7 +312,11 @@ export const TransferModal: React.FC<TransferModalProps> = ({
                         editDriverPhone ||
                         selectedTransfer.driverPhone ||
                         "On standby"
-                      })\n• Airport: ${
+                      })${
+                        selectedTransfer.femaleDriver
+                          ? "\n• Preference: 👩‍🦰 Female Chauffeur requested (prioritized on schedule)"
+                          : ""
+                      }\n• Airport: ${
                         selectedTransfer.airport
                       }\n• Meeting Point: Arrival Hall exit after baggage reclaim (Chauffeur will hold AddmeTour sign with your name).\n• Free Waiting: 60 minutes after actual landing.\nWishing you a safe flight to Baku!`
                     )}`}

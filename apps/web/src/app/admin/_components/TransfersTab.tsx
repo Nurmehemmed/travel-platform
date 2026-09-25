@@ -127,6 +127,35 @@ export const TransfersTab: React.FC<TransfersTabProps> = ({
                 : adminT.status[st as keyof typeof adminT.status] || st}
             </button>
           ))}
+
+          {/* Female Chauffeur Quick Filter */}
+          <button
+            type="button"
+            onClick={() =>
+              setTransferStatusFilter(
+                transferStatusFilter === "female_driver" ? "all" : "female_driver"
+              )
+            }
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              transferStatusFilter === "female_driver"
+                ? "bg-pink-600 text-white shadow-sm ring-2 ring-pink-300"
+                : "bg-pink-50 text-pink-700 border border-pink-200 hover:bg-pink-100"
+            }`}
+          >
+            <span>👩‍🦰</span>
+            <span>{language === "AZ" ? "Xanım Sürücü" : "Female Driver"}</span>
+            {transfersList.filter((t) => t.femaleDriver).length > 0 && (
+              <span
+                className={`ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                  transferStatusFilter === "female_driver"
+                    ? "bg-white text-pink-700"
+                    : "bg-pink-200 text-pink-800"
+                }`}
+              >
+                {transfersList.filter((t) => t.femaleDriver).length}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
@@ -156,23 +185,45 @@ export const TransfersTab: React.FC<TransfersTabProps> = ({
               {transfersList
                 .filter((t) => {
                   const matchesFilter =
-                    transferStatusFilter === "all" || t.status === transferStatusFilter;
+                    transferStatusFilter === "all"
+                      ? true
+                      : transferStatusFilter === "female_driver"
+                      ? Boolean(t.femaleDriver)
+                      : t.status === transferStatusFilter;
                   const q = searchQuery.toLowerCase().trim();
+                  const isFemaleQuery = ["female", "woman", "qadın", "xanım", "lady", "женщина"].some((w) => q.includes(w));
+                  const isGuideQuery = ["guide", "bələdçi", "гид"].some((w) => q.includes(w));
                   const matchesQuery =
                     !q ||
                     t.bookingNumber.toLowerCase().includes(q) ||
                     t.passengerName.toLowerCase().includes(q) ||
                     t.flightNumber.toLowerCase().includes(q) ||
                     t.phoneNumber.toLowerCase().includes(q) ||
-                    t.dropoffAddress.toLowerCase().includes(q);
+                    t.dropoffAddress.toLowerCase().includes(q) ||
+                    (isFemaleQuery && Boolean(t.femaleDriver)) ||
+                    (isGuideQuery && Boolean(t.additionalGuide));
                   return matchesFilter && matchesQuery;
                 })
                 .map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-4">
-                      <span className="font-mono font-bold text-slate-900 block text-xs">
-                        {item.bookingNumber}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-mono font-bold text-slate-900 block text-xs">
+                          {item.bookingNumber}
+                        </span>
+                        {item.femaleDriver && (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-pink-50 border border-pink-200 px-1.5 py-0.5 text-[9px] font-bold text-pink-700 shadow-2xs">
+                            <span>👩‍🦰</span>
+                            <span>{language === "AZ" ? "Xanım Sürücü" : "Female Driver"}</span>
+                          </span>
+                        )}
+                        {item.additionalGuide && (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-sky-50 border border-sky-200 px-1.5 py-0.5 text-[9px] font-bold text-sky-700 shadow-2xs">
+                            <span>🧭</span>
+                            <span>{language === "AZ" ? "+Bələdçi" : "+Guide"}</span>
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[11px] text-slate-500 block mt-0.5">
                         {item.airport} &middot;{" "}
                         {item.direction === "arrival"
@@ -274,6 +325,11 @@ export const TransfersTab: React.FC<TransfersTabProps> = ({
                             </span>
                           )}
                         </div>
+                      ) : item.femaleDriver ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-pink-50 border border-pink-200 px-2 py-0.5 text-[10px] font-bold text-pink-700 shadow-2xs">
+                          <span>👩‍🦰</span>
+                          <span>{language === "AZ" ? "Xanım Sürücü Gözləyir" : "Female Driver Needed"}</span>
+                        </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-700">
                           {language === "AZ" ? "Təyin Edilməyib" : "Unassigned"}
