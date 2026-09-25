@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { constructMetadata, SUPPORTED_LOCALES } from "../seo";
+import { CURRENT_BRAND } from "../brand";
 
 describe("Enterprise SEO & Hreflang Canonical Engine", () => {
   it("generates correct canonical URL and multi-regional hreflang alternates", () => {
@@ -12,7 +13,7 @@ describe("Enterprise SEO & Hreflang Canonical Engine", () => {
 
     expect(meta.title).toEqual({
       default: "Baku Old City Walking Tour",
-      template: "%s | AddmeTour Azerbaijan",
+      template: `%s | ${CURRENT_BRAND.name} Azerbaijan`,
     });
     expect(meta.description).toBe("Discover medieval Icherisheher with private expert historian.");
     expect(meta.alternates?.canonical).toContain("/tours/baku-old-city-walking-tour");
@@ -36,7 +37,7 @@ describe("Enterprise SEO & Hreflang Canonical Engine", () => {
     const tw = meta.twitter as any;
 
     expect(og?.type).toBe("website");
-    expect(og?.siteName).toBe("AddmeTour Azerbaijan DMC");
+    expect(og?.siteName).toBe(`${CURRENT_BRAND.name} Azerbaijan DMC`);
     expect(tw?.card).toBe("summary_large_image");
     expect(meta.robots).toMatchObject({
       index: true,

@@ -239,6 +239,9 @@ export default function HomePage() {
       <HomeHero
         currentSlide={currentSlide}
         setCurrentSlide={setCurrentSlide}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setActiveFilter={setActiveFilter}
       />
 
       <HomeStatsAndTrust />

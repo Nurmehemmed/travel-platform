@@ -84,12 +84,36 @@ const DESTINATION_OPTIONS: DestinationTheme[] = [
     desc: "UNESCO remote eagle's nest stone settlement inhabited continuously for 5,000 years.",
   },
   {
+    id: "georgia_combo",
+    name: "Azerbaijan & Georgia: Great Caucasus",
+    region: "Multi-Country (AZ + GE)",
+    image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=800&q=80",
+    tag: "2 Countries · 6 Days",
+    desc: "Baku, Sheki Khan Palace, Sighnaghi Kakheti wine region, Old Tbilisi & Kazbegi Gergeti Church.",
+  },
+  {
+    id: "uzbekistan_combo",
+    name: "Silk Road Caravan: Azerbaijan & Uzbekistan",
+    region: "Multi-Country (AZ + UZ)",
+    image: "https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=800&q=80",
+    tag: "2 Countries · 7 Days",
+    desc: "Baku Caspian shores, Tashkent, Afrosiyob high-speed bullet train, Samarkand Registan & ancient Bukhara.",
+  },
+  {
+    id: "turkey_combo",
+    name: "Baku to Bosphorus: Azerbaijan & Turkey",
+    region: "Multi-Country (AZ + TR)",
+    image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80",
+    tag: "2 Countries · 8 Days",
+    desc: "Baku modern architecture, private Bosphorus yacht in Istanbul & sunrise Cappadocia hot air balloons.",
+  },
+  {
     id: "caucasus_combo",
-    name: "Trans-Caucasus (Azerbaijan + Georgia + Turkey)",
-    region: "Multi-Country Route",
+    name: "Grand Silk Road (AZ + GE + TR + UZ)",
+    region: "4-Country Expedition",
     image: "https://images.unsplash.com/photo-1601132359864-c974e79890ac?w=800&q=80",
-    tag: "3 Countries in 1",
-    desc: "Seamless Silk Road journey: Baku → Sheki → Tbilisi → Kazbegi → Istanbul.",
+    tag: "4 Countries in 1",
+    desc: "The ultimate cross-continental route spanning Azerbaijan, Georgia, Turkey & Uzbekistan.",
   },
 ];
 
@@ -224,6 +248,26 @@ export default function CustomItineraryClient() {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const combo = params.get("combo")?.toLowerCase();
+      if (combo === "georgia") {
+        setSelectedDestIds(["georgia_combo"]);
+        setDurationDays(6);
+      } else if (combo === "uzbekistan") {
+        setSelectedDestIds(["uzbekistan_combo"]);
+        setDurationDays(7);
+      } else if (combo === "turkey") {
+        setSelectedDestIds(["turkey_combo"]);
+        setDurationDays(8);
+      } else if (combo === "grand" || combo === "trans" || combo === "all") {
+        setSelectedDestIds(["caucasus_combo"]);
+        setDurationDays(10);
+      }
+    }
   }, []);
 
   const toggleDestination = (id: string) => {

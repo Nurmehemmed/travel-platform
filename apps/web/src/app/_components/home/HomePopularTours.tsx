@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Users, Star, ArrowRight, Heart, MapPin, Sparkles, Zap, Shield, Bookmark, MessageCircle } from "lucide-react";
+import { Clock, Users, Star, ArrowRight, Heart, MapPin, Sparkles, Zap, Shield, Bookmark, MessageCircle, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { useSiteSettings } from "@/lib/settings-context";
@@ -147,6 +147,14 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                       </span>
                     )}
 
+                    {/* TripAdvisor-style "Top Rated Experience" badge */}
+                    {tour.rating >= 4.8 && (
+                      <span className="absolute bottom-2.5 left-2.5 rounded-lg px-2.5 py-1 text-[10px] font-extrabold bg-slate-900/90 text-amber-300 backdrop-blur-md border border-amber-400/40 shadow-sm flex items-center gap-1">
+                        <Sparkles className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        <span>Top Rated in Baku</span>
+                      </span>
+                    )}
+
                     {/* Save to Favorites Button */}
                     <button
                       type="button"
@@ -194,22 +202,38 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                         {tourTitle}
                       </h3>
                     </Link>
-                    <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2 min-h-[2.75rem]">
+                    <p className="text-sm text-slate-500 leading-relaxed mb-3 line-clamp-2 min-h-[2.5rem]">
                       {tourDesc}
                     </p>
 
                     {/* Meta */}
-                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-4">
+                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
                       <span className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" /> {tourDuration}
+                        <Clock className="h-3.5 w-3.5 text-slate-400" /> {tourDuration}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5" /> {tourGroupSize}
+                        <Users className="h-3.5 w-3.5 text-slate-400" /> {tourGroupSize}
                       </span>
                     </div>
 
+                    {/* TripAdvisor & GetYourGuide Trust Triggers */}
+                    <div className="flex flex-col gap-1.5 py-2.5 my-1.5 border-y border-slate-100 text-[11px] bg-slate-50/70 -mx-6 px-6">
+                      <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                        <span>Free cancellation (up to 24h prior)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-sky-800 font-semibold text-[10.5px]">
+                        <Shield className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+                        <span>Reserve now & pay on tour day</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-600 font-medium text-[10.5px]">
+                        <MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                        <span>Hotel pickup & drop-off included</span>
+                      </div>
+                    </div>
+
                     {/* Price + Dual CTAs - Always pinned to bottom */}
-                    <div className="flex flex-col gap-3 pt-4 mt-auto border-t border-slate-100">
+                    <div className="flex flex-col gap-2.5 pt-3 mt-auto">
                       <div className="flex items-baseline justify-between">
                         <div>
                           {tour.originalPrice && (
@@ -234,9 +258,9 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                             setBookingModalTour({ id: tour.id, title: tourTitle, price: tour.price });
                           }}
                           aria-label={`Reserve date for ${tourTitle} (${formatPrice(tour.price)})`}
-                          className="w-full rounded-xl py-2.5 px-2 text-xs font-bold transition-all duration-200 border border-slate-300 text-slate-800 hover:bg-slate-100 active:scale-98 text-center cursor-pointer shadow-sm"
+                          className="w-full rounded-xl py-2.5 px-2 text-xs font-black transition-all duration-200 border-2 border-amber-400/60 bg-amber-50 text-amber-950 hover:bg-amber-100 active:scale-98 text-center cursor-pointer shadow-xs"
                         >
-                          📅 {t.bookingModal.reserveDateBtn}
+                          📅 Reserve (Pay Later)
                         </button>
                         <a
                           href={`https://wa.me/${siteConfig.contact.whatsappClean}?text=${encodeURIComponent(
@@ -251,6 +275,9 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                           <span>{t.tours.bookNow}</span>
                         </a>
                       </div>
+                      <p className="text-[10px] text-center text-slate-400 font-medium">
+                        🛡️ Zero prepayment • Lock in your date risk-free
+                      </p>
                     </div>
                   </div>
                 </div>

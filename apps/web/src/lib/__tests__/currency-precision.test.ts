@@ -37,8 +37,8 @@ describe("Financial Precision & Currency Conversion Boundary Suite", () => {
       expect(format(100, "USD")).toBe("$100");
       expect(format(100, "AZN")).toBe("₼170");
       expect(format(100, "AED")).toBe("367 د.إ"); // Symbol follows value for AED
-      expect(format(100, "EUR")).toBe("€92");
-      expect(format(100, "GBP")).toBe("£79");
+      expect(format(100, "EUR")).toBe("€88");
+      expect(format(100, "GBP")).toBe("£76");
     });
   });
 

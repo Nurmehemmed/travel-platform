@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, MapPin, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, MapPin, Star, Search } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { LOCALIZED_SLIDES } from "@/lib/tours-i18n";
 import { HERO_SLIDES } from "./data";
@@ -11,11 +11,17 @@ import { HERO_SLIDES } from "./data";
 interface HomeHeroProps {
   currentSlide: number;
   setCurrentSlide: React.Dispatch<React.SetStateAction<number>>;
+  searchQuery?: string;
+  setSearchQuery?: (q: string) => void;
+  setActiveFilter?: (f: string) => void;
 }
 
 export const HomeHero: React.FC<HomeHeroProps> = ({
   currentSlide,
   setCurrentSlide,
+  searchQuery,
+  setSearchQuery,
+  setActiveFilter,
 }) => {
   const [mounted] = React.useState(true);
   const { language, isRtl, t } = useLanguage();
@@ -132,6 +138,62 @@ export const HomeHero: React.FC<HomeHeroProps> = ({
                 >
                   {t.nav.transfer}
                 </Link>
+              </div>
+
+              {/* ── TripAdvisor & GetYourGuide Interactive Quick-Search & Destination Chips ── */}
+              <div className="w-full max-w-xl mt-6 sm:mt-7 pointer-events-auto animate-slide-up">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const el = document.getElementById("tours");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="relative flex items-center bg-white/95 backdrop-blur-xl p-1.5 rounded-full shadow-2xl border border-white/50 focus-within:ring-2 focus-within:ring-amber-400 transition-all duration-300"
+                >
+                  <div className="flex items-center pl-3.5 text-slate-400">
+                    <Search className="h-4 w-4 text-amber-500 shrink-0" />
+                  </div>
+                  <input
+                    type="text"
+                    value={searchQuery || ""}
+                    onChange={(e) => setSearchQuery?.(e.target.value)}
+                    placeholder={language === "AZ" ? "Haraya getmək istəyirsiniz? (Bakı, Qobustan, Şəki...)" : language === "RU" ? "Куда хотите поехать? (Баку, Гобустан, Шеки...)" : "Where to in Azerbaijan? (Baku, Gobustan, Sheki...)"}
+                    className="w-full bg-transparent px-3 py-2 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-full px-5 py-2 bg-[#0f3460] hover:bg-[#1a4a82] text-white font-bold text-xs sm:text-sm transition-all duration-200 shrink-0 shadow-md hover:scale-105 active:scale-95 cursor-pointer"
+                  >
+                    {language === "AZ" ? "Axtar" : language === "RU" ? "Найти" : "Search"}
+                  </button>
+                </form>
+
+                {/* 4 Popular 1-Tap Destination Chips */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-3 text-xs">
+                  <span className="text-white/80 text-[11px] font-bold hidden sm:inline-block">
+                    {language === "AZ" ? "Populyar:" : language === "RU" ? "Популярно:" : "Popular:"}
+                  </span>
+                  {[
+                    { label: "🏙️ Baku City", query: "Baku", filter: "City" },
+                    { label: "🌋 Gobustan Volcanoes", query: "Gobustan", filter: "Day Trip" },
+                    { label: "🏔️ Shahdag & Gabala", query: "Shahdag", filter: "Adventure" },
+                    { label: "🏛️ Sheki Silk Road", query: "Sheki", filter: "Overnight" },
+                  ].map((chip) => (
+                    <button
+                      key={chip.label}
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery?.(chip.query);
+                        setActiveFilter?.(chip.filter);
+                        const el = document.getElementById("tours");
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="rounded-full px-3 py-1 bg-white/20 hover:bg-white/35 text-white backdrop-blur-md border border-white/25 transition-all duration-200 hover:scale-105 active:scale-95 text-[11px] sm:text-xs font-bold cursor-pointer shadow-sm"
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           );

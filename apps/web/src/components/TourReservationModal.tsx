@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Check } from "lucide-react";
+import { X, Check, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { getLocalizedTour } from "@/lib/tours-i18n";
@@ -27,6 +27,7 @@ export function TourReservationModal({
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [confirmedResNumber, setConfirmedResNumber] = useState<string | null>(null);
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"on_arrival" | "online">("on_arrival");
 
   if (!tour) return null;
 
@@ -49,6 +50,7 @@ export function TourReservationModal({
           travelerName: bookingName,
           phoneNumber: bookingPhone,
           price: tour.price,
+          paymentMethod,
         }),
       });
       const data = await res.json();
@@ -119,7 +121,7 @@ export function TourReservationModal({
           </div>
         ) : (
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-3">
               <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
                 {t.bookingModal.badge}
               </span>
@@ -127,9 +129,20 @@ export function TourReservationModal({
             <h3 className="font-display text-xl font-bold text-slate-900 mb-1">
               {getLocalizedTour(tour, language).title}
             </h3>
-            <p className="text-xs text-slate-500 mb-5">
+            <p className="text-xs text-slate-500 mb-4">
               {t.bookingModal.subtitle}
             </p>
+
+            {/* Zero-Risk Reassurance Banner (Tripadvisor/GetYourGuide standard) */}
+            <div className="rounded-2xl bg-emerald-50 border border-emerald-200/80 p-3 mb-4 flex items-start gap-2.5">
+              <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="text-xs text-emerald-950">
+                <span className="font-extrabold block text-emerald-900">Zero Prepayment Required</span>
+                <p className="text-[11px] text-emerald-800 leading-tight mt-0.5">
+                  Hold your date with zero deposit. Free cancellation up to 24 hours prior to tour start.
+                </p>
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
               <div>
@@ -187,6 +200,57 @@ export function TourReservationModal({
                 />
               </div>
 
+              {/* Payment Method Selector */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                  Payment Preference
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div
+                    onClick={() => setPaymentMethod("on_arrival")}
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                      paymentMethod === "on_arrival"
+                        ? "bg-amber-50/80 border-amber-500 ring-1 ring-amber-400/40"
+                        : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">💵 Pay on Tour Day</span>
+                      <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-amber-500 text-slate-950">
+                        Popular
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-1">Cash or card to your guide upon pickup.</p>
+                  </div>
+
+                  <div
+                    onClick={() => setPaymentMethod("online")}
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                      paymentMethod === "online"
+                        ? "bg-sky-50/80 border-sky-500 ring-1 ring-sky-400/40"
+                        : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">💳 Pay Online</span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 mt-1">Card link sent after confirmation.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Trust Checklist */}
+              <div className="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+                <div className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span>Instant WhatsApp & Email voucher with guide details</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-700">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span>Hotel lobby pickup & drop-off included</span>
+                </div>
+              </div>
+
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
                 <div className="flex justify-between font-medium">
                   <span>{t.bookingModal.ratePerGroup}</span>
@@ -206,7 +270,7 @@ export function TourReservationModal({
                 className="w-full rounded-xl py-3 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:opacity-95 cursor-pointer mt-2 disabled:opacity-50"
                 style={{ backgroundColor: "#0f3460" }}
               >
-                {bookingSubmitting ? t.bookingModal.submittingBtn : t.bookingModal.submitBtn}
+                {bookingSubmitting ? t.bookingModal.submittingBtn : "Confirm Reservation (Pay Later)"}
               </button>
             </form>
           </div>

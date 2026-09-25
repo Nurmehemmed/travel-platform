@@ -794,24 +794,27 @@ Please confirm guide availability and pickup details.`;
       </main>
 
       {/* ═══════════════════════════════════════════════════════ MOBILE STICKY ACTION BAR */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#0b1329]/95 backdrop-blur-xl border-t border-white/15 p-3.5 z-40 shadow-2xl flex items-center justify-between gap-3 safe-area-pb">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#0b1329]/95 backdrop-blur-xl border-t border-white/15 p-3 sm:p-3.5 z-40 shadow-2xl flex items-center justify-between gap-3 safe-area-pb">
         <div>
           <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">
-            Total ({adults} Guests)
+            Total ({adults} {adults === 1 ? "Guest" : "Guests"})
           </span>
           <div className="flex items-baseline gap-1">
             <span className="text-xl font-black text-amber-400">{formatPrice(grandTotalUSD)}</span>
             <span className="text-[10px] text-slate-400">total</span>
           </div>
+          <span className="text-[9.5px] text-emerald-400 font-bold flex items-center gap-1 mt-0.5">
+            <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" /> Free cancellation (24h)
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 text-xs font-black shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 sm:px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 text-xs font-black shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
           >
             <Calendar className="h-3.5 w-3.5" />
-            <span>Reserve Now</span>
+            <span>Reserve (Pay Later)</span>
           </button>
           <a
             href={buildWhatsAppMessage()}
