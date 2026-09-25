@@ -12,6 +12,7 @@ import { VISA_TRACK_TRANSLATIONS } from "@/lib/pages-i18n";
 import { VisaTrackingSkeleton } from "@/components/Skeletons";
 import VoucherShareActions from "@/components/VoucherShareActions";
 import { CURRENT_BRAND } from "@/lib/brand";
+import { BrandLogo } from "@/components/BrandLogo";
 
 interface TrackedApplication {
   id: string;
@@ -121,9 +122,9 @@ export default function VisaTrackPage() {
             <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
             <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
-          <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white truncate max-w-[130px] sm:max-w-none">
-            {t.nav.trackVisa}
-          </span>
+          <Link href="/" className="flex items-center gap-1.5 shrink-0">
+            <BrandLogo variant="header" showTagline={false} />
+          </Link>
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSelector variant="dark" />
             <Link href="/visa/apply" className="text-xs text-[#f59e0b] hover:underline font-semibold shrink-0 whitespace-nowrap">

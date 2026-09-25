@@ -1,15 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fbbf24" />
-      <stop offset="100%" stop-color="#d97706" />
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f3460"/>
+      <stop offset="100%" stop-color="#1a5276"/>
     </linearGradient>
+    <linearGradient id="waveGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c9a84c"/>
+      <stop offset="100%" stop-color="#f0c040"/>
+    </linearGradient>
+    <clipPath id="squircleClip">
+      <rect x="0" y="0" width="512" height="512" rx="115" ry="115"/>
+    </clipPath>
   </defs>
-  <!-- Squircle Background with Transparent Canvas -->
-  <rect x="15" y="15" width="482" height="482" rx="112" fill="url(#amberGrad)" />
-  <!-- Crisp Center Map Pin -->
+
+  <!-- Squircle background -->
+  <rect x="0" y="0" width="512" height="512" rx="115" fill="url(#bgGrad)"/>
+
+  <!-- Bold "B" lettermark -->
+  <text
+    x="80"
+    y="390"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="420"
+    font-weight="bold"
+    fill="white"
+    opacity="0.95"
+  >B</text>
+
+  <!-- Golden wave accent at bottom -->
   <path
-    d="M256 92 C194 92 143.4 142.6 143.4 204.6 C143.4 286 256 410 256 410 C256 410 368.6 286 368.6 204.6 C368.6 142.6 318 92 256 92 Z M256 250 C230.9 250 210.6 229.7 210.6 204.6 C210.6 179.5 230.9 159.2 256 159.2 C281.1 159.2 301.4 179.5 301.4 204.6 C301.4 229.7 281.1 250 256 250 Z"
-    fill="#ffffff"
+    d="M0 400 Q80 360 160 390 Q240 420 320 385 Q400 350 512 380 L512 512 L0 512 Z"
+    fill="url(#waveGold)"
+    opacity="0.85"
+  />
+  <!-- Second lighter wave -->
+  <path
+    d="M0 440 Q100 410 200 435 Q300 460 400 430 Q460 415 512 425 L512 512 L0 512 Z"
+    fill="white"
+    opacity="0.12"
   />
 </svg>

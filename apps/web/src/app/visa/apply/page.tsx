@@ -14,6 +14,7 @@ import { useSiteSettings } from "@/lib/settings-context";
 import { VISA_APPLY_TRANSLATIONS } from "@/lib/pages-i18n";
 import { DatePicker } from "@/components/DatePicker";
 import { CustomSelect } from "@/components/CustomSelect";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default function VisaApplyPage() {
   const { t, showToast, language } = useLanguage();
@@ -244,11 +245,9 @@ export default function VisaApplyPage() {
             <span className="hidden sm:inline">{t.visaPage.headerBadge}</span>
             <span className="sm:hidden">{t.transferPage.back}</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white truncate max-w-[120px] sm:max-w-none">
-              Azerbaijan e-Visa
-            </span>
-          </div>
+          <Link href="/" className="flex items-center gap-1.5 shrink-0">
+            <BrandLogo variant="header" showTagline={false} />
+          </Link>
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSelector variant="dark" />
             <Link href="/visa/track" className="text-xs text-white/80 hover:text-white hidden sm:inline whitespace-nowrap">
