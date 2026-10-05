@@ -36,4 +36,24 @@ describe("Payriff Payment Integration Engine", () => {
     expect(check.isPaid).toBe(true);
     expect(check.rawStatus).toBe("SIMULATED_APPROVED");
   });
+
+  it("permits sandbox simulation when live credentials are not configured", async () => {
+    const originalEnv = process.env.NODE_ENV;
+    try {
+      (process.env as any).NODE_ENV = "production";
+      const result = await createPayriffOrder({
+        applicationNumber: "TR-123456",
+        amount: 25,
+        currency: "USD",
+        description: "Tour Down Payment",
+        email: "tourist@example.com",
+      });
+
+      expect(result.orderId).toBeDefined();
+      expect(result.isMock).toBe(true);
+      expect(result.paymentUrl).toContain("TR-123456");
+    } finally {
+      (process.env as any).NODE_ENV = originalEnv;
+    }
+  });
 });

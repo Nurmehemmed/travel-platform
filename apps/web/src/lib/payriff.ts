@@ -31,6 +31,30 @@ const PAYRIFF_API_URL = process.env.PAYRIFF_API_URL || "https://api.payriff.com/
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 /**
+ * Checks whether sandbox / test payment simulation is allowed.
+ * - In development, always true.
+ * - In production, allowed if ALLOW_PAYMENT_SANDBOX="true" OR when live credentials are not yet configured.
+ */
+export function isPaymentSandboxAllowed(): boolean {
+  if (process.env.ALLOW_PAYMENT_SANDBOX === "false" || process.env.NEXT_PUBLIC_ALLOW_PAYMENT_SANDBOX === "false") {
+    return false;
+  }
+  if (process.env.ALLOW_PAYMENT_SANDBOX === "true" || process.env.NEXT_PUBLIC_ALLOW_PAYMENT_SANDBOX === "true") {
+    return true;
+  }
+  if (process.env.NODE_ENV !== "production") {
+    return true;
+  }
+  // When live keys are not configured in production, enable sandbox simulation so payments and checkout can be tested
+  const hasLiveKeys = Boolean(
+    PAYRIFF_SECRET_KEY &&
+    PAYRIFF_SECRET_KEY !== "mock" &&
+    !PAYRIFF_SECRET_KEY.startsWith("test_mock")
+  );
+  return !hasLiveKeys;
+}
+
+/**
  * Creates a Payriff payment session for a Visa or Tour order.
  * If credentials are missing, seamlessly returns a sandbox simulation checkout URL.
  */
@@ -53,7 +77,7 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     : `${APP_URL}/api/payment/payriff-callback`;
 
   if (isMock) {
-    if (process.env.NODE_ENV === "production") {
+    if (!isPaymentSandboxAllowed()) {
       throw new Error("Payment gateway credentials (PAYRIFF_SECRET_KEY / PAYRIFF_MERCHANT_ID) are missing or invalid in production.");
     }
     // Return local Payriff Sandbox checkout simulation for all services (eSIM, Transfer, Tour, Visa)
@@ -112,12 +136,12 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
     };
   } catch (err: unknown) {
     console.error("Payriff API Connection Failure:", err);
-    if (process.env.NODE_ENV === "production") {
+    if (!isPaymentSandboxAllowed()) {
       throw new Error("Payment gateway connection error. Please try again shortly.");
     }
-    // Fall back to sandbox simulation in development only
+    // Fall back to sandbox simulation
     const fallbackOrderId = `PR-FALLBACK-${Math.floor(100000 + Math.random() * 900000)}`;
-    const serviceTag = isTransfer ? "transfer" : isEsim ? "esim" : "visa";
+    const serviceTag = isTransfer ? "transfer" : isEsim ? "esim" : isTour ? "tour" : "visa";
     return {
       orderId: fallbackOrderId,
       paymentUrl: `${APP_URL}/pay/sandbox?service=${serviceTag}&ref=${encodeURIComponent(applicationNumber)}&orderId=${fallbackOrderId}&amount=${amount}&currency=${currency}&notice=fallback`,
@@ -134,17 +158,13 @@ export async function verifyPayriffOrder(orderId: string): Promise<{ isPaid: boo
     return { isPaid: false, rawStatus: "INVALID_ORDER_ID" };
   }
 
-  // In production, NEVER trust mock, simulated, or fallback order IDs. Live settlement is strictly required.
-  if (process.env.NODE_ENV === "production") {
-    if (!PAYRIFF_SECRET_KEY || orderId.startsWith("PR-SIM-") || orderId.startsWith("PR-FALLBACK-")) {
-      console.error("[CRITICAL SECURITY] Blocked simulated/uncredentialed payment verification in production", { orderId });
-      return { isPaid: false, rawStatus: "SIMULATION_BLOCKED_IN_PRODUCTION" };
-    }
-  } else {
-    // Development simulation only
-    if (!PAYRIFF_SECRET_KEY || orderId.startsWith("PR-SIM-") || orderId.startsWith("PR-FALLBACK-")) {
+  // Handle simulated / fallback order IDs
+  if (!PAYRIFF_SECRET_KEY || orderId.startsWith("PR-SIM-") || orderId.startsWith("PR-FALLBACK-")) {
+    if (isPaymentSandboxAllowed()) {
       return { isPaid: true, rawStatus: "SIMULATED_APPROVED" };
     }
+    console.error("[CRITICAL SECURITY] Blocked simulated/uncredentialed payment verification in production", { orderId });
+    return { isPaid: false, rawStatus: "SIMULATION_BLOCKED_IN_PRODUCTION" };
   }
 
   try {

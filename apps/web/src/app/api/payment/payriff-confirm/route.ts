@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db, visaApplications, esimOrders, transferBookings, tourReservations, customItineraries, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
 import { sendTelegramVisaAlert, sendTelegramTransferAlert, sendTelegramTourAlert, notifyTelegram } from "@/lib/telegram";
-import { verifyPayriffOrder } from "@/lib/payriff";
+import { verifyPayriffOrder, isPaymentSandboxAllowed } from "@/lib/payriff";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 
@@ -32,11 +32,11 @@ export async function POST(req: Request) {
       ip,
     });
 
-    // 2. Strict Production Guard: NEVER allow simulated payments in production
-    if (process.env.NODE_ENV === "production" && simulated) {
-      logger.warn("Attempted simulated payment in production", { applicationNumber, ip });
+    // 2. Check Sandbox simulation permission
+    if (simulated && !isPaymentSandboxAllowed()) {
+      logger.warn("Attempted simulated payment in production without sandbox mode enabled", { applicationNumber, ip });
       return NextResponse.json(
-        { error: "Unauthorized: Sandbox payment simulation is strictly prohibited in production mode." },
+        { error: "Unauthorized: Sandbox payment simulation is disabled in production mode." },
         { status: 403 }
       );
     }

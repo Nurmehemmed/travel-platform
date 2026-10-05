@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db, esimOrders, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
 import { notifyTelegram } from "@/lib/telegram";
-import { verifyPayriffOrder } from "@/lib/payriff";
+import { verifyPayriffOrder, isPaymentSandboxAllowed } from "@/lib/payriff";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 
@@ -23,10 +23,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing order number" }, { status: 400 });
     }
 
-    // Strict Production Guard: NEVER allow simulated payments in production
-    if (process.env.NODE_ENV === "production" && simulated) {
+    // Check Sandbox simulation permission
+    if (simulated && !isPaymentSandboxAllowed()) {
       return NextResponse.json(
-        { error: "Unauthorized: Sandbox simulation is strictly prohibited in production mode." },
+        { error: "Unauthorized: Sandbox simulation is disabled in production mode." },
         { status: 403 }
       );
     }
