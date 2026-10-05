@@ -40,22 +40,25 @@ export async function createPayriffOrder(params: PayriffCreateOrderParams): Prom
   // Check if live/sandbox Payriff keys are present
   const isMock = !PAYRIFF_SECRET_KEY || PAYRIFF_SECRET_KEY === "mock" || PAYRIFF_SECRET_KEY.startsWith("test_mock");
 
-  // Detect service type by reference prefix: ATR- = transfer, ESIM- = esim, AZV- = visa
+  // Detect service type by reference prefix: ATR- = transfer, ESIM- = esim, TR- = tour, ITN- = itinerary, AZV- = visa
   const isTransfer = applicationNumber.startsWith("ATR-");
   const isEsim = applicationNumber.startsWith("ESIM-");
+  const isTour = applicationNumber.startsWith("TR-");
   const callbackBase = isTransfer
     ? `${APP_URL}/api/payment/transfer-callback`
     : isEsim
     ? `${APP_URL}/api/payment/esim-callback`
+    : isTour
+    ? `${APP_URL}/api/payment/tour-callback`
     : `${APP_URL}/api/payment/payriff-callback`;
 
   if (isMock) {
     if (process.env.NODE_ENV === "production") {
       throw new Error("Payment gateway credentials (PAYRIFF_SECRET_KEY / PAYRIFF_MERCHANT_ID) are missing or invalid in production.");
     }
-    // Return local Payriff Sandbox checkout simulation for all services (eSIM, Transfer, Visa)
+    // Return local Payriff Sandbox checkout simulation for all services (eSIM, Transfer, Tour, Visa)
     const mockOrderId = `PR-SIM-${Math.floor(100000 + Math.random() * 900000)}`;
-    const serviceTag = isTransfer ? "transfer" : isEsim ? "esim" : "visa";
+    const serviceTag = isTransfer ? "transfer" : isEsim ? "esim" : isTour ? "tour" : "visa";
     const paymentUrl = `${APP_URL}/pay/sandbox?service=${serviceTag}&ref=${encodeURIComponent(applicationNumber)}&orderId=${mockOrderId}&amount=${Number(amount).toFixed(2)}&currency=${currency}`;
     return {
       orderId: mockOrderId,

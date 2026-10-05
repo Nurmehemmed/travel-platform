@@ -22,14 +22,6 @@ export const AIRPORTS: AirportInfo[] = [
     lat: 40.7419,
     lng: 46.3175,
   },
-  {
-    code: "NAJ",
-    name: "Nakhchivan Airport",
-    city: "Nakhchivan",
-    fullName: "Nakhchivan Airport (NAJ)",
-    lat: 39.1892,
-    lng: 45.4594,
-  },
 ];
 
 /** Get airport info by code */

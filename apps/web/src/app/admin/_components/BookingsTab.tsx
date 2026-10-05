@@ -137,9 +137,24 @@ export const BookingsTab: React.FC<BookingsTabProps> = ({
                     </td>
                     <td className="px-5 py-4">
                       <span className="font-bold text-slate-900 block">${r.price}</span>
-                      <span className="text-[10px] text-slate-400 block">
-                        ~{(Number(r.price) * 1.7).toFixed(0)} AZN
-                      </span>
+                      {r.paymentStatus === "deposit_paid" || r.paymentMethod === "partial_deposit" ? (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center gap-1 rounded bg-sky-50 text-sky-800 border border-sky-200 px-1.5 py-0.5 text-[10px] font-bold">
+                            💳 Deposit: ${r.depositAmount || (Number(r.price) * 0.2).toFixed(2)}
+                          </span>
+                          <span className="block text-[10px] font-semibold text-amber-700 mt-0.5">
+                            Due on tour: ${r.remainingAmount || (Number(r.price) * 0.8).toFixed(2)}
+                          </span>
+                        </div>
+                      ) : r.paymentStatus === "paid" ? (
+                        <span className="inline-flex items-center gap-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 px-1.5 py-0.5 text-[10px] font-bold mt-1">
+                          ✅ Paid 100%
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded bg-amber-50 text-amber-800 border border-amber-200 px-1.5 py-0.5 text-[10px] font-bold mt-1">
+                          💵 Collect: ${r.price} on tour
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       {r.guideName ? (

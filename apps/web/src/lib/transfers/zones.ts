@@ -186,30 +186,6 @@ export const TRANSFER_ZONES: TransferZone[] = [
     distanceKm: 0,
     isCustom: true,
   },
-
-  // ── NAJ (Nakhchivan) ────────────────────────────────────────────────────────
-  {
-    id: "NAJ-nakhchivan-center",
-    airport: "NAJ",
-    name: "Nakhchivan City Center",
-    description: "Nakhchivan city, Tabriz Hotel, and central districts",
-    distanceKm: 7,
-  },
-  {
-    id: "NAJ-duzdag",
-    airport: "NAJ",
-    name: "Duzdag Physiotherapy & Salt Caves",
-    description: "Duzdag Hotel and underground speleotherapy sanatorium",
-    distanceKm: 18,
-  },
-  {
-    id: "NAJ-custom",
-    airport: "NAJ",
-    name: "Custom Destination",
-    description: "Enter your specific address — price will be confirmed by our team",
-    distanceKm: 0,
-    isCustom: true,
-  },
 ];
 
 /** Get all zones for a given airport */

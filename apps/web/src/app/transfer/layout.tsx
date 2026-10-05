@@ -8,9 +8,9 @@ const APP_URL =
   `https://${CURRENT_BRAND.domain}`;
 
 export const metadata: Metadata = {
-  title: `Airport Transfer — Baku, Ganja & Nakhchivan | ${CURRENT_BRAND.name}`,
+  title: `Airport Transfer — Baku & Ganja | ${CURRENT_BRAND.name}`,
   description:
-    "Book private airport transfers in Baku (GYD), Ganja & Nakhchivan. Fixed prices, flight monitoring, meet & greet, and 24/7 support in Azerbaijan.",
+    "Book private airport transfers in Baku (GYD) & Ganja (GJA). Fixed prices, flight monitoring, meet & greet, and 24/7 support in Azerbaijan.",
   keywords: [
     "Azerbaijan airport transfer",
     "Baku airport taxi",
@@ -21,7 +21,6 @@ export const metadata: Metadata = {
     "airport pickup Baku",
     "meet and greet Baku airport",
     "Ganja airport transfer",
-    "Nakhchivan airport transfer",
     `${CURRENT_BRAND.name} transfer`,
   ],
   alternates: {
@@ -43,7 +42,7 @@ export const metadata: Metadata = {
     siteName: CURRENT_BRAND.name,
     title: "Airport Transfer in Azerbaijan — Fixed Prices, Professional Drivers",
     description:
-      "Book a private airport transfer across Azerbaijan. Fixed prices, meet & greet, flight monitoring. Available at GYD, GJA, and NAJ airports.",
+      "Book a private airport transfer across Azerbaijan. Fixed prices, meet & greet, flight monitoring. Available at GYD and GJA airports.",
     images: [
       {
         url: "/images/og-transfer-cover.jpg",
@@ -61,7 +60,7 @@ const transferJsonLd = {
   "@id": `${APP_URL}/transfer#service`,
   name: `${CURRENT_BRAND.name} Airport Transfer`,
   description:
-    "Professional private airport transfer service in Azerbaijan. Fixed prices, meet & greet, flight tracking at Heydar Aliyev International (GYD), Ganja (GJA), and Nakhchivan (NAJ) airports.",
+    "Professional private airport transfer service in Azerbaijan. Fixed prices, meet & greet, flight tracking at Heydar Aliyev International (GYD) and Ganja (GJA) airports.",
   provider: {
     "@type": "TravelAgency",
     "@id": `${APP_URL}/#organization`,

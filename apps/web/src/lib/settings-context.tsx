@@ -32,8 +32,12 @@ export interface PublicSettings {
     transferPerKmMinivan: number;
     transferPerKmSprinter: number;
     transferRoundTripDiscountPercent: number;
+    transferDepositPercent: number;
+    tourDepositPercent: number;
+    defaultDepositPercent: number;
   };
   transferPolicy: {
+    minLeadTimeHours: number;
     cancellationHours: number;
     waitTimeIntlMins: number;
     waitTimeDomMins: number;
@@ -85,8 +89,12 @@ export const DEFAULT_PUBLIC_SETTINGS: PublicSettings = {
     transferPerKmMinivan: 0.75,
     transferPerKmSprinter: 1.10,
     transferRoundTripDiscountPercent: 10,
+    transferDepositPercent: 20,
+    tourDepositPercent: 20,
+    defaultDepositPercent: 20,
   },
   transferPolicy: {
+    minLeadTimeHours: 8,
     cancellationHours: 24,
     waitTimeIntlMins: 60,
     waitTimeDomMins: 30,
@@ -267,3 +275,5 @@ export function useSiteSettings() {
   const context = useContext(SettingsContext);
   return context;
 }
+
+export const useSettings = useSiteSettings;

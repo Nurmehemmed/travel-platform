@@ -11,7 +11,7 @@ describe("TransferService Domain Logic", () => {
     dropoffAddress: "Nizami Street 10",
     vehicleClass: "sedan",
     flightNumber: "J2-075",
-    flightDate: "2026-06-15",
+    flightDate: "2028-06-15",
     flightTime: "14:30",
     passengerName: "Alice Smith",
     passengerCount: 2,
@@ -81,9 +81,45 @@ describe("TransferService Domain Logic", () => {
         ...validOneWayInput,
         direction: "round_trip",
         returnFlightNumber: "J2-076",
-        returnDate: "2026-06-22",
+        returnDate: "2028-06-22",
         returnTime: "18:00",
       });
+      expect(result.valid).toBe(true);
+    });
+
+    it("rejects booking when flight date and time is in the past", () => {
+      const result = transferService.validateBooking({
+        ...validOneWayInput,
+        flightDate: "2020-01-01",
+        flightTime: "10:00",
+      });
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain("cannot be in the past");
+    });
+
+    it("rejects round-trip booking when return flight is before arrival flight", () => {
+      const result = transferService.validateBooking({
+        ...validOneWayInput,
+        direction: "round_trip",
+        flightDate: "2028-06-20",
+        flightTime: "18:00",
+        returnFlightNumber: "J2-076",
+        returnDate: "2028-06-19",
+        returnTime: "10:00",
+      });
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain("must be after the arrival flight");
+    });
+
+    it("allows skipping lead time check with skipLeadTimeCheck flag", () => {
+      const result = transferService.validateBooking(
+        {
+          ...validOneWayInput,
+          flightDate: "2020-01-01",
+          flightTime: "10:00",
+        },
+        { skipLeadTimeCheck: true }
+      );
       expect(result.valid).toBe(true);
     });
 

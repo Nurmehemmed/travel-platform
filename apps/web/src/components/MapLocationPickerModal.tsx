@@ -18,7 +18,8 @@ import {
   AirportCode,
   resolveLocationByCoords,
   resolveLocationOrZone,
-  AZERBAIJAN_MAP_BOUNDS,
+  BAKU_MAP_BOUNDS,
+  GANJA_MAP_BOUNDS,
   checkLocationServiceability,
   MAP_HOTSPOTS,
   MapHotspot,
@@ -63,13 +64,19 @@ export function MapLocationPickerModal({
   const leafletModuleRef = useRef<any>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Default coordinate setup according to airport
+  const defaultCoords =
+    airportCode === "GJA"
+      ? { lat: 40.6828, lng: 46.3606 } // Ganja City Center
+      : { lat: 40.3756, lng: 49.8450 }; // Baku City Center
+
   // State for selected coords & resolved details
-  const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number }>({
-    lat: 40.3756,
-    lng: 49.8450, // Baku City Center default
-  });
+  const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number }>(defaultCoords);
   const [resolvedAddress, setResolvedAddress] = useState<string>(
-    initialAddress || "JW Marriott Absheron Baku, 674 Azadliq Square"
+    initialAddress ||
+      (airportCode === "GJA"
+        ? "Ganja City Center, Heydar Aliyev Square"
+        : "JW Marriott Absheron Baku, 674 Azadliq Square")
   );
   const [resolvedLocationName, setResolvedLocationName] = useState<string | undefined>();
   const [resolvedLocationId, setResolvedLocationId] = useState<string | undefined>(
@@ -92,8 +99,12 @@ export function MapLocationPickerModal({
   >([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  // Instantaneous geographic validation (blocks water and Caspian Sea, out-of-bounds)
-  const serviceability = checkLocationServiceability(currentCoords.lat, currentCoords.lng);
+  // Geographic boundary validation (limited strictly to Baku or Ganja according to airport)
+  const serviceability = checkLocationServiceability(
+    currentCoords.lat,
+    currentCoords.lng,
+    airportCode
+  );
 
   // Compute zone and distance
   const { zone: resolvedZone, distanceKm: resolvedDistanceKm } = resolveLocationByCoords(
@@ -146,17 +157,24 @@ export function MapLocationPickerModal({
     });
   }, []);
 
-  // Quick chips for popular destinations in Azerbaijan
-  const quickShortcuts = [
-    { name: "JW Marriott", query: "JW Marriott Absheron Baku", lat: 40.3725, lng: 49.8530, id: "loc-jw-marriott" },
-    { name: "Flame Towers", query: "Fairmont Baku (Flame Towers)", lat: 40.3598, lng: 49.8258, id: "loc-fairmont-flame" },
-    { name: "Old City", query: "Old City (Icherisheher Historic Quarter)", lat: 40.3660, lng: 49.8335, id: "loc-dst-old-city" },
-    { name: "Shahdag Resort", query: "Shahdag Mountain Resort", lat: 41.3214, lng: 48.1464, id: "loc-reg-shahdag" },
-    { name: "Qabala Tufandag", query: "Tufandag Mountain Resort", lat: 40.9825, lng: 47.8492, id: "loc-reg-qabala" },
-    { name: "Bilgah Beach", query: "Bilgah Beach Hotel", lat: 40.5847, lng: 49.9824, id: "loc-bilgah-beach" },
-  ];
+  // Quick chips for popular destinations strictly in Baku or Ganja
+  const quickShortcuts =
+    airportCode === "GJA"
+      ? [
+          { name: "Ganja Center", query: "Ganja City Center, Heydar Aliyev Square", lat: 40.6828, lng: 46.3606, id: "loc-gja-center" },
+          { name: "Ramada Plaza", query: "Ramada Plaza by Wyndham Ganja", lat: 40.6950, lng: 46.3650, id: "loc-gja-ramada" },
+          { name: "Goygol Lake", query: "Goygol National Park & Lake", lat: 40.4080, lng: 46.3240, id: "loc-gja-goygol" },
+          { name: "Naftalan Spa", query: "Naftalan Health Sanatoriums", lat: 40.5067, lng: 46.8250, id: "loc-reg-naftalan" },
+        ]
+      : [
+          { name: "JW Marriott", query: "JW Marriott Absheron Baku", lat: 40.3725, lng: 49.8530, id: "loc-jw-marriott" },
+          { name: "Flame Towers", query: "Fairmont Baku (Flame Towers)", lat: 40.3598, lng: 49.8258, id: "loc-fairmont-flame" },
+          { name: "Old City", query: "Old City (Icherisheher Historic Quarter)", lat: 40.3660, lng: 49.8335, id: "loc-dst-old-city" },
+          { name: "Fountain Sq", query: "Fountain Square (Nizami Street)", lat: 40.3703, lng: 49.8375, id: "loc-dst-fountain-sq" },
+          { name: "Bilgah Beach", query: "Bilgah Beach Hotel", lat: 40.5847, lng: 49.9824, id: "loc-bilgah-beach" },
+        ];
 
-  // Initialize coordinates from initialLocationId if available
+  // Initialize coordinates from initialLocationId or airport defaults
   useEffect(() => {
     if (initialLocationId) {
       const { location } = resolveLocationOrZone(initialLocationId, airportCode);
@@ -165,14 +183,31 @@ export function MapLocationPickerModal({
         setResolvedAddress(location.address || location.name);
         setResolvedLocationName(location.name);
         setResolvedLocationId(location.id);
+        return;
       }
     }
-  }, [initialLocationId, airportCode]);
+
+    if (airportCode === "GJA") {
+      const gjaLat = 40.6828;
+      const gjaLng = 46.3606;
+      setCurrentCoords({ lat: gjaLat, lng: gjaLng });
+      setResolvedAddress(initialAddress || "Ganja City Center, Heydar Aliyev Square");
+      setResolvedLocationName("Ganja City Center");
+      setResolvedLocationId("loc-gja-center");
+    } else {
+      const bakuLat = 40.3756;
+      const bakuLng = 49.8450;
+      setCurrentCoords({ lat: bakuLat, lng: bakuLng });
+      setResolvedAddress(initialAddress || "JW Marriott Absheron Baku, 674 Azadliq Square");
+      setResolvedLocationName("JW Marriott Absheron Baku");
+      setResolvedLocationId("loc-jw-marriott");
+    }
+  }, [isOpen, initialLocationId, airportCode, initialAddress]);
 
   // Reverse geocoding lookup via internal API route (bypasses browser CORS & User-Agent blocks)
   const performReverseGeocode = useCallback(
     async (lat: number, lng: number) => {
-      const check = checkLocationServiceability(lat, lng);
+      const check = checkLocationServiceability(lat, lng, airportCode);
       if (!check.isServiceable) {
         setResolvedAddress(check.message);
         setResolvedLocationName(undefined);
@@ -213,23 +248,30 @@ export function MapLocationPickerModal({
     [airportCode, language]
   );
 
-  // Fast reset action to Baku City Center
-  const handleResetToBaku = useCallback(() => {
-    const bakuLat = 40.3725;
-    const bakuLng = 49.8530;
-    setCurrentCoords({ lat: bakuLat, lng: bakuLng });
-    setResolvedAddress("JW Marriott Absheron Baku, 674 Azadliq Square");
-    setResolvedLocationName("JW Marriott Absheron Baku");
-    setResolvedLocationId("loc-jw-marriott");
+  // Fast reset action to active region center (Baku or Ganja)
+  const handleResetToCenter = useCallback(() => {
+    const isGja = airportCode === "GJA";
+    const centerLat = isGja ? 40.6828 : 40.3725;
+    const centerLng = isGja ? 46.3606 : 49.8530;
+    const centerAddress = isGja
+      ? "Ganja City Center, Heydar Aliyev Square"
+      : "JW Marriott Absheron Baku, 674 Azadliq Square";
+    const centerName = isGja ? "Ganja City Center" : "JW Marriott Absheron Baku";
+    const centerId = isGja ? "loc-gja-center" : "loc-jw-marriott";
+
+    setCurrentCoords({ lat: centerLat, lng: centerLng });
+    setResolvedAddress(centerAddress);
+    setResolvedLocationName(centerName);
+    setResolvedLocationId(centerId);
 
     if (markerRef.current && leafletModuleRef.current) {
-      markerRef.current.setLatLng([bakuLat, bakuLng]);
+      markerRef.current.setLatLng([centerLat, centerLng]);
       markerRef.current.setIcon(createPinIcon(leafletModuleRef.current, true));
     }
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo([bakuLat, bakuLng], 15, { duration: 1.0 });
+      mapInstanceRef.current.flyTo([centerLat, centerLng], 14, { duration: 1.0 });
     }
-  }, [createPinIcon]);
+  }, [airportCode, createPinIcon]);
 
   // Select a curated hotspot directly
   const handleSelectHotspot = useCallback(
@@ -270,16 +312,21 @@ export function MapLocationPickerModal({
 
       if (!mapContainerRef.current) return;
 
-      const initialCheck = checkLocationServiceability(currentCoords.lat, currentCoords.lng);
+      const initialCheck = checkLocationServiceability(
+        currentCoords.lat,
+        currentCoords.lng,
+        airportCode
+      );
       const pinIcon = createPinIcon(L, initialCheck.isServiceable);
+      const activeBounds = airportCode === "GJA" ? GANJA_MAP_BOUNDS : BAKU_MAP_BOUNDS;
 
-      // Initialize map locked strictly to Azerbaijan bounds
+      // Initialize map locked strictly to selected region bounds (Baku or Ganja)
       const map = L.map(mapContainerRef.current, {
         center: [currentCoords.lat, currentCoords.lng],
-        zoom: 14,
-        minZoom: 7,
+        zoom: 13,
+        minZoom: 9,
         maxZoom: 18,
-        maxBounds: AZERBAIJAN_MAP_BOUNDS,
+        maxBounds: activeBounds,
         maxBoundsViscosity: 1.0,
         zoomControl: true,
       });
@@ -295,9 +342,16 @@ export function MapLocationPickerModal({
         }
       ).addTo(map);
 
-      // Render Curated Hotspot POIs on the map
+      // Render Curated Hotspot POIs for active service region
       const hotspotLayer = L.layerGroup().addTo(map);
-      MAP_HOTSPOTS.forEach((spot) => {
+      const visibleHotspots = MAP_HOTSPOTS.filter((spot) => {
+        if (airportCode === "GJA") {
+          return spot.lat >= 40.25 && spot.lat <= 40.95 && spot.lng >= 46.00 && spot.lng <= 47.30;
+        }
+        return spot.lat >= 40.05 && spot.lat <= 40.75 && spot.lng >= 49.30 && spot.lng <= 50.55;
+      });
+
+      visibleHotspots.forEach((spot) => {
         const borderColor =
           spot.category === "resort"
             ? "#10b981"
@@ -353,17 +407,17 @@ export function MapLocationPickerModal({
         draggable: true,
       }).addTo(map);
 
-      // Marker drag live feedback (changes to warning pin dynamically if over water/border)
+      // Marker drag live feedback (changes to warning pin dynamically if outside active borders)
       marker.on("drag", () => {
         const position = marker.getLatLng();
-        const check = checkLocationServiceability(position.lat, position.lng);
+        const check = checkLocationServiceability(position.lat, position.lng, airportCode);
         marker.setIcon(createPinIcon(L, check.isServiceable));
       });
 
       // Marker dragend event (resolves coords and updates state)
       marker.on("dragend", () => {
         const position = marker.getLatLng();
-        const check = checkLocationServiceability(position.lat, position.lng);
+        const check = checkLocationServiceability(position.lat, position.lng, airportCode);
         marker.setIcon(createPinIcon(L, check.isServiceable));
         setCurrentCoords({ lat: position.lat, lng: position.lng });
         performReverseGeocode(position.lat, position.lng);
@@ -372,7 +426,7 @@ export function MapLocationPickerModal({
       // Map click event to move pin
       map.on("click", (e: any) => {
         const { lat, lng } = e.latlng;
-        const check = checkLocationServiceability(lat, lng);
+        const check = checkLocationServiceability(lat, lng, airportCode);
         marker.setLatLng([lat, lng]);
         marker.setIcon(createPinIcon(L, check.isServiceable));
         setCurrentCoords({ lat, lng });
@@ -399,7 +453,7 @@ export function MapLocationPickerModal({
         mapInstanceRef.current = null;
       }
     };
-  }, [isOpen]);
+  }, [isOpen, airportCode]);
 
   // Debounced search places via internal API route
   const fetchSearchResults = useCallback(
@@ -460,6 +514,7 @@ export function MapLocationPickerModal({
     lng: number;
     locationId?: string;
   }) => {
+    const check = checkLocationServiceability(item.lat, item.lng, airportCode);
     setCurrentCoords({ lat: item.lat, lng: item.lng });
     setResolvedAddress(item.address || item.title);
     setResolvedLocationName(item.title);
@@ -470,7 +525,7 @@ export function MapLocationPickerModal({
     if (mapInstanceRef.current && markerRef.current) {
       markerRef.current.setLatLng([item.lat, item.lng]);
       if (leafletModuleRef.current) {
-        markerRef.current.setIcon(createPinIcon(leafletModuleRef.current, true));
+        markerRef.current.setIcon(createPinIcon(leafletModuleRef.current, check.isServiceable));
       }
       mapInstanceRef.current.flyTo([item.lat, item.lng], 15, {
         duration: 1.2,
@@ -680,7 +735,7 @@ export function MapLocationPickerModal({
               </div>
               <button
                 type="button"
-                onClick={handleResetToBaku}
+                onClick={handleResetToCenter}
                 className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] shadow-xs cursor-pointer transition-colors"
               >
                 <RotateCcw className="h-3 w-3" />
@@ -738,7 +793,7 @@ export function MapLocationPickerModal({
                   </div>
                 ) : (
                   <p className="text-[10px] text-rose-500 mt-0.5 font-medium">
-                    ⚠️ Drag the pin to any valid street or hotel in Azerbaijan to confirm.
+                    ⚠️ {serviceability.message}
                   </p>
                 )}
               </div>

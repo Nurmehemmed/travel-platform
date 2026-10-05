@@ -1,6 +1,9 @@
-import { db, tourReservations, packages, recordAuditLog } from "@travel/db";
+import { db, tourReservations, packages, siteSettings, recordAuditLog } from "@travel/db";
 import { desc, eq } from "drizzle-orm";
 import { logger } from "@/lib/logger";
+import { calculatePaymentBreakdown } from "@/lib/transfers/policy";
+import { createPayriffOrder } from "@/lib/payriff";
+import { sendTelegramTourAlert } from "@/lib/telegram";
 
 export interface CreateTourReservationInput {
   tourId: string;
@@ -9,7 +12,9 @@ export interface CreateTourReservationInput {
   guests?: number | string;
   travelerName: string;
   phoneNumber: string;
+  email?: string;
   price: number | string;
+  paymentMethod?: "online" | "on_arrival" | "partial_deposit";
   clientIp?: string | null;
 }
 
@@ -140,11 +145,59 @@ export class TourService {
 
     const guestCount = Math.max(1, Math.min(50, Number(input.guests) || 1));
     const reservationNumber = generateReservationNumber();
+    const cleanEmail = input.email ? String(input.email).trim().toLowerCase() : null;
 
     const tourDateStr: string =
       (typeof input.tourDate === "string"
         ? input.tourDate.split("T")[0]
         : new Date(input.tourDate).toISOString().split("T")[0]) || new Date().toISOString().slice(0, 10);
+
+    // Read configurable deposit percentage (default 20%)
+    let depositPercent = 20;
+    try {
+      const settingsRows = await db.select().from(siteSettings);
+      const settingsMap: Record<string, any> = {};
+      for (const r of settingsRows) {
+        settingsMap[r.key] = r.value;
+      }
+      depositPercent =
+        Number(settingsMap["pricing_tour_deposit_percent"]) ||
+        Number(settingsMap["pricing_default_deposit_percent"]) ||
+        20;
+    } catch {
+      // Default to 20% if settings table unavailable
+    }
+
+    const totalPrice = validation.trustedUnitPrice;
+    const breakdown = calculatePaymentBreakdown(totalPrice, depositPercent);
+
+    const rawPaymentMethod = input.paymentMethod || "on_arrival";
+    const isOnline = rawPaymentMethod === "online" || rawPaymentMethod === "partial_deposit";
+    const finalPaymentMethod = isOnline
+      ? (breakdown.isPartial ? "partial_deposit" : "online")
+      : "on_arrival";
+
+    const depositAmountVal = isOnline
+      ? (breakdown.isPartial ? breakdown.depositAmount : totalPrice)
+      : 0;
+
+    const remainingAmountVal = isOnline
+      ? (breakdown.isPartial ? breakdown.remainingAmount : 0)
+      : totalPrice;
+
+    // Initialize Payriff order if online payment
+    let payriffResult: any = null;
+    if (isOnline) {
+      payriffResult = await createPayriffOrder({
+        applicationNumber: reservationNumber,
+        amount: depositAmountVal,
+        currency: "USD",
+        description: breakdown.isPartial
+          ? `Tour Deposit (${depositPercent}%) — ${input.tourTitle}`
+          : `Tour Reservation — ${input.tourTitle}`,
+        email: cleanEmail || "booking@azerbaijantravel.com",
+      });
+    }
 
     const created = await db.transaction(async (tx) => {
       const [inserted] = await tx
@@ -157,7 +210,13 @@ export class TourService {
           guests: guestCount,
           travelerName: String(input.travelerName).trim(),
           phoneNumber: String(input.phoneNumber).trim(),
-          price: String(validation.trustedUnitPrice!.toFixed(2)),
+          email: cleanEmail,
+          price: String(totalPrice.toFixed(2)),
+          depositAmount: String(depositAmountVal.toFixed(2)),
+          remainingAmount: String(remainingAmountVal.toFixed(2)),
+          paymentMethod: finalPaymentMethod,
+          paymentStatus: "pending",
+          payriffOrderId: payriffResult?.orderId || null,
           status: "pending",
         })
         .returning();
@@ -174,7 +233,13 @@ export class TourService {
             guests: guestCount,
             travelerName: input.travelerName,
             phoneNumber: input.phoneNumber,
-            verifiedPrice: validation.trustedUnitPrice,
+            email: cleanEmail,
+            verifiedPrice: totalPrice,
+            depositPercent,
+            depositAmount: depositAmountVal,
+            remainingAmount: remainingAmountVal,
+            paymentMethod: finalPaymentMethod,
+            payriffOrderId: payriffResult?.orderId || null,
             clientIp: input.clientIp,
           },
         }, tx);
@@ -188,13 +253,38 @@ export class TourService {
         reservationNumber: created.reservationNumber,
         tourTitle: input.tourTitle,
         travelerName: input.travelerName,
-        verifiedPrice: validation.trustedUnitPrice,
+        verifiedPrice: totalPrice,
+        depositAmount: depositAmountVal,
+        remainingAmount: remainingAmountVal,
+        paymentMethod: finalPaymentMethod,
       });
+
+      // If customer chose pay on arrival (cash/card on tour day), alert operations immediately
+      if (!isOnline) {
+        sendTelegramTourAlert({
+          reservationNumber: created.reservationNumber,
+          tourTitle: input.tourTitle,
+          tourDate: tourDateStr,
+          guests: guestCount,
+          travelerName: input.travelerName,
+          phoneNumber: input.phoneNumber,
+          email: cleanEmail,
+          totalPrice,
+          depositAmount: depositAmountVal,
+          remainingAmount: remainingAmountVal,
+          paymentMethod: finalPaymentMethod,
+          paymentStatus: "pending",
+        }).catch((err) => logger.warn("Telegram tour alert failed", { err: err?.message }));
+      }
     }
 
     return {
       reservationNumber: created?.reservationNumber ?? reservationNumber,
       reservation: created,
+      paymentUrl: payriffResult?.paymentUrl || null,
+      depositAmount: depositAmountVal,
+      remainingAmount: remainingAmountVal,
+      breakdown,
     };
   }
 

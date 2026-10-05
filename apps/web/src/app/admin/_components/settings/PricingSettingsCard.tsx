@@ -337,6 +337,75 @@ export const PricingSettingsCard: React.FC<PricingSettingsCardProps> = ({
             </span>
           </div>
 
+          <div className="p-3.5 rounded-xl border border-sky-200 bg-sky-50/50">
+            <span className="text-[11px] font-bold text-sky-800 block mb-1">
+              {isAZ ? "Transfer İlkin Depoziti (%)" : "Transfer Down Payment (%)"}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={settingsDraft["pricing_transfer_deposit_percent"] ?? 20}
+                onChange={(e) =>
+                  setSettingsDraft((prev) => ({
+                    ...prev,
+                    pricing_transfer_deposit_percent: Number(e.target.value),
+                  }))
+                }
+                className="w-full rounded-lg border border-sky-300 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-900 outline-none"
+              />
+            </div>
+            <span className="text-[10px] text-sky-700 mt-1 block">
+              {isAZ ? "Transfer üçün onlayn depozit (qalanı çatdırılmada)" : "Transfer online deposit; remainder on arrival"}
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/50">
+            <span className="text-[11px] font-bold text-indigo-800 block mb-1">
+              {isAZ ? "Tur İlkin Depoziti (%)" : "Tour Down Payment (%)"}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={settingsDraft["pricing_tour_deposit_percent"] ?? 20}
+                onChange={(e) =>
+                  setSettingsDraft((prev) => ({
+                    ...prev,
+                    pricing_tour_deposit_percent: Number(e.target.value),
+                  }))
+                }
+                className="w-full rounded-lg border border-indigo-300 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-900 outline-none"
+              />
+            </div>
+            <span className="text-[10px] text-indigo-700 mt-1 block">
+              {isAZ ? "Turlar üçün onlayn depozit (qalanı tur günü)" : "Tours online deposit; remainder on tour day"}
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl border border-amber-200 bg-amber-50/50">
+            <span className="text-[11px] font-bold text-amber-800 block mb-1">
+              {isAZ ? "Minimum Sifariş Vaxtı (Saat)" : "Min Lead Time (Hours)"}
+            </span>
+            <input
+              type="number"
+              min="1"
+              value={settingsDraft["transfer_min_lead_time_hours"] ?? 8}
+              onChange={(e) =>
+                setSettingsDraft((prev) => ({
+                  ...prev,
+                  transfer_min_lead_time_hours: Number(e.target.value),
+                }))
+              }
+              className="w-full rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-900 outline-none"
+            />
+            <span className="text-[10px] text-amber-700 mt-1 block">
+              {isAZ ? "Gəlişə qədər qəbul limiti (8 saat)" : "Max proximity to arrival (8h)"}
+            </span>
+          </div>
+
           <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50">
             <span className="text-[11px] font-bold text-slate-600 block mb-1">
               {isAZ ? "Pulsuz Ləğv (Saat)" : "Free Cancellation (h)"}

@@ -89,7 +89,7 @@ export default function TermsOfServicePage() {
           <div className="text-xs sm:text-sm text-slate-600 leading-relaxed space-y-2">
             <p>{CURRENT_BRAND.name} provides premium travel technology and destination management services across Azerbaijan, including:</p>
             <ul className="list-disc pl-6 space-y-1.5 marker:text-sky-500">
-              <li><strong>Private Airport Transfers:</strong> Door-to-door meet & greet transfers across GYD (Baku), GJA (Ganja), and NAJ (Nakhchivan) airports.</li>
+              <li><strong>Private Airport Transfers:</strong> Door-to-door meet & greet transfers across GYD (Baku) and GJA (Ganja) airports.</li>
               <li><strong>Guided Tours & Excursions:</strong> Day tours, mountain excursions (Shahdag, Qabala), historical tours, and private cultural journeys.</li>
               <li><strong>Azerbaijan e-Visa Processing:</strong> ASAN Visa application validation, quality inspection, and official government submission.</li>
               <li><strong>Custom Itinerary Planner:</strong> Tailored day-by-day travel programs, accommodation curation, and MICE corporate logistics.</li>
@@ -127,7 +127,7 @@ export default function TermsOfServicePage() {
                 <span>Airport Transfers</span>
               </h4>
               <p>
-                100% full refund if cancelled at least 24 hours prior to scheduled pickup. 50% refund if cancelled 12–24 hours prior. For complete details, see our <Link href="/transfer/policy" className="text-sky-600 underline font-semibold">Transfer Booking Policy</Link>.
+                Transfer requests are accepted up to a maximum of 8 hours prior to arrival. 100% full refund if cancelled at least 24 hours prior to scheduled pickup. 50% refund if cancelled 12–24 hours prior. For complete details, see our <Link href="/transfer/policy" className="text-sky-600 underline font-semibold">Transfer Booking Policy</Link>.
               </p>
             </div>
 

@@ -14,7 +14,10 @@ import {
   TransferZone,
   VehicleClass,
   AirportCode,
+  validateTransferLeadTime,
+  validateReturnFlightTime,
 } from "@/lib/transfer-zones";
+import { calculateTransferPaymentBreakdown } from "@/lib/transfers/policy";
 import { isVehicleClassActive } from "@/lib/transfers/vehicles";
 import { siteSettings } from "@travel/db";
 
@@ -37,7 +40,7 @@ export interface CreateTransferBookingInput {
   luggageNotes?: string | null;
   femaleDriver?: boolean;
   additionalGuide?: boolean;
-  paymentMethod?: "online" | "on_arrival";
+  paymentMethod?: "online" | "on_arrival" | "partial_deposit";
   userId?: string | null;
   clientIp?: string | null;
 }
@@ -61,7 +64,10 @@ export class TransferService {
   /**
    * Validate booking input requirements
    */
-  validateBooking(input: CreateTransferBookingInput): { valid: boolean; error?: string } {
+  validateBooking(
+    input: CreateTransferBookingInput,
+    options?: { skipLeadTimeCheck?: boolean }
+  ): { valid: boolean; error?: string | undefined } {
     const {
       direction,
       airport,
@@ -114,6 +120,29 @@ export class TransferService {
     const vehicle = getVehicleConfig(vehicleClass);
     if (!vehicle) {
       return { valid: false, error: "Invalid vehicle class selected." };
+    }
+
+    // 8-hour advance booking lead time validation
+    if (!options?.skipLeadTimeCheck) {
+      const leadCheck = validateTransferLeadTime(flightDate, flightTime);
+      if (!leadCheck.valid) {
+        return {
+          valid: false,
+          error:
+            leadCheck.error ||
+            "Transfer requests are accepted up to a maximum of 8 hours prior to arrival.",
+        };
+      }
+
+      if (direction === "round_trip") {
+        const returnCheck = validateReturnFlightTime(flightDate, flightTime, returnDate!, returnTime!);
+        if (!returnCheck.valid) {
+          return {
+            valid: false,
+            error: returnCheck.error || "Invalid return flight date or time.",
+          };
+        }
+      }
     }
 
     return { valid: true };
@@ -192,14 +221,35 @@ export class TransferService {
     const paymentMethod = input.paymentMethod || "online";
     const dbDirection = normalizeTransferDirection(input.direction);
 
+    // Read configurable deposit percent (default 20%)
+    const depositPercent = Number(settingsMap["pricing_transfer_deposit_percent"]) || 20;
+    const breakdown = calculateTransferPaymentBreakdown(pricing.totalAmount, depositPercent);
+
+    const isOnline = paymentMethod === "online" || paymentMethod === "partial_deposit";
+    const finalPaymentMethod = zone.isCustom
+      ? "on_arrival"
+      : isOnline
+      ? (breakdown.isPartial ? "partial_deposit" : "online")
+      : "on_arrival";
+
+    const depositAmountVal = isOnline && !zone.isCustom
+      ? (breakdown.isPartial ? breakdown.depositAmount : pricing.totalAmount)
+      : 0;
+
+    const remainingAmountVal = isOnline && !zone.isCustom
+      ? (breakdown.isPartial ? breakdown.remainingAmount : 0)
+      : pricing.totalAmount;
+
     // Initialize Payriff order if online payment and not custom quote
     let payriffResult: any = null;
-    if (paymentMethod === "online" && !zone.isCustom) {
+    if (isOnline && !zone.isCustom) {
       payriffResult = await createPayriffOrder({
         applicationNumber: bookingNumber,
-        amount: pricing.totalAmount,
+        amount: breakdown.isPartial ? breakdown.depositAmount : pricing.totalAmount,
         currency: "USD",
-        description: `Airport Transfer ${input.direction} — ${zone.name} (${input.vehicleClass})`,
+        description: breakdown.isPartial
+          ? `Transfer Deposit (${depositPercent}%) ${input.direction} — ${zone.name} (${input.vehicleClass})`
+          : `Airport Transfer ${input.direction} — ${zone.name} (${input.vehicleClass})`,
         email: cleanEmail,
       });
     }
@@ -217,6 +267,8 @@ export class TransferService {
         vehicleClass: input.vehicleClass as any,
         basePrice: String(pricing.basePrice.toFixed(2)),
         totalAmount: String(pricing.totalAmount.toFixed(2)),
+        depositAmount: String(depositAmountVal.toFixed(2)),
+        remainingAmount: String(remainingAmountVal.toFixed(2)),
         flightNumber: String(input.flightNumber).trim().toUpperCase(),
         flightDate: input.flightDate,
         flightTime: input.flightTime,
@@ -232,8 +284,8 @@ export class TransferService {
         luggageNotes: input.luggageNotes ? String(input.luggageNotes).trim() : null,
         femaleDriver: Boolean(input.femaleDriver),
         additionalGuide: Boolean(input.additionalGuide),
-        paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
-        paymentStatus: paymentMethod === "on_arrival" || zone.isCustom ? "on_arrival" : "pending",
+        paymentMethod: finalPaymentMethod,
+        paymentStatus: finalPaymentMethod === "on_arrival" ? "on_arrival" : "pending",
         status: "pending",
         payriffOrderId: payriffResult?.orderId || null,
       });
@@ -254,7 +306,9 @@ export class TransferService {
           flightNumber: input.flightNumber,
           flightDate: input.flightDate,
           totalAmount: pricing.totalAmount,
-          paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
+          depositAmount: depositAmountVal,
+          remainingAmount: remainingAmountVal,
+          paymentMethod: finalPaymentMethod,
           hasPayriffOrder: !!payriffResult?.orderId,
           clientIp: input.clientIp,
         },
@@ -266,8 +320,10 @@ export class TransferService {
       direction: input.direction,
       airport: input.airport,
       vehicleClass: input.vehicleClass,
-      paymentMethod,
+      paymentMethod: finalPaymentMethod,
       totalAmount: pricing.totalAmount,
+      depositAmount: depositAmountVal,
+      remainingAmount: remainingAmountVal,
     });
 
     // Asynchronously dispatch customer confirmation email
@@ -286,7 +342,7 @@ export class TransferService {
     }).catch((err) => console.warn("[Non-fatal transfer confirmation email error]:", err));
 
     // Handle on-arrival or custom quote
-    if (paymentMethod === "on_arrival" || zone.isCustom) {
+    if (finalPaymentMethod === "on_arrival") {
       sendTelegramTransferAlert({
         bookingNumber,
         direction: dbDirection,
@@ -304,7 +360,9 @@ export class TransferService {
         phoneNumber: String(input.phoneNumber).trim(),
         email: cleanEmail,
         totalAmount: pricing.totalAmount,
-        paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
+        depositAmount: 0,
+        remainingAmount: pricing.totalAmount,
+        paymentMethod: "on_arrival",
         femaleDriver: Boolean(input.femaleDriver),
         additionalGuide: Boolean(input.additionalGuide),
       }).catch(console.error);
@@ -312,19 +370,23 @@ export class TransferService {
       return {
         success: true,
         bookingNumber,
-        paymentMethod: zone.isCustom ? "on_arrival" : paymentMethod,
+        paymentMethod: "on_arrival",
         totalAmount: pricing.totalAmount,
+        depositAmount: 0,
+        remainingAmount: pricing.totalAmount,
         isCustomZone: zone.isCustom,
         trackUrl: `/transfer/track?ref=${encodeURIComponent(bookingNumber)}&email=${encodeURIComponent(cleanEmail)}`,
       };
     }
 
-    // Online payment return
+    // Online payment return (deposit or full)
     return {
       success: true,
       bookingNumber,
-      paymentMethod: "online",
+      paymentMethod: finalPaymentMethod,
       totalAmount: pricing.totalAmount,
+      depositAmount: depositAmountVal,
+      remainingAmount: remainingAmountVal,
       isCustomZone: false,
       orderId: payriffResult.orderId,
       paymentUrl: payriffResult.paymentUrl,
@@ -363,6 +425,8 @@ export class TransferService {
       passengerName: booking.passengerName,
       passengerCount: booking.passengerCount,
       totalAmount: booking.totalAmount,
+      depositAmount: booking.depositAmount,
+      remainingAmount: booking.remainingAmount,
       paymentMethod: booking.paymentMethod,
       paymentStatus: booking.paymentStatus,
       driverName: booking.driverName,

@@ -153,6 +153,26 @@ function getSettingMetadata(key: string): { category: string; label: string; des
       label: "Round-Trip Discount (%)",
       description: "Percentage discount applied to both legs of round-trip transfers",
     },
+    pricing_transfer_deposit_percent: {
+      category: "pricing",
+      label: "Transfer Down Payment Deposit (%)",
+      description: "Percentage charged online as upfront down payment (remaining balance collected upon delivery)",
+    },
+    pricing_tour_deposit_percent: {
+      category: "pricing",
+      label: "Tour Down Payment Deposit (%)",
+      description: "Percentage charged online as upfront down payment for tour reservations (remaining balance collected on tour day)",
+    },
+    pricing_default_deposit_percent: {
+      category: "pricing",
+      label: "Platform Down Payment Deposit (%)",
+      description: "Platform-wide down payment deposit percentage across all bookings and activities",
+    },
+    transfer_min_lead_time_hours: {
+      category: "operations",
+      label: "Minimum Transfer Lead Time (Hours)",
+      description: "Transfer requests are accepted up to a maximum of 8 hours prior to arrival",
+    },
     transfer_cancellation_hours: {
       category: "operations",
       label: "Transfer Free Cancellation Window (Hours)",

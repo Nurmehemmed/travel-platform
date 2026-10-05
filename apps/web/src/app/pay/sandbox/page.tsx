@@ -38,6 +38,8 @@ function PayriffSandboxContent() {
     ? tPay.serviceEsim
     : ref.startsWith("ATR-")
     ? tPay.serviceTransfer
+    : ref.startsWith("TR-")
+    ? "Tour Experience"
     : ref.startsWith("ITN-")
     ? tPay.serviceItinerary
     : tPay.serviceVisa;
@@ -91,6 +93,8 @@ function PayriffSandboxContent() {
           router.push(`/esim?payment=success&orderNumber=${encodeURIComponent(ref)}`);
         } else if (ref.startsWith("ATR-")) {
           router.push(`/transfer/book?ref=${encodeURIComponent(ref)}&status=confirmed`);
+        } else if (ref.startsWith("TR-")) {
+          router.push(`/tours?reservation=${encodeURIComponent(ref)}&paid=true`);
         } else {
           router.push(`/visa/track?ref=${encodeURIComponent(ref)}&paid=true`);
         }

@@ -14,8 +14,17 @@ export const LOCALIZED_TRANSFER_POLICY: Record<LanguageCode, LocalizedTransferPo
     btnClose: "Close",
     viewFullTerms: "View Complete Platform Terms of Service →",
     sections: {
+      advanceBooking: {
+        title: "1. 8-Hour Advance Booking Cutoff",
+        badge: "8h Lead Time",
+        points: [
+          "Transfer requests are accepted up to a maximum of 8 hours prior to arrival.",
+          "This mandatory lead time guarantees dedicated chauffeur allocation, vehicle safety check, and live flight radar tracking.",
+          "For urgent or same-day transfer requests within 8 hours of arrival, please contact our 24/7 operations team directly via WhatsApp.",
+        ],
+      },
       cancellation: {
-        title: "1. 24-Hour Free Cancellation & 100% Refund",
+        title: "2. 24-Hour Free Cancellation & 100% Refund",
         badge: "100% Refund",
         points: [
           "100% full refund for cancellations made at least 24 hours prior to the scheduled pickup time.",
@@ -91,8 +100,17 @@ export const LOCALIZED_TRANSFER_POLICY: Record<LanguageCode, LocalizedTransferPo
     btnClose: "Bağla",
     viewFullTerms: "Platformanın tam İstifadə Şərtlərini oxu →",
     sections: {
+      advanceBooking: {
+        title: "1. 8 Saat Əvvəlcədən Sifariş Qaydası",
+        badge: "8 Saat Qabaqcadan",
+        points: [
+          "Transfer sifarişləri gəlişə ən azı 8 saat qalana qədər qəbul edilir.",
+          "Bu müddət sürücünün vaxtında təyin olunması, avtomobilin dezinfeksiyası və uçuşun canlı radarda izlənməsini təmin edir.",
+          "8 saatdan az müddət qaldıqda təcili sifarişlər üçün 24/7 dispetçer xidmətimizlə birbaşa WhatsApp vasitəsilə əlaqə saxlayın.",
+        ],
+      },
       cancellation: {
-        title: "1. 24 Saat Əvvəl Pulsuz Ləğv və 100% Geri Qaytarılma",
+        title: "2. 24 Saat Əvvəl Pulsuz Ləğv və 100% Geri Qaytarılma",
         badge: "100% Geri Qaytarılma",
         points: [
           "Planlaşdırılan qarşılanma vaxtına ən azı 24 saat qalmış ləğv edildikdə ödəniş 100% tam geri qaytarılır.",
@@ -168,8 +186,17 @@ export const LOCALIZED_TRANSFER_POLICY: Record<LanguageCode, LocalizedTransferPo
     btnClose: "Закрыть",
     viewFullTerms: "Смотреть полные условия сервиса →",
     sections: {
+      advanceBooking: {
+        title: "1. Предварительное бронирование (минимум за 8 часов)",
+        badge: "За 8 часов",
+        points: [
+          "Заявки на трансфер принимаются максимум за 8 часов до прибытия (не менее чем за 8 часов до рейса).",
+          "Это время необходимо для назначения персонального водителя, подготовки автомобиля и настройки радарного трекинга рейса.",
+          "Для срочных заказов менее чем за 8 часов до рейса обращайтесь в круглосуточную диспетчерскую службу через WhatsApp.",
+        ],
+      },
       cancellation: {
-        title: "1. Бесплатная отмена за 24 часа и 100% возврат",
+        title: "2. Бесплатная отмена за 24 часа и 100% возврат",
         badge: "100% Возврат",
         points: [
           "100% полный возврат средств при отмене не менее чем за 24 часа до времени подачи автомобиля.",
@@ -245,8 +272,17 @@ export const LOCALIZED_TRANSFER_POLICY: Record<LanguageCode, LocalizedTransferPo
     btnClose: "إغلاق",
     viewFullTerms: "عرض الشروط والأحكام الكاملة للمنصة ←",
     sections: {
+      advanceBooking: {
+        title: "1. مهلة الحجز المسبق (8 ساعات)",
+        badge: "قبل 8 ساعات",
+        points: [
+          "تُقبل طلبات النقل حتى 8 ساعات كحد أقصى قبل موعد وصول الرحلة.",
+          "تضمن هذه المهلة تخصيص سائق معتمد وتجهيز السيارة ومتابعة مسار الرحلة عبر الرادار.",
+          "للطلبات العاجلة خلال أقل من 8 ساعات، يرجى التواصل مباشرة مع فريق العمليات 24/7 عبر واتساب.",
+        ],
+      },
       cancellation: {
-        title: "1. إلغاء مجاني قبل 24 ساعة واسترداد 100%",
+        title: "2. إلغاء مجاني قبل 24 ساعة واسترداد 100%",
         badge: "استرداد كامل 100%",
         points: [
           "استرداد كامل بنسبة 100% عند الإلغاء قبل 24 ساعة على الأقل من موعد الاستقبال المحدد.",
@@ -322,8 +358,17 @@ export const LOCALIZED_TRANSFER_POLICY: Record<LanguageCode, LocalizedTransferPo
     btnClose: "Schließen",
     viewFullTerms: "Vollständige AGB anzeigen →",
     sections: {
+      advanceBooking: {
+        title: "1. 8-Stunden-Vorausbuchungsfrist",
+        badge: "8h Vorlaufzeit",
+        points: [
+          "Transferanfragen werden bis maximal 8 Stunden vor Ankunft angenommen.",
+          "Diese Frist garantiert die Zuweisung eines Chauffeurs, die Fahrzeugprüfung und die Live-Flugverfolgung per Radar.",
+          "Für dringende Transferanfragen weniger als 8 Stunden vor Ankunft wenden Sie sich bitte per WhatsApp an unsere 24/7-Zentrale.",
+        ],
+      },
       cancellation: {
-        title: "1. 24h kostenlose Stornierung & 100% Rückerstattung",
+        title: "2. 24h kostenlose Stornierung & 100% Rückerstattung",
         badge: "100% Rückerstattung",
         points: [
           "100% volle Rückerstattung bei Stornierung bis zu 24 Stunden vor der geplanten Abholzeit.",
@@ -399,8 +444,17 @@ export const LOCALIZED_TRANSFER_POLICY: Record<LanguageCode, LocalizedTransferPo
     btnClose: "Fermer",
     viewFullTerms: "Voir les conditions générales de la plateforme →",
     sections: {
+      advanceBooking: {
+        title: "1. Délai de réservation préalable de 8 heures",
+        badge: "Préavis de 8h",
+        points: [
+          "Les demandes de transfert sont acceptées jusqu'à 8 heures avant l'arrivée.",
+          "Ce délai préalable garantit l'affectation du chauffeur privé, la préparation du véhicule et le suivi en direct du vol.",
+          "Pour toute demande urgente à moins de 8 heures de l'arrivée, veuillez contacter directement notre assistance 24/7 sur WhatsApp.",
+        ],
+      },
       cancellation: {
-        title: "1. Annulation gratuite jusqu'à 24h & Remboursement 100%",
+        title: "2. Annulation gratuite jusqu'à 24h & Remboursement 100%",
         badge: "Remboursement 100%",
         points: [
           "Remboursement intégral de 100 % pour toute annulation effectuée 24 heures ou plus avant l'heure prévue.",

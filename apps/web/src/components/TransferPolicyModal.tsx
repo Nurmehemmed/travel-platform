@@ -6,6 +6,7 @@ import {
   X,
   ShieldCheck,
   Clock,
+  Calendar,
   Plane,
   DollarSign,
   Briefcase,
@@ -61,6 +62,7 @@ export function TransferPolicyModal({
   if (!isOpen) return null;
 
   const sectionIcons = [
+    <Calendar key="advance" className="h-4 w-4 text-sky-600" />,
     <Clock key="clock" className="h-4 w-4 text-emerald-600" />,
     <Plane key="plane" className="h-4 w-4 text-sky-600" />,
     <ShieldCheck key="vip" className="h-4 w-4 text-amber-600" />,
@@ -71,6 +73,7 @@ export function TransferPolicyModal({
   ];
 
   const sectionsList = [
+    pol.sections.advanceBooking,
     pol.sections.cancellation,
     pol.sections.flightTracking,
     pol.sections.meetAndGreet,

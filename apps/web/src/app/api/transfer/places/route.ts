@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
     }
 
-    // Geographic boundary and water check
-    const serviceCheck = checkLocationServiceability(lat, lng);
+    // Geographic boundary and water check (restricted strictly to active airport service zone: Baku or Ganja)
+    const serviceCheck = checkLocationServiceability(lat, lng, airport);
     if (!serviceCheck.isServiceable) {
       return NextResponse.json({
         isServiceable: false,
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const cacheKey = `rev:${lat.toFixed(4)},${lng.toFixed(4)}:${lang}`;
+    const cacheKey = `rev:${lat.toFixed(4)},${lng.toFixed(4)}:${airport}:${lang}`;
     const cached = GEO_CACHE.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
       return NextResponse.json(cached.data);
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
         const road = addr.road || addr.pedestrian || addr.street || addr.neighbourhood || "";
         const houseNumber = addr.house_number ? ` ${addr.house_number}` : "";
         const suburb = addr.suburb || addr.city_district || addr.district || "";
-        const city = addr.city || addr.town || addr.village || addr.county || "Baku";
+        const city = addr.city || addr.town || addr.village || addr.county || (airport === "GJA" ? "Ganja" : "Baku");
 
         let formatted = "";
         if (road) {
@@ -142,16 +142,17 @@ export async function GET(request: NextRequest) {
 
   const queryNorm = q.toLowerCase();
 
-  // 1. Search local high-quality curated destinations in Azerbaijan
+  // 1. Search local curated destinations for this specific airport
   const localResults = POPULAR_DESTINATIONS.filter((d) => {
+    if (d.airport !== airport) return false;
     if (d.name.toLowerCase().includes(queryNorm)) return true;
     if (d.address && d.address.toLowerCase().includes(queryNorm)) return true;
     if (d.badge && d.badge.toLowerCase().includes(queryNorm)) return true;
     if (d.aliases && d.aliases.some((a) => a.toLowerCase().includes(queryNorm))) return true;
     return false;
   }).map((d) => {
-    const lat = d.lat || (d.zoneId.includes("shahdag") ? 41.3214 : d.zoneId.includes("qabala") ? 40.9825 : 40.3756);
-    const lng = d.lng || (d.zoneId.includes("shahdag") ? 48.1464 : d.zoneId.includes("qabala") ? 47.8492 : 49.8450);
+    const lat = d.lat || (airport === "GJA" ? 40.6828 : 40.3756);
+    const lng = d.lng || (airport === "GJA" ? 46.3606 : 49.8450);
     const { zone, distanceKm } = resolveLocationByCoords(lat, lng, airport);
 
     return {
@@ -167,12 +168,12 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  // 2. Query Nominatim for street/building/address autocomplete in Azerbaijan
+  // 2. Query Nominatim for street/building/address autocomplete in Azerbaijan, filtered by airport service bounds
   let remoteResults: any[] = [];
   try {
     const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
       q
-    )}&countrycodes=az&limit=6&addressdetails=1`;
+    )}&countrycodes=az&limit=8&addressdetails=1`;
 
     const res = await fetch(nominatimUrl, {
       headers: {
@@ -184,26 +185,36 @@ export async function GET(request: NextRequest) {
 
     if (res.ok) {
       const data = await res.json();
-      remoteResults = (data || []).map((item: any) => {
-        const itemLat = parseFloat(item.lat);
-        const itemLng = parseFloat(item.lon);
-        const { zone, distanceKm } = resolveLocationByCoords(itemLat, itemLng, airport);
+      remoteResults = (data || [])
+        .filter((item: any) => {
+          const itemLat = parseFloat(item.lat);
+          const itemLng = parseFloat(item.lon);
+          return (
+            !isNaN(itemLat) &&
+            !isNaN(itemLng) &&
+            checkLocationServiceability(itemLat, itemLng, airport).isServiceable
+          );
+        })
+        .map((item: any) => {
+          const itemLat = parseFloat(item.lat);
+          const itemLng = parseFloat(item.lon);
+          const { zone, distanceKm } = resolveLocationByCoords(itemLat, itemLng, airport);
 
-        const parts = (item.display_name || "").split(", ");
-        const title = parts[0] || item.display_name;
-        const subtitle = parts.slice(1, 3).join(", ") || `${zone.name} (~${distanceKm} km)`;
+          const parts = (item.display_name || "").split(", ");
+          const title = parts[0] || item.display_name;
+          const subtitle = parts.slice(1, 3).join(", ") || `${zone.name} (~${distanceKm} km)`;
 
-        return {
-          title,
-          subtitle,
-          address: parts.slice(0, 3).join(", ") || title,
-          lat: itemLat,
-          lng: itemLng,
-          zoneId: zone.id,
-          zoneName: zone.name,
-          distanceKm,
-        };
-      });
+          return {
+            title,
+            subtitle,
+            address: parts.slice(0, 3).join(", ") || title,
+            lat: itemLat,
+            lng: itemLng,
+            zoneId: zone.id,
+            zoneName: zone.name,
+            distanceKm,
+          };
+        });
     }
   } catch (err) {
     console.warn("[Nominatim Autocomplete Error]:", err);

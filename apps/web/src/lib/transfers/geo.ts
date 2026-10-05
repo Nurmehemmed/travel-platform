@@ -193,30 +193,48 @@ export function resolveLocationByCoords(
     return { zone, distanceKm: 8 };
   }
 
-  if (airport === "NAJ") {
-    if (lat >= 39.25) {
-      const zone = getZoneById("NAJ-duzdag") || getZonesByAirport("NAJ")[0]!;
-      return { zone, distanceKm: 18 };
-    }
-    if (lng >= 45.8) {
-      const zone = getZoneById("NAJ-ordubad") || getZonesByAirport("NAJ")[0]!;
-      return { zone, distanceKm: 75 };
-    }
-    const zone = getZoneById("NAJ-nakhchivan-center") || getZonesByAirport("NAJ")[0]!;
-    return { zone, distanceKm: 7 };
-  }
-
   const fallback = getZonesByAirport(airport)[0]!;
   return { zone: fallback, distanceKm: fallback.distanceKm || estDrivingDistance };
 }
 
 /**
- * Azerbaijan geographic coordinate bounds for Leaflet map camera containment.
+ * Baku geographic coordinate bounds for Leaflet map camera containment.
+ * Spans Greater Baku, Absheron Peninsula, Sumqayit, and Lokbatan.
  */
-export const AZERBAIJAN_MAP_BOUNDS: [[number, number], [number, number]] = [
-  [38.35, 44.75], // South-West (Astara / Sadarak)
-  [41.95, 50.95], // North-East (Balakan / Chilov tip)
+export const BAKU_MAP_BOUNDS: [[number, number], [number, number]] = [
+  [40.05, 49.30], // South-West
+  [40.75, 50.55], // North-East
 ];
+
+/**
+ * Ganja geographic coordinate bounds for Leaflet map camera containment.
+ * Spans Greater Ganja, Goygol, Naftalan, and Mingachevir corridor.
+ */
+export const GANJA_MAP_BOUNDS: [[number, number], [number, number]] = [
+  [40.25, 46.00], // South-West
+  [40.95, 47.30], // North-East
+];
+
+/**
+ * Combined bounds covering both Baku and Ganja service corridors.
+ */
+export const BAKU_AND_GANJA_MAP_BOUNDS: [[number, number], [number, number]] = [
+  [40.05, 45.90],
+  [40.95, 50.55],
+];
+
+/** Preserved for backward compatibility */
+export const AZERBAIJAN_MAP_BOUNDS = BAKU_AND_GANJA_MAP_BOUNDS;
+
+/** Checks if coordinates are within the Greater Baku & Absheron transfer service corridor */
+export function isCoordInBaku(lat: number, lng: number): boolean {
+  return lat >= 40.05 && lat <= 40.75 && lng >= 49.30 && lng <= 50.55;
+}
+
+/** Checks if coordinates are within the Greater Ganja transfer service corridor */
+export function isCoordInGanja(lat: number, lng: number): boolean {
+  return lat >= 40.25 && lat <= 40.95 && lng >= 46.00 && lng <= 47.30;
+}
 
 export interface ServiceabilityCheckResult {
   isServiceable: boolean;
@@ -225,96 +243,81 @@ export interface ServiceabilityCheckResult {
 }
 
 /**
- * Evaluates whether geographical coordinates fall on valid serviceable land in Azerbaijan,
+ * Evaluates whether geographical coordinates fall on valid serviceable land in Baku or Ganja,
  * rejecting Caspian Sea water, international borders, and off-grid zones.
  */
-export function checkLocationServiceability(lat: number, lng: number): ServiceabilityCheckResult {
-  // 1. Boundary bounding box check
-  if (lat < 38.35 || lat > 41.95 || lng < 44.75 || lng > 50.95) {
-    return {
-      isServiceable: false,
-      status: "out_of_bounds",
-      message: "Location is outside Azerbaijan's borders. We only service destinations within Azerbaijan.",
-    };
+export function checkLocationServiceability(
+  lat: number,
+  lng: number,
+  airport?: AirportCode
+): ServiceabilityCheckResult {
+  const inBaku = isCoordInBaku(lat, lng);
+  const inGanja = isCoordInGanja(lat, lng);
+
+  // If specific airport requested, limit strictly to that airport's designated zone
+  if (airport === "GYD") {
+    if (!inBaku) {
+      return {
+        isServiceable: false,
+        status: "out_of_bounds",
+        message: "Location is outside the Baku service area. Heydar Aliyev Airport (GYD) transfers are strictly limited to Greater Baku and Absheron.",
+      };
+    }
+  } else if (airport === "GJA") {
+    if (!inGanja) {
+      return {
+        isServiceable: false,
+        status: "out_of_bounds",
+        message: "Location is outside the Ganja service area. Ganja Airport (GJA) transfers are strictly limited to the Ganja region.",
+      };
+    }
+  } else {
+    // If no airport context provided, must belong to either Baku or Ganja
+    if (!inBaku && !inGanja) {
+      return {
+        isServiceable: false,
+        status: "out_of_bounds",
+        message: "Transfer service is strictly limited to Baku and Ganja regions only.",
+      };
+    }
   }
 
-  // 2. Caspian Sea (Water) detection:
-  // North Coast (lat >= 41.25): Yalama/Nabran/Khudat coast is around lng 48.70. East of 48.72 is water.
-  if (lat >= 41.25 && lng > 48.72) {
-    return {
-      isServiceable: false,
-      status: "water",
-      message: "Selected point is in the Caspian Sea. Please place the pin on land or near a coastal resort.",
-    };
-  }
-
-  // Shabran / Khachmaz / Siyazan coast (40.85 <= lat < 41.25): coast is around lng 49.1 - 49.30
-  if (lat >= 40.85 && lat < 41.25 && lng > 49.30) {
-    return {
-      isServiceable: false,
-      status: "water",
-      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
-    };
-  }
-
-  // North of Absheron peninsula (40.62 <= lat < 40.85): Sumqayit to Pirallahi
-  if (lat >= 40.62 && lng > 49.80) {
-    if (lng > 50.48) {
+  // Caspian Sea water detection (for Baku coastal points)
+  if (inBaku) {
+    // Absheron Peninsula east tip: Pirallahi island is up to lng ~50.45. East of 50.48 is open sea.
+    if (lat >= 40.35 && lat < 40.62 && lng > 50.48) {
       return {
         isServiceable: false,
         status: "water",
         message: "Selected point is in the Caspian Sea. Please place the pin on land.",
       };
     }
-    if (lat > 40.63 && lng > 50.15) {
+
+    // North of Absheron sea
+    if (lat >= 40.62 && lng > 49.80) {
+      if (lng > 50.48 || (lat > 40.63 && lng > 50.15)) {
+        return {
+          isServiceable: false,
+          status: "water",
+          message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+        };
+      }
+    }
+
+    // Baku Bay water area (lat between 40.32 and 40.365, east of the amphitheater coast ~49.87)
+    if (lat >= 40.32 && lat <= 40.365 && lng > 49.87 && lng < 50.05) {
       return {
         isServiceable: false,
         status: "water",
-        message: "Selected point is in the Caspian Sea. Please place the pin on land.",
+        message: "Selected point is in Baku Bay (water). Please place the pin along the Boulevard or street address.",
       };
     }
-  }
-
-  // Absheron Peninsula east tip: Pirallahi island is up to lng ~50.45. East of 50.48 is open sea.
-  if (lat >= 40.35 && lat < 40.62 && lng > 50.48) {
-    return {
-      isServiceable: false,
-      status: "water",
-      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
-    };
-  }
-
-  // Baku Bay water area (lat between 40.32 and 40.365, east of the amphitheater coast ~49.87)
-  if (lat >= 40.32 && lat <= 40.365 && lng > 49.87 && lng < 50.05) {
-    return {
-      isServiceable: false,
-      status: "water",
-      message: "Selected point is in Baku Bay (water). Please place the pin along the Boulevard or street address.",
-    };
-  }
-
-  // Gobustan / Shirvan / Neftchala coast (39.50 <= lat < 40.32): coast is around lng 49.3 - 49.48
-  if (lat >= 39.50 && lat < 40.32 && lng > 49.48) {
-    return {
-      isServiceable: false,
-      status: "water",
-      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
-    };
-  }
-
-  // South coast (Lankaran / Astara, lat < 39.50): coast is around lng 48.90
-  if (lat < 39.50 && lng > 48.95) {
-    return {
-      isServiceable: false,
-      status: "water",
-      message: "Selected point is in the Caspian Sea. Please place the pin on land.",
-    };
   }
 
   return {
     isServiceable: true,
     status: "ok",
-    message: "Valid destination in Azerbaijan.",
+    message: "Valid destination in service area.",
   };
 }
 
@@ -330,7 +333,7 @@ export interface MapHotspot {
 }
 
 /**
- * Curated registry of verified popular hotels, resorts, and cultural landmarks across Azerbaijan.
+ * Curated registry of verified popular hotels, resorts, and cultural landmarks across Baku and Ganja.
  * Rendered on the interactive map as clickable visual hotspots.
  */
 export const MAP_HOTSPOTS: MapHotspot[] = [
@@ -425,7 +428,7 @@ export const MAP_HOTSPOTS: MapHotspot[] = [
     badge: "5★ Seaside Resort",
     icon: "🏖️",
   },
-  // Key Landmarks
+  // Key Baku Landmarks
   {
     id: "loc-dst-old-city",
     name: "Old City (Icherisheher & Maiden Tower)",
@@ -456,26 +459,36 @@ export const MAP_HOTSPOTS: MapHotspot[] = [
     badge: "Zaha Hadid Icon",
     icon: "🏛️",
   },
-  // Top Regional Resorts
+  // Key Ganja Hotspots
   {
-    id: "loc-reg-shahdag",
-    name: "Shahdag Mountain Resort",
-    category: "resort",
-    lat: 41.3214,
-    lng: 48.1464,
-    address: "Shahdag Ski Resort, Gusar Region",
-    badge: "Alpine Ski Resort",
-    icon: "🏔️",
+    id: "loc-reg-ganja",
+    name: "Ganja City Center (Javad Khan St)",
+    category: "landmark",
+    lat: 40.6828,
+    lng: 46.3606,
+    address: "Heydar Aliyev Square, Ganja",
+    badge: "Historic Capital",
+    icon: "🏙️",
   },
   {
-    id: "loc-reg-qabala",
-    name: "Tufandag Mountain Resort (Qabala)",
+    id: "loc-gja-ramada",
+    name: "Ramada Plaza by Wyndham Ganja",
+    category: "hotel",
+    lat: 40.6950,
+    lng: 46.3650,
+    address: "Heydar Aliyev Avenue, Ganja",
+    badge: "5★ Hotel",
+    icon: "🏨",
+  },
+  {
+    id: "loc-gja-goygol",
+    name: "Goygol National Park & Lake",
     category: "resort",
-    lat: 40.9825,
-    lng: 47.8492,
-    address: "Tufandag Complex, Qabala",
-    badge: "Mountain Resort",
-    icon: "🚠",
+    lat: 40.4080,
+    lng: 46.3240,
+    address: "Goygol National Park, Ganja Region",
+    badge: "Alpine Lake",
+    icon: "🌲",
   },
   {
     id: "loc-reg-naftalan",
@@ -486,26 +499,6 @@ export const MAP_HOTSPOTS: MapHotspot[] = [
     address: "Chinar / Gashalti Sanatorium, Naftalan",
     badge: "Thermal Healing",
     icon: "🛁",
-  },
-  {
-    id: "loc-reg-sheki",
-    name: "Sheki Historic Center (Khan's Palace)",
-    category: "landmark",
-    lat: 41.2045,
-    lng: 47.1975,
-    address: "Mirza Fatali Akhundov Street, Sheki",
-    badge: "UNESCO Silk Road",
-    icon: "🏰",
-  },
-  {
-    id: "loc-reg-ganja",
-    name: "Ganja City Center (Javad Khan St)",
-    category: "landmark",
-    lat: 40.6828,
-    lng: 46.3606,
-    address: "Heydar Aliyev Square, Ganja",
-    badge: "Historic Capital",
-    icon: "🏙️",
   },
 ];
 

@@ -10,3 +10,4 @@ export * from "./zones";
 export * from "./destinations";
 export * from "./pricing";
 export * from "./geo";
+export * from "./policy";

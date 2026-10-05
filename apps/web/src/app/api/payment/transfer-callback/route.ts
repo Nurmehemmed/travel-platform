@@ -42,35 +42,42 @@ export async function GET(req: Request) {
     );
   }
 
+  const existingBooking = await db.query.transferBookings.findFirst({
+    where: eq(transferBookings.bookingNumber, bookingNumber),
+  });
+
+  const isDeposit =
+    existingBooking?.paymentMethod === "partial_deposit" ||
+    Number(existingBooking?.remainingAmount || 0) > 0;
+  const newPaymentStatus = isDeposit ? "deposit_paid" : "paid";
+
   // Atomic idempotent update
   const updated = await db.transaction(async (tx) => {
     const [row] = await tx
       .update(transferBookings)
       .set({
-        paymentStatus: "paid",
+        paymentStatus: newPaymentStatus,
         status: "pending",
         payriffOrderId: orderId,
-        adminNotes: `Payriff Order verified: ${orderId || "OK"}`,
+        adminNotes: `Payriff Order verified: ${orderId || "OK"}${isDeposit ? ` (Deposit $${existingBooking?.depositAmount} received)` : ""}`,
         updatedAt: new Date(),
       })
       .where(
         and(
           eq(transferBookings.bookingNumber, bookingNumber),
-          ne(transferBookings.paymentStatus, "paid")
+          ne(transferBookings.paymentStatus, newPaymentStatus)
         )
       )
       .returning();
     return row;
   });
 
-  const booking = updated || (await db.query.transferBookings.findFirst({
-    where: eq(transferBookings.bookingNumber, bookingNumber),
-  }));
+  const booking = updated || existingBooking;
 
   if (updated) {
     const airportInfo = getAirportByCode(updated.airport as "GYD" | "GJA" | "NAJ");
 
-    // Fire Telegram transfer alert only on initial transition to paid
+    // Fire Telegram transfer alert only on initial transition to paid/deposit_paid
     sendTelegramTransferAlert({
       bookingNumber:      updated.bookingNumber,
       direction:          updated.direction,
@@ -88,7 +95,10 @@ export async function GET(req: Request) {
       phoneNumber:        updated.phoneNumber,
       email:              updated.email,
       totalAmount:        updated.totalAmount,
-      paymentMethod:      "online",
+      depositAmount:      updated.depositAmount,
+      remainingAmount:    updated.remainingAmount,
+      paymentMethod:      updated.paymentMethod as any,
+      paymentStatus:      updated.paymentStatus,
       femaleDriver:       Boolean(updated.femaleDriver),
       additionalGuide:    Boolean(updated.additionalGuide),
     }).catch(console.error);
@@ -128,21 +138,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Payment verification failed with provider" }, { status: 400 });
     }
 
+    const existingBooking = await db.query.transferBookings.findFirst({
+      where: eq(transferBookings.bookingNumber, bookingNumber),
+    });
+
+    const isDeposit =
+      existingBooking?.paymentMethod === "partial_deposit" ||
+      Number(existingBooking?.remainingAmount || 0) > 0;
+    const newPaymentStatus = isDeposit ? "deposit_paid" : "paid";
+
     // Atomic idempotent update
     const updated = await db.transaction(async (tx) => {
       const [row] = await tx
         .update(transferBookings)
         .set({
-          paymentStatus: "paid",
+          paymentStatus: newPaymentStatus,
           status: "pending",
           payriffOrderId: orderId,
-          adminNotes: `Payriff Webhook Verified: Order ${orderId} (${check.rawStatus || "APPROVED"})`,
+          adminNotes: `Payriff Webhook Verified: Order ${orderId} (${check.rawStatus || "APPROVED"})${isDeposit ? ` (Deposit $${existingBooking?.depositAmount} received)` : ""}`,
           updatedAt: new Date(),
         })
         .where(
           and(
             eq(transferBookings.bookingNumber, bookingNumber),
-            ne(transferBookings.paymentStatus, "paid")
+            ne(transferBookings.paymentStatus, newPaymentStatus)
           )
         )
         .returning();
@@ -152,7 +171,7 @@ export async function POST(req: Request) {
     if (updated) {
       const airportInfo = getAirportByCode(updated.airport as "GYD" | "GJA" | "NAJ");
 
-      // Fire Telegram alert only on initial transition to paid
+      // Fire Telegram alert only on initial transition to paid/deposit_paid
       sendTelegramTransferAlert({
         bookingNumber:      updated.bookingNumber,
         direction:          updated.direction,
@@ -170,7 +189,10 @@ export async function POST(req: Request) {
         phoneNumber:        updated.phoneNumber,
         email:              updated.email,
         totalAmount:        updated.totalAmount,
-        paymentMethod:      "online",
+        depositAmount:      updated.depositAmount,
+        remainingAmount:    updated.remainingAmount,
+        paymentMethod:      updated.paymentMethod as any,
+        paymentStatus:      updated.paymentStatus,
         femaleDriver:       Boolean(updated.femaleDriver),
         additionalGuide:    Boolean(updated.additionalGuide),
       }).catch(console.error);

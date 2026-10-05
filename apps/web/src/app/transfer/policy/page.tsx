@@ -6,6 +6,7 @@ import {
   Car,
   ShieldCheck,
   Clock,
+  Calendar,
   Plane,
   DollarSign,
   Briefcase,
@@ -34,6 +35,7 @@ export default function TransferPolicyPage() {
   const dispatchWhatsappClean = (settings.transferPolicy.dispatchWhatsapp || "+994 12 404 78 88").replace(/\D/g, "");
 
   const sectionIcons = [
+    <Calendar key="advance" className="h-5 w-5 text-sky-600" />,
     <Clock key="clock" className="h-5 w-5 text-emerald-600" />,
     <Plane key="plane" className="h-5 w-5 text-sky-600" />,
     <ShieldCheck key="vip" className="h-5 w-5 text-amber-600" />,
@@ -44,6 +46,7 @@ export default function TransferPolicyPage() {
   ];
 
   const sectionsList = [
+    pol.sections.advanceBooking,
     pol.sections.cancellation,
     pol.sections.flightTracking,
     pol.sections.meetAndGreet,

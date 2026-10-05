@@ -8,7 +8,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     heroBadge: "24/7 Flight-Monitored Chauffeur Service",
     heroTitle: "Seamless Airport Transfers in Azerbaijan",
     heroDesc:
-      "Fixed-rate, reliable airport pick-up and drop-off across Baku (GYD), Ganja (GJA), and Nakhchivan (NAJ). Free 60-minute wait time with real-time flight tracking.",
+      "Fixed-rate, reliable airport pick-up and drop-off across Baku (GYD) and Ganja (GJA). Free 60-minute wait time with real-time flight tracking.",
     back: "Back",
     calcTitle: "Instant Rate Calculator",
     calcSubtitle:
@@ -76,7 +76,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     heroBadge: "24/7 Uçuş Nəzarətli Şofer Xidməti",
     heroTitle: "Azərbaycanda Rahat Hava Limanı Transferləri",
     heroDesc:
-      "Bakı (GYD), Gəncə (GJA) və Naxçıvan (NAJ) üzrə sabit qiymətli etibarlı transfer. Uçuşun izlənməsi və 60 dəqiqə pulsuz gözləmə.",
+      "Bakı (GYD) və Gəncə (GJA) üzrə sabit qiymətli etibarlı transfer. Uçuşun izlənməsi və 60 dəqiqə pulsuz gözləmə.",
     back: "Geri",
     calcTitle: "Dərhal Qiymət Hesablama",
     calcSubtitle:
@@ -144,7 +144,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     heroBadge: "Круглосуточный трансфер с отслеживанием рейса",
     heroTitle: "Комфортные трансферы из аэропортов Азербайджана",
     heroDesc:
-      "Фиксированные тарифы в аэропортах Баку (GYD), Гянджи (GJA) и Нахчывана (NAJ). Бесплатное ожидание до 60 минут и онлайн-отслеживание рейсов.",
+      "Фиксированные тарифы в аэропортах Баку (GYD) и Гянджи (GJA). Бесплатное ожидание до 60 минут и онлайн-отслеживание рейсов.",
     back: "Назад",
     calcTitle: "Калькулятор стоимости трансфера",
     calcSubtitle:
@@ -210,7 +210,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     heroBadge: "Service Chauffeur Privé 24/7 avec Suivi de Vol",
     heroTitle: "Transferts d'Aéroport Sérénité en Azerbaïdjan",
     heroDesc:
-      "Tarifs fixes et chauffeurs fiables aux aéroports de Bakou (GYD), Gandja (GJA) et Nakhitchevan (NAJ). 60 minutes d'attente gratuite.",
+      "Tarifs fixes et chauffeurs fiables aux aéroports de Bakou (GYD) et Gandja (GJA). 60 minutes d'attente gratuite.",
     back: "Retour",
     calcTitle: "Calculateur de Tarif Immédiat",
     calcSubtitle:
@@ -277,7 +277,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     heroBadge: "خدمة سائق خاص 24/7 مع مراقبة الرحلات الجوية",
     heroTitle: "توصيل المطار براحة تامة في أذربيجان",
     heroDesc:
-      "أسعار ثابتة وخدمة موثوقة في مطارات باكو (GYD) وغنجة (GJA) ونخجوان (NAJ). 60 دقيقة انتظار مجاني.",
+      "أسعار ثابتة وخدمة موثوقة في مطارات باكو (GYD) وغنجة (GJA). 60 دقيقة انتظار مجاني.",
     back: "رجوع",
     calcTitle: "حاسبة الأجرة الفورية",
     calcSubtitle: "حدد المطار والوجهة ونوع المركبة لمعرفة السعر النهائي دون أي رسوم مخفية.",
@@ -342,7 +342,7 @@ export const TRANSFER_PAGE_TRANSLATIONS: Record<LanguageCode, TransferPageTransl
     heroBadge: "24/7 Chauffeurdienst mit Flugüberwachung",
     heroTitle: "Bequeme Flughafentransfers in Aserbaidschan",
     heroDesc:
-      "Feste Tarife an den Flughäfen Baku (GYD), Ganja (GJA) und Nachitschewan (NAJ). 60 Minuten kostenfreie Wartezeit bei Flugverspätung.",
+      "Feste Tarife an den Flughäfen Baku (GYD) und Ganja (GJA). 60 Minuten kostenfreie Wartezeit bei Flugverspätung.",
     back: "Zurück",
     calcTitle: "Sofortiger Tarifrechner",
     calcSubtitle:
@@ -411,32 +411,26 @@ export const LOCALIZED_AIRPORTS: Record<LanguageCode, Record<string, string>> = 
   EN: {
     GYD: "Heydar Aliyev International Airport (GYD)",
     GJA: "Ganja Airport (GJA)",
-    NAJ: "Nakhchivan Airport (NAJ)",
   },
   AZ: {
     GYD: "Heydər Əliyev Beynəlxalq Aeroportu (GYD)",
     GJA: "Gəncə Beynəlxalq Hava Limanı (GJA)",
-    NAJ: "Naxçıvan Beynəlxalq Hava Limanı (NAJ)",
   },
   RU: {
     GYD: "Международный аэропорт Гейдар Алиев (GYD)",
     GJA: "Международный аэропорт Гянджа (GJA)",
-    NAJ: "Международный аэропорт Нахчыван (NAJ)",
   },
   AR: {
     GYD: "مطار حيدر علييف الدولي (GYD)",
     GJA: "مطار غنجة الدولي (GJA)",
-    NAJ: "مطار نخجوان الدولي (NAJ)",
   },
   FR: {
     GYD: "Aéroport international Heydar Aliyev (GYD)",
     GJA: "Aéroport de Gandja (GJA)",
-    NAJ: "Aéroport de Nakhitchevan (NAJ)",
   },
   DE: {
     GYD: "Internationaler Flughafen Heydar Aliyev (GYD)",
     GJA: "Flughafen Gändschä (GJA)",
-    NAJ: "Flughafen Nachitschewan (NAJ)",
   },
 };
 
@@ -636,32 +630,26 @@ export const LOCALIZED_AIRPORT_DESCRIPTIONS: Record<LanguageCode, Record<string,
   EN: {
     GYD: "Baku's main hub. 30 km from city center. Dedicated pickup zone at Terminal 1 & 2.",
     GJA: "Western Azerbaijan gateway. 8 km from Ganja center with transfers to Goygol and Naftalan.",
-    NAJ: "Nakhchivan Autonomous Republic. 7 km from city center with prompt airport greeting.",
   },
   AZ: {
     GYD: "Bakının əsas hava qapısı. Mərkəzdən 30 km məsafədə. Terminal 1 və 2-də xüsusi qarşılama zonası.",
     GJA: "Qərbi Azərbaycanın hava qapısı. Gəncə mərkəzindən 8 km. Göygöl və Naftalana rahat transferlər.",
-    NAJ: "Naxçıvan Muxtar Respublikası. Mərkəzdən 7 km məsafədə, operativ hava limanı qarşılaması.",
   },
   RU: {
     GYD: "Главный хаб Баку. 30 км от центра города. Встреча у Терминалов 1 и 2.",
     GJA: "Ворота западного Азербайджана. 8 км от центра Гянджи, трансферы в Гёйгёль и Нафталан.",
-    NAJ: "Нахчыванская Автономная Республика. 7 км от центра города с пунктуальной встречей.",
   },
   AR: {
     GYD: "بوابة باكو الرئيسية. يبعد 30 كم عن مركز المدينة مع نقطة استقبال مخصصة في المبنى 1 و 2.",
     GJA: "بوابة غرب أذربيجان. يبعد 8 كم عن وسط غنجة مع خدمات توصيل إلى غويغول ونفتالان.",
-    NAJ: "جمهورية نخجوان ذاتية الحكم. يبعد 7 كم عن مركز المدينة مع استقبال فوري ومباشر.",
   },
   FR: {
     GYD: "Hub principal de Bakou. À 30 km du centre. Zone de prise en charge dédiée aux terminaux 1 et 2.",
     GJA: "Porte d'entrée de l'ouest. À 8 km du centre de Gandja avec liaisons vers Goygol et Naftalan.",
-    NAJ: "République autonome du Nakhitchevan. À 7 km du centre-ville avec accueil ponctuel.",
   },
   DE: {
     GYD: "Hauptdrehkreuz von Baku. 30 km vom Zentrum entfernt. Abholzone an Terminal 1 & 2.",
     GJA: "Tor zum Westen Aserbaidschans. 8 km vom Zentrum Gändschäs mit Transfers nach Goygol und Naftalan.",
-    NAJ: "Autonome Republik Nachitschewan. 7 km vom Stadtzentrum mit persönlicher Abholung.",
   },
 };
 
@@ -858,10 +846,10 @@ export const LOCALIZED_VEHICLE_FEATURES: Record<string, Record<string, string[]>
 };
 
 export const LOCALIZED_AIRPORT_CITIES: Record<string, Record<string, string>> = {
-  EN: { GYD: "Baku", GJA: "Ganja", NAJ: "Nakhchivan" },
-  AZ: { GYD: "Bakı", GJA: "Gəncə", NAJ: "Naxçıvan" },
-  RU: { GYD: "Баку", GJA: "Гянджа", NAJ: "Нахчыван" },
-  FR: { GYD: "Bakou", GJA: "Gandja", NAJ: "Nakhitchevan" },
-  AR: { GYD: "باكو", GJA: "غنجة", NAJ: "نخجوان" },
-  DE: { GYD: "Baku", GJA: "Gändschä", NAJ: "Nachitschewan" },
+  EN: { GYD: "Baku", GJA: "Ganja" },
+  AZ: { GYD: "Bakı", GJA: "Gəncə" },
+  RU: { GYD: "Баку", GJA: "Гянджа" },
+  FR: { GYD: "Bakou", GJA: "Gandja" },
+  AR: { GYD: "باكو", GJA: "غنجة" },
+  DE: { GYD: "Baku", GJA: "Gändschä" },
 };

@@ -18,6 +18,7 @@ export interface LocalizedTransferPolicy {
   btnClose: string;
   viewFullTerms: string;
   sections: {
+    advanceBooking: TransferPolicyClause;
     cancellation: TransferPolicyClause;
     flightTracking: TransferPolicyClause;
     meetAndGreet: TransferPolicyClause;
@@ -209,6 +210,10 @@ export interface TransferBookTranslations {
   payOnlineDesc: string;
   payCashTitle: string;
   payCashDesc: string;
+  downPaymentLabel: string;
+  remainingDeliveryLabel: string;
+  depositPayDesc: string;
+  dueNowLabel: string;
   termsCheckbox: string;
   btnBack: string;
   btnContinueFlight: string;
@@ -227,6 +232,11 @@ export interface TransferBookTranslations {
   errFlightDateRequired: string;
   errFlightTimeRequired: string;
   errReturnFlightRequired: string;
+  policyLeadTimeTitle: string;
+  policyLeadTimeDesc: string;
+  errLeadTime8Hours: string;
+  errReturnMustBeAfterPrimary: string;
+  urgentDispatchHint: string;
   driverGuidePrefTitle: string;
   femaleDriverLabel: string;
   femaleDriverDesc: string;

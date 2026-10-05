@@ -113,6 +113,7 @@ export const transferVehicleEnum = pgEnum("transfer_vehicle", [
 export const transferPaymentMethodEnum = pgEnum("transfer_payment_method", [
   "online",
   "on_arrival",
+  "partial_deposit",
 ]);
 
 export const transferStatusEnum = pgEnum("transfer_status", [
@@ -426,6 +427,11 @@ export const bookings = pgTable(
      * if pricing_tiers.price changes after purchase.
      */
     totalPrice:    numeric("total_price", { precision: 10, scale: 2 }).notNull(),
+    depositAmount: numeric("deposit_amount", { precision: 10, scale: 2 }),
+    remainingAmount: numeric("remaining_amount", { precision: 10, scale: 2 }),
+    paymentMethod: varchar("payment_method", { length: 30 }).default("on_arrival"),
+    paymentStatus: varchar("payment_status", { length: 30 }).default("pending"),
+    payriffOrderId: varchar("payriff_order_id", { length: 100 }),
     status:        bookingStatusEnum("status").notNull().default("pending"),
     bookedAt:      timestamp("booked_at", { withTimezone: true })
       .notNull()
@@ -634,9 +640,11 @@ export const transferBookings = pgTable(
     additionalGuide: boolean("additional_guide").default(false),
 
     // Payment
-    paymentMethod:  transferPaymentMethodEnum("payment_method").notNull().default("online"),
-    paymentStatus:  varchar("payment_status", { length: 30 }).notNull().default("pending"),
-    payriffOrderId: varchar("payriff_order_id", { length: 100 }),
+    paymentMethod:   transferPaymentMethodEnum("payment_method").notNull().default("online"),
+    paymentStatus:   varchar("payment_status", { length: 30 }).notNull().default("pending"),
+    payriffOrderId:  varchar("payriff_order_id", { length: 100 }),
+    depositAmount:   numeric("deposit_amount", { precision: 10, scale: 2 }),
+    remainingAmount: numeric("remaining_amount", { precision: 10, scale: 2 }),
 
     // Operations
     status:      transferStatusEnum("status").notNull().default("pending"),
@@ -696,7 +704,13 @@ export const tourReservations = pgTable(
     guests:            integer("guests").notNull().default(1),
     travelerName:      varchar("traveler_name", { length: 200 }).notNull(),
     phoneNumber:       varchar("phone_number", { length: 50 }).notNull(),
+    email:             varchar("email", { length: 255 }),
     price:             numeric("price", { precision: 10, scale: 2 }).notNull(),
+    depositAmount:     numeric("deposit_amount", { precision: 10, scale: 2 }),
+    remainingAmount:   numeric("remaining_amount", { precision: 10, scale: 2 }),
+    paymentMethod:     varchar("payment_method", { length: 30 }).default("on_arrival"),
+    paymentStatus:     varchar("payment_status", { length: 30 }).default("pending"),
+    payriffOrderId:    varchar("payriff_order_id", { length: 100 }),
     status:            varchar("status", { length: 30 }).notNull().default("pending"),
     guideName:         varchar("guide_name", { length: 150 }),
     guidePhone:        varchar("guide_phone", { length: 50 }),
@@ -733,6 +747,11 @@ export const customItineraries = pgTable(
 
     // Pricing & Budget
     estimatedPriceUsd: numeric("estimated_price_usd", { precision: 10, scale: 2 }).notNull(),
+    depositAmount:     numeric("deposit_amount", { precision: 10, scale: 2 }),
+    remainingAmount:   numeric("remaining_amount", { precision: 10, scale: 2 }),
+    paymentMethod:     varchar("payment_method", { length: 30 }).default("on_arrival"),
+    paymentStatus:     varchar("payment_status", { length: 30 }).default("pending"),
+    payriffOrderId:    varchar("payriff_order_id", { length: 100 }),
     currency:          varchar("currency", { length: 10 }).notNull().default("USD"),
     specialRequests:   text("special_requests"),
 

@@ -53,7 +53,9 @@ interface BookingData {
   passengerName: string;
   passengerCount: number;
   totalAmount: string;
-  paymentMethod: "online" | "on_arrival";
+  depositAmount?: string | null;
+  remainingAmount?: string | null;
+  paymentMethod: "online" | "on_arrival" | "partial_deposit";
   paymentStatus: string;
   driverName?: string | null;
   driverPhone?: string | null;
@@ -436,9 +438,40 @@ function TransferTrackContent() {
                 </div>
                 <div>
                   <span className="text-slate-400">{tt.paymentLabel}</span>
-                  <p className="font-semibold text-slate-800">
-                    ${booking.totalAmount} · {booking.paymentMethod === "online" ? tt.paidOnline : tt.payCash}
-                  </p>
+                  {booking.paymentMethod === "partial_deposit" || booking.paymentStatus === "deposit_paid" ? (
+                    <div className="space-y-1 mt-0.5">
+                      <p className="font-semibold text-slate-800">
+                        ${booking.totalAmount} ·{" "}
+                        <span className="text-emerald-700 font-bold">
+                          {language === "AZ"
+                            ? `İlkin Depozit Ödənilib: $${booking.depositAmount || "0.00"}`
+                            : language === "RU"
+                            ? `Предоплата внесена: $${booking.depositAmount || "0.00"}`
+                            : language === "AR"
+                            ? `تم دفع العربون: $${booking.depositAmount || "0.00"}`
+                            : `Down Payment Paid: $${booking.depositAmount || "0.00"}`}
+                        </span>
+                      </p>
+                      {Number(booking.remainingAmount || 0) > 0 && (
+                        <p className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1 inline-flex items-center gap-1">
+                          <span>💵</span>
+                          <span>
+                            {language === "AZ"
+                              ? `Çatdırılmada sürücüyə nağd ödəniləcək qalıq: $${booking.remainingAmount}`
+                              : language === "RU"
+                              ? `К оплате водителю при встрече наличными: $${booking.remainingAmount}`
+                              : language === "AR"
+                              ? `المتبقي نقداً للسائق عند الوصول: $${booking.remainingAmount}`
+                              : `Balance to pay chauffeur upon arrival: $${booking.remainingAmount}`}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="font-semibold text-slate-800">
+                      ${booking.totalAmount} · {booking.paymentMethod === "online" ? tt.paidOnline : tt.payCash}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -472,7 +505,9 @@ function TransferTrackContent() {
                 "Route": `${LOCALIZED_ZONES[language]?.[booking.pickupZone] || booking.pickupZone} ➔ ${booking.dropoffAddress}`,
                 "Flight": `${booking.flightNumber} (${booking.flightDate} ${booking.flightTime})`,
                 "Vehicle": booking.vehicleClass === "sedan" ? t.transferPage.sedan : booking.vehicleClass === "suv" ? t.transferPage.suv : t.transferPage.minivan,
-                "Payment": `$${booking.totalAmount} (${booking.paymentMethod === "online" ? tt.paidOnline : tt.payCash})`,
+                "Payment": booking.paymentMethod === "partial_deposit"
+                  ? `Total: $${booking.totalAmount} (Deposit Paid: $${booking.depositAmount || "0.00"}, Due on Delivery: $${booking.remainingAmount || "0.00"})`
+                  : `$${booking.totalAmount} (${booking.paymentMethod === "online" ? tt.paidOnline : tt.payCash})`,
               }}
               pdfFilename={`${CURRENT_BRAND.name}-Transfer-Voucher-${booking.bookingNumber}`}
             />

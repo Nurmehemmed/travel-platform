@@ -124,13 +124,30 @@ export const TourReservationModal: React.FC<TourReservationModalProps> = ({
                   </div>
                   <div className="text-right">
                     <span className="text-slate-400 block text-[10px] uppercase font-medium">
-                      {language === "AZ" ? "Təxmini AZN" : "Approx. AZN"}
+                      {language === "AZ" ? "Ödəniş Vəziyyəti" : "Payment Status"}
                     </span>
-                    <span className="text-xs font-bold text-slate-600">
-                      ~{(Number(selectedTourRes.price) * 1.7).toFixed(0)} AZN
+                    <span className="text-xs font-bold text-slate-800">
+                      {selectedTourRes.paymentStatus === "deposit_paid"
+                        ? "💳 Deposit Paid"
+                        : selectedTourRes.paymentStatus === "paid"
+                        ? "✅ Paid 100%"
+                        : "💵 On Arrival"}
                     </span>
                   </div>
                 </div>
+
+                {(selectedTourRes.depositAmount || selectedTourRes.remainingAmount) && (
+                  <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200/80 space-y-1">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-600 font-medium">Deposit Received:</span>
+                      <span className="font-bold text-sky-800">${selectedTourRes.depositAmount || "0.00"}</span>
+                    </div>
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-600 font-medium">Balance to Collect on Tour:</span>
+                      <span className="font-bold text-amber-900">${selectedTourRes.remainingAmount || selectedTourRes.price}</span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="pt-2 border-t border-amber-200/60">
                   <a

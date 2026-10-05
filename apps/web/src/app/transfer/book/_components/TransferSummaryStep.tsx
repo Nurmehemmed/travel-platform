@@ -16,6 +16,8 @@ import {
 import { AirportCode, VehicleClass } from "@/lib/transfer-zones";
 import { LOCALIZED_AIRPORTS, LOCALIZED_ZONES } from "@/lib/pages-i18n";
 import { LanguageCode } from "@/lib/i18n";
+import { useSiteSettings } from "@/lib/settings-context";
+import { calculateTransferPaymentBreakdown } from "@/lib/transfers/policy";
 
 interface TransferSummaryStepProps {
   direction: "arrival" | "departure" | "round_trip";
@@ -96,7 +98,11 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
   language,
   getVehicleLabel,
 }) => {
+  const { settings } = useSiteSettings();
+  const depositPercent = settings?.pricing?.transferDepositPercent ?? 20;
   const totalAmount = isCustomZone ? 0 : pricing?.totalAmount || 0;
+  const breakdown = calculateTransferPaymentBreakdown(totalAmount, depositPercent);
+
   return (
             <form onSubmit={handleSubmitBooking} className="space-y-6">
               <div>
@@ -201,6 +207,7 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
                   <span>{tb.tollsFuelFree}</span>
                   <span className="text-emerald-600 font-semibold">{tb.includedFree}</span>
                 </div>
+
                 <div className="border-t border-slate-100 pt-3 flex items-center justify-between">
                   <span className="font-bold text-slate-900 text-sm">{tb.totalDue}</span>
                   <div className="text-right">
@@ -215,10 +222,53 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
                     <div className="text-[10px] text-slate-400">{tb.allTaxesInc}</div>
                   </div>
                 </div>
-                {!isCustomZone && (
-                  <p className="text-[10px] text-slate-400 mt-2 border-t border-slate-100 pt-1.5 leading-relaxed">
-                    {tb.payriffDesc}
-                  </p>
+
+                {!isCustomZone && breakdown.isPartial && paymentMethod === "online" && (
+                  <div className="mt-3 pt-3 border-t border-dashed border-sky-200 bg-sky-50/70 -mx-4 -mb-4 p-4 rounded-b-xl space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-sky-900 flex items-center gap-1.5">
+                        <CreditCard className="h-3.5 w-3.5 text-sky-600" />
+                        {tb.downPaymentLabel} ({breakdown.depositPercent}%):
+                      </span>
+                      <div className="text-right">
+                        <span className="font-extrabold text-sm text-sky-700">
+                          ${breakdown.depositAmount.toFixed(2)}
+                        </span>
+                        <span className="block text-[10px] font-semibold text-slate-500">
+                          (~{(breakdown.depositAmount * 1.7).toFixed(2)} AZN)
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-slate-600">
+                      <span className="flex items-center gap-1.5">
+                        <Banknote className="h-3.5 w-3.5 text-emerald-600" />
+                        {tb.remainingDeliveryLabel} ({100 - breakdown.depositPercent}%):
+                      </span>
+                      <span className="font-bold text-slate-800">
+                        ${breakdown.remainingAmount.toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-sky-800 leading-relaxed pt-1">
+                      ℹ️ {tb.depositPayDesc || `Pay $${breakdown.depositAmount.toFixed(2)} online today. The remaining $${breakdown.remainingAmount.toFixed(2)} balance is payable in cash to your driver upon arrival.`}
+                    </p>
+                  </div>
+                )}
+
+                {!isCustomZone && paymentMethod === "on_arrival" && (
+                  <div className="mt-3 pt-3 border-t border-dashed border-emerald-200 bg-emerald-50/50 -mx-4 -mb-4 p-4 rounded-b-xl">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-emerald-900 flex items-center gap-1.5">
+                        <Banknote className="h-3.5 w-3.5 text-emerald-600" />
+                        {tb.payCashTitle}:
+                      </span>
+                      <span className="font-extrabold text-sm text-emerald-700">
+                        ${totalAmount.toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-emerald-800 leading-relaxed mt-1">
+                      {tb.payCashDesc}
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -237,12 +287,31 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
                           : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <CreditCard className="h-5 w-5 text-sky-600" />
-                        <span className="font-bold text-sm text-slate-900">{tb.payOnlineTitle}</span>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-5 w-5 text-sky-600" />
+                          <span className="font-bold text-sm text-slate-900">
+                            {breakdown.isPartial
+                              ? `${tb.downPaymentLabel} (${breakdown.depositPercent}%)`
+                              : tb.payOnlineTitle}
+                          </span>
+                        </div>
+                        {breakdown.isPartial && (
+                          <span className="rounded-full bg-sky-100 text-sky-700 text-[10px] font-extrabold px-2 py-0.5 border border-sky-200">
+                            ${breakdown.depositAmount.toFixed(2)}
+                          </span>
+                        )}
                       </div>
                       <p className="text-[11px] text-slate-500 leading-relaxed">
-                        {tb.payOnlineDesc}
+                        {breakdown.isPartial
+                          ? (language === "AZ"
+                              ? `Cəmi ${breakdown.depositPercent}% ($${breakdown.depositAmount.toFixed(2)}) depozit ödəyin, qalan məbləği ($${breakdown.remainingAmount.toFixed(2)}) çatdırılmada sürücüyə nağd ödəyin.`
+                              : language === "RU"
+                              ? `Оплатите сейчас только ${breakdown.depositPercent}% ($${breakdown.depositAmount.toFixed(2)}) онлайн, остаток ($${breakdown.remainingAmount.toFixed(2)}) — наличными водителю при встрече.`
+                              : language === "AR"
+                              ? `ادفع الآن عربون ${breakdown.depositPercent}% ($${breakdown.depositAmount.toFixed(2)}) عبر الإنترنت، والمتبقي ($${breakdown.remainingAmount.toFixed(2)}) نقداً للسائق عند الوصول.`
+                              : `Pay a ${breakdown.depositPercent}% down payment ($${breakdown.depositAmount.toFixed(2)}) online now. The remaining $${breakdown.remainingAmount.toFixed(2)} is due upon arrival.`)
+                          : tb.payOnlineDesc}
                       </p>
                     </div>
 
@@ -254,9 +323,14 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
                           : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <Banknote className="h-5 w-5 text-emerald-600" />
-                        <span className="font-bold text-sm text-slate-900">{tb.payCashTitle}</span>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <Banknote className="h-5 w-5 text-emerald-600" />
+                          <span className="font-bold text-sm text-slate-900">{tb.payCashTitle}</span>
+                        </div>
+                        <span className="rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-extrabold px-2 py-0.5 border border-emerald-200">
+                          ${totalAmount.toFixed(2)}
+                        </span>
                       </div>
                       <p className="text-[11px] text-slate-500 leading-relaxed">
                         {tb.payCashDesc}
@@ -462,7 +536,11 @@ export const TransferSummaryStep: React.FC<TransferSummaryStepProps> = ({
                     </>
                   ) : paymentMethod === "online" && !isCustomZone ? (
                     <>
-                      <span>{tb.btnPayCard} (${totalAmount})</span>
+                      <span>
+                        {breakdown.isPartial
+                          ? `${tb.btnPayCard} ($${breakdown.depositAmount.toFixed(2)})`
+                          : `${tb.btnPayCard} ($${totalAmount.toFixed(2)})`}
+                      </span>
                       <ArrowRight className="h-4 w-4" />
                     </>
                   ) : isCustomZone ? (

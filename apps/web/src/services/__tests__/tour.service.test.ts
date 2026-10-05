@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { TourService, generateReservationNumber, STATIC_CATALOG_PRICES } from "../tour.service";
+import { calculatePaymentBreakdown } from "../../lib/transfers/policy";
 
 describe("TourService Domain Logic", () => {
   const tourService = new TourService();
@@ -73,4 +74,46 @@ describe("TourService Domain Logic", () => {
       expect(result.error).toContain("Missing required");
     });
   });
+
+  describe("Tour Deposit & Down Payment Breakdown", () => {
+    it("calculates 20% down payment deposit for standard tour ($25)", () => {
+      const res = calculatePaymentBreakdown(25, 20);
+
+      expect(res.totalAmount).toBe(25);
+      expect(res.depositPercent).toBe(20);
+      expect(res.depositAmount).toBe(5);
+      expect(res.remainingAmount).toBe(20);
+      expect(res.isPartial).toBe(true);
+      expect(res.depositAmount + res.remainingAmount).toBe(25);
+    });
+
+    it("calculates 20% down payment deposit for Sheki Cultural Journey ($149)", () => {
+      const res = calculatePaymentBreakdown(149, 20);
+
+      expect(res.totalAmount).toBe(149);
+      expect(res.depositPercent).toBe(20);
+      expect(res.depositAmount).toBe(29.8);
+      expect(res.remainingAmount).toBe(119.2);
+      expect(res.depositAmount + res.remainingAmount).toBe(149);
+    });
+
+    it("supports configurable deposit percentage from admin (e.g. 15% or 30%)", () => {
+      const res15 = calculatePaymentBreakdown(100, 15);
+      expect(res15.depositAmount).toBe(15);
+      expect(res15.remainingAmount).toBe(85);
+
+      const res30 = calculatePaymentBreakdown(100, 30);
+      expect(res30.depositAmount).toBe(30);
+      expect(res30.remainingAmount).toBe(70);
+    });
+
+    it("handles zero deposit (pay on tour day)", () => {
+      const res = calculatePaymentBreakdown(65, 0);
+
+      expect(res.depositAmount).toBe(0);
+      expect(res.remainingAmount).toBe(65);
+      expect(res.isPartial).toBe(false);
+    });
+  });
 });
+

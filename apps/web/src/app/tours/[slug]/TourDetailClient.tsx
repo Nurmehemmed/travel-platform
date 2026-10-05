@@ -98,6 +98,7 @@ export default function TourDetailClient({ tour, relatedTours }: TourDetailClien
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"online" | "on_arrival">("online");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -143,6 +144,10 @@ export default function TourDetailClient({ tour, relatedTours }: TourDetailClien
   }, 0);
   const grandTotalUSD = basePriceUSD + addOnsTotalUSD;
 
+  const depositPercent = settings?.pricing?.tourDepositPercent ?? 20;
+  const depositAmountUSD = Math.round(grandTotalUSD * (depositPercent / 100));
+  const remainingAmountUSD = Math.max(0, grandTotalUSD - depositAmountUSD);
+
   const toggleAddOn = (id: string) => {
     setSelectedAddOnIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -176,6 +181,7 @@ export default function TourDetailClient({ tour, relatedTours }: TourDetailClien
 📅 Date: ${formattedDateString}
 👥 Guests: ${adults} Adults${children > 0 ? `, ${children} Children` : ""}
 ${addOnNames ? `✨ Add-ons: ${addOnNames}\n` : ""}💰 Estimated Total: ${formatPrice(grandTotalUSD)} (${grandTotalUSD} USD)
+💳 Down Payment Option: ${depositPercent}% (${formatPrice(depositAmountUSD)})
 
 Please confirm guide availability and pickup details.`;
 
@@ -193,8 +199,13 @@ Please confirm guide availability and pickup details.`;
         body: JSON.stringify({
           tourId: tour.id,
           tourTitle: tour.title,
-          date: selectedDate,
-          guests: { adults, children },
+          tourDate: selectedDate,
+          guests: totalGuests,
+          travelerName: fullName,
+          phoneNumber: phone,
+          email: email.trim(),
+          price: tour.price,
+          paymentMethod,
           addOns: selectedAddOnIds,
           priceUSD: grandTotalUSD,
           currency: activeCurrency.code,
@@ -202,11 +213,16 @@ Please confirm guide availability and pickup details.`;
         }),
       });
 
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (paymentMethod === "online" && data.paymentUrl) {
+          showToast("Redirecting to secure card checkout...", "info");
+          window.location.href = data.paymentUrl;
+          return;
+        }
         setBookingSuccess(true);
         showToast("Reservation submitted successfully! Our team will contact you.", "success");
       } else {
-        // Fallback for demo resilience
         setBookingSuccess(true);
       }
     } catch {
@@ -710,6 +726,16 @@ Please confirm guide availability and pickup details.`;
                   </div>
                   <span className="text-2xl font-black text-slate-900">{formatPrice(grandTotalUSD)}</span>
                 </div>
+
+                <div className="rounded-xl bg-sky-50 border border-sky-200/80 p-2.5 text-[11px] text-sky-950 flex items-start justify-between">
+                  <div>
+                    <span className="font-bold text-sky-900 block">💳 {depositPercent}% Down Payment Available</span>
+                    <span className="text-sky-700 text-[10px]">
+                      Pay {formatPrice(depositAmountUSD)} now · {formatPrice(remainingAmountUSD)} on tour day
+                    </span>
+                  </div>
+                  <span className="text-xs font-extrabold text-sky-900 shrink-0">{formatPrice(depositAmountUSD)}</span>
+                </div>
               </div>
 
               {/* Dual Booking CTAs */}
@@ -721,7 +747,7 @@ Please confirm guide availability and pickup details.`;
                   style={{ backgroundColor: "#0f3460" }}
                 >
                   <Calendar className="h-4 w-4 text-amber-400" />
-                  <span>Reserve Date (Pay Later / Cash on Arrival)</span>
+                  <span>Reserve Date ({depositPercent}% Deposit or Pay on Tour Day)</span>
                 </button>
 
                 <a
@@ -931,9 +957,71 @@ Please confirm guide availability and pickup details.`;
                     />
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex justify-between items-center">
-                    <span>Payable on tour day:</span>
-                    <span className="font-extrabold text-slate-900 text-sm">{formatPrice(grandTotalUSD)}</span>
+                  {/* Payment Method Selector */}
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Payment Preference
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div
+                        onClick={() => setPaymentMethod("online")}
+                        className={`p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                          paymentMethod === "online"
+                            ? "bg-sky-50/80 border-sky-500 ring-1 ring-sky-400/40"
+                            : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900">💳 Down Payment ({depositPercent}%)</span>
+                          <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-sky-500 text-white">
+                            Recommended
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-1">
+                          {formatPrice(depositAmountUSD)} now · {formatPrice(remainingAmountUSD)} on tour day
+                        </p>
+                      </div>
+
+                      <div
+                        onClick={() => setPaymentMethod("on_arrival")}
+                        className={`p-2.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
+                          paymentMethod === "on_arrival"
+                            ? "bg-amber-50/80 border-amber-500 ring-1 ring-amber-400/40"
+                            : "bg-slate-50 border-slate-200 hover:border-slate-300"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900">💵 Pay on Tour Day</span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-1">
+                          Zero deposit now · {formatPrice(grandTotalUSD)} upon pickup.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                    <div className="flex justify-between font-medium">
+                      <span>Total Estimated Price:</span>
+                      <span className="font-bold text-slate-900">{formatPrice(grandTotalUSD)}</span>
+                    </div>
+                    {paymentMethod === "online" ? (
+                      <>
+                        <div className="flex justify-between text-sky-800 font-semibold text-[11px] pt-1 border-t border-slate-200">
+                          <span>Due Today ({depositPercent}% Down Payment):</span>
+                          <span className="font-extrabold text-sky-700">{formatPrice(depositAmountUSD)}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-500 text-[11px]">
+                          <span>Due on Tour Day (Cash or Card):</span>
+                          <span className="font-semibold text-slate-700">{formatPrice(remainingAmountUSD)}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between text-amber-800 font-semibold text-[11px] pt-1 border-t border-slate-200">
+                        <span>Payable on tour day (100%):</span>
+                        <span className="font-extrabold text-amber-900">{formatPrice(grandTotalUSD)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <button
@@ -941,7 +1029,11 @@ Please confirm guide availability and pickup details.`;
                     disabled={submitting}
                     className="w-full rounded-xl py-3.5 text-xs font-bold text-white bg-[#0f3460] hover:opacity-95 cursor-pointer shadow-lg disabled:opacity-50"
                   >
-                    {submitting ? "Confirming Reservation..." : "Confirm Free Reservation"}
+                    {submitting
+                      ? "Processing..."
+                      : paymentMethod === "online"
+                      ? `Pay Down Payment (${formatPrice(depositAmountUSD)}) & Confirm`
+                      : "Confirm Reservation (Pay on Tour Day)"}
                   </button>
                 </form>
               </div>

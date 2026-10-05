@@ -21,6 +21,8 @@ import {
   calculateRoundTripPrice,
   getAirportByCode,
   getVehicleConfig,
+  validateTransferLeadTime,
+  validateReturnFlightTime,
 } from "@/lib/transfer-zones";
 import {
   LOCALIZED_AIRPORTS,
@@ -297,6 +299,14 @@ function TransferBookForm() {
       triggerValidationError(tb.errFlightTimeRequired, "flightTime");
       return;
     }
+
+    // 8-hour advance booking lead time validation
+    const leadCheck = validateTransferLeadTime(flightDate, flightTime);
+    if (!leadCheck.valid) {
+      triggerValidationError(leadCheck.error || tb.errLeadTime8Hours, "flightTime");
+      return;
+    }
+
     if (direction === "round_trip") {
       if (!returnFlightNumber.trim()) {
         triggerValidationError(tb.errReturnFlightRequired, "returnFlightNumber");
@@ -308,6 +318,12 @@ function TransferBookForm() {
       }
       if (!returnTime) {
         triggerValidationError(tb.errReturnFlightRequired, "returnTime");
+        return;
+      }
+
+      const returnCheck = validateReturnFlightTime(flightDate, flightTime, returnDate, returnTime);
+      if (!returnCheck.valid) {
+        triggerValidationError(returnCheck.error || tb.errReturnMustBeAfterPrimary, "returnTime");
         return;
       }
     }

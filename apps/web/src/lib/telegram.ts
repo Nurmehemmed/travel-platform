@@ -136,7 +136,10 @@ export interface TransferTelegramAlertPayload {
   phoneNumber: string;
   email: string;
   totalAmount: number | string;
-  paymentMethod: "online" | "on_arrival";
+  depositAmount?: number | string | null | undefined;
+  remainingAmount?: number | string | null | undefined;
+  paymentMethod: "online" | "on_arrival" | "partial_deposit";
+  paymentStatus?: string | null | undefined;
   femaleDriver?: boolean;
   additionalGuide?: boolean;
 }
@@ -173,11 +176,23 @@ export async function sendTelegramTransferAlert(
     payload.vehicleClass === "executive" ? "🚌 Executive Minibus" :
     "🚗 Sedan";
 
-  const paymentLabel = payload.paymentMethod === "online" ? "✅ Paid Online" : "💵 Pay on Arrival";
+  let paymentLabel = "💵 Pay on Arrival";
+  if (payload.paymentMethod === "online" || payload.paymentStatus === "paid") {
+    paymentLabel = "✅ Paid Online (100%)";
+  } else if (payload.paymentMethod === "partial_deposit" || payload.paymentStatus === "deposit_paid") {
+    const dep = Number(payload.depositAmount || 0).toFixed(2);
+    const rem = Number(payload.remainingAmount || 0).toFixed(2);
+    paymentLabel = `💳 Deposit Paid: $${dep} · 💵 Collect on Delivery: $${rem}`;
+  }
 
   const returnSection =
     payload.direction === "round_trip" && payload.returnFlightNumber
       ? `\n↩️ <b>Return Flight:</b> ${payload.returnFlightNumber} on ${payload.returnDate}`
+      : "";
+
+  const depositDetails =
+    payload.paymentMethod === "partial_deposit" || payload.paymentStatus === "deposit_paid"
+      ? `\n💳 <b>Down Payment Received:</b> $${Number(payload.depositAmount || 0).toFixed(2)}\n💵 <b>Cash to Collect from Passenger:</b> $${Number(payload.remainingAmount || 0).toFixed(2)}`
       : "";
 
   const prefsSection = [
@@ -204,7 +219,7 @@ ${vehicleLabel}
 📧 <b>Email:</b> ${payload.email}
 ${prefsSection ? `\n${prefsSection}` : ""}
 
-💰 <b>Total:</b> $${Number(payload.totalAmount).toFixed(2)} — ${paymentLabel}
+💰 <b>Total:</b> $${Number(payload.totalAmount).toFixed(2)} — ${paymentLabel}${depositDetails}
 
 👉 <a href="${appUrl}/admin">Open Admin Portal → Transfers</a>
 `;
@@ -233,3 +248,95 @@ ${prefsSection ? `\n${prefsSection}` : ""}
     return false;
   }
 }
+
+// ─── Tour Reservation Alert ──────────────────────────────────────────────────
+
+export interface TourTelegramAlertPayload {
+  reservationNumber: string;
+  tourTitle: string;
+  tourDate: string;
+  guests: number;
+  travelerName: string;
+  phoneNumber: string;
+  email?: string | null | undefined;
+  totalPrice: number | string;
+  depositAmount?: number | string | null | undefined;
+  remainingAmount?: number | string | null | undefined;
+  paymentMethod: "online" | "on_arrival" | "partial_deposit";
+  paymentStatus?: string | null | undefined;
+}
+
+/**
+ * Sends a tour reservation alert to the operations Telegram channel.
+ */
+export async function sendTelegramTourAlert(
+  payload: TourTelegramAlertPayload
+): Promise<boolean> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!botToken || !chatId) {
+    console.log(
+      `[Telegram Tour Alert] (not configured): New tour ${payload.reservationNumber} for ${payload.travelerName}`
+    );
+    return false;
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  let paymentLabel = "💵 Pay on Tour Day (100%)";
+  if (payload.paymentMethod === "online" || payload.paymentStatus === "paid") {
+    paymentLabel = "✅ Paid Online (100%)";
+  } else if (payload.paymentMethod === "partial_deposit" || payload.paymentStatus === "deposit_paid") {
+    const dep = Number(payload.depositAmount || 0).toFixed(2);
+    const rem = Number(payload.remainingAmount || 0).toFixed(2);
+    paymentLabel = `💳 Deposit Paid: $${dep} · 💵 Collect on Tour Day: $${rem}`;
+  }
+
+  const depositDetails =
+    payload.paymentMethod === "partial_deposit" || payload.paymentStatus === "deposit_paid"
+      ? `\n💳 <b>Down Payment Received:</b> $${Number(payload.depositAmount || 0).toFixed(2)}\n💵 <b>Cash to Collect from Traveler:</b> $${Number(payload.remainingAmount || 0).toFixed(2)}`
+      : "";
+
+  const text = `
+🏛️ <b>NEW TOUR RESERVATION</b>
+
+🆔 <b>Reservation Ref:</b> <code>${payload.reservationNumber}</code>
+🏷️ <b>Tour:</b> ${escapeHtml(payload.tourTitle)}
+📅 <b>Date:</b> ${payload.tourDate}
+👥 <b>Guests:</b> ${payload.guests}
+
+👤 <b>Lead Traveler:</b> ${escapeHtml(payload.travelerName)}
+📱 <b>Phone:</b> ${escapeHtml(payload.phoneNumber)}
+${payload.email ? `📧 <b>Email:</b> ${escapeHtml(payload.email)}` : ""}
+
+💰 <b>Total Price:</b> $${Number(payload.totalPrice).toFixed(2)} — ${paymentLabel}${depositDetails}
+
+👉 <a href="${appUrl}/admin">Open Admin Portal → Bookings</a>
+`;
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(5000),
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      console.error("[Telegram Tour Alert error]:", errData);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("[Telegram Tour Alert dispatch failed]:", error);
+    return false;
+  }
+}
+

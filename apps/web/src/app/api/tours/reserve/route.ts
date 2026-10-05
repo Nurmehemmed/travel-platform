@@ -32,6 +32,10 @@ export async function POST(req: Request) {
       success: true,
       reservationNumber: result.reservationNumber,
       reservation: result.reservation,
+      paymentUrl: result.paymentUrl,
+      depositAmount: result.depositAmount,
+      remainingAmount: result.remainingAmount,
+      breakdown: result.breakdown,
     });
   } catch (error: any) {
     log.error("Failed to create tour reservation", error);

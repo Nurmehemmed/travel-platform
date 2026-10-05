@@ -131,7 +131,9 @@ export interface TransferItem {
   distanceKm?: string | null;
   basePrice?: string | null;
   totalAmount: string;
-  paymentMethod: "online" | "on_arrival";
+  depositAmount?: string | null;
+  remainingAmount?: string | null;
+  paymentMethod: "online" | "on_arrival" | "partial_deposit";
   paymentStatus: string;
   status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
   femaleDriver?: boolean | null;
@@ -151,7 +153,13 @@ export interface TourReservationItem {
   guests: number;
   travelerName: string;
   phoneNumber: string;
+  email?: string | null;
   price: string;
+  depositAmount?: string | null;
+  remainingAmount?: string | null;
+  paymentMethod?: "online" | "on_arrival" | "partial_deposit" | null;
+  paymentStatus?: "pending" | "deposit_paid" | "paid" | "failed" | null;
+  payriffOrderId?: string | null;
   status: "pending" | "confirmed" | "completed" | "cancelled";
   guideName?: string | null;
   guidePhone?: string | null;

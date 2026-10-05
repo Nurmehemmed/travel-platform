@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { db, visaApplications, esimOrders, transferBookings, recordAuditLog } from "@travel/db";
+import { db, visaApplications, esimOrders, transferBookings, tourReservations, customItineraries, recordAuditLog } from "@travel/db";
 import { eq } from "drizzle-orm";
-import { sendTelegramVisaAlert, sendTelegramTransferAlert, notifyTelegram } from "@/lib/telegram";
+import { sendTelegramVisaAlert, sendTelegramTransferAlert, sendTelegramTourAlert, notifyTelegram } from "@/lib/telegram";
 import { verifyPayriffOrder } from "@/lib/payriff";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
@@ -142,13 +142,18 @@ export async function POST(req: Request) {
         transfer.additionalGuide ? "⚠️ SERVICE: Driver + Licensed Tour Guide Requested" : null,
       ].filter(Boolean).join(" | ");
 
-      const baseAdminNote = `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}`;
+      const isDeposit =
+        transfer.paymentMethod === "partial_deposit" ||
+        Number(transfer.remainingAmount || 0) > 0;
+      const targetPaymentStatus = isDeposit ? "deposit_paid" : "paid";
+
+      const baseAdminNote = `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}${isDeposit ? ` (Deposit $${transfer.depositAmount} Paid, Remaining $${transfer.remainingAmount} Due)` : ""}`;
       const finalAdminNotes = prefNotes ? `${baseAdminNote} — ${prefNotes}` : baseAdminNote;
 
       await db
         .update(transferBookings)
         .set({
-          paymentStatus: "paid",
+          paymentStatus: targetPaymentStatus,
           status: "pending",
           payriffOrderId: orderId || `PR-SANDBOX-${transfer.bookingNumber}`,
           adminNotes: finalAdminNotes,
@@ -171,7 +176,10 @@ export async function POST(req: Request) {
         pickupZone: transfer.pickupZone,
         dropoffAddress: transfer.dropoffAddress,
         totalAmount: transfer.totalAmount,
-        paymentMethod: "online",
+        depositAmount: transfer.depositAmount,
+        remainingAmount: transfer.remainingAmount,
+        paymentMethod: transfer.paymentMethod as any,
+        paymentStatus: targetPaymentStatus,
         femaleDriver: (transfer as any).femaleDriver,
         additionalGuide: (transfer as any).additionalGuide,
       }).catch((err) => logger.warn("Telegram transfer alert failed", { err: err?.message }));
@@ -180,6 +188,126 @@ export async function POST(req: Request) {
         success: true,
         applicationNumber,
         redirectUrl: `/transfer/track?booking=${encodeURIComponent(applicationNumber)}&paid=true`,
+      });
+    }
+
+    // ── Handle Tour Reservations (TR-XXXXXX) ──
+    if (applicationNumber.startsWith("TR-")) {
+      const reservation = await db.query.tourReservations.findFirst({
+        where: eq(tourReservations.reservationNumber, applicationNumber),
+      });
+
+      if (!reservation) {
+        return NextResponse.json({ error: "Tour reservation not found" }, { status: 404 });
+      }
+
+      const isDeposit =
+        reservation.paymentMethod === "partial_deposit" ||
+        Number(reservation.remainingAmount || 0) > 0;
+      const targetPaymentStatus = isDeposit ? "deposit_paid" : "paid";
+
+      const baseAdminNote = `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}${isDeposit ? ` (Deposit $${reservation.depositAmount} Paid, Remaining $${reservation.remainingAmount} Due)` : ""}`;
+
+      await db
+        .update(tourReservations)
+        .set({
+          paymentStatus: targetPaymentStatus,
+          status: "confirmed",
+          payriffOrderId: orderId || `PR-SANDBOX-${reservation.reservationNumber}`,
+          adminNotes: reservation.adminNotes ? `${reservation.adminNotes} | ${baseAdminNote}` : baseAdminNote,
+          updatedAt: new Date(),
+        })
+        .where(eq(tourReservations.reservationNumber, applicationNumber));
+
+      await recordAuditLog({
+        action: "payment.confirmed",
+        entityType: "tour" as any,
+        entityId: applicationNumber,
+        actorType: "customer",
+        actorEmail: reservation.email || null,
+        ipAddress: ip,
+        metadata: {
+          orderId: orderId || null,
+          amount: isDeposit ? reservation.depositAmount : reservation.price,
+          totalPrice: reservation.price,
+          depositAmount: reservation.depositAmount,
+          remainingAmount: reservation.remainingAmount,
+          paymentStatus: targetPaymentStatus,
+          simulated: !!simulated,
+        },
+      });
+
+      sendTelegramTourAlert({
+        reservationNumber: reservation.reservationNumber,
+        tourTitle: reservation.tourTitle,
+        tourDate: reservation.tourDate,
+        guests: reservation.guests,
+        travelerName: reservation.travelerName,
+        phoneNumber: reservation.phoneNumber,
+        email: reservation.email,
+        totalPrice: reservation.price,
+        depositAmount: reservation.depositAmount,
+        remainingAmount: reservation.remainingAmount,
+        paymentMethod: reservation.paymentMethod as any,
+        paymentStatus: targetPaymentStatus,
+      }).catch((err) => logger.warn("Telegram tour alert failed", { err: err?.message }));
+
+      return NextResponse.json({
+        success: true,
+        applicationNumber,
+        redirectUrl: `/tours?reservation=${encodeURIComponent(applicationNumber)}&paid=true`,
+      });
+    }
+
+    // ── Handle Custom Itineraries (ITN-XXXXXX) ──
+    if (applicationNumber.startsWith("ITN-")) {
+      const itn = await db.query.customItineraries.findFirst({
+        where: eq(customItineraries.referenceCode, applicationNumber),
+      });
+
+      if (!itn) {
+        return NextResponse.json({ error: "Custom itinerary not found" }, { status: 404 });
+      }
+
+      const isDeposit =
+        itn.paymentMethod === "partial_deposit" ||
+        Number(itn.remainingAmount || 0) > 0;
+      const targetPaymentStatus = isDeposit ? "deposit_paid" : "paid";
+
+      const baseAdminNote = `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}${isDeposit ? ` (Deposit $${itn.depositAmount} Paid, Remaining $${itn.remainingAmount} Due)` : ""}`;
+
+      await db
+        .update(customItineraries)
+        .set({
+          paymentStatus: targetPaymentStatus,
+          status: "confirmed",
+          payriffOrderId: orderId || `PR-SANDBOX-${itn.referenceCode}`,
+          adminNotes: itn.adminNotes ? `${itn.adminNotes} | ${baseAdminNote}` : baseAdminNote,
+          updatedAt: new Date(),
+        })
+        .where(eq(customItineraries.referenceCode, applicationNumber));
+
+      await recordAuditLog({
+        action: "payment.confirmed",
+        entityType: "tour" as any,
+        entityId: applicationNumber,
+        actorType: "customer",
+        actorEmail: itn.email,
+        ipAddress: ip,
+        metadata: {
+          orderId: orderId || null,
+          estimatedPriceUsd: itn.estimatedPriceUsd,
+          depositAmount: itn.depositAmount,
+          remainingAmount: itn.remainingAmount,
+          paymentStatus: targetPaymentStatus,
+          simulated: !!simulated,
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        applicationNumber,
+        redirectUrl: `/custom-plan?ref=${encodeURIComponent(applicationNumber)}&paid=true`,
       });
     }
 

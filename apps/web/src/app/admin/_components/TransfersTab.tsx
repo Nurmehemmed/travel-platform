@@ -301,6 +301,19 @@ export const TransfersTab: React.FC<TransfersTabProps> = ({
                         <span className="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-0.5">
                           {language === "AZ" ? "✓ Onlayn Ödənilib" : "✓ Paid Online"}
                         </span>
+                      ) : item.paymentStatus === "deposit_paid" || item.paymentMethod === "partial_deposit" ? (
+                        <div className="space-y-0.5 mt-0.5">
+                          <span className="inline-block text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-1.5 py-0.5 rounded">
+                            {language === "AZ"
+                              ? `✓ Depozit: $${item.depositAmount || "0.00"}`
+                              : `✓ Deposit: $${item.depositAmount || "0.00"}`}
+                          </span>
+                          <span className="block text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">
+                            {language === "AZ"
+                              ? `⚠️ Qalıq: $${item.remainingAmount || "0.00"}`
+                              : `⚠️ Collect: $${item.remainingAmount || "0.00"}`}
+                          </span>
+                        </div>
                       ) : item.paymentStatus === "cash_collected" ? (
                         <span className="inline-block text-[10px] font-bold text-teal-700 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded mt-0.5">
                           {language === "AZ" ? "💵 Nağd Təhvil Alınıb" : "💵 Cash Remitted"}

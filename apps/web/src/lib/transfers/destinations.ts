@@ -721,51 +721,6 @@ export const POPULAR_DESTINATIONS: DestinationLocation[] = [
     aliases: ["custom", "other", "address"],
     badge: "Custom Quote",
   },
-
-  // ── ✈️ NAJ (Nakhchivan Airport Locations) ───────────────────────────────────
-  {
-    id: "loc-naj-tabriz",
-    name: "Tabriz Hotel Nakhchivan",
-    category: "hotel",
-    zoneId: "NAJ-nakhchivan-center",
-    airport: "NAJ",
-    distanceKm: 7,
-    address: "Heydar Aliyev Avenue, Nakhchivan",
-    aliases: ["tabriz hotel", "nakhchivan hotel", "tabriz"],
-    badge: "5★ Hotel",
-  },
-  {
-    id: "loc-naj-duzdag",
-    name: "Duzdag Physiotherapy & Salt Caves Resort",
-    category: "hotel",
-    zoneId: "NAJ-duzdag",
-    airport: "NAJ",
-    distanceKm: 18,
-    address: "Duzdag Mountain, Nakhchivan",
-    aliases: ["duzdag", "duzdaq", "salt caves", "speleotherapy", "duzdag hotel"],
-    badge: "Salt Therapy Resort",
-  },
-  {
-    id: "loc-naj-center",
-    name: "Nakhchivan City Center & Momine Khatun",
-    category: "district",
-    zoneId: "NAJ-nakhchivan-center",
-    airport: "NAJ",
-    distanceKm: 7,
-    address: "Atabeylar Complex, Nakhchivan",
-    aliases: ["nakhchivan center", "momine khatun", "nohur tomb"],
-    badge: "Downtown",
-  },
-  {
-    id: "loc-custom-naj",
-    name: "Custom Nakhchivan Address",
-    category: "custom",
-    zoneId: "NAJ-custom",
-    airport: "NAJ",
-    distanceKm: 0,
-    aliases: ["custom", "other", "address"],
-    badge: "Custom Quote",
-  },
 ];
 
 /** Get all destinations for a given airport */
