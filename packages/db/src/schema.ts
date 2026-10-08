@@ -352,24 +352,105 @@ export const availabilitySlots = pgTable(
      * CHECK constraint enforced at DB level: available_seats >= 0
      */
     availableSeats: integer("available_seats").notNull(),
+    /** In-flight checkout locked seats (soft hold with TTL) */
+    lockedSeats:    integer("locked_seats").notNull().default(0),
+    /** Whether this departure is 100% guaranteed to run */
+    isGuaranteed:   boolean("is_guaranteed").notNull().default(false),
+    /** Minimum participants required to auto-promote to guaranteed */
+    minParticipants: integer("min_participants").notNull().default(4),
+    /** Operational cutoff in hours before departure (e.g. 24h) */
+    cutoffHours:    integer("cutoff_hours").notNull().default(24),
+    /** Meeting time display (e.g. "09:00 AM") */
+    meetingTime:    varchar("meeting_time", { length: 50 }).default("09:00 AM"),
+    /** Optional departure-specific price override */
+    priceOverride:  numeric("price_override", { precision: 10, scale: 2 }),
     status:         slotStatusEnum("status").notNull().default("open"),
     createdAt,
   },
   (t) => [
     index("slots_package_idx").on(t.packageId),
-    // This index is the heart of the date + capacity search query
     index("slots_departure_date_idx").on(t.departureDate),
     index("slots_available_seats_idx").on(t.availableSeats),
+    index("slots_is_guaranteed_idx").on(t.isGuaranteed),
   ]
 );
 
 export const availabilitySlotsRelations = relations(availabilitySlots, ({ one, many }) => ({
-  package:      one(packages, {
+  package:          one(packages, {
     fields: [availabilitySlots.packageId],
     references: [packages.id],
   }),
-  pricingTiers: many(pricingTiers),
-  bookings:     many(bookings),
+  pricingTiers:     many(pricingTiers),
+  bookings:         many(bookings),
+  seatHolds:        many(seatHolds),
+  tourReservations: many(tourReservations),
+  waitlist:         many(tourWaitlist),
+}));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6b. Seat Holds (anti-overselling cart reservation locks)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const seatHolds = pgTable(
+  "seat_holds",
+  {
+    id:        uuid("id").primaryKey().defaultRandom(),
+    slotId:    uuid("slot_id")
+      .notNull()
+      .references(() => availabilitySlots.id, { onDelete: "cascade" }),
+    sessionId: varchar("session_id", { length: 120 }).notNull().unique(),
+    seats:     integer("seats").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    status:    varchar("status", { length: 20 }).notNull().default("active"),
+    ...timestamps,
+  },
+  (t) => [
+    index("seat_holds_slot_idx").on(t.slotId),
+    index("seat_holds_expires_idx").on(t.expiresAt),
+    uniqueIndex("seat_holds_session_idx").on(t.sessionId),
+  ]
+);
+
+export const seatHoldsRelations = relations(seatHolds, ({ one }) => ({
+  slot: one(availabilitySlots, {
+    fields: [seatHolds.slotId],
+    references: [availabilitySlots.id],
+  }),
+}));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6c. Tour Waitlist (demand capture for sold-out guaranteed departures)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const tourWaitlist = pgTable(
+  "tour_waitlist",
+  {
+    id:           uuid("id").primaryKey().defaultRandom(),
+    slotId:       uuid("slot_id")
+      .references(() => availabilitySlots.id, { onDelete: "cascade" }),
+    tourId:       varchar("tour_id", { length: 100 }).notNull(),
+    tourTitle:    varchar("tour_title", { length: 255 }).notNull(),
+    desiredDate:  date("desired_date").notNull(),
+    guests:       integer("guests").notNull().default(2),
+    travelerName: varchar("traveler_name", { length: 200 }).notNull(),
+    email:        varchar("email", { length: 255 }).notNull(),
+    phoneNumber:  varchar("phone_number", { length: 50 }).notNull(),
+    status:       varchar("status", { length: 30 }).notNull().default("waiting"),
+    notes:        text("notes"),
+    ...timestamps,
+  },
+  (t) => [
+    index("tour_waitlist_tour_idx").on(t.tourId),
+    index("tour_waitlist_slot_idx").on(t.slotId),
+    index("tour_waitlist_status_idx").on(t.status),
+  ]
+);
+
+export const tourWaitlistRelations = relations(tourWaitlist, ({ one }) => ({
+  slot: one(availabilitySlots, {
+    fields: [tourWaitlist.slotId],
+    references: [availabilitySlots.id],
+  }),
 }));
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -701,6 +782,8 @@ export const tourReservations = pgTable(
     tourId:            varchar("tour_id", { length: 100 }).notNull(),
     tourTitle:         varchar("tour_title", { length: 255 }).notNull(),
     tourDate:          date("tour_date").notNull(),
+    slotId:            uuid("slot_id").references(() => availabilitySlots.id, { onDelete: "set null" }),
+    isGuaranteed:      boolean("is_guaranteed").notNull().default(false),
     guests:            integer("guests").notNull().default(1),
     travelerName:      varchar("traveler_name", { length: 200 }).notNull(),
     phoneNumber:       varchar("phone_number", { length: 50 }).notNull(),
@@ -720,9 +803,17 @@ export const tourReservations = pgTable(
   (t) => [
     index("tour_res_status_idx").on(t.status),
     index("tour_res_date_idx").on(t.tourDate),
+    index("tour_res_slot_idx").on(t.slotId),
     uniqueIndex("tour_res_number_idx").on(t.reservationNumber),
   ]
 );
+
+export const tourReservationsRelations = relations(tourReservations, ({ one }) => ({
+  slot: one(availabilitySlots, {
+    fields: [tourReservations.slotId],
+    references: [availabilitySlots.id],
+  }),
+}));
 
 export const customItineraries = pgTable(
   "custom_itineraries",
@@ -880,6 +971,12 @@ export type NewAuditLog        = typeof auditLogs.$inferInsert;
 
 export type TourReservation    = typeof tourReservations.$inferSelect;
 export type NewTourReservation = typeof tourReservations.$inferInsert;
+
+export type SeatHold           = typeof seatHolds.$inferSelect;
+export type NewSeatHold        = typeof seatHolds.$inferInsert;
+
+export type TourWaitlist       = typeof tourWaitlist.$inferSelect;
+export type NewTourWaitlist    = typeof tourWaitlist.$inferInsert;
 
 export type CustomItinerary    = typeof customItineraries.$inferSelect;
 export type NewCustomItinerary = typeof customItineraries.$inferInsert;

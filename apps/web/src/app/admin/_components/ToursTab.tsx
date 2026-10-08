@@ -1,7 +1,9 @@
 "use client";
 
-import { Search, Compass, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Search, Compass, Trash2, Calendar, ShieldCheck } from "lucide-react";
 import type { TourItem } from "./types";
+import { TourDeparturesModal } from "./modals";
 
 interface ToursTabProps {
   adminT: any;
@@ -20,6 +22,8 @@ export function ToursTab({
   handleToggleTourActive,
   handleDeleteTour,
 }: ToursTabProps) {
+  const [selectedDeparturesTour, setSelectedDeparturesTour] = useState<TourItem | null>(null);
+
   const filteredTours = tours.filter(
     (t) =>
       t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -144,7 +148,14 @@ export function ToursTab({
                     {t.isActive ? adminT.toursTab.active : adminT.toursTab.inactive}
                   </button>
                 </td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-6 py-4 text-right flex items-center justify-end gap-1">
+                  <button
+                    onClick={() => setSelectedDeparturesTour(t)}
+                    className="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
+                    title="Manage Guaranteed Departures & Inventory"
+                  >
+                    <Calendar className="h-4 w-4" />
+                  </button>
                   <button
                     onClick={() => handleDeleteTour(t.id)}
                     className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
@@ -158,6 +169,12 @@ export function ToursTab({
           </tbody>
         </table>
       </div>
+
+      <TourDeparturesModal
+        isOpen={Boolean(selectedDeparturesTour)}
+        onClose={() => setSelectedDeparturesTour(null)}
+        tour={selectedDeparturesTour}
+      />
     </div>
   );
 }

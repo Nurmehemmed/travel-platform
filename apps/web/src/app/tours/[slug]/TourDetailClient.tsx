@@ -16,6 +16,7 @@ import { useSiteSettings } from "@/lib/settings-context";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { DatePicker } from "@/components/DatePicker";
+import { TourDeparturesPicker } from "@/components/TourDeparturesPicker";
 import { BrandLogo } from "@/components/BrandLogo";
 import { CURRENT_BRAND } from "@/lib/brand";
 
@@ -81,6 +82,7 @@ export default function TourDetailClient({ tour, relatedTours }: TourDetailClien
   };
 
   const [selectedDate, setSelectedDate] = useState<string>(getTomorrowString);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>(["lunch"]);
@@ -200,6 +202,7 @@ Please confirm guide availability and pickup details.`;
           tourId: tour.id,
           tourTitle: tour.title,
           tourDate: selectedDate,
+          slotId: selectedSlotId || undefined,
           guests: totalGuests,
           travelerName: fullName,
           phoneNumber: phone,
@@ -577,19 +580,18 @@ Please confirm guide availability and pickup details.`;
                 </div>
               </div>
 
-              {/* Date Selection */}
+              {/* Guaranteed Departures & Date Selection */}
               <div className="space-y-3 mb-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
-                    1. Select Travel Date
-                  </label>
-                  <DatePicker
-                    value={selectedDate}
-                    onChange={(d: string) => setSelectedDate(d)}
-                    minDate={new Date().toISOString().split("T")[0]}
-                    placeholder="Choose departure date"
-                  />
-                </div>
+                <TourDeparturesPicker
+                  tourId={tour.id}
+                  tourTitle={tour.title}
+                  selectedDate={selectedDate}
+                  onSelectDate={(date: string, slotId?: string | null) => {
+                    setSelectedDate(date);
+                    setSelectedSlotId(slotId || null);
+                  }}
+                  guestCount={totalGuests}
+                />
 
                 {/* Guests count */}
                 <div>
@@ -903,7 +905,14 @@ Please confirm guide availability and pickup details.`;
               </div>
             ) : (
               <div>
-                <h3 className="font-display text-xl font-bold text-slate-900 mb-1">Reserve Your Tour</h3>
+                <h3 className="font-display text-xl font-bold text-slate-900 mb-1 flex items-center justify-between">
+                  <span>Reserve Your Tour</span>
+                  {selectedSlotId && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                      <ShieldCheck className="h-3 w-3" /> Guaranteed
+                    </span>
+                  )}
+                </h3>
                 <p className="text-xs text-slate-500 mb-4">
                   {tour.title} · {formattedDateString} · {totalGuests} Guests
                 </p>

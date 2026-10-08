@@ -13,17 +13,23 @@ import { CustomSelect } from "@/components/CustomSelect";
 interface TourReservationModalProps {
   tour: { id: string; title: string; price: number } | null;
   onClose: () => void;
+  initialDate?: string;
+  initialSlotId?: string | null;
+  isGuaranteed?: boolean;
 }
 
 export function TourReservationModal({
   tour,
   onClose,
+  initialDate,
+  initialSlotId,
+  isGuaranteed,
 }: TourReservationModalProps) {
   const { t, language, showToast } = useLanguage();
   const { formatPrice, formatPriceWithSubtext } = useCurrency();
   const { settings } = useSettings();
 
-  const [bookingDate, setBookingDate] = useState("");
+  const [bookingDate, setBookingDate] = useState(initialDate || "");
   const [bookingGuests, setBookingGuests] = useState(2);
   const [bookingName, setBookingName] = useState("");
   const [bookingPhone, setBookingPhone] = useState("");
@@ -53,6 +59,7 @@ export function TourReservationModal({
           tourId: tour.id,
           tourTitle: tour.title,
           tourDate: bookingDate,
+          slotId: initialSlotId || undefined,
           guests: bookingGuests,
           travelerName: bookingName,
           phoneNumber: bookingPhone,
@@ -135,10 +142,15 @@ export function TourReservationModal({
           </div>
         ) : (
           <div>
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
               <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
                 {t.bookingModal.badge}
               </span>
+              {isGuaranteed && (
+                <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 flex items-center gap-1 border border-emerald-300/60">
+                  <ShieldCheck className="h-3 w-3" /> 100% Guaranteed Departure
+                </span>
+              )}
             </div>
             <h3 className="font-display text-xl font-bold text-slate-900 mb-1">
               {getLocalizedTour(tour, language).title}

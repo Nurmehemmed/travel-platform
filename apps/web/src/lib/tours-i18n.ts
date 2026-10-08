@@ -740,3 +740,140 @@ export function getLocalizedTour(tour: any, lang: LanguageCode): LocalizedTourRe
     tags: translatedTags,
   };
 }
+
+export interface GuaranteedToursTranslations {
+  guaranteedBadge: string;
+  guaranteedTooltip: string;
+  limitedAvailability: string;
+  onlySpotsLeft: (count: number) => string;
+  soldOut: string;
+  joinWaitlist: string;
+  selectDeparture: string;
+  customDateRequest: string;
+  customDateHint: string;
+  spotsLeft: (count: number) => string;
+  spotHeldBanner: (minutes: string) => string;
+  waitlistModalTitle: string;
+  waitlistModalSubtitle: string;
+  waitlistSuccess: string;
+  allGuaranteedTag: string;
+  instantConfirmation: string;
+  smallGroupCapped: (max: number) => string;
+}
+
+export const GUARANTEED_TOURS_I18N: Record<LanguageCode, GuaranteedToursTranslations> = {
+  EN: {
+    guaranteedBadge: "100% Guaranteed Departure",
+    guaranteedTooltip: "This departure date is 100% guaranteed to run regardless of the final group size. Book your flights with zero fear of cancellation.",
+    limitedAvailability: "Limited Availability",
+    onlySpotsLeft: (count) => `Only ${count} ${count === 1 ? "seat" : "seats"} left!`,
+    soldOut: "Sold Out",
+    joinWaitlist: "Join Priority Waitlist",
+    selectDeparture: "Select Guaranteed Departure Date",
+    customDateRequest: "Need a different date?",
+    customDateHint: "Request a custom departure date or private tour with your personal guide.",
+    spotsLeft: (count) => `${count} spots remaining`,
+    spotHeldBanner: (time) => `⏱️ Spot held for ${time} while you complete checkout`,
+    waitlistModalTitle: "Join Priority Departure Waitlist",
+    waitlistModalSubtitle: "If any seat opens up or a cancellation occurs, you will be notified immediately with a direct booking link.",
+    waitlistSuccess: "You have been added to the priority waitlist! We will notify you instantly.",
+    allGuaranteedTag: "Guaranteed Departures",
+    instantConfirmation: "Instant Confirmation",
+    smallGroupCapped: (max) => `Small Group (Max ${max})`,
+  },
+  AZ: {
+    guaranteedBadge: "100% Zəmanətli Çıxış",
+    guaranteedTooltip: "Bu turun çıxışı iştirakçı sayından asılı olmayaraq 100% zəmanətlidir. Uçuş və planlarınızı heç bir ləğv riski olmadan arxayınlıqla qura bilərsiniz.",
+    limitedAvailability: "Məhdud Yerlər",
+    onlySpotsLeft: (count) => `Cəmi ${count} yer qaldı!`,
+    soldOut: "Yerlər Bitdi",
+    joinWaitlist: "Gözləmə Siyahısına Qoşul",
+    selectDeparture: "Zəmanətli Çıxış Tarixini Seçin",
+    customDateRequest: "Fərqli tarix lazımdır?",
+    customDateHint: "Şəxsi bələdçinizlə xüsusi tarix və ya fərdi tur sifariş edin.",
+    spotsLeft: (count) => `${count} yer qalıb`,
+    spotHeldBanner: (time) => `⏱️ Rezervasiyanız tamamlanana qədər yeriniz ${time} saxlanılır`,
+    waitlistModalTitle: "Prioritet Gözləmə Siyahısına Qoşulun",
+    waitlistModalSubtitle: "Hər hansı yer boşaldıqda və ya ləğv olduqda dərhal sizə birbaşa rezervasiya linki göndəriləcək.",
+    waitlistSuccess: "Gözləmə siyahısına uğurla əlavə olundunuz! Yer açılan kimi sizə xəbər verəcəyik.",
+    allGuaranteedTag: "Zəmanətli Turlar",
+    instantConfirmation: "Dərhal Təsdiq",
+    smallGroupCapped: (max) => `Kiçik Qrup (Maks. ${max})`,
+  },
+  RU: {
+    guaranteedBadge: "100% Гарантированный выезд",
+    guaranteedTooltip: "Выезд по этой дате 100% состоится независимо от числа участников. Бронируйте перелеты и отели с полной уверенностью.",
+    limitedAvailability: "Ограниченное кол-во мест",
+    onlySpotsLeft: (count) => `Осталось всего ${count} ${count === 1 ? "место" : "мест"}!`,
+    soldOut: "Мест нет",
+    joinWaitlist: "В лист ожидания",
+    selectDeparture: "Выберите гарантированную дату",
+    customDateRequest: "Нужна другая дата?",
+    customDateHint: "Запросите индивидуальную дату тура с персональным гидом.",
+    spotsLeft: (count) => `Осталось мест: ${count}`,
+    spotHeldBanner: (time) => `⏱️ Место зарезервировано на ${time} для оплаты`,
+    waitlistModalTitle: "Приоритетный лист ожидания",
+    waitlistModalSubtitle: "Если освободится место или будет отмена, мы мгновенно вышлем вам персональную ссылку для брони.",
+    waitlistSuccess: "Вы добавлены в лист ожидания! Мы свяжемся с вами сразу при открытии мест.",
+    allGuaranteedTag: "Гарантированные туры",
+    instantConfirmation: "Моментальное подтверждение",
+    smallGroupCapped: (max) => `Малая группа (до ${max} чел)`,
+  },
+  AR: {
+    guaranteedBadge: "انطلاق مضمون 100%",
+    guaranteedTooltip: "انطلاق هذه الرحلة مضمون بنسبة 100% بغض النظر عن عدد المشاركين. احجز رحلتك بثقة تامة.",
+    limitedAvailability: "مقاعد محدودة",
+    onlySpotsLeft: (count) => `باقٍ ${count} مقاعد فقط!`,
+    soldOut: "نفدت المقاعد",
+    joinWaitlist: "الانضمام لقائمة الانتظار",
+    selectDeparture: "اختر تاريخ المغادرة المضمون",
+    customDateRequest: "هل ترغب في تاريخ آخر؟",
+    customDateHint: "اطلب موعداً خاصاً أو جولة مخصصة مع مرشدك السياحي.",
+    spotsLeft: (count) => `${count} مقاعد متبقية`,
+    spotHeldBanner: (time) => `⏱️ تم حجز مقعدك لمدة ${time} لإتمام الدفع`,
+    waitlistModalTitle: "الانضمام لقائمة الانتظار ذات الأولوية",
+    waitlistModalSubtitle: "في حال توفر مقعد أو إلغاء حجز، سنرسل إليك فوراً رابط حجز مباشر.",
+    waitlistSuccess: "تمت إضافتك بنجاح إلى قائمة الانتظار! سنبلغك بمجرد توفر المقاعد.",
+    allGuaranteedTag: "رحلات مضمونة",
+    instantConfirmation: "تأكيد فوري",
+    smallGroupCapped: (max) => `مجموعة صغيرة (أقصى ${max})`,
+  },
+  FR: {
+    guaranteedBadge: "Départ 100% Garanti",
+    guaranteedTooltip: "Cette date de départ est garantie à 100%, quel que soit le nombre final de participants. Réservez vos vols en toute sérénité.",
+    limitedAvailability: "Places limitées",
+    onlySpotsLeft: (count) => `Plus que ${count} ${count === 1 ? "place" : "places"} !`,
+    soldOut: "Complet",
+    joinWaitlist: "Rejoindre la liste d'attente",
+    selectDeparture: "Sélectionnez une date de départ garantie",
+    customDateRequest: "Besoin d'une autre date ?",
+    customDateHint: "Demandez une date personnalisée ou un tour privé avec votre guide.",
+    spotsLeft: (count) => `${count} places restantes`,
+    spotHeldBanner: (time) => `⏱️ Place réservée pendant ${time} pour finaliser le paiement`,
+    waitlistModalTitle: "Liste d'attente prioritaire",
+    waitlistModalSubtitle: "Si une place se libère ou en cas d'annulation, vous serez immédiatement informé avec un lien de réservation direct.",
+    waitlistSuccess: "Vous avez été ajouté à la liste d'attente prioritaire ! Nous vous contacterons dès qu'une place se libère.",
+    allGuaranteedTag: "Départs Garantis",
+    instantConfirmation: "Confirmation instantanée",
+    smallGroupCapped: (max) => `Petit groupe (max ${max})`,
+  },
+  DE: {
+    guaranteedBadge: "100% Garantierte Durchführung",
+    guaranteedTooltip: "Dieses Abreisedatum ist zu 100% garantiert, unabhängig von der endgültigen Teilnehmerzahl. Buchen Sie Ihre Flüge ohne Stornierungsrisiko.",
+    limitedAvailability: "Begrenzte Plätze",
+    onlySpotsLeft: (count) => `Nur noch ${count} ${count === 1 ? "Platz" : "Plätze"} verfügbar!`,
+    soldOut: "Ausgebucht",
+    joinWaitlist: "Auf die Warteliste setzen",
+    selectDeparture: "Garantiertes Abreisedatum wählen",
+    customDateRequest: "Anderes Datum gewünscht?",
+    customDateHint: "Fragen Sie ein individuelles Datum oder eine Privattour mit persönlichem Guide an.",
+    spotsLeft: (count) => `Noch ${count} Plätze verfügbar`,
+    spotHeldBanner: (time) => `⏱️ Platz für ${time} reserviert zum Abschluss der Buchung`,
+    waitlistModalTitle: "Prioritäts-Warteliste beitreten",
+    waitlistModalSubtitle: "Sobald ein Platz frei wird oder eine Stornierung erfolgt, werden Sie sofort mit einem direkten Buchungslink benachrichtigt.",
+    waitlistSuccess: "Sie wurden erfolgreich zur Warteliste hinzugefügt! Wir benachrichtigen Sie sofort bei freien Plätzen.",
+    allGuaranteedTag: "Garantierte Abreisen",
+    instantConfirmation: "Sofortige Bestätigung",
+    smallGroupCapped: (max) => `Kleine Gruppe (max. ${max})`,
+  },
+};

@@ -5,3 +5,4 @@ export * from "./TourReservationModal";
 export * from "./DestinationModal";
 export * from "./LightboxModal";
 export * from "./TransferZonesModal";
+export * from "./TourDeparturesModal";

@@ -41,39 +41,21 @@ export async function GET(req: Request) {
     );
   }
 
+  let finalResult: { reservation: any; isAutoGuaranteed: boolean } | null = null;
+  try {
+    const { tourService } = await import("@/services/tour.service");
+    finalResult = await tourService.finalizeConfirmedPayment(reservationNumber, orderId);
+  } catch (err: any) {
+    console.error("finalizeConfirmedPayment error in tour-callback:", err);
+  }
+
   const existingRes = await db.query.tourReservations.findFirst({
     where: eq(tourReservations.reservationNumber, reservationNumber),
   });
 
-  const isDeposit =
-    existingRes?.paymentMethod === "partial_deposit" ||
-    Number(existingRes?.remainingAmount || 0) > 0;
-  const newPaymentStatus = isDeposit ? "deposit_paid" : "paid";
+  const resRecord = finalResult?.reservation || existingRes;
 
-  // Atomic idempotent update
-  const updated = await db.transaction(async (tx) => {
-    const [row] = await tx
-      .update(tourReservations)
-      .set({
-        paymentStatus: newPaymentStatus,
-        status: "confirmed",
-        payriffOrderId: orderId,
-        adminNotes: `Payriff Order verified: ${orderId || "OK"}${isDeposit ? ` (Deposit $${existingRes?.depositAmount} received)` : ""}`,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(tourReservations.reservationNumber, reservationNumber),
-          ne(tourReservations.paymentStatus, newPaymentStatus)
-        )
-      )
-      .returning();
-    return row;
-  });
-
-  const resRecord = updated || existingRes;
-
-  if (updated && resRecord) {
+  if (resRecord) {
     // Fire Telegram tour alert only on initial transition to paid/deposit_paid
     sendTelegramTourAlert({
       reservationNumber: resRecord.reservationNumber,
@@ -88,6 +70,7 @@ export async function GET(req: Request) {
       remainingAmount: resRecord.remainingAmount,
       paymentMethod: resRecord.paymentMethod as any,
       paymentStatus: resRecord.paymentStatus,
+      isGuaranteed: resRecord.isGuaranteed,
     }).catch(console.error);
   }
 
@@ -128,31 +111,14 @@ export async function POST(req: Request) {
       where: eq(tourReservations.reservationNumber, reservationNumber),
     });
 
-    const isDeposit =
-      existingRes?.paymentMethod === "partial_deposit" ||
-      Number(existingRes?.remainingAmount || 0) > 0;
-    const newPaymentStatus = isDeposit ? "deposit_paid" : "paid";
-
-    // Atomic idempotent update
-    const updated = await db.transaction(async (tx) => {
-      const [row] = await tx
-        .update(tourReservations)
-        .set({
-          paymentStatus: newPaymentStatus,
-          status: "confirmed",
-          payriffOrderId: orderId,
-          adminNotes: `Payriff Webhook Verified: Order ${orderId} (${check.rawStatus || "APPROVED"})${isDeposit ? ` (Deposit $${existingRes?.depositAmount} received)` : ""}`,
-          updatedAt: new Date(),
-        })
-        .where(
-          and(
-            eq(tourReservations.reservationNumber, reservationNumber),
-            ne(tourReservations.paymentStatus, newPaymentStatus)
-          )
-        )
-        .returning();
-      return row;
-    });
+    let updated: any = null;
+    try {
+      const { tourService } = await import("@/services/tour.service");
+      const finalResult = await tourService.finalizeConfirmedPayment(reservationNumber, orderId);
+      updated = finalResult.reservation;
+    } catch (err: any) {
+      console.error("finalizeConfirmedPayment error in POST webhook:", err);
+    }
 
     if (updated) {
       sendTelegramTourAlert({
@@ -168,6 +134,7 @@ export async function POST(req: Request) {
         remainingAmount: updated.remainingAmount,
         paymentMethod: updated.paymentMethod as any,
         paymentStatus: updated.paymentStatus,
+        isGuaranteed: updated.isGuaranteed,
       }).catch(console.error);
     }
 

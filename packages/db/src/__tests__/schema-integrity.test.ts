@@ -19,6 +19,9 @@ import {
   transferPaymentMethodEnum,
   transferStatusEnum,
   slotStatusEnum,
+  availabilitySlots,
+  seatHolds,
+  tourWaitlist,
 } from "../schema";
 
 describe("Database Schema Integrity Suite", () => {
@@ -53,7 +56,11 @@ describe("Database Schema Integrity Suite", () => {
       expect(transferVehicleEnum.enumValues).toContain("suv");
       expect(transferVehicleEnum.enumValues).toContain("minivan");
       expect(transferVehicleEnum.enumValues).toContain("sprinter");
-      expect(transferPaymentMethodEnum.enumValues).toEqual(["online", "on_arrival"]);
+      expect(transferPaymentMethodEnum.enumValues).toEqual([
+        "online",
+        "on_arrival",
+        "partial_deposit",
+      ]);
       expect(transferStatusEnum.enumValues).toEqual([
         "pending",
         "confirmed",
@@ -139,6 +146,46 @@ describe("Database Schema Integrity Suite", () => {
       expect(cols.travelerName).toBeDefined();
       expect(cols.phoneNumber).toBeDefined();
       expect(cols.price).toBeDefined();
+      expect(cols.status).toBeDefined();
+      expect(cols.slotId).toBeDefined();
+      expect(cols.isGuaranteed).toBeDefined();
+    });
+
+    it("verifies availability_slots table contains capacity and guaranteed departure fields", () => {
+      const cols = getTableColumns(availabilitySlots);
+      expect(cols.id).toBeDefined();
+      expect(cols.packageId).toBeDefined();
+      expect(cols.departureDate).toBeDefined();
+      expect(cols.returnDate).toBeDefined();
+      expect(cols.totalSeats).toBeDefined();
+      expect(cols.availableSeats).toBeDefined();
+      expect(cols.lockedSeats).toBeDefined();
+      expect(cols.isGuaranteed).toBeDefined();
+      expect(cols.minParticipants).toBeDefined();
+      expect(cols.cutoffHours).toBeDefined();
+      expect(cols.meetingTime).toBeDefined();
+      expect(cols.status).toBeDefined();
+    });
+
+    it("verifies seat_holds table contains temporary reservation lock fields", () => {
+      const cols = getTableColumns(seatHolds);
+      expect(cols.id).toBeDefined();
+      expect(cols.slotId).toBeDefined();
+      expect(cols.sessionId).toBeDefined();
+      expect(cols.seats).toBeDefined();
+      expect(cols.expiresAt).toBeDefined();
+      expect(cols.status).toBeDefined();
+    });
+
+    it("verifies tour_waitlist table contains demand capture fields", () => {
+      const cols = getTableColumns(tourWaitlist);
+      expect(cols.id).toBeDefined();
+      expect(cols.tourId).toBeDefined();
+      expect(cols.desiredDate).toBeDefined();
+      expect(cols.guests).toBeDefined();
+      expect(cols.travelerName).toBeDefined();
+      expect(cols.email).toBeDefined();
+      expect(cols.phoneNumber).toBeDefined();
       expect(cols.status).toBeDefined();
     });
 

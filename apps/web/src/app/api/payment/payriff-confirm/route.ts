@@ -208,16 +208,11 @@ export async function POST(req: Request) {
 
       const baseAdminNote = `Payment confirmed via Payriff (${orderId || "Direct"}). ${simulated ? "[Sandbox Simulation]" : "[Live Gateway]"}${isDeposit ? ` (Deposit $${reservation.depositAmount} Paid, Remaining $${reservation.remainingAmount} Due)` : ""}`;
 
-      await db
-        .update(tourReservations)
-        .set({
-          paymentStatus: targetPaymentStatus,
-          status: "confirmed",
-          payriffOrderId: orderId || `PR-SANDBOX-${reservation.reservationNumber}`,
-          adminNotes: reservation.adminNotes ? `${reservation.adminNotes} | ${baseAdminNote}` : baseAdminNote,
-          updatedAt: new Date(),
-        })
-        .where(eq(tourReservations.reservationNumber, applicationNumber));
+      const { tourService } = await import("@/services/tour.service");
+      const { reservation: updatedRes } = await tourService.finalizeConfirmedPayment(
+        applicationNumber,
+        orderId || `PR-SANDBOX-${reservation.reservationNumber}`
+      );
 
       await recordAuditLog({
         action: "payment.confirmed",
@@ -233,6 +228,7 @@ export async function POST(req: Request) {
           depositAmount: reservation.depositAmount,
           remainingAmount: reservation.remainingAmount,
           paymentStatus: targetPaymentStatus,
+          isGuaranteed: updatedRes?.isGuaranteed,
           simulated: !!simulated,
         },
       });
@@ -250,6 +246,7 @@ export async function POST(req: Request) {
         remainingAmount: reservation.remainingAmount,
         paymentMethod: reservation.paymentMethod as any,
         paymentStatus: targetPaymentStatus,
+        isGuaranteed: updatedRes?.isGuaranteed,
       }).catch((err) => logger.warn("Telegram tour alert failed", { err: err?.message }));
 
       return NextResponse.json({

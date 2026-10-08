@@ -17,6 +17,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { BrandLogo } from "@/components/BrandLogo";
 import { CURRENT_BRAND } from "@/lib/brand";
+import { GUARANTEED_TOURS_I18N } from "@/lib/tours-i18n";
 
 interface DestinationDetailClientProps {
   destination: DestinationDetailData;
@@ -27,10 +28,11 @@ export default function DestinationDetailClient({
   destination,
   tours,
 }: DestinationDetailClientProps) {
-  const { t, isRtl } = useLanguage();
+  const { t, isRtl, language } = useLanguage();
   const { formatPrice, formatPriceWithSubtext } = useCurrency();
   const { settings } = useSiteSettings();
   const [isScrolled, setIsScrolled] = useState(false);
+  const gtI18n = GUARANTEED_TOURS_I18N[language] || GUARANTEED_TOURS_I18N.EN;
 
 
   useEffect(() => {
@@ -283,11 +285,17 @@ export default function DestinationDetailClient({
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  {tour.badge && (
-                    <span className="absolute top-3 left-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-amber-500 text-slate-900">
-                      {tour.badge}
+                  <div className="absolute top-3 left-3 flex flex-col gap-1 items-start">
+                    {tour.badge && (
+                      <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-amber-500 text-slate-900 shadow-xs">
+                        {tour.badge}
+                      </span>
+                    )}
+                    <span className="rounded-full px-2 py-0.5 text-[9.5px] font-bold bg-emerald-600/90 text-white shadow-xs flex items-center gap-1 backdrop-blur-xs">
+                      <ShieldCheck className="h-2.5 w-2.5" />
+                      <span>{gtI18n.allGuaranteedTag}</span>
                     </span>
-                  )}
+                  </div>
                 </div>
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-center gap-1 text-xs font-bold text-slate-800 mb-1.5">
@@ -299,7 +307,10 @@ export default function DestinationDetailClient({
                     {tour.title}
                   </h3>
                   <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs text-slate-500 font-medium">{tour.duration}</span>
+                    <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                      <span>{gtI18n.instantConfirmation}</span>
+                    </span>
                     <span className="text-lg font-black text-slate-900">{formatPrice(tour.price)}</span>
                   </div>
                 </div>

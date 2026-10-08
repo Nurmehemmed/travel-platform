@@ -36,6 +36,7 @@ export async function POST(req: Request) {
       depositAmount: result.depositAmount,
       remainingAmount: result.remainingAmount,
       breakdown: result.breakdown,
+      isGuaranteed: result.isGuaranteed,
     });
   } catch (error: any) {
     log.error("Failed to create tour reservation", error);

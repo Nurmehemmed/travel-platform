@@ -115,5 +115,62 @@ describe("TourService Domain Logic", () => {
       expect(res.isPartial).toBe(false);
     });
   });
+
+  describe("Guaranteed Departures & Limited Availability Inventory", () => {
+    it("generates intelligent upcoming departures schedule with guaranteed flags", async () => {
+      const departures = await tourService.getTourDepartures("baku-old-city-walking-tour");
+      expect(departures.length).toBeGreaterThan(0);
+
+      const first = departures[0]!;
+      expect(first).toBeDefined();
+      expect(first.totalSeats).toBeGreaterThan(0);
+      expect(first.availableSeats).toBeGreaterThan(0);
+      expect(typeof first.isGuaranteed).toBe("boolean");
+      expect(typeof first.isAlmostFull).toBe("boolean");
+      expect(first.meetingTime).toBeDefined();
+    });
+
+    it("atomically calculates 15-minute seat hold expiration for checkout sessions", async () => {
+      const hold = await tourService.holdSeats({
+        slotId: "virtual-slot-baku-old-city-walking-tour-2026-07-01",
+        guests: 2,
+        sessionId: "SESSION-TEST-12345",
+      });
+
+      expect(hold.success).toBe(true);
+      expect(hold.expiresAt.getTime()).toBeGreaterThan(Date.now() + 14 * 60 * 1000);
+      expect(hold.expiresAt.getTime()).toBeLessThanOrEqual(Date.now() + 16 * 60 * 1000);
+    });
+
+    it("validates reservation with slotId correctly", async () => {
+      const validation = await tourService.validateReservation({
+        tourId: "t1",
+        tourTitle: "Baku Old City Walking Tour",
+        tourDate: "2026-06-20",
+        slotId: "virtual-slot-t1-2026-06-20",
+        guests: 2,
+        travelerName: "Alice Walker",
+        phoneNumber: "+994501234567",
+        price: 25,
+      });
+
+      expect(validation.valid).toBe(true);
+      expect(validation.trustedUnitPrice).toBe(25);
+    });
+
+    it("rejects waitlist submission when required contact details are missing", async () => {
+      await expect(
+        tourService.joinWaitlist({
+          tourId: "t1",
+          tourTitle: "",
+          desiredDate: "2026-06-20",
+          guests: 2,
+          travelerName: "",
+          email: "",
+          phoneNumber: "",
+        })
+      ).rejects.toThrow("Missing required waitlist");
+    });
+  });
 });
 

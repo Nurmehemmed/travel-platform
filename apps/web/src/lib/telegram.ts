@@ -264,6 +264,7 @@ export interface TourTelegramAlertPayload {
   remainingAmount?: number | string | null | undefined;
   paymentMethod: "online" | "on_arrival" | "partial_deposit";
   paymentStatus?: string | null | undefined;
+  isGuaranteed?: boolean | undefined;
 }
 
 /**
@@ -298,12 +299,16 @@ export async function sendTelegramTourAlert(
       ? `\n💳 <b>Down Payment Received:</b> $${Number(payload.depositAmount || 0).toFixed(2)}\n💵 <b>Cash to Collect from Traveler:</b> $${Number(payload.remainingAmount || 0).toFixed(2)}`
       : "";
 
+  const guaranteedBadge = payload.isGuaranteed
+    ? `\n🛡️ <b>Departure Guarantee:</b> 🟢 100% GUARANTEED TO RUN`
+    : "";
+
   const text = `
 🏛️ <b>NEW TOUR RESERVATION</b>
 
 🆔 <b>Reservation Ref:</b> <code>${payload.reservationNumber}</code>
 🏷️ <b>Tour:</b> ${escapeHtml(payload.tourTitle)}
-📅 <b>Date:</b> ${payload.tourDate}
+📅 <b>Date:</b> ${payload.tourDate}${guaranteedBadge}
 👥 <b>Guests:</b> ${payload.guests}
 
 👤 <b>Lead Traveler:</b> ${escapeHtml(payload.travelerName)}
@@ -336,6 +341,68 @@ ${payload.email ? `📧 <b>Email:</b> ${escapeHtml(payload.email)}` : ""}
     return true;
   } catch (error) {
     console.error("[Telegram Tour Alert dispatch failed]:", error);
+    return false;
+  }
+}
+
+// ─── Tour Waitlist Alert ─────────────────────────────────────────────────────
+
+export interface WaitlistTelegramAlertPayload {
+  tourTitle: string;
+  desiredDate: string;
+  guests: number;
+  travelerName: string;
+  email: string;
+  phoneNumber: string;
+  notes?: string | null;
+}
+
+export async function sendTelegramWaitlistAlert(
+  payload: WaitlistTelegramAlertPayload
+): Promise<boolean> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!botToken || !chatId) {
+    console.log(
+      `[Telegram Waitlist Alert] (not configured): Waitlist for ${payload.tourTitle} by ${payload.travelerName}`
+    );
+    return false;
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  const text = `
+🔔⚡ <b>NEW TOUR WAITLIST SIGNUP</b>
+
+🏷️ <b>Tour:</b> ${escapeHtml(payload.tourTitle)}
+📅 <b>Desired Date:</b> ${payload.desiredDate}
+👥 <b>Guests:</b> ${payload.guests}
+
+👤 <b>Traveler:</b> ${escapeHtml(payload.travelerName)}
+📱 <b>Phone:</b> ${escapeHtml(payload.phoneNumber)}
+📧 <b>Email:</b> ${escapeHtml(payload.email)}
+${payload.notes ? `📝 <b>Notes:</b> ${escapeHtml(payload.notes)}` : ""}
+
+👉 <a href="${appUrl}/admin">Open Admin Portal to Manage Capacity</a>
+`;
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(5000),
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      }),
+    });
+
+    return res.ok;
+  } catch (error) {
+    console.error("[Telegram Waitlist Alert error]:", error);
     return false;
   }
 }

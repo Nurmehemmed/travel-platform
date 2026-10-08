@@ -111,6 +111,11 @@ export const BookingsTab: React.FC<BookingsTabProps> = ({
                       <span className="text-[11px] text-slate-500 block mt-0.5 font-medium">
                         📅 {r.tourDate}
                       </span>
+                      {r.isGuaranteed && (
+                        <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-0.5">
+                          🛡️ Guaranteed
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-4 font-semibold text-slate-800 max-w-[200px] truncate">
                       {r.tourTitle}

@@ -7,7 +7,7 @@ import { Clock, Users, Star, ArrowRight, Heart, MapPin, Sparkles, Zap, Shield, B
 import { useLanguage } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency-context";
 import { useSiteSettings } from "@/lib/settings-context";
-import { getLocalizedTour } from "@/lib/tours-i18n";
+import { getLocalizedTour, GUARANTEED_TOURS_I18N } from "@/lib/tours-i18n";
 import { TourCardsSkeleton } from "@/components/Skeletons";
 import { CURRENT_BRAND } from "@/lib/brand";
 import { TOUR_FILTERS } from "./data";
@@ -38,6 +38,7 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
   const { settings: siteConfig } = useSiteSettings();
   const filteredTours = toursList;
   const setBookingModalTour = onBookTour;
+  const gtI18n = GUARANTEED_TOURS_I18N[language] || GUARANTEED_TOURS_I18N.EN;
 
   return (
 <section id="tours" className="py-16" style={{ backgroundColor: "#f0f9ff" }}>
@@ -137,16 +138,22 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                       style={{ objectFit: "cover" }}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    {/* Badge */}
-                    {tourBadge && (
-                      <span
-                        className={`absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold ${
-                          tour.badgeColor?.includes("text-") ? "" : "text-white"
-                        } ${tour.badgeColor}`}
-                      >
-                        {tourBadge}
+                    {/* Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start z-10 pointer-events-none">
+                      {tourBadge && (
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            tour.badgeColor?.includes("text-") ? "" : "text-white"
+                          } ${tour.badgeColor}`}
+                        >
+                          {tourBadge}
+                        </span>
+                      )}
+                      <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-emerald-600/95 text-white shadow-sm flex items-center gap-1 backdrop-blur-xs border border-emerald-400/30">
+                        <Shield className="h-2.5 w-2.5 fill-emerald-200/20" />
+                        <span>{gtI18n.allGuaranteedTag}</span>
                       </span>
-                    )}
+                    </div>
 
                     {/* TripAdvisor-style "Top Rated Experience" badge */}
                     {tour.rating >= 4.8 && (
@@ -220,11 +227,15 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                     {/* TripAdvisor & GetYourGuide Trust Triggers */}
                     <div className="flex flex-col gap-1.5 py-2.5 my-1.5 border-y border-slate-100 text-[11px] bg-slate-50/70 -mx-6 px-6">
                       <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                        <Shield className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                        <span>{gtI18n.guaranteedBadge} · Limited Seats</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-700 font-semibold text-[10.5px]">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                         <span>Free cancellation (up to 24h prior)</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-sky-800 font-semibold text-[10.5px]">
-                        <Shield className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+                        <Zap className="h-3.5 w-3.5 text-sky-600 shrink-0" />
                         <span>Reserve now & pay on tour day</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-600 font-medium text-[10.5px]">

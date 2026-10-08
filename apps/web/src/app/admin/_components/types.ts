@@ -160,6 +160,8 @@ export interface TourReservationItem {
   paymentMethod?: "online" | "on_arrival" | "partial_deposit" | null;
   paymentStatus?: "pending" | "deposit_paid" | "paid" | "failed" | null;
   payriffOrderId?: string | null;
+  slotId?: string | null;
+  isGuaranteed?: boolean;
   status: "pending" | "confirmed" | "completed" | "cancelled";
   guideName?: string | null;
   guidePhone?: string | null;
