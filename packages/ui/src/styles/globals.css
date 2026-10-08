@@ -47,22 +47,51 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #f0f9ff;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
     background: #93c5fd;
     border-radius: 9999px;
-    border: 2px solid #f0f9ff;
-    transition: background-color 0.25s ease, border-color 0.25s ease;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.25s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
     background: #0284c7;
+    background-clip: content-box;
   }
 
   ::-webkit-scrollbar-thumb:active {
     background: #0f3460;
+    background-clip: content-box;
+  }
+
+  /* ── Sleek Modal & Inset Scrollbar ── */
+  .modal-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .modal-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .modal-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .modal-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+    border: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .modal-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
   }
 
   body {

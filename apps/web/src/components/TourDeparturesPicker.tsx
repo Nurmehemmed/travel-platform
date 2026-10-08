@@ -40,6 +40,7 @@ export function TourDeparturesPicker({
   const [loading, setLoading] = useState(true);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [showCustomDate, setShowCustomDate] = useState(false);
+  const [showAllSlots, setShowAllSlots] = useState(false);
   const [waitlistModalSlot, setWaitlistModalSlot] = useState<TourDepartureSlot | null>(null);
   const [showGuaranteeInfo, setShowGuaranteeInfo] = useState(false);
 
@@ -145,65 +146,79 @@ export function TourDeparturesPicker({
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          {departures.slice(0, 6).map((slot) => {
-            const isSelected = selectedSlotId === slot.id && !showCustomDate;
-            const isFewLeft = slot.isAlmostFull;
-            const isSoldOut = slot.isSoldOut;
+        <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {(showAllSlots ? departures.slice(0, 10) : departures.slice(0, 4)).map((slot) => {
+              const isSelected = selectedSlotId === slot.id && !showCustomDate;
+              const isFewLeft = slot.isAlmostFull;
+              const isSoldOut = slot.isSoldOut;
 
-            return (
-              <div
-                key={slot.id}
-                onClick={() => handleSelectSlot(slot)}
-                className={`relative p-3 rounded-xl border text-left transition-all duration-150 cursor-pointer select-none ${
-                  isSelected
-                    ? "border-[#0f3460] bg-blue-50/60 shadow-sm ring-1 ring-[#0f3460]"
-                    : isSoldOut
-                    ? "border-slate-200 bg-slate-50/80 opacity-75 hover:border-slate-300"
-                    : "border-slate-200 bg-white hover:border-[#0f3460]/40 hover:bg-slate-50/50"
-                }`}
+              return (
+                <div
+                  key={slot.id}
+                  onClick={() => handleSelectSlot(slot)}
+                  className={`relative p-2.5 sm:p-3 rounded-xl border text-left transition-all duration-150 cursor-pointer select-none ${
+                    isSelected
+                      ? "border-[#0f3460] bg-blue-50/60 shadow-sm ring-1 ring-[#0f3460]"
+                      : isSoldOut
+                      ? "border-slate-200 bg-slate-50/80 opacity-75 hover:border-slate-300"
+                      : "border-slate-200 bg-white hover:border-[#0f3460]/40 hover:bg-slate-50/50"
+                  }`}
+                >
+                  {/* Top row: Date & Guaranteed badge */}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900">
+                      {formatDateDisplay(slot.departureDate)}
+                    </span>
+
+                    {slot.isGuaranteed ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-300/40">
+                        <ShieldCheck className="h-3 w-3" /> Guaranteed
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-medium">Scheduled</span>
+                    )}
+                  </div>
+
+                  {/* Bottom row: Time & Live Seat Scarcity */}
+                  <div className="mt-1.5 flex items-center justify-between text-[11px]">
+                    <span className="text-slate-500 flex items-center gap-1 font-mono">
+                      <Clock className="h-3 w-3 text-slate-400" />
+                      {slot.meetingTime}
+                    </span>
+
+                    {isSoldOut ? (
+                      <span className="font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200/50">
+                        Sold Out · Waitlist
+                      </span>
+                    ) : isFewLeft ? (
+                      <span className="font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/60 flex items-center gap-1 animate-pulse">
+                        <Zap className="h-3 w-3 fill-amber-500 text-amber-500" />
+                        {text.onlySpotsLeft(slot.availableSeats)}
+                      </span>
+                    ) : (
+                      <span className="text-slate-600 font-medium flex items-center gap-1">
+                        <Users className="h-3 w-3 text-slate-400" />
+                        {slot.availableSeats} spots left
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {departures.length > 4 && (
+            <div className="text-center pt-0.5">
+              <button
+                type="button"
+                onClick={() => setShowAllSlots(!showAllSlots)}
+                className="text-[11px] font-semibold text-[#0f3460] hover:underline cursor-pointer"
               >
-                {/* Top row: Date & Guaranteed badge */}
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-xs sm:text-sm text-slate-900">
-                    {formatDateDisplay(slot.departureDate)}
-                  </span>
-
-                  {slot.isGuaranteed ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-300/40">
-                      <ShieldCheck className="h-3 w-3" /> Guaranteed
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-slate-400 font-medium">Scheduled</span>
-                  )}
-                </div>
-
-                {/* Bottom row: Time & Live Seat Scarcity */}
-                <div className="mt-2 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 flex items-center gap-1 font-mono">
-                    <Clock className="h-3 w-3 text-slate-400" />
-                    {slot.meetingTime}
-                  </span>
-
-                  {isSoldOut ? (
-                    <span className="font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-200/50">
-                      Sold Out · Waitlist
-                    </span>
-                  ) : isFewLeft ? (
-                    <span className="font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/60 flex items-center gap-1 animate-pulse">
-                      <Zap className="h-3 w-3 fill-amber-500 text-amber-500" />
-                      {text.onlySpotsLeft(slot.availableSeats)}
-                    </span>
-                  ) : (
-                    <span className="text-slate-600 font-medium flex items-center gap-1">
-                      <Users className="h-3 w-3 text-slate-400" />
-                      {slot.availableSeats} spots left
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                {showAllSlots ? "Show fewer dates" : `+ View ${departures.length - 4} more upcoming dates`}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

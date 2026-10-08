@@ -102,24 +102,23 @@ export function TourReservationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl p-6 sm:p-8 shadow-2xl bg-white border border-slate-200 animate-scale-up">
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
+      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col rounded-3xl shadow-2xl bg-white border border-slate-200 animate-scale-up overflow-hidden">
         {bookingSuccess ? (
-          <div className="text-center py-6">
+          <div className="text-center p-6 sm:p-8 relative">
+            <button
+              onClick={onClose}
+              className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 mb-4">
               <Check className="h-8 w-8" />
             </div>
@@ -143,42 +142,55 @@ export function TourReservationModal({
             </button>
           </div>
         ) : (
-          <div>
-            <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
-                {t.bookingModal.badge}
-              </span>
-              {(isGuaranteed || isSlotGuaranteed || Boolean(selectedSlotId)) && (
-                <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 flex items-center gap-1 border border-emerald-300/60">
-                  <ShieldCheck className="h-3 w-3" /> 100% Guaranteed Departure
-                </span>
-              )}
-            </div>
-            <h3 className="font-display text-xl font-bold text-slate-900 mb-1">
-              {getLocalizedTour(tour, language).title}
-            </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              {t.bookingModal.subtitle}
-            </p>
+          <>
+            {/* Fixed Header */}
+            <div className="shrink-0 p-5 sm:p-6 pb-3 border-b border-slate-100 bg-white relative">
+              <button
+                onClick={onClose}
+                className="absolute top-5 right-5 z-20 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
 
-            {/* Zero-Risk Reassurance Banner */}
-            <div className="rounded-2xl bg-emerald-50 border border-emerald-200/80 p-3 mb-4 flex items-start gap-2.5">
-              <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-              <div className="text-xs text-emerald-950">
-                <span className="font-extrabold block text-emerald-900">
-                  {paymentMethod === "online"
-                    ? `Lock In Your Spot with ${depositPercent}% Down Payment`
-                    : "Zero Prepayment Required"}
+              <div className="flex items-center gap-2 mb-2 flex-wrap pr-8">
+                <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
+                  {t.bookingModal.badge}
                 </span>
-                <p className="text-[11px] text-emerald-800 leading-tight mt-0.5">
-                  {paymentMethod === "online"
-                    ? `Pay just ${formatPrice(breakdown.depositAmount)} now to secure your guide. Pay remaining ${formatPrice(breakdown.remainingAmount)} on tour day.`
-                    : `Hold your date with zero deposit. Pay ${formatPrice(tour.price)} in cash or card to your guide upon pickup.`}
-                </p>
+                {(isGuaranteed || isSlotGuaranteed || Boolean(selectedSlotId)) && (
+                  <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 flex items-center gap-1 border border-emerald-300/60">
+                    <ShieldCheck className="h-3 w-3" /> 100% Guaranteed Departure
+                  </span>
+                )}
               </div>
+              <h3 className="font-display text-xl font-bold text-slate-900 pr-8">
+                {getLocalizedTour(tour, language).title}
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {t.bookingModal.subtitle}
+              </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 pt-3 space-y-3.5 modal-scrollbar">
+              {/* Zero-Risk Reassurance Banner */}
+              <div className="rounded-2xl bg-emerald-50 border border-emerald-200/80 p-3 flex items-start gap-2.5">
+                <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div className="text-xs text-emerald-950">
+                  <span className="font-extrabold block text-emerald-900">
+                    {paymentMethod === "online"
+                      ? `Lock In Your Spot with ${depositPercent}% Down Payment`
+                      : "Zero Prepayment Required"}
+                  </span>
+                  <p className="text-[11px] text-emerald-800 leading-tight mt-0.5">
+                    {paymentMethod === "online"
+                      ? `Pay just ${formatPrice(breakdown.depositAmount)} now to secure your guide. Pay remaining ${formatPrice(breakdown.remainingAmount)} on tour day.`
+                      : `Hold your date with zero deposit. Pay ${formatPrice(tour.price)} in cash or card to your guide upon pickup.`}
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-3.5">
               <div className="pt-1">
                 <TourDeparturesPicker
                   tourId={tour.id}
@@ -351,6 +363,7 @@ export function TourReservationModal({
               </button>
             </form>
           </div>
+        </>
         )}
       </div>
     </div>
