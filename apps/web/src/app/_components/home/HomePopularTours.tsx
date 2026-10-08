@@ -267,7 +267,7 @@ export const HomePopularTours: React.FC<HomePopularToursProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            setBookingModalTour({ id: tour.id, title: tourTitle, price: tour.price });
+                            setBookingModalTour({ id: tour.slug || tour.id, title: tourTitle, price: tour.price });
                           }}
                           aria-label={`Reserve date for ${tourTitle} (${formatPrice(tour.price)})`}
                           className="w-full rounded-xl py-2.5 px-2 text-xs font-black transition-all duration-200 border-2 border-amber-400/60 bg-amber-50 text-amber-950 hover:bg-amber-100 active:scale-98 text-center cursor-pointer shadow-xs"

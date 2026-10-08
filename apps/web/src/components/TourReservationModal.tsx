@@ -7,8 +7,8 @@ import { useCurrency } from "@/lib/currency-context";
 import { useSettings } from "@/lib/settings-context";
 import { calculatePaymentBreakdown } from "@/lib/transfers/policy";
 import { getLocalizedTour } from "@/lib/tours-i18n";
-import { DatePicker } from "@/components/DatePicker";
 import { CustomSelect } from "@/components/CustomSelect";
+import { TourDeparturesPicker } from "@/components/TourDeparturesPicker";
 
 interface TourReservationModalProps {
   tour: { id: string; title: string; price: number } | null;
@@ -30,6 +30,8 @@ export function TourReservationModal({
   const { settings } = useSettings();
 
   const [bookingDate, setBookingDate] = useState(initialDate || "");
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(initialSlotId || null);
+  const [isSlotGuaranteed, setIsSlotGuaranteed] = useState<boolean>(Boolean(isGuaranteed));
   const [bookingGuests, setBookingGuests] = useState(2);
   const [bookingName, setBookingName] = useState("");
   const [bookingPhone, setBookingPhone] = useState("");
@@ -59,7 +61,7 @@ export function TourReservationModal({
           tourId: tour.id,
           tourTitle: tour.title,
           tourDate: bookingDate,
-          slotId: initialSlotId || undefined,
+          slotId: selectedSlotId || initialSlotId || undefined,
           guests: bookingGuests,
           travelerName: bookingName,
           phoneNumber: bookingPhone,
@@ -107,7 +109,7 @@ export function TourReservationModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl bg-white border border-slate-200 animate-scale-up">
+      <div className="relative w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl p-6 sm:p-8 shadow-2xl bg-white border border-slate-200 animate-scale-up">
         <button
           onClick={onClose}
           className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
@@ -146,7 +148,7 @@ export function TourReservationModal({
               <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900">
                 {t.bookingModal.badge}
               </span>
-              {isGuaranteed && (
+              {(isGuaranteed || isSlotGuaranteed || Boolean(selectedSlotId)) && (
                 <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 flex items-center gap-1 border border-emerald-300/60">
                   <ShieldCheck className="h-3 w-3" /> 100% Guaranteed Departure
                 </span>
@@ -177,16 +179,19 @@ export function TourReservationModal({
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  {t.bookingModal.dateLabel}
-                </label>
-                <DatePicker
-                  required
-                  minDate={new Date().toISOString().split("T")[0]}
-                  value={bookingDate}
-                  placeholder={t.bookingModal.dateLabel}
-                  onChange={(val) => setBookingDate(val)}
+              <div className="pt-1">
+                <TourDeparturesPicker
+                  tourId={tour.id}
+                  tourTitle={tour.title}
+                  selectedDate={bookingDate}
+                  onSelectDate={(date: string, slotId?: string | null) => {
+                    setBookingDate(date);
+                    setSelectedSlotId(slotId || null);
+                    if (slotId) {
+                      setIsSlotGuaranteed(true);
+                    }
+                  }}
+                  guestCount={bookingGuests}
                 />
               </div>
 

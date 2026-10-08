@@ -222,13 +222,23 @@ export class TourService {
     const normalized = String(tourIdOrSlug).trim().toLowerCase();
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(normalized);
 
+    const ID_TO_SLUG_MAP: Record<string, string> = {
+      t1: "baku-old-city-walking-tour",
+      t2: "absheron-peninsula-day-trip",
+      t3: "sheki-cultural-journey",
+      t4: "modern-baku-architecture-tour",
+      t5: "gobustan-petroglyphs-mud-volcanoes",
+      t6: "caucasus-mountain-highlands",
+    };
+    const effectiveSlug = ID_TO_SLUG_MAP[normalized] || normalized;
+
     let targetPackageId: string | null = null;
     try {
       if (isUuid) {
         targetPackageId = normalized;
       } else {
         const pkg = await db.query.packages.findFirst({
-          where: eq(packages.slug, normalized),
+          where: eq(packages.slug, effectiveSlug),
         });
         if (pkg) {
           targetPackageId = pkg.id;
